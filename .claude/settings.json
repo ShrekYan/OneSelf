@@ -28,7 +28,8 @@
       "Bash(npx tsc --noEmit)"
     ],
     "ask": ["Bash(git push *)", "Bash(npm install *)", "Bash(npx prisma migrate *)"],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "acceptEdits",
+    "deny": ["Bash(rm -rf *)", "Bash(sudo *)", "Bash(curl *)", "Bash(wget *)", "Read(./.env*)", "Read(./secrets/**)", "Read(./**/credentials*)", "Edit(./.env*)", "Edit(./secrets/**)", "WebFetch"]
   },
   "model": "ark-code-latest",
   "language": "chinese",

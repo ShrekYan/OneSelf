@@ -43,7 +43,7 @@
 - 使用 useLocalObservable 定义局部状态
 - 页面使用 useObserver 监听状态变化
 - 使用 withPersist 进行数据持久化（支持加密）
-- CSS Modules 隔离样式
+- CSS Modules 隔离样式，**导入时使用 `styles` 作为变量名**，不要使用 `style`（容易和 props.style 冲突）
 - Commitlint 规范提交
 - Prettier + ESLint 格式化代码
 
