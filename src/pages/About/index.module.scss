@@ -1,0 +1,105 @@
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.content {
+  padding: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.version {
+  text-align: center;
+  color: #666666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.infoSection {
+  margin-bottom: 24px;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.libraries {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.library {
+  background: #f6f8fa;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.library .name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.library .version {
+  font-size: 12px;
+  color: #666666;
+  font-family: 'Courier New', monospace;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.features li {
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #666666;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.featureIcon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.featureText {
+  flex: 1;
+}
+
+.team {
+  text-align: center;
+  color: #666666;
+  font-size: 14px;
+  padding: 16px;
+  background: #f6f8fa;
+  border-radius: 8px;
+}

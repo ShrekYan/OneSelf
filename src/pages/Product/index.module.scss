@@ -1,0 +1,288 @@
+/**
+ * Product 页面样式表
+ * 包含：搜索栏、筛选栏、商品列表、底部导航等样式
+ */
+
+/* ==================== 容器样式 ==================== */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  padding-bottom: 60px;
+}
+
+/* ==================== 顶部搜索栏 ==================== */
+
+.searchBar {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.searchInputContainer {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  transition: all 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #ff5000;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 80, 0, 0.1);
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ==================== 分类和排序栏 ==================== */
+
+.filterBar {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 分类导航 */
+.categoryNav {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.categoryItem {
+  display: inline-block;
+  padding: 6px 16px;
+  margin-right: 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.active {
+    background-color: #ff5000;
+    color: #ffffff;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+/* ============ 排序下拉菜单 ============ */
+
+.sortDropdown {
+  position: relative;
+}
+
+.sortButton {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+
+  &.active {
+    background-color: #ff5000;
+    color: #ffffff;
+  }
+}
+
+.sortArrow {
+  font-size: 10px;
+  transition: transform 0.3s;
+
+  &.asc {
+    transform: rotate(180deg);
+  }
+}
+
+.sortMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.sortOption {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.active {
+    color: #ff5000;
+    font-weight: 600;
+  }
+}
+
+/* ==================== 商品列表 ==================== */
+
+.productListContainer {
+  padding: 12px;
+}
+
+/* 瀑布流布局 - 使用 CSS Columns */
+.productWaterfall {
+  column-count: 2;
+  column-gap: 12px;
+}
+
+/* ==================== 加载状态 ==================== */
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* 修复全局样式不生效：使用 :global() 语法并确保权重足够 */
+:global(.adm-infinite-scroll) {
+  display: flex !important;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.noMoreContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
+}
+
+.noDataContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.noDataIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.noDataText {
+  font-size: 14px;
+}
+
+/* ==================== 底部导航栏 ==================== */
+
+.bottomNav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  background-color: #ffffff;
+  border-top: 1px solid #f0f0f0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.navIcon {
+  font-size: 20px;
+}
+
+.navText {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+.navItem.active {
+  .navText {
+    color: #ff5000;
+  }
+}
