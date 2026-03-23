@@ -17,26 +17,6 @@ import { loginSchema, type LoginFormData } from './schema';
 
 import style from './index.module.scss';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * 登录页面组件
  * 功能：用户登录、表单验证、记住用户名
