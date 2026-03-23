@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom'
 const Home = lazy(() => import('@/pages/Home'))
 const About = lazy(() => import('@/pages/About'))
 const Login = lazy(() => import('@/pages/Login'))
+const Register = lazy(() => import('@/pages/Register'))
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
 const Product = lazy(() => import('@/pages/Product'))
@@ -18,6 +19,10 @@ const routes = [
   {
     path: '/login',
     element: <Login />
+  },
+  {
+    path: '/register',
+    element: <Register />
   },
   {
     path: '/forgot-password',

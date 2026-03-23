@@ -6,7 +6,7 @@ import { useObserver } from "mobx-react";
 import { useEffectOnce } from "react-use";
 import { useNavigate } from "react-router-dom";
 import useStore from "./useStore";
-import { PAGE_TITLE, LABELS } from "./constant";
+import { PAGE_TITLE, LABELS, ROUTES } from "./constant";
 import {
   getRememberedUsername,
   saveLoginState,
@@ -35,7 +35,8 @@ const Login: React.FC = () => {
     defaultValues: {
       username: "",
       password: "",
-      rememberMe: false
+      rememberMe: false,
+      agreeTerms: false
     }
   });
 
@@ -73,14 +74,14 @@ const Login: React.FC = () => {
         });
 
         // 跳转到首页
-        window.location.href = "/home";
+        navigate("/home");
       } else {
         Toast.show({
           icon: "fail",
           content: "登录失败，请检查用户名和密码"
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("登录错误:", error);
       Toast.show({
         icon: "fail",
@@ -164,7 +165,7 @@ const Login: React.FC = () => {
                 />
                 <a
                   className={style.forgotPassword}
-                  onClick={() => navigate("/forgot-password")}
+                  onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
                 >
                   {LABELS.FORGOT_PASSWORD}
                 </a>
@@ -187,9 +188,55 @@ const Login: React.FC = () => {
             {/* 注册链接 */}
             <div className={style.signUp}>
               <span className={style.signUpText}>还没有账号？</span>
-              <a className={style.signUpLink} href="#">
+              <a
+                className={style.signUpLink}
+                onClick={() => navigate(ROUTES.REGISTER)}
+              >
                 {LABELS.SIGN_UP}
               </a>
+            </div>
+
+            {/* 用户协议和隐私政策勾选 */}
+            <div className={style.termsAgreement}>
+              <Controller
+                name="agreeTerms"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <Checkbox
+                      checked={value}
+                      onChange={onChange}
+                      disabled={store.isLoading || isSubmitting}
+                    >
+                      <span className={style.termsText}>
+                        {LABELS.AGREE_TERMS_PREFIX}{" "}
+                        <a
+                          className={style.termsLink}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(ROUTES.USER_AGREEMENT);
+                          }}
+                        >
+                          {LABELS.USER_AGREEMENT}
+                        </a>
+                        {" "}{LABELS.AND}{" "}
+                        <a
+                          className={style.termsLink}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(ROUTES.PRIVACY_POLICY);
+                          }}
+                        >
+                          {LABELS.PRIVACY_POLICY}
+                        </a>
+                      </span>
+                    </Checkbox>
+                    {errors.agreeTerms && (
+                      <div className={style.termsError}>{errors.agreeTerms.message}</div>
+                    )}
+                  </>
+                )}
+              />
             </div>
           </form>
         </div>

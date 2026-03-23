@@ -34,5 +34,38 @@
   "model": "ark-code-latest",
   "language": "chinese",
   "alwaysThinkingEnabled": true,
-  "effortLevel": "medium"
+  "effortLevel": "medium",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys; d=json.load(sys.stdin); cmd=d.get('tool_input',{}).get('command',''); blocked=['rm -rf /','DROP TABLE','DROP DATABASE',':(){:|:&};:']; sys.exit(2) if any(b in cmd for b in blocked) else sys.exit(0)\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); sys.exit(2 if any(x in p for x in ['.env','package-lock.json','.git/']) else 0)\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read f; echo \"$f\" | grep -qE '\\.(ts|tsx)$' && npx prettier --write \"$f\"; exit 0; }"
+          }
+        ]
+      }
+    ]
+  }
 }

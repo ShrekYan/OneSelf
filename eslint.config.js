@@ -46,6 +46,9 @@ export default tseslint.config({
     'quotes': ['error', 'single'],
     'indent': ['error', 2],
     'comma-dangle': ['error', 'always-multiline'],
-    'object-curly-spacing': ['error', 'always']
+    'object-curly-spacing': ['error', 'always'],
+
+    // 禁止多个空行限制：最多允许 1 行连续空行
+    'no-multiple-empty-lines': ['warn', { max: 1 }]
   }
 })

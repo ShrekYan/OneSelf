@@ -15,7 +15,12 @@ export const loginSchema = z.object({
     .min(6, "密码至少需要6个字符")
     .max(20, "密码不能超过20个字符")
     .trim(),
-  rememberMe: z.boolean()
+  rememberMe: z.boolean(),
+  agreeTerms: z
+    .boolean()
+    .refine(val => val === true, {
+      message: "请阅读并同意用户协议和隐私政策"
+    })
 });
 
 /**

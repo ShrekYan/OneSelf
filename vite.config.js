@@ -4,7 +4,6 @@ import path from 'path';
 import checker from 'vite-plugin-checker';
 import { viteVConsole } from 'vite-plugin-vconsole';
 import removeConsole from 'vite-plugin-remove-console';
-import compression from 'vite-plugin-compression2';
 //import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig(function (_a) {
     var mode = _a.mode;
@@ -32,11 +31,11 @@ export default defineConfig(function (_a) {
             }),
             // 移除控制台输出（生产模式）
             removeConsole(),
-            // 压缩插件
-            compression({
-                algorithm: 'gzip',
-                threshold: 10240
-            }),
+            // // 压缩插件
+            // compression({
+            //   algorithm: 'gzip' as const,
+            //   threshold: 10240
+            // }),
             // // 打包分析
             // visualizer({
             //   filename: 'stats.html',
