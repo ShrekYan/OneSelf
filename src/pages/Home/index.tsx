@@ -1,24 +1,24 @@
-import React from "react";
-import { Button, Toast, Space } from "antd-mobile";
-import { useObserver } from "mobx-react";
-import useStore from "./useStore";
-import { useEffectOnce } from "react-use";
-import { HomeConst, FeatureList, CommandList } from "./constant";
-import { formatCommand, navigateTo } from "./handle";
-import style from "./index.module.scss";
+import React from 'react';
+import { Button, Toast, Space } from 'antd-mobile';
+import { useObserver } from 'mobx-react';
+import useStore from './useStore';
+import { useEffectOnce } from 'react-use';
+import { HomeConst, FeatureList, CommandList } from './constant';
+import { formatCommand, navigateTo } from './handle';
+import style from './index.module.scss';
 
 const Home: React.FC = () => {
   const store = useStore();
 
   useEffectOnce(() => {
-    console.log("Home 页面初始化");
+    console.log('Home 页面初始化');
   });
 
   const handleTestClick = async () => {
     await store.handleTestClick();
     Toast.show({
-      icon: "success",
-      content: "加载完成！"
+      icon: 'success',
+      content: '加载完成！',
     });
   };
 
@@ -67,10 +67,7 @@ const Home: React.FC = () => {
               >
                 测试加载状态
               </Button>
-              <Button
-                size="large"
-                onClick={() => navigateTo("/about")}
-              >
+              <Button size="large" onClick={() => navigateTo('/about')}>
                 跳转到关于页面
               </Button>
             </Space>
