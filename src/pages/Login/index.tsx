@@ -1,25 +1,25 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Checkbox, Toast } from "antd-mobile";
-import { useObserver } from "mobx-react";
-import { useEffectOnce } from "react-use";
-import { useNavigate } from "react-router-dom";
-import useStore from "./useStore";
-import { PAGE_TITLE, LABELS, ROUTES } from "./constant";
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Input, Button, Checkbox, Toast } from 'antd-mobile';
+import { useObserver } from 'mobx-react';
+import { useEffectOnce } from 'react-use';
+import { useNavigate } from 'react-router-dom';
+import useStore from './useStore';
+import { PAGE_TITLE, LABELS, ROUTES } from './constant';
 import {
   getRememberedUsername,
   saveLoginState,
   saveToken,
-  loginApi
-} from "./handle";
-import { loginSchema, type LoginFormData } from "./schema";
+  loginApi,
+} from './handle';
+import { loginSchema, type LoginFormData } from './schema';
+
+import style from './index.module.scss';
 
 
 
 
-
-import style from "./index.module.scss";
 
 /**
  * 登录页面组件
@@ -34,15 +34,15 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    control
+    control,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
       rememberMe: false,
-      agreeTerms: false
-    }
+      agreeTerms: false,
+    },
   });
 
   // 初始化时恢复记住的用户名
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
     if (rememberedUsername) {
       reset({
         username: rememberedUsername,
-        rememberMe: true
+        rememberMe: true,
       });
     }
   });
@@ -74,23 +74,23 @@ const Login: React.FC = () => {
         saveLoginState(formData);
 
         Toast.show({
-          icon: "success",
-          content: "登录成功！"
+          icon: 'success',
+          content: '登录成功！',
         });
 
         // 跳转到首页
-        navigate("/home");
+        navigate('/home');
       } else {
         Toast.show({
-          icon: "fail",
-          content: "登录失败，请检查用户名和密码"
+          icon: 'fail',
+          content: '登录失败，请检查用户名和密码',
         });
       }
     } catch (error: unknown) {
-      console.error("登录错误:", error);
+      console.error('登录错误:', error);
       Toast.show({
-        icon: "fail",
-        content: "登录失败，请稍后重试"
+        icon: 'fail',
+        content: '登录失败，请稍后重试',
       });
     }
   });
@@ -122,7 +122,9 @@ const Login: React.FC = () => {
                       clearable
                     />
                     {errors.username && (
-                      <div className={style.errorText}>{errors.username.message}</div>
+                      <div className={style.errorText}>
+                        {errors.username.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -145,7 +147,9 @@ const Login: React.FC = () => {
                       clearable
                     />
                     {errors.password && (
-                      <div className={style.errorText}>{errors.password.message}</div>
+                      <div className={style.errorText}>
+                        {errors.password.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -214,20 +218,20 @@ const Login: React.FC = () => {
                       disabled={store.isLoading || isSubmitting}
                     >
                       <span className={style.termsText}>
-                        {LABELS.AGREE_TERMS_PREFIX}{" "}
+                        {LABELS.AGREE_TERMS_PREFIX}{' '}
                         <a
                           className={style.termsLink}
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             navigate(ROUTES.USER_AGREEMENT);
                           }}
                         >
                           {LABELS.USER_AGREEMENT}
-                        </a>
-                        {" "}{LABELS.AND}{" "}
+                        </a>{' '}
+                        {LABELS.AND}{' '}
                         <a
                           className={style.termsLink}
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             navigate(ROUTES.PRIVACY_POLICY);
                           }}
@@ -237,7 +241,9 @@ const Login: React.FC = () => {
                       </span>
                     </Checkbox>
                     {errors.agreeTerms && (
-                      <div className={style.termsError}>{errors.agreeTerms.message}</div>
+                      <div className={style.termsError}>
+                        {errors.agreeTerms.message}
+                      </div>
                     )}
                   </>
                 )}

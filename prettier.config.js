@@ -10,7 +10,6 @@ export default {
   proseWrap: 'never',
   htmlWhitespaceSensitivity: 'strict',
   vueIndentScriptAndStyle: false,
-  maxEmptyLines: 2,
   overrides: [
     {
       files: '*.json',
