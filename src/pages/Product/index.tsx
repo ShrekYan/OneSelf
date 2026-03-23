@@ -13,7 +13,7 @@ import {
   collectProduct,
 } from './handle';
 import { ProductCard } from './components/ProductCard';
-import style from './index.module.scss';
+import styles from './index.module.scss';
 
 /**
  * 商品列表页面组件
@@ -163,7 +163,7 @@ const Product: React.FC = () => {
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement; // target: 点击的目标元素
-      if (!target.closest(`.${style['sort-dropdown']}`)) {
+      if (!target.closest(`.${styles.sortDropdown}`)) {
         setShowSortMenu(false);
       }
     };
@@ -178,24 +178,21 @@ const Product: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={style.container}>
+      <div className={styles.container}>
         {/* 顶部搜索栏 */}
-        <div className={style['search-bar']}>
-          <div className={style['search-input-container']}>
-            <span className={style['search-icon']}>🔍</span>
+        <div className={styles.searchBar}>
+          <div className={styles.searchInputContainer}>
+            <span className={styles.searchIcon}>🔍</span>
             <input
               ref={searchInputRef}
               type="text"
-              className={style['search-input']}
+              className={styles.searchInput}
               placeholder="搜索商品..."
               onChange={handleSearchInputChange}
               value={store.searchKeyword}
             />
             {store.searchKeyword && (
-              <div
-                className={style['clear-button']}
-                onClick={handleClearSearch}
-              >
+              <div className={styles.clearButton} onClick={handleClearSearch}>
                 ✕
               </div>
             )}
@@ -203,14 +200,14 @@ const Product: React.FC = () => {
         </div>
 
         {/* 分类和排序栏 */}
-        <div className={style['filter-bar']}>
-          <div className={style['filter-row']}>
-            <div className={style['category-nav']}>
+        <div className={styles.filterBar}>
+          <div className={styles.filterRow}>
+            <div className={styles.categoryNav}>
               {ProductConst.CATEGORIES.map(category => (
                 <div
                   key={category.id}
-                  className={`${style['category-item']} ${
-                    store.currentCategory === category.id ? style.active : ''
+                  className={`${styles.categoryItem} ${
+                    store.currentCategory === category.id ? styles.active : ''
                   }`}
                   onClick={() => handleCategorySelect(category.id)}
                 >
@@ -218,9 +215,9 @@ const Product: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className={style['sort-dropdown']}>
+            <div className={styles.sortDropdown}>
               <button
-                className={`${style['sort-button']} ${showSortMenu ? style.active : ''}`}
+                className={`${styles.sortButton} ${showSortMenu ? styles.active : ''}`}
                 onClick={handleSortMenuToggle}
               >
                 {
@@ -228,15 +225,15 @@ const Product: React.FC = () => {
                     s => s.id === store.currentSort,
                   )?.name
                 }
-                <span className={style['sort-arrow']}>▼</span>
+                <span className={styles.sortArrow}>▼</span>
               </button>
               {showSortMenu && (
-                <div className={style['sort-menu']}>
+                <div className={styles.sortMenu}>
                   {ProductConst.SORT_OPTIONS.map(option => (
                     <div
                       key={option.id}
-                      className={`${style['sort-option']} ${
-                        store.currentSort === option.id ? style.active : ''
+                      className={`${styles.sortOption} ${
+                        store.currentSort === option.id ? styles.active : ''
                       }`}
                       onClick={() => handleSortSelect(option.id)}
                     >
@@ -250,7 +247,7 @@ const Product: React.FC = () => {
         </div>
 
         {/* 商品列表容器 */}
-        <div className={style['product-list-container']}>
+        <div className={styles.productListContainer}>
           <PullToRefresh
             onRefresh={async () => {
               store.setRefreshing(true);
@@ -263,13 +260,13 @@ const Product: React.FC = () => {
           >
             {/* 加载中状态 */}
             {store.loading && store.page === 1 ? (
-              <div className={style['loading-container']}>
+              <div className={styles.loadingContainer}>
                 <Loading color="primary" />
               </div>
             ) : /* 无数据状态 */ store.productList.length === 0 ? (
-              <div className={style['no-data-container']}>
-                <div className={style['no-data-icon']}>🛍️</div>
-                <div className={style['no-data-text']}>暂无商品</div>
+              <div className={styles.noDataContainer}>
+                <div className={styles.noDataIcon}>🛍️</div>
+                <div className={styles.noDataText}>暂无商品</div>
               </div>
             ) : (
               <InfiniteScroll
@@ -280,7 +277,7 @@ const Product: React.FC = () => {
                 threshold={100}
               >
                 {/* 商品瀑布流列表 */}
-                <div className={style['product-waterfall']}>
+                <div className={styles.productWaterfall}>
                   {store.productList.map(product => (
                     <ProductCard
                       key={product.id}
@@ -294,7 +291,7 @@ const Product: React.FC = () => {
 
                 {/* 加载更多状态 */}
                 {store.loadingMore && (
-                  <div className={style['loading-container']}>
+                  <div className={styles.loadingContainer}>
                     <Loading color="primary" />
                     <span style={{ marginLeft: 8 }}>加载中...</span>
                   </div>
@@ -302,7 +299,7 @@ const Product: React.FC = () => {
 
                 {/* 没有更多数据提示 */}
                 {!store.hasMore && store.productList.length > 0 && (
-                  <div className={style['no-more-container']}>
+                  <div className={styles.noMoreContainer}>
                     —— 没有更多商品了 ——
                   </div>
                 )}
@@ -312,15 +309,15 @@ const Product: React.FC = () => {
         </div>
 
         {/* 底部导航栏 */}
-        <div className={style['bottom-nav']}>
+        <div className={styles.bottomNav}>
           {ProductConst.NAVIGATION_ITEMS.map(item => (
             <div
               key={item.id}
-              className={`${style['nav-item']} ${store.currentNav === item.id ? style.active : ''}`}
+              className={`${styles.navItem} ${store.currentNav === item.id ? styles.active : ''}`}
               onClick={() => handleNavClick(item.id)}
             >
-              <span className={style['nav-icon']}>{item.icon}</span>
-              <span className={style['nav-text']}>{item.name}</span>
+              <span className={styles.navIcon}>{item.icon}</span>
+              <span className={styles.navText}>{item.name}</span>
             </div>
           ))}
         </div>

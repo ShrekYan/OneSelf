@@ -7,7 +7,7 @@
   padding: 32px;
 }
 
-.register-box {
+.registerBox {
   background: rgb(255 255 255 / 95%);
   border-radius: 24px;
   padding: 48px 32px;
@@ -40,27 +40,27 @@
   gap: 20px;
 }
 
-.form-item {
+.formItem {
   position: relative;
 }
 
-.error-text {
+.errorText {
   font-size: 12px;
   color: #ff4d4f;
   margin-top: 4px;
   padding-left: 4px;
 }
 
-.verify-code-row {
+.verifyCodeRow {
   display: flex;
   gap: 12px;
   align-items: flex-end;
 
-  .verify-code-input {
+  .verifyCodeInput {
     flex: 1;
   }
 
-  .code-button {
+  .codeButton {
     flex-shrink: 0;
     white-space: nowrap;
   }
@@ -85,17 +85,17 @@
   }
 }
 
-.login-link {
+.loginLink {
   text-align: center;
   margin-top: 8px;
 }
 
-.login-text {
+.loginText {
   font-size: 14px;
   color: #666;
 }
 
-.login-link-anchor {
+.loginLinkAnchor {
   font-size: 14px;
   color: #1890ff;
   text-decoration: none;

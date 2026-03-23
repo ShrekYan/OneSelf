@@ -10,7 +10,8 @@ import style from './index.module.scss';
 
 /**
  * 首页 - 项目欢迎页面
- * @description 展示项目技术特性列表、开发命令，演示 MobX 异步加载状态管理和路由跳转
+ * @description 展示项目技术特性列表、开发命令，
+ * 演示 MobX 异步加载状态管理和路由跳转
  */
 const Home: React.FC = observer(() => {
   const store = useStore();
@@ -58,8 +59,8 @@ const Home: React.FC = observer(() => {
           <ul className={style.features}>
             {FeatureList.map((feature, index) => (
               <li key={index}>
-                <span className={style['feature-icon']}>{feature.icon}</span>
-                <span className={style['feature-text']}>{feature.text}</span>
+                <span className={style.featureIcon}>{feature.icon}</span>
+                <span className={style.featureText}>{feature.text}</span>
               </li>
             ))}
           </ul>
@@ -68,9 +69,9 @@ const Home: React.FC = observer(() => {
         {/* 开发命令卡片 - 展示常用开发命令说明 */}
         <div className={style.card}>
           <h2>开发命令</h2>
-          <div className={style['command-list']}>
+          <div className={style.commandList}>
             {CommandList.map((cmd, index) => (
-              <div key={index} className={style['code-block']}>
+              <div key={index} className={style.codeBlock}>
                 <div className={style.command}>{cmd.command}</div>
                 <div className={style.description}>{cmd.description}</div>
               </div>

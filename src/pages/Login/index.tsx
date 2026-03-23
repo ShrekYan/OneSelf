@@ -15,7 +15,7 @@ import {
 } from './handle';
 import { loginSchema, type LoginFormData } from './schema';
 
-import style from './index.module.scss';
+import styles from './index.module.scss';
 
 /**
  * 登录页面组件
@@ -93,18 +93,18 @@ const Login: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={style.container}>
-        <div className={style['login-box']}>
+      <div className={styles.container}>
+        <div className={styles.loginBox}>
           {/* 页面头部 */}
-          <div className={style.header}>
-            <div className={style.logo}>🔐</div>
-            <h1 className={style.title}>{PAGE_TITLE}</h1>
+          <div className={styles.header}>
+            <div className={styles.logo}>🔐</div>
+            <h1 className={styles.title}>{PAGE_TITLE}</h1>
           </div>
 
           {/* 登录表单 */}
-          <form className={style.form} onSubmit={handleLogin}>
+          <form className={styles.form} onSubmit={handleLogin}>
             {/* 用户名输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="username"
                 control={control}
@@ -118,7 +118,7 @@ const Login: React.FC = () => {
                       clearable
                     />
                     {errors.username && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.username.message}
                       </div>
                     )}
@@ -128,7 +128,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* 密码输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="password"
                 control={control}
@@ -143,7 +143,7 @@ const Login: React.FC = () => {
                       clearable
                     />
                     {errors.password && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.password.message}
                       </div>
                     )}
@@ -153,8 +153,8 @@ const Login: React.FC = () => {
             </div>
 
             {/* 记住我 */}
-            <div className={style['form-item']}>
-              <div className={style['remember-me']}>
+            <div className={styles.formItem}>
+              <div className={styles.rememberMe}>
                 <Controller
                   name="rememberMe"
                   control={control}
@@ -169,7 +169,7 @@ const Login: React.FC = () => {
                   )}
                 />
                 <a
-                  className={style['forgot-password']}
+                  className={styles.forgotPassword}
                   onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
                 >
                   {LABELS.FORGOT_PASSWORD}
@@ -178,7 +178,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* 登录按钮 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Button
                 type="submit"
                 color="primary"
@@ -191,10 +191,10 @@ const Login: React.FC = () => {
             </div>
 
             {/* 注册链接 */}
-            <div className={style['sign-up']}>
-              <span className={style['sign-up-text']}>还没有账号？</span>
+            <div className={styles.signUp}>
+              <span className={styles.signUpText}>还没有账号？</span>
               <a
-                className={style['sign-up-link']}
+                className={styles.signUpLink}
                 onClick={() => navigate(ROUTES.REGISTER)}
               >
                 {LABELS.SIGN_UP}
@@ -202,7 +202,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* 用户协议和隐私政策勾选 */}
-            <div className={style['terms-agreement']}>
+            <div className={styles.termsAgreement}>
               <Controller
                 name="agreeTerms"
                 control={control}
@@ -213,10 +213,10 @@ const Login: React.FC = () => {
                       onChange={onChange}
                       disabled={store.isLoading || isSubmitting}
                     >
-                      <span className={style['terms-text']}>
+                      <span className={styles.termsText}>
                         {LABELS.AGREE_TERMS_PREFIX}{' '}
                         <a
-                          className={style['terms-link']}
+                          className={styles.termsLink}
                           onClick={e => {
                             e.stopPropagation();
                             navigate(ROUTES.USER_AGREEMENT);
@@ -226,7 +226,7 @@ const Login: React.FC = () => {
                         </a>{' '}
                         {LABELS.AND}{' '}
                         <a
-                          className={style['terms-link']}
+                          className={styles.termsLink}
                           onClick={e => {
                             e.stopPropagation();
                             navigate(ROUTES.PRIVACY_POLICY);
@@ -237,7 +237,7 @@ const Login: React.FC = () => {
                       </span>
                     </Checkbox>
                     {errors.agreeTerms && (
-                      <div className={style['terms-error']}>
+                      <div className={styles.termsError}>
                         {errors.agreeTerms.message}
                       </div>
                     )}

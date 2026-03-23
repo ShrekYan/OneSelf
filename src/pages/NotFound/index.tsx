@@ -5,7 +5,7 @@ import useStore from './useStore';
 import { useEffectOnce } from 'react-use';
 import { NotFoundConst } from './constant';
 import { navigateBack, navigateToHome } from './handle';
-import style from './index.module.scss';
+import styles from './index.module.scss';
 
 const NotFound: React.FC = () => {
   const store = useStore();
@@ -15,12 +15,12 @@ const NotFound: React.FC = () => {
   });
 
   return useObserver(() => (
-    <div className={style.container}>
-      <div className={style.content}>
-        <div className={style.icon}>{NotFoundConst.ERROR_ICONS.NOT_FOUND}</div>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.icon}>{NotFoundConst.ERROR_ICONS.NOT_FOUND}</div>
         <h1>{store.errorCode}</h1>
-        <p className={style['error-title']}>{store.errorTitle}</p>
-        <p className={style['error-message']}>{store.errorMessage}</p>
+        <p className={styles.errorTitle}>{store.errorTitle}</p>
+        <p className={styles.errorMessage}>{store.errorMessage}</p>
 
         <Space block>
           <Button color="primary" size="large" onClick={navigateBack}>

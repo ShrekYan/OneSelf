@@ -8,7 +8,7 @@ import useStore from './useStore';
 import { PAGE_TITLE, LABELS, REGEX } from './constant';
 import { sendVerifyCodeApi, registerApi, saveToken } from './handle';
 import { registerSchema, type RegisterFormData } from './schema';
-import style from './index.module.scss';
+import styles from './index.module.scss';
 
 /**
  * 注册页面组件
@@ -113,18 +113,18 @@ const Register: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={style.container}>
-        <div className={style['register-box']}>
+      <div className={styles.container}>
+        <div className={styles.registerBox}>
           {/* 页面头部 */}
-          <div className={style.header}>
-            <div className={style.logo}>📝</div>
-            <h1 className={style.title}>{PAGE_TITLE}</h1>
+          <div className={styles.header}>
+            <div className={styles.logo}>📝</div>
+            <h1 className={styles.title}>{PAGE_TITLE}</h1>
           </div>
 
           {/* 注册表单 */}
-          <form className={style.form} onSubmit={handleRegister}>
+          <form className={styles.form} onSubmit={handleRegister}>
             {/* 用户名输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="username"
                 control={control}
@@ -138,7 +138,7 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.username && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.username.message}
                       </div>
                     )}
@@ -148,7 +148,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 手机号输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="phone"
                 control={control}
@@ -164,7 +164,7 @@ const Register: React.FC = () => {
                       maxLength={11}
                     />
                     {errors.phone && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.phone.message}
                       </div>
                     )}
@@ -174,9 +174,9 @@ const Register: React.FC = () => {
             </div>
 
             {/* 验证码输入框 + 发送按钮 */}
-            <div className={style['form-item']}>
-              <div className={style['verify-code-row']}>
-                <div className={style['verify-code-input']}>
+            <div className={styles.formItem}>
+              <div className={styles.verifyCodeRow}>
+                <div className={styles.verifyCodeInput}>
                   <Controller
                     name="verifyCode"
                     control={control}
@@ -192,7 +192,7 @@ const Register: React.FC = () => {
                           maxLength={6}
                         />
                         {errors.verifyCode && (
-                          <div className={style['error-text']}>
+                          <div className={styles.errorText}>
                             {errors.verifyCode.message}
                           </div>
                         )}
@@ -201,7 +201,7 @@ const Register: React.FC = () => {
                   />
                 </div>
                 <Button
-                  className={style['code-button']}
+                  className={styles.codeButton}
                   color="primary"
                   size="large"
                   disabled={
@@ -221,7 +221,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 密码输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="password"
                 control={control}
@@ -236,7 +236,7 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.password && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.password.message}
                       </div>
                     )}
@@ -246,7 +246,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 确认密码输入框 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Controller
                 name="confirmPassword"
                 control={control}
@@ -261,7 +261,7 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.confirmPassword && (
-                      <div className={style['error-text']}>
+                      <div className={styles.errorText}>
                         {errors.confirmPassword.message}
                       </div>
                     )}
@@ -271,8 +271,8 @@ const Register: React.FC = () => {
             </div>
 
             {/* 用户协议 */}
-            <div className={style['form-item']}>
-              <div className={style.agreement}>
+            <div className={styles.formItem}>
+              <div className={styles.agreement}>
                 <Controller
                   name="agreement"
                   control={control}
@@ -296,14 +296,14 @@ const Register: React.FC = () => {
                 </span>
               </div>
               {errors.agreement && (
-                <div className={style['error-text']}>
+                <div className={styles.errorText}>
                   {errors.agreement.message}
                 </div>
               )}
             </div>
 
             {/* 注册按钮 */}
-            <div className={style['form-item']}>
+            <div className={styles.formItem}>
               <Button
                 type="submit"
                 color="primary"
@@ -316,12 +316,10 @@ const Register: React.FC = () => {
             </div>
 
             {/* 去登录链接 */}
-            <div className={style['login-link']}>
-              <span className={style['login-text']}>
-                {LABELS.LOGIN_PREFIX}，
-              </span>
+            <div className={styles.loginLink}>
+              <span className={styles.loginText}>{LABELS.LOGIN_PREFIX}，</span>
               <a
-                className={style['login-link-anchor']}
+                className={styles.loginLinkAnchor}
                 href="#"
                 onClick={e => {
                   e.preventDefault();

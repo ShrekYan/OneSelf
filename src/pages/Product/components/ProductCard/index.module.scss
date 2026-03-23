@@ -23,7 +23,7 @@
 
 /* ==================== 图片区域 ==================== */
 
-.image-container {
+.imageContainer {
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -31,7 +31,7 @@
   background-color: #f5f5f5;
 }
 
-.image-wrapper {
+.imageWrapper {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,7 +39,7 @@
   height: 100%;
 }
 
-.discount-badge {
+.discountBadge {
   position: absolute;
   top: 8px;
   left: 8px;
@@ -107,13 +107,13 @@
 
 /* ==================== 价格区域 ==================== */
 
-.price-container {
+.priceContainer {
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
 
-.price-symbol {
+.priceSymbol {
   font-size: 14px;
   color: #ff5000;
   font-weight: 600;
@@ -125,7 +125,7 @@
   font-weight: 700;
 }
 
-.original-price {
+.originalPrice {
   font-size: 12px;
   color: #999;
   text-decoration: line-through;
@@ -141,19 +141,19 @@
   border-top: 1px solid #f5f5f5;
 }
 
-.sales-info {
+.salesInfo {
   font-size: 12px;
   color: #999;
 }
 
 /* ==================== 操作按钮 ==================== */
 
-.action-buttons {
+.actionButtons {
   display: flex;
   gap: 8px;
 }
 
-.action-button {
+.actionButton {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -173,7 +173,7 @@
   }
 }
 
-.cart-button {
+.cartButton {
   background-color: #ff5000;
   color: #fff;
 

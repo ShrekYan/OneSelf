@@ -1,26 +1,26 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import checker from 'vite-plugin-checker'
-import { viteVConsole } from 'vite-plugin-vconsole'
-import removeConsole from 'vite-plugin-remove-console'
-import compression from 'vite-plugin-compression2'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import checker from 'vite-plugin-checker';
+import { viteVConsole } from 'vite-plugin-vconsole';
+import removeConsole from 'vite-plugin-remove-console';
+// import compression from 'vite-plugin-compression2'
 //import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '')
+  const env = loadEnv(mode, '.', '');
 
   return {
     plugins: [
       react({
         babel: {
-          plugins: ['babel-plugin-react-compiler']
-        }
+          plugins: ['babel-plugin-react-compiler'],
+        },
       }),
 
       // TypeScript 检查
       checker({
-        typescript: true
+        typescript: true,
       }),
 
       // VConsole 插件（开发模式）
@@ -30,8 +30,8 @@ export default defineConfig(({ mode }) => {
         enabled: mode.includes('dev'),
         config: {
           maxLogNumber: 1000,
-          theme: 'dark'
-        }
+          theme: 'dark',
+        },
       }),
 
       // 移除控制台输出（生产模式）
@@ -61,22 +61,23 @@ export default defineConfig(({ mode }) => {
         '@/assets': path.resolve(__dirname, './src/assets'),
         '@/styles': path.resolve(__dirname, './src/styles'),
         '@/api': path.resolve(__dirname, './src/api'),
-        '@/types': path.resolve(__dirname, './src/types')
-      }
+        '@/types': path.resolve(__dirname, './src/types'),
+      },
     },
 
     css: {
       modules: {
-        generateScopedName: '[name]__[local]___[hash:base64:5]'
+        generateScopedName: '[name]__[local]___[hash:base64:5]',
+        localsConvention: 'camelCase',
       },
       preprocessorOptions: {
         scss: {
-          additionalData: `@import "@/styles/variables.scss";`
-        }
+          additionalData: `@import "@/styles/variables.scss";`,
+        },
       },
       postcss: {
-        plugins: []
-      }
+        plugins: [],
+      },
     },
 
     server: {
@@ -87,9 +88,9 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: env.VITE_API_BASE_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
-        }
-      }
+          rewrite: path => path.replace(/^\/api/, ''),
+        },
+      },
     },
 
     build: {
@@ -102,14 +103,14 @@ export default defineConfig(({ mode }) => {
           manualChunks: {
             vendor: ['react', 'react-dom'],
             antd: ['antd-mobile'],
-            utils: ['dayjs', 'axios', 'numeral']
-          }
-        }
-      }
+            utils: ['dayjs', 'axios', 'numeral'],
+          },
+        },
+      },
     },
 
     optimizeDeps: {
-      include: ['react', 'react-dom', 'antd-mobile', 'dayjs']
-    }
-  }
-})
+      include: ['react', 'react-dom', 'antd-mobile', 'dayjs'],
+    },
+  };
+});
