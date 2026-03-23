@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 允许通过环境变量跳过检查
+# 使用方式: SKIP_PRE_PUSH=1 git push
+if [ "$SKIP_PRE_PUSH" = "1" ]; then
+  echo "ℹ️  Skipping pre-push code review and security audit (SKIP_PRE_PUSH=1)"
+  exit 0
+fi
+
+# 代码质量审查和安全审计
+echo "Running code-reviewer and security-auditor agents in parallel..."
+
+# 创建临时文件用于存储 agent 输出
+REVIEW_RESULT_FILE=$(mktemp)
+AUDIT_RESULT_FILE=$(mktemp)
+
+# 并行运行 agent
+claude --agent code-reviewer -p "审查本次提交(staged changes)的代码质量。请根据 .claude/agents/code-reviewer.md 中的规范进行审查。如果代码符合规范，请回复 'APPROVE'；如果发现任何不符合规范或有风险的地方，请以 'REJECT' 开头并详细说明原因。" > "$REVIEW_RESULT_FILE" &
+claude --agent security-auditor -p "对本次提交(staged changes)的代码进行安全审计。请根据 .claude/agents/security-auditor.md 中的规范进行审计。如果代码安全，请回复 'APPROVE'；如果发现安全隐患，请以 'REJECT' 开头并详细说明原因。" > "$AUDIT_RESULT_FILE" &
+
+# 等待所有后台任务完成
+wait
+
+# 检查结果
+REVIEW_CONTENT=$(cat "$REVIEW_RESULT_FILE")
+AUDIT_CONTENT=$(cat "$AUDIT_RESULT_FILE")
+
+# 清理临时文件
+rm "$REVIEW_RESULT_FILE" "$AUDIT_RESULT_FILE"
+
+REVIEW_PASSED=false
+if echo "$REVIEW_CONTENT" | grep -q "APPROVE"; then
+    REVIEW_PASSED=true
+fi
+
+AUDIT_PASSED=false
+if echo "$AUDIT_CONTENT" | grep -q "APPROVE"; then
+    AUDIT_PASSED=true
+fi
+
+# 根据结果决定是否中止 push
+if [ "$REVIEW_PASSED" = "false" ]; then
+    echo "Code review failed! Reason:"
+    echo "$REVIEW_CONTENT"
+fi
+
+if [ "$AUDIT_PASSED" = "false" ]; then
+    echo "Security audit failed! Reason:"
+    echo "$AUDIT_CONTENT"
+fi
+
+if [ "$REVIEW_PASSED" = "false" ] || [ "$AUDIT_PASSED" = "false" ]; then
+    exit 1
+fi
+
+echo "Code review and security audit passed!"

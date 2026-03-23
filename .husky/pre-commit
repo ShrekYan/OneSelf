@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-
+# 对暂存文件进行代码格式化和检查
 npx lint-staged
+
+# TypeScript 类型检查
+echo "Running TypeScript type check..."
+npx tsc --noEmit --pretty
