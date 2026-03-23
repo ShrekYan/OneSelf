@@ -1,54 +1,56 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
 
-export default tseslint.config({
-  extends: [
-    js.configs.recommended,
-    ...tseslint.configs.recommended,
-    'prettier'
-  ],
-  files: ['**/*.{ts,tsx}'],
-  ignores: ['dist'],
-  languageOptions: {
-    ecmaVersion: 2020,
-    globals: globals.browser,
-    parserOptions: {
-      project: './tsconfig.json'
-    }
+export default tseslint.config(
+  // 1. Global ignores
+  {
+    ignores: ['dist', 'eslint.config.js'],
   },
-  plugins: {
-    'react-hooks': reactHooks,
-    'react-refresh': reactRefresh
+
+  // 2. ESLint recommended rules
+  js.configs.recommended,
+
+  // 3. TypeScript recommended rules that require type-checking
+  ...tseslint.configs.recommendedTypeChecked,
+
+  // 4. Configuration to provide tsconfig.json path for type-aware rules
+  {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
   },
-  rules: {
-    // TypeScript 规则
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/ban-types': 'warn',
 
-    // React 规则
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true }
-    ],
+  // 5. React specific rules
+  {
+    files: ['**/*.{ts,tsx}'],
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    },
+  },
 
-    // 其他规则
-    'no-console': 'warn',
-    'no-debugger': 'error',
-    'eqeqeq': ['error', 'always'],
-    'semi': ['error', 'always'],
-    'quotes': ['error', 'single'],
-    'indent': ['error', 2],
-    'comma-dangle': ['error', 'always-multiline'],
-    'object-curly-spacing': ['error', 'always'],
+  // 6. Other custom rules (optional, as many are covered by recommended)
+  {
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-debugger': 'error',
+      'eqeqeq': ['error', 'always'],
+      '@typescript-eslint/no-misused-promises': 'off',
+    },
+  },
 
-    // 禁止多个空行限制：最多允许 1 行连续空行
-    'no-multiple-empty-lines': ['warn', { max: 1 }]
-  }
-})
+  // 7. Prettier config must be last to override other formatting rules
+  prettierConfig,
+);
