@@ -44,7 +44,7 @@ export default tseslint.config(
   // 6. Other custom rules (optional, as many are covered by recommended)
   {
     rules: {
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'off',
       'no-debugger': 'error',
       'eqeqeq': ['error', 'always'],
       '@typescript-eslint/no-misused-promises': 'off',

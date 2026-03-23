@@ -83,7 +83,8 @@ export default Button;
 ### 使用 CSS Modules
 
 - 样式文件名必须是 `index.module.scss`
-- 使用 camelCase 命名 class
+- **SCSS 文件中使用 kebab-case 命名 class**（如 `.search-bar`）
+- **TSX 文件中使用驼峰引用**（`styles.searchBar` 自动映射到 `.search-bar`）
 - 不允许全局样式污染
 
 ```scss
@@ -95,17 +96,20 @@ export default Button;
   padding: 20px;
 }
 
-.text {
-  font-size: 28px; // 基于 750px 设计稿，自动转为 vw
-  color: #333;
+.search-bar {
+  .search-input {
+    // ...
+  }
 }
 ```
 
 ```tsx
-// 在组件中引入
+// 在组件中引入 - 仍使用驼峰引用
 import styles from './index.module.scss';
 
-<div className={styles.container}>{children}</div>
+<div className={styles.container}>
+  <div className={styles.searchBar}>...
+</div>
 ```
 
 ### 像素单位

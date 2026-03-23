@@ -7,13 +7,13 @@
   padding: 32px;
 }
 
-.loginBox {
-  background: rgba(255, 255, 255, 0.95);
+.login-box {
+  background: rgb(255 255 255 / 95%);
   border-radius: 24px;
   padding: 48px 32px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 15%);
   backdrop-filter: blur(10px);
 }
 
@@ -30,7 +30,7 @@
 .title {
   font-size: 28px;
   font-weight: 600;
-  color: #333333;
+  color: #333;
   margin: 0;
 }
 
@@ -40,24 +40,24 @@
   gap: 24px;
 }
 
-.formItem {
+.form-item {
   position: relative;
 }
 
-.errorText {
+.error-text {
   font-size: 12px;
   color: #ff4d4f;
   margin-top: 4px;
   padding-left: 4px;
 }
 
-.rememberMe {
+.remember-me {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.forgotPassword {
+.forgot-password {
   font-size: 14px;
   color: #1890ff;
   text-decoration: none;
@@ -68,17 +68,17 @@
   }
 }
 
-.signUp {
+.sign-up {
   text-align: center;
   margin-top: 8px;
 }
 
-.signUpText {
+.sign-up-text {
   font-size: 14px;
-  color: #666666;
+  color: #666;
 }
 
-.signUpLink {
+.sign-up-link {
   font-size: 14px;
   color: #1890ff;
   text-decoration: none;
@@ -92,7 +92,7 @@
 }
 
 /* 用户协议勾选区域 */
-.termsAgreement {
+.terms-agreement {
   margin-top: 16px;
 
   :global(.adm-checkbox) {
@@ -104,13 +104,13 @@
   }
 }
 
-.termsText {
+.terms-text {
   font-size: 14px;
-  color: #666666;
+  color: #666;
   line-height: 1.4;
 }
 
-.termsLink {
+.terms-link {
   color: #1890ff;
   text-decoration: none;
   font-weight: 500;
@@ -121,7 +121,7 @@
   }
 }
 
-.termsError {
+.terms-error {
   font-size: 12px;
   color: #ff4d4f;
   margin-top: 4px;
@@ -129,12 +129,12 @@
 }
 
 /* 响应式设计 */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .container {
     padding: 16px;
   }
 
-  .loginBox {
+  .login-box {
     padding: 32px 24px;
     border-radius: 16px;
   }
@@ -150,11 +150,9 @@
 
 /* 安全区域适配 */
 .safe-area-top {
-  padding-top: constant(safe-area-inset-top);
   padding-top: env(safe-area-inset-top);
 }
 
 .safe-area-bottom {
-  padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
 }

@@ -5,10 +5,10 @@
 /* ==================== 卡片容器 ==================== */
 
 .card {
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
   transition: all 0.3s;
   break-inside: avoid;
   margin-bottom: 12px;
@@ -23,7 +23,7 @@
 
 /* ==================== 图片区域 ==================== */
 
-.imageContainer {
+.image-container {
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -31,7 +31,7 @@
   background-color: #f5f5f5;
 }
 
-.imageWrapper {
+.image-wrapper {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,13 +39,13 @@
   height: 100%;
 }
 
-.discountBadge {
+.discount-badge {
   position: absolute;
   top: 8px;
   left: 8px;
   padding: 4px 8px;
   background: linear-gradient(135deg, #ff5000, #ff6b00);
-  color: #ffffff;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   border-radius: 4px;
@@ -107,13 +107,13 @@
 
 /* ==================== 价格区域 ==================== */
 
-.priceContainer {
+.price-container {
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
 
-.priceSymbol {
+.price-symbol {
   font-size: 14px;
   color: #ff5000;
   font-weight: 600;
@@ -125,7 +125,7 @@
   font-weight: 700;
 }
 
-.originalPrice {
+.original-price {
   font-size: 12px;
   color: #999;
   text-decoration: line-through;
@@ -141,19 +141,19 @@
   border-top: 1px solid #f5f5f5;
 }
 
-.salesInfo {
+.sales-info {
   font-size: 12px;
   color: #999;
 }
 
 /* ==================== 操作按钮 ==================== */
 
-.actionButtons {
+.action-buttons {
   display: flex;
   gap: 8px;
 }
 
-.actionButton {
+.action-button {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -169,13 +169,13 @@
 
   &:active {
     background-color: #ff5000;
-    color: #ffffff;
+    color: #fff;
   }
 }
 
-.cartButton {
+.cart-button {
   background-color: #ff5000;
-  color: #ffffff;
+  color: #fff;
 
   &:active {
     background-color: #ff6b00;
@@ -184,7 +184,7 @@
 
 /* ==================== 响应式设计 ==================== */
 
-@media (max-width: 375px) {
+@media (width <= 375px) {
   .title {
     font-size: 13px;
   }
@@ -194,7 +194,7 @@
   }
 }
 
-@media (max-width: 320px) {
+@media (width <= 320px) {
   .title {
     font-size: 12px;
   }

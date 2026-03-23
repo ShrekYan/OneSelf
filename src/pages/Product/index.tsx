@@ -1,19 +1,19 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { useObserver } from "mobx-react";
-import { PullToRefresh, InfiniteScroll, Loading, Toast } from "antd-mobile";
-import { useEffectOnce } from "react-use";
-import { debounce } from "es-toolkit";
-import useStore, { SortType } from "./useStore";
-import { ProductConst } from "./constant";
-import { type ProductItem } from "@/types/product";
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useObserver } from 'mobx-react';
+import { PullToRefresh, InfiniteScroll, Loading, Toast } from 'antd-mobile';
+import { useEffectOnce } from 'react-use';
+import { debounce } from 'es-toolkit';
+import useStore, { SortType } from './useStore';
+import { ProductConst } from './constant';
+import { type ProductItem } from '@/types/product';
 import {
   navigateToProductDetail,
   navigateToCart,
   addToCart,
-  collectProduct
-} from "./handle";
-import { ProductCard } from "./components/ProductCard";
-import style from "./index.module.scss";
+  collectProduct,
+} from './handle';
+import { ProductCard } from './components/ProductCard';
+import style from './index.module.scss';
 
 /**
  * 商品列表页面组件
@@ -31,14 +31,14 @@ const Product: React.FC = () => {
         // keyword: 用户输入的搜索关键词
         store.setSearchKeyword(keyword);
         store.clearProductList();
-        store.fetchProductList();
+        void store.fetchProductList();
       }, ProductConst.SEARCH_DEBOUNCE_TIME),
-    []
+    [store],
   );
 
   // 页面初始化时加载商品列表
   useEffectOnce(() => {
-    store.fetchProductList();
+    void store.fetchProductList();
   });
 
   /**
@@ -50,7 +50,7 @@ const Product: React.FC = () => {
       const value = e.target.value; // value: 输入框的当前值
       debouncedSearch(value);
     },
-    [debouncedSearch]
+    [debouncedSearch],
   );
 
   /**
@@ -58,12 +58,12 @@ const Product: React.FC = () => {
    */
   const handleClearSearch = useCallback(() => {
     if (searchInputRef.current) {
-      searchInputRef.current.value = "";
-      store.setSearchKeyword("");
+      searchInputRef.current.value = '';
+      store.setSearchKeyword('');
       store.clearProductList();
-      store.fetchProductList();
+      void store.fetchProductList();
     }
-  }, []);
+  }, [store]);
 
   /**
    * 处理分类选择
@@ -75,16 +75,16 @@ const Product: React.FC = () => {
 
       store.setCurrentCategory(categoryId);
       store.clearProductList();
-      store.fetchProductList();
+      void store.fetchProductList();
     },
-    [store.currentCategory]
+    [store],
   );
 
   /**
    * 切换排序菜单显示状态
    */
   const handleSortMenuToggle = useCallback(() => {
-    setShowSortMenu((prev) => !prev);
+    setShowSortMenu(prev => !prev);
   }, []);
 
   /**
@@ -100,10 +100,10 @@ const Product: React.FC = () => {
 
       store.setCurrentSort(sortId as SortType);
       store.clearProductList();
-      store.fetchProductList();
+      void store.fetchProductList();
       setShowSortMenu(false);
     },
-    [store.currentSort]
+    [store],
   );
 
   /**
@@ -125,7 +125,7 @@ const Product: React.FC = () => {
       e.stopPropagation();
       addToCart(product);
     },
-    []
+    [],
   );
 
   /**
@@ -138,24 +138,27 @@ const Product: React.FC = () => {
       e.stopPropagation();
       collectProduct(product);
     },
-    []
+    [],
   );
 
   /**
    * 处理底部导航点击事件
    * @param navId - 导航项ID
    */
-  const handleNavClick = useCallback((navId: string) => {
-    if (navId === "cart") {
-      navigateToCart();
-      return;
-    }
+  const handleNavClick = useCallback(
+    (navId: string) => {
+      if (navId === 'cart') {
+        navigateToCart();
+        return;
+      }
 
-    store.setCurrentNav(navId);
-    Toast.show({
-      content: `切换到: ${ProductConst.NAVIGATION_ITEMS.find((n) => n.id === navId)?.name}`
-    });
-  }, []);
+      store.setCurrentNav(navId);
+      Toast.show({
+        content: `切换到: ${ProductConst.NAVIGATION_ITEMS.find(n => n.id === navId)?.name}`,
+      });
+    },
+    [store],
+  );
 
   /**
    * 点击页面外部关闭排序菜单
@@ -163,15 +166,15 @@ const Product: React.FC = () => {
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement; // target: 点击的目标元素
-      if (!target.closest(`.${style.sortDropdown}`)) {
+      if (!target.closest(`.${style['sort-dropdown']}`)) {
         setShowSortMenu(false);
       }
     };
 
     if (showSortMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
       return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener('mousedown', handleClickOutside);
       };
     }
   }, [showSortMenu]);
@@ -180,19 +183,22 @@ const Product: React.FC = () => {
     return (
       <div className={style.container}>
         {/* 顶部搜索栏 */}
-        <div className={style.searchBar}>
-          <div className={style.searchInputContainer}>
-            <span className={style.searchIcon}>🔍</span>
+        <div className={style['search-bar']}>
+          <div className={style['search-input-container']}>
+            <span className={style['search-icon']}>🔍</span>
             <input
               ref={searchInputRef}
               type="text"
-              className={style.searchInput}
+              className={style['search-input']}
               placeholder="搜索商品..."
               onChange={handleSearchInputChange}
               value={store.searchKeyword}
             />
             {store.searchKeyword && (
-              <div className={style.clearButton} onClick={handleClearSearch}>
+              <div
+                className={style['clear-button']}
+                onClick={handleClearSearch}
+              >
                 ✕
               </div>
             )}
@@ -200,14 +206,14 @@ const Product: React.FC = () => {
         </div>
 
         {/* 分类和排序栏 */}
-        <div className={style.filterBar}>
-          <div className={style.filterRow}>
-            <div className={style.categoryNav}>
-              {ProductConst.CATEGORIES.map((category) => (
+        <div className={style['filter-bar']}>
+          <div className={style['filter-row']}>
+            <div className={style['category-nav']}>
+              {ProductConst.CATEGORIES.map(category => (
                 <div
                   key={category.id}
-                  className={`${style.categoryItem} ${
-                    store.currentCategory === category.id ? style.active : ""
+                  className={`${style['category-item']} ${
+                    store.currentCategory === category.id ? style.active : ''
                   }`}
                   onClick={() => handleCategorySelect(category.id)}
                 >
@@ -215,21 +221,25 @@ const Product: React.FC = () => {
                 </div>
               ))}
             </div>
-            <div className={style.sortDropdown}>
+            <div className={style['sort-dropdown']}>
               <button
-                className={`${style.sortButton} ${showSortMenu ? style.active : ""}`}
+                className={`${style['sort-button']} ${showSortMenu ? style.active : ''}`}
                 onClick={handleSortMenuToggle}
               >
-                {ProductConst.SORT_OPTIONS.find((s) => s.id === store.currentSort)?.name}
-                <span className={style.sortArrow}>▼</span>
+                {
+                  ProductConst.SORT_OPTIONS.find(
+                    s => s.id === store.currentSort,
+                  )?.name
+                }
+                <span className={style['sort-arrow']}>▼</span>
               </button>
               {showSortMenu && (
-                <div className={style.sortMenu}>
-                  {ProductConst.SORT_OPTIONS.map((option) => (
+                <div className={style['sort-menu']}>
+                  {ProductConst.SORT_OPTIONS.map(option => (
                     <div
                       key={option.id}
-                      className={`${style.sortOption} ${
-                        store.currentSort === option.id ? style.active : ""
+                      className={`${style['sort-option']} ${
+                        store.currentSort === option.id ? style.active : ''
                       }`}
                       onClick={() => handleSortSelect(option.id)}
                     >
@@ -243,26 +253,26 @@ const Product: React.FC = () => {
         </div>
 
         {/* 商品列表容器 */}
-        <div className={style.productListContainer}>
+        <div className={style['product-list-container']}>
           <PullToRefresh
             onRefresh={async () => {
               store.setRefreshing(true);
               await store.refreshProductList();
               Toast.show({
-                icon: "success",
-                content: "刷新成功"
+                icon: 'success',
+                content: '刷新成功',
               });
             }}
           >
             {/* 加载中状态 */}
             {store.loading && store.page === 1 ? (
-              <div className={style.loadingContainer}>
+              <div className={style['loading-container']}>
                 <Loading color="primary" />
               </div>
             ) : /* 无数据状态 */ store.productList.length === 0 ? (
-              <div className={style.noDataContainer}>
-                <div className={style.noDataIcon}>🛍️</div>
-                <div className={style.noDataText}>暂无商品</div>
+              <div className={style['no-data-container']}>
+                <div className={style['no-data-icon']}>🛍️</div>
+                <div className={style['no-data-text']}>暂无商品</div>
               </div>
             ) : (
               <InfiniteScroll
@@ -273,8 +283,8 @@ const Product: React.FC = () => {
                 threshold={100}
               >
                 {/* 商品瀑布流列表 */}
-                <div className={style.productWaterfall}>
-                  {store.productList.map((product) => (
+                <div className={style['product-waterfall']}>
+                  {store.productList.map(product => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -287,7 +297,7 @@ const Product: React.FC = () => {
 
                 {/* 加载更多状态 */}
                 {store.loadingMore && (
-                  <div className={style.loadingContainer}>
+                  <div className={style['loading-container']}>
                     <Loading color="primary" />
                     <span style={{ marginLeft: 8 }}>加载中...</span>
                   </div>
@@ -295,7 +305,7 @@ const Product: React.FC = () => {
 
                 {/* 没有更多数据提示 */}
                 {!store.hasMore && store.productList.length > 0 && (
-                  <div className={style.noMoreContainer}>
+                  <div className={style['no-more-container']}>
                     —— 没有更多商品了 ——
                   </div>
                 )}
@@ -305,15 +315,15 @@ const Product: React.FC = () => {
         </div>
 
         {/* 底部导航栏 */}
-        <div className={style.bottomNav}>
-          {ProductConst.NAVIGATION_ITEMS.map((item) => (
+        <div className={style['bottom-nav']}>
+          {ProductConst.NAVIGATION_ITEMS.map(item => (
             <div
               key={item.id}
-              className={`${style.navItem} ${store.currentNav === item.id ? style.active : ""}`}
+              className={`${style['nav-item']} ${store.currentNav === item.id ? style.active : ''}`}
               onClick={() => handleNavClick(item.id)}
             >
-              <span className={style.navIcon}>{item.icon}</span>
-              <span className={style.navText}>{item.name}</span>
+              <span className={style['nav-icon']}>{item.icon}</span>
+              <span className={style['nav-text']}>{item.name}</span>
             </div>
           ))}
         </div>

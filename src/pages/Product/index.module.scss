@@ -15,20 +15,20 @@
 
 /* ==================== 顶部搜索栏 ==================== */
 
-.searchBar {
+.search-bar {
   padding: 12px 16px;
-  background-color: #ffffff;
+  background-color: #fff;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
-.searchInputContainer {
+.search-input-container {
   position: relative;
 }
 
-.searchIcon {
+.search-icon {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -38,7 +38,7 @@
   pointer-events: none;
 }
 
-.searchInput {
+.search-input {
   width: 100%;
   padding: 10px 12px 10px 40px;
   border: 1px solid #e0e0e0;
@@ -50,12 +50,12 @@
   &:focus {
     outline: none;
     border-color: #ff5000;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 2px rgba(255, 80, 0, 0.1);
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgb(255 80 0 / 10%);
   }
 }
 
-.clearButton {
+.clear-button {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -74,23 +74,23 @@
 
 /* ==================== 分类和排序栏 ==================== */
 
-.filterBar {
+.filter-bar {
   padding: 12px 16px;
-  background-color: #ffffff;
+  background-color: #fff;
   position: sticky;
   top: 56px;
   z-index: 99;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
-.filterRow {
+.filter-row {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 /* 分类导航 */
-.categoryNav {
+.category-nav {
   flex: 1;
   overflow-x: auto;
   white-space: nowrap;
@@ -100,7 +100,7 @@
   }
 }
 
-.categoryItem {
+.category-item {
   display: inline-block;
   padding: 6px 16px;
   margin-right: 8px;
@@ -118,7 +118,7 @@
 
   &.active {
     background-color: #ff5000;
-    color: #ffffff;
+    color: #fff;
   }
 
   &:active {
@@ -128,11 +128,11 @@
 
 /* ============ 排序下拉菜单 ============ */
 
-.sortDropdown {
+.sort-dropdown {
   position: relative;
 }
 
-.sortButton {
+.sort-button {
   padding: 6px 12px;
   border-radius: 16px;
   font-size: 14px;
@@ -147,11 +147,11 @@
 
   &.active {
     background-color: #ff5000;
-    color: #ffffff;
+    color: #fff;
   }
 }
 
-.sortArrow {
+.sort-arrow {
   font-size: 10px;
   transition: transform 0.3s;
 
@@ -160,19 +160,19 @@
   }
 }
 
-.sortMenu {
+.sort-menu {
   position: absolute;
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   z-index: 1000;
   overflow: hidden;
 }
 
-.sortOption {
+.sort-option {
   padding: 12px 20px;
   font-size: 14px;
   color: #333;
@@ -192,19 +192,19 @@
 
 /* ==================== 商品列表 ==================== */
 
-.productListContainer {
+.product-list-container {
   padding: 12px;
 }
 
 /* 瀑布流布局 - 使用 CSS Columns */
-.productWaterfall {
+.product-waterfall {
   column-count: 2;
   column-gap: 12px;
 }
 
 /* ==================== 加载状态 ==================== */
 
-.loadingContainer {
+.loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -218,7 +218,7 @@
   flex-direction: column;
 }
 
-.noMoreContainer {
+.no-more-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -227,7 +227,7 @@
   font-size: 14px;
 }
 
-.noDataContainer {
+.no-data-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -236,23 +236,23 @@
   color: #999;
 }
 
-.noDataIcon {
+.no-data-icon {
   font-size: 64px;
   margin-bottom: 16px;
 }
 
-.noDataText {
+.no-data-text {
   font-size: 14px;
 }
 
 /* ==================== 底部导航栏 ==================== */
 
-.bottomNav {
+.bottom-nav {
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 8px 0;
-  background-color: #ffffff;
+  background-color: #fff;
   border-top: 1px solid #f0f0f0;
   position: fixed;
   bottom: 0;
@@ -261,7 +261,7 @@
   z-index: 1000;
 }
 
-.navItem {
+.nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -271,18 +271,18 @@
   transition: all 0.3s;
 }
 
-.navIcon {
+.nav-icon {
   font-size: 20px;
 }
 
-.navText {
+.nav-text {
   font-size: 12px;
   color: #999;
   font-weight: 500;
 }
 
-.navItem.active {
-  .navText {
+.nav-item.active {
+  .nav-text {
     color: #ff5000;
   }
 }

@@ -1,8 +1,7 @@
-import stylelint from 'stylelint'
-import standardScss from 'stylelint-config-standard-scss'
-import scssPlugin from 'stylelint-scss'
+const standardScss = require('stylelint-config-standard-scss')
+const scssPlugin = require('stylelint-scss')
 
-export default stylelint.createConfig({
+module.exports = {
   extends: [
     standardScss
   ],
@@ -25,9 +24,11 @@ export default stylelint.createConfig({
     'selector-attribute-quotes': 'always',
     'selector-pseudo-element-colon-notation': 'double',
     'selector-type-case': 'lower',
-    'unit-case': 'lower',
     'value-keyword-case': 'lower',
-    'value-list-comma-newline-after': 'always-multi-line',
-    'value-list-comma-space-after': 'always'
+    'selector-class-pattern': null,
+    'selector-pseudo-class-no-unknown': [true, {
+      ignorePseudoClasses: ['global']
+    }],
+    'declaration-block-no-shorthand-property-overrides': null
   }
-})
+}

@@ -38,9 +38,8 @@ blockquote, q {
   quotes: none;
 }
 
-blockquote:before, blockquote:after,
-q:before, q:after {
-  content: '';
+blockquote::before, blockquote::after,
+q::before, q::after {
   content: none;
 }
 
@@ -63,7 +62,7 @@ button, input, select, textarea {
 
 button {
   cursor: pointer;
-  -webkit-appearance: none;
+  appearance: none;
   -webkit-tap-highlight-color: transparent;
 }
 

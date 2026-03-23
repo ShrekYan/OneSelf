@@ -27,14 +27,26 @@
       "Bash(npm --version)",
       "Bash(npx tsc --noEmit)"
     ],
-    "ask": ["Bash(git push *)", "Bash(npm install *)", "Bash(npx prisma migrate *)"],
-    "defaultMode": "acceptEdits",
-    "deny": ["Bash(rm -rf *)", "Bash(sudo *)", "Bash(curl *)", "Bash(wget *)", "Read(./.env*)", "Read(./secrets/**)", "Read(./**/credentials*)", "Edit(./.env*)", "Edit(./secrets/**)", "WebFetch"]
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Read(./.env*)",
+      "Read(./secrets/**)",
+      "Read(./**/credentials*)",
+      "Edit(./.env*)",
+      "Edit(./secrets/**)",
+      "WebFetch"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(npx prisma migrate *)"
+    ],
+    "defaultMode": "acceptEdits"
   },
   "model": "ark-code-latest",
-  "language": "chinese",
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
   "hooks": {
     "PreToolUse": [
       {
@@ -67,5 +79,12 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": false,
+    "security-guidance@claude-plugins-official": true
+  },
+  "language": "chinese",
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "medium"
 }

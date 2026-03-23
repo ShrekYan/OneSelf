@@ -1,14 +1,14 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Checkbox, Toast } from "antd-mobile";
-import { useObserver } from "mobx-react";
-import { useNavigate } from "react-router-dom";
-import useStore from "./useStore";
-import { PAGE_TITLE, LABELS, REGEX } from "./constant";
-import { sendVerifyCodeApi, registerApi, saveToken } from "./handle";
-import { registerSchema, type RegisterFormData } from "./schema";
-import style from "./index.module.scss";
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Input, Button, Checkbox, Toast } from 'antd-mobile';
+import { useObserver } from 'mobx-react';
+import { useNavigate } from 'react-router-dom';
+import useStore from './useStore';
+import { PAGE_TITLE, LABELS, REGEX } from './constant';
+import { sendVerifyCodeApi, registerApi, saveToken } from './handle';
+import { registerSchema, type RegisterFormData } from './schema';
+import style from './index.module.scss';
 
 /**
  * 注册页面组件
@@ -23,31 +23,35 @@ const Register: React.FC = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     control,
-    watch
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      phone: "",
-      verifyCode: "",
-      password: "",
-      confirmPassword: "",
-      agreement: false
-    }
+      username: '',
+      phone: '',
+      verifyCode: '',
+      password: '',
+      confirmPassword: '',
+      agreement: false,
+    },
   });
 
   // 监听手机号用于发送验证码验证
-  const phoneValue = watch("phone");
+  const phoneValue = watch('phone');
 
   /**
    * 处理发送验证码
    */
   const handleSendCode = async () => {
     // 先验证手机号格式
-    if (!phoneValue || phoneValue.length !== 11 || !REGEX.PHONE.test(phoneValue)) {
+    if (
+      !phoneValue ||
+      phoneValue.length !== 11 ||
+      !REGEX.PHONE.test(phoneValue)
+    ) {
       Toast.show({
-        icon: "fail",
-        content: "请输入正确的手机号码"
+        icon: 'fail',
+        content: '请输入正确的手机号码',
       });
       return;
     }
@@ -56,14 +60,14 @@ const Register: React.FC = () => {
       await store.sendVerifyCode(phoneValue);
       await sendVerifyCodeApi(phoneValue);
       Toast.show({
-        icon: "success",
-        content: "验证码已发送"
+        icon: 'success',
+        content: '验证码已发送',
       });
     } catch (error) {
-      console.error("发送验证码失败:", error);
+      console.error('发送验证码失败:', error);
       Toast.show({
-        icon: "fail",
-        content: "发送验证码失败，请稍后重试"
+        icon: 'fail',
+        content: '发送验证码失败，请稍后重试',
       });
     }
   };
@@ -84,25 +88,25 @@ const Register: React.FC = () => {
         saveToken(apiResult.token);
 
         Toast.show({
-          icon: "success",
-          content: apiResult.message || "注册成功！"
+          icon: 'success',
+          content: apiResult.message || '注册成功！',
         });
 
         // 跳转到首页
         setTimeout(() => {
-          window.location.href = "/home";
+          window.location.href = '/home';
         }, 1000);
       } else {
         Toast.show({
-          icon: "fail",
-          content: apiResult.message || "注册失败，请稍后重试"
+          icon: 'fail',
+          content: apiResult.message || '注册失败，请稍后重试',
         });
       }
     } catch (error) {
-      console.error("注册错误:", error);
+      console.error('注册错误:', error);
       Toast.show({
-        icon: "fail",
-        content: "注册失败，请稍后重试"
+        icon: 'fail',
+        content: '注册失败，请稍后重试',
       });
     }
   });
@@ -110,7 +114,7 @@ const Register: React.FC = () => {
   return useObserver(() => {
     return (
       <div className={style.container}>
-        <div className={style.registerBox}>
+        <div className={style['register-box']}>
           {/* 页面头部 */}
           <div className={style.header}>
             <div className={style.logo}>📝</div>
@@ -120,7 +124,7 @@ const Register: React.FC = () => {
           {/* 注册表单 */}
           <form className={style.form} onSubmit={handleRegister}>
             {/* 用户名输入框 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <Controller
                 name="username"
                 control={control}
@@ -134,7 +138,9 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.username && (
-                      <div className={style.errorText}>{errors.username.message}</div>
+                      <div className={style['error-text']}>
+                        {errors.username.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -142,7 +148,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 手机号输入框 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <Controller
                 name="phone"
                 control={control}
@@ -158,7 +164,9 @@ const Register: React.FC = () => {
                       maxLength={11}
                     />
                     {errors.phone && (
-                      <div className={style.errorText}>{errors.phone.message}</div>
+                      <div className={style['error-text']}>
+                        {errors.phone.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -166,9 +174,9 @@ const Register: React.FC = () => {
             </div>
 
             {/* 验证码输入框 + 发送按钮 */}
-            <div className={style.formItem}>
-              <div className={style.verifyCodeRow}>
-                <div className={style.verifyCodeInput}>
+            <div className={style['form-item']}>
+              <div className={style['verify-code-row']}>
+                <div className={style['verify-code-input']}>
                   <Controller
                     name="verifyCode"
                     control={control}
@@ -184,27 +192,36 @@ const Register: React.FC = () => {
                           maxLength={6}
                         />
                         {errors.verifyCode && (
-                          <div className={style.errorText}>{errors.verifyCode.message}</div>
+                          <div className={style['error-text']}>
+                            {errors.verifyCode.message}
+                          </div>
                         )}
                       </>
                     )}
                   />
                 </div>
                 <Button
-                  className={style.codeButton}
+                  className={style['code-button']}
                   color="primary"
                   size="large"
-                  disabled={store.isLoading || isSubmitting || store.countdown > 0 || store.isSendingCode}
+                  disabled={
+                    store.isLoading ||
+                    isSubmitting ||
+                    store.countdown > 0 ||
+                    store.isSendingCode
+                  }
                   loading={store.isSendingCode}
                   onClick={handleSendCode}
                 >
-                  {store.countdown > 0 ? `${store.countdown}s后重发` : LABELS.SEND_CODE}
+                  {store.countdown > 0
+                    ? `${store.countdown}s后重发`
+                    : LABELS.SEND_CODE}
                 </Button>
               </div>
             </div>
 
             {/* 密码输入框 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <Controller
                 name="password"
                 control={control}
@@ -219,7 +236,9 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.password && (
-                      <div className={style.errorText}>{errors.password.message}</div>
+                      <div className={style['error-text']}>
+                        {errors.password.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -227,7 +246,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 确认密码输入框 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <Controller
                 name="confirmPassword"
                 control={control}
@@ -242,7 +261,9 @@ const Register: React.FC = () => {
                       clearable
                     />
                     {errors.confirmPassword && (
-                      <div className={style.errorText}>{errors.confirmPassword.message}</div>
+                      <div className={style['error-text']}>
+                        {errors.confirmPassword.message}
+                      </div>
                     )}
                   </>
                 )}
@@ -250,7 +271,7 @@ const Register: React.FC = () => {
             </div>
 
             {/* 用户协议 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <div className={style.agreement}>
                 <Controller
                   name="agreement"
@@ -264,29 +285,25 @@ const Register: React.FC = () => {
                   )}
                 />
                 <span>
-                  {LABELS.AGREEMENT}{" "}
-                  <a
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                  >
+                  {LABELS.AGREEMENT}{' '}
+                  <a href="#" onClick={e => e.preventDefault()}>
                     {LABELS.TERMS}
-                  </a>{" "}
-                  和{" "}
-                  <a
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                  >
+                  </a>{' '}
+                  和{' '}
+                  <a href="#" onClick={e => e.preventDefault()}>
                     {LABELS.PRIVACY}
                   </a>
                 </span>
               </div>
               {errors.agreement && (
-                <div className={style.errorText}>{errors.agreement.message}</div>
+                <div className={style['error-text']}>
+                  {errors.agreement.message}
+                </div>
               )}
             </div>
 
             {/* 注册按钮 */}
-            <div className={style.formItem}>
+            <div className={style['form-item']}>
               <Button
                 type="submit"
                 color="primary"
@@ -299,14 +316,16 @@ const Register: React.FC = () => {
             </div>
 
             {/* 去登录链接 */}
-            <div className={style.loginLink}>
-              <span className={style.loginText}>{LABELS.LOGIN_PREFIX}，</span>
+            <div className={style['login-link']}>
+              <span className={style['login-text']}>
+                {LABELS.LOGIN_PREFIX}，
+              </span>
               <a
-                className={style.loginLinkAnchor}
+                className={style['login-link-anchor']}
                 href="#"
-                onClick={(e) => {
+                onClick={e => {
                   e.preventDefault();
-                  navigate("/login");
+                  navigate('/login');
                 }}
               >
                 {LABELS.LOGIN_SUFFIX}

@@ -429,3 +429,171 @@ const sendCode = () => {
 ## 相关组件
 
 - [CountDownMs](../CountDownMs/README.md) - 毫秒级高精度倒计时组件
+
+---
+
+## JSX/React 组件注释规范
+
+### 组件 JSDoc 注释规则
+
+#### 1. 函数组件注释
+
+每个导出的页面组件或公共组件必须添加 JSDoc 注释说明用途：
+
+```tsx
+/**
+ * 首页 - 项目欢迎页面
+ * @description 展示项目技术特性列表、开发命令，演示 MobX 异步加载状态管理和路由跳转
+ */
+const Home: React.FC = observer(() => {
+  // ...
+});
+
+export default Home;
+```
+
+```tsx
+/**
+ * 登录页面
+ * @description 用户通过手机号验证码登录，支持自动跳转回原页面
+ */
+const Login: React.FC = () => {
+  // ...
+};
+```
+
+#### 2. 带 Props 的组件注释
+
+对于有 Props 的公共组件，先在 `interface` 上注释，再在组件上注释：
+
+```tsx
+/**
+ * 商品卡片组件属性
+ */
+interface ProductCardProps {
+  /** 商品ID */
+  id: string;
+  /** 商品名称 */
+  name: string;
+  /** 商品价格（单位：分） */
+  price: number;
+  /** 商品图片URL */
+  image: string;
+  /** 点击卡片回调 */
+  onClick: (id: string) => void;
+  /** 是否禁用 */
+  disabled?: boolean;
+}
+
+/**
+ * 商品卡片 - 展示商品基本信息，支持点击跳转
+ * @example
+ * ```tsx
+ * <ProductCard
+ *   id="1"
+ *   name="商品名称"
+ *   price={1000}
+ *   image="https://example.com/image.jpg"
+ *   onClick={handleClick}
+ * />
+ * ```
+ */
+const ProductCard: React.FC<ProductCardProps> = ({
+  id,
+  name,
+  price,
+  image,
+  onClick,
+  disabled = false,
+}) => {
+  // ...
+};
+```
+
+#### 3. 事件处理函数注释
+
+组件内部复杂的事件处理函数需要添加注释：
+
+```tsx
+const [form] = useForm<LoginForm>();
+
+/**
+ * 提交表单 - 调用登录API，成功后跳转
+ */
+const handleSubmit = async (data: LoginForm) => {
+  // ...
+};
+
+/**
+ * 获取验证码 - 校验手机号，调用发送验证码API
+ */
+const handleSendCode = async () => {
+  // ...
+};
+```
+
+#### 4. 内联注释规则
+
+**JSX 结构中的注释：**
+
+```tsx
+return (
+  <div className={style.container}>
+    {/* 头部区域 - 显示标题和图标 */}
+    <div className={style.header}>
+      <h1>{title}</h1>
+    </div>
+
+    {/* 商品列表 - 下拉加载更多 */}
+    <div className={style.list}>
+      {list.map(item => (
+        <ProductCard key={item.id} {...item} />
+      ))}
+    </div>
+
+    {/* 底部安全区域 - 适配 iPhone 小黑条 */}
+    <div className={style.safeArea} />
+  </div>
+};
+```
+
+**JSX 注释规范：**
+- 使用 `{/* 内容 */}` 格式，不使用 `// 内容` 或 `/* 内容 */`
+- 注释块前后保留一个空格：`{/* 注释 */}` ✅，`{/*注释*/}` ❌
+- 对分块的 JSX 结构添加说明注释，提高可读性
+
+#### 5. 复杂条件渲染注释
+
+条件判断逻辑复杂时，说明判断条件：
+
+```tsx
+{/* 未登录状态 - 显示登录按钮 */}
+{!user && <LoginButton />}
+
+{/* 已登录且有权限 - 显示操作按钮 */}
+{user && hasPermission && <ActionButton />}
+
+{/* 已登录但无权限 - 显示占位提示 */}
+{user && !hasPermission && <NoPermissionTip />}
+```
+
+### JSX 注释检查清单
+
+- [ ] 组件是否有 JSDoc 一句话功能说明？
+- [ ] Props 接口每个字段是否都有注释？
+- [ ] 复杂的事件处理函数是否添加了注释？
+- [ ] JSX 分块结构是否使用 `{/* 注释 */}` 说明？
+- [ ] 复杂条件渲染是否说明判断条件？
+- [ ] 是否删除了注释掉的死代码？
+- [ ] 有没有不必要的废话注释（代码已经说清楚的不用重复注释）？
+
+### 总结
+
+| 注释位置 | 注释方式 | 要求 |
+|----------|----------|------|
+| 组件函数 | JSDoc `/** ... */` | 必须，一句话说明组件用途 |
+| Props 接口 | JSDoc `/** ... */` | 必须，每个字段都要说明 |
+| 组件内部复杂函数 | JSDoc 或行注释 | 复杂函数必须，简单函数可省略 |
+| JSX 分块结构 | JSX 注释 `{/* ... */}` | 推荐，提高可读性 |
+| 复杂条件分支 | 行内/块注释 | 必须，说明判断条件 |
+| 显而易见的代码 | 不需要注释 | - |

@@ -7,13 +7,13 @@
   padding: 32px;
 }
 
-.forgotPasswordBox {
-  background: rgba(255, 255, 255, 0.95);
+.forgot-password-box {
+  background: rgb(255 255 255 / 95%);
   border-radius: 24px;
   padding: 48px 32px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 15%);
   backdrop-filter: blur(10px);
 }
 
@@ -30,13 +30,13 @@
 .title {
   font-size: 28px;
   font-weight: 600;
-  color: #333333;
-  margin: 0 0 8px 0;
+  color: #333;
+  margin: 0 0 8px;
 }
 
 .description {
   font-size: 14px;
-  color: #666666;
+  color: #666;
   margin: 0;
 }
 
@@ -46,37 +46,37 @@
   gap: 24px;
 }
 
-.formItem {
+.form-item {
   position: relative;
 }
 
-.formLabel {
+.form-label {
   font-size: 14px;
-  color: #333333;
+  color: #333;
   font-weight: 500;
   margin-bottom: 8px;
   display: block;
 }
 
-.errorText {
+.error-text {
   font-size: 12px;
   color: #ff4d4f;
   margin-top: 4px;
   padding-left: 4px;
 }
 
-.verificationCodeContainer {
+.verification-code-container {
   display: flex;
   gap: 12px;
   align-items: flex-start;
   flex: 1;
 }
 
-.verificationCodeInput {
+.verification-code-input {
   flex: 1;
 }
 
-.sendCodeButton {
+.send-code-button {
   white-space: nowrap;
   min-width: 120px;
 }
@@ -86,13 +86,13 @@
   text-align: center;
 }
 
-.backToLogin {
+.back-to-login {
   font-size: 14px;
-  color: #666666;
+  color: #666;
   margin-bottom: 16px;
 }
 
-.backToLoginLink {
+.back-to-login-link {
   color: #1890ff;
   text-decoration: none;
   margin-left: 4px;
@@ -106,7 +106,7 @@
 
 .tips {
   font-size: 12px;
-  color: #999999;
+  color: #999;
   text-align: left;
   padding: 12px;
   background: #f5f5f5;
@@ -114,19 +114,19 @@
   line-height: 1.6;
 }
 
-.tipsTitle {
+.tips-title {
   font-weight: 500;
-  color: #666666;
+  color: #666;
   margin-bottom: 4px;
 }
 
 /* 响应式设计 */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .container {
     padding: 16px;
   }
 
-  .forgotPasswordBox {
+  .forgot-password-box {
     padding: 32px 24px;
     border-radius: 16px;
   }
@@ -139,23 +139,21 @@
     font-size: 48px;
   }
 
-  .verificationCodeContainer {
+  .verification-code-container {
     flex: 1;
     flex-direction: column;
   }
 
-  .sendCodeButton {
+  .send-code-button {
     width: 100%;
   }
 }
 
 /* 安全区域适配 */
 .safe-area-top {
-  padding-top: constant(safe-area-inset-top);
   padding-top: env(safe-area-inset-top);
 }
 
 .safe-area-bottom {
-  padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
 }

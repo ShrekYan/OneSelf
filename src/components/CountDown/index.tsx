@@ -54,7 +54,7 @@ const calculateTimeLeft = (targetTime: number): TimeData => {
 
   const days = Math.floor(totalSeconds / (3600 * 24));
   const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const minutes = Math.floor(totalSeconds % 3600) / 60;
   const seconds = totalSeconds % 60;
 
   return {
@@ -80,152 +80,155 @@ const calculateTimeLeft = (targetTime: number): TimeData => {
  * />
  * ```
  */
-export const CountDown = React.memo<CountDownProps>(({
-  targetTime,
-  autoStart = true,
-  format = 'HH:mm:ss',
-  showLeadingZero = true,
-  splitBox = false,
-  onFinish,
-  onTick,
-  className,
-  style,
-}) => {
-  // 存储剩余时间状态
-  const [timeLeft, setTimeLeft] = React.useState<TimeData>(() =>
-    calculateTimeLeft(targetTime)
-  );
+export const CountDown = React.memo<CountDownProps>(
+  ({
+    targetTime,
+    autoStart = true,
+    format = 'HH:mm:ss',
+    showLeadingZero = true,
+    splitBox = false,
+    onFinish,
+    onTick,
+    className,
+    style,
+  }) => {
+    // 存储剩余时间状态
+    const [timeLeft, setTimeLeft] = React.useState<TimeData>(() =>
+      calculateTimeLeft(targetTime),
+    );
 
-  // timer ref
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+    // timer ref
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  /**
-   * 清除计时器
-   */
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
+    /**
+     * 清除计时器
+     */
+    const clearTimer = useCallback(() => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }, []);
 
-  /**
-   * 启动倒计时
-   */
-  const start = useCallback(() => {
-    clearTimer();
+    /**
+     * 启动倒计时
+     */
+    const start = useCallback(() => {
+      clearTimer();
 
-    // 如果已经结束，直接返回
-    if (timeLeft.totalSeconds <= 0) {
-      return;
-    }
+      // 如果已经结束，直接返回
+      if (timeLeft.totalSeconds <= 0) {
+        return;
+      }
 
-    timerRef.current = setInterval(() => {
+      timerRef.current = setInterval(() => {
+        const newTimeLeft = calculateTimeLeft(targetTime);
+        setTimeLeft(newTimeLeft);
+        onTick?.(newTimeLeft);
+
+        // 倒计时结束
+        if (newTimeLeft.totalSeconds <= 0) {
+          clearTimer();
+          onFinish?.();
+        }
+      }, 1000);
+    }, [targetTime, timeLeft.totalSeconds, clearTimer, onFinish, onTick]);
+
+    // 组件挂载时自动开始
+    useEffect(() => {
+      if (autoStart) {
+        start();
+      }
+      return () => clearTimer();
+    }, [autoStart, start, clearTimer]);
+
+    // targetTime 变化时重新计算并重启
+    useEffect(() => {
       const newTimeLeft = calculateTimeLeft(targetTime);
       setTimeLeft(newTimeLeft);
-      onTick?.(newTimeLeft);
 
-      // 倒计时结束
-      if (newTimeLeft.totalSeconds <= 0) {
-        clearTimer();
-        onFinish?.();
+      if (autoStart && newTimeLeft.totalSeconds > 0) {
+        start();
       }
-    }, 1000);
-  }, [targetTime, timeLeft.totalSeconds, clearTimer, onFinish, onTick]);
 
+      return () => clearTimer();
+    }, [targetTime, autoStart, start, clearTimer]);
 
-  // 组件挂载时自动开始
-  useEffect(() => {
-    if (autoStart) {
-      start();
-    }
-    return () => clearTimer();
-  }, [autoStart, start, clearTimer]);
+    /**
+     * 渲染时间部分
+     */
+    const renderTimePart = (value: number, label: string): React.ReactNode => {
+      const displayValue = showLeadingZero ? padZero(value) : value.toString();
 
-  // targetTime 变化时重新计算并重启
-  useEffect(() => {
-    const newTimeLeft = calculateTimeLeft(targetTime);
-    setTimeLeft(newTimeLeft);
-
-    if (autoStart && newTimeLeft.totalSeconds > 0) {
-      start();
-    }
-
-    return () => clearTimer();
-  }, [targetTime, autoStart, start, clearTimer]);
-
-  /**
-   * 渲染时间部分
-   */
-  const renderTimePart = (value: number, label: string): React.ReactNode => {
-    const displayValue = showLeadingZero ? padZero(value) : value.toString();
-
-    if (splitBox) {
-      return (
-        <span className={styles.timeBox}>
-          <span className={styles.timeNumber}>{displayValue}</span>
-          {label && <span className={styles.timeLabel}>{label}</span>}
-        </span>
-      );
-    }
-
-    return <span className={styles.timeText}>{displayValue}</span>;
-  };
-
-  /**
-   * 根据格式渲染倒计时
-   */
-  const renderFormattedTime = (): React.ReactNode => {
-    const { days, hours, minutes, seconds } = timeLeft;
-    const parts: React.ReactNode[] = [];
-
-    // 使用正则替换格式字符串
-    const formatParts = format.match(/(DD|HH|mm|ss|[^DHms]+)/g) || [];
-
-    formatParts.forEach((part) => {
-      switch (part) {
-        case 'DD':
-          if (days > 0 || format.includes('DD')) {
-            parts.push(renderTimePart(days, '天'));
-          }
-          break;
-        case 'HH':
-          parts.push(renderTimePart(hours, '时'));
-          break;
-        case 'mm':
-          parts.push(renderTimePart(minutes, '分'));
-          break;
-        case 'ss':
-          parts.push(renderTimePart(seconds, '秒'));
-          break;
-        default:
-          // 非格式字符直接输出（比如冒号分隔符）
-          if (splitBox) {
-            parts.push(<span className={styles.separator}>{part}</span>);
-          } else {
-            parts.push(<span className={styles.separatorText}>{part}</span>);
-          }
-          break;
+      if (splitBox) {
+        return (
+          <span className={styles['time-box']}>
+            <span className={styles['time-number']}>{displayValue}</span>
+            {label && <span className={styles['time-label']}>{label}</span>}
+          </span>
+        );
       }
-    });
 
-    return parts;
-  };
+      return <span className={styles['time-text']}>{displayValue}</span>;
+    };
 
-  const rootClassName = classNames(
-    styles.container,
-    {
-      [styles.splitBox]: splitBox,
-    },
-    className
-  );
+    /**
+     * 根据格式渲染倒计时
+     */
+    const renderFormattedTime = (): React.ReactNode => {
+      const { days, hours, minutes, seconds } = timeLeft;
+      const parts: React.ReactNode[] = [];
 
-  return (
-    <div className={rootClassName} style={style}>
-      {renderFormattedTime()}
-    </div>
-  );
-});
+      // 使用正则替换格式字符串
+      const formatParts = format.match(/(DD|HH|mm|ss|[^DHms]+)/g) || [];
+
+      formatParts.forEach(part => {
+        switch (part) {
+          case 'DD':
+            if (days > 0 || format.includes('DD')) {
+              parts.push(renderTimePart(days, '天'));
+            }
+            break;
+          case 'HH':
+            parts.push(renderTimePart(hours, '时'));
+            break;
+          case 'mm':
+            parts.push(renderTimePart(minutes, '分'));
+            break;
+          case 'ss':
+            parts.push(renderTimePart(seconds, '秒'));
+            break;
+          default:
+            // 非格式字符直接输出（比如冒号分隔符）
+            if (splitBox) {
+              parts.push(<span className={styles.separator}>{part}</span>);
+            } else {
+              parts.push(
+                <span className={styles['separator-text']}>{part}</span>,
+              );
+            }
+            break;
+        }
+      });
+
+      return parts;
+    };
+
+    const rootClassName = classNames(
+      styles.container,
+      {
+        [styles['split-box']]: splitBox,
+      },
+      className,
+    );
+
+    return (
+      <div className={rootClassName} style={style}>
+        {renderFormattedTime()}
+      </div>
+    );
+  },
+);
 
 CountDown.displayName = 'CountDown';
 

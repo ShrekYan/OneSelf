@@ -1,7 +1,6 @@
-export const formatCommand = (command: string): string => {
-  return command;
-};
+/**
+ * @fileoverview 首页工具函数预留位置
+ * @description 该文件用于存放首页相关的工具函数，当前为示例预留
+ */
 
-export const navigateTo = (url: string): void => {
-  window.location.href = url;
-};
+// 页面工具函数预留位置
