@@ -1080,3 +1080,15 @@ module.exports = {
 ```
 
 **经验总结**: 当项目启用 `"type": "module"` 后，配置文件应该使用 `.cjs` 扩展名。
+
+### @typescript-eslint/no-floating-promises 规则
+
+**项目约定**:
+- 该规则已**禁用**，不需要为 fire-and-forget（触发后忘记）的异步函数添加 `void` 标记
+- 在 MobX 页面中，store 的异步方法（如 `fetchProductList`）通常不需要 await，可以直接调用
+- 只有在需要等待结果进行后续处理时才使用 await
+
+**原因**:
+- 在事件回调、防抖函数、初始化钩子中，很多异步操作不需要等待完成
+- 强制添加 `void` 会增加代码噪音，对业务逻辑没有帮助
+- 项目使用 TypeScript 已经足够安全，开发人员自行判断是否需要处理错误

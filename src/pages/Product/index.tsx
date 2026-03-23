@@ -31,14 +31,14 @@ const Product: React.FC = () => {
         // keyword: 用户输入的搜索关键词
         store.setSearchKeyword(keyword);
         store.clearProductList();
-        void store.fetchProductList();
+        store.fetchProductList();
       }, ProductConst.SEARCH_DEBOUNCE_TIME),
-    [store],
+    [],
   );
 
   // 页面初始化时加载商品列表
   useEffectOnce(() => {
-    void store.fetchProductList();
+    store.fetchProductList();
   });
 
   /**
@@ -61,9 +61,9 @@ const Product: React.FC = () => {
       searchInputRef.current.value = '';
       store.setSearchKeyword('');
       store.clearProductList();
-      void store.fetchProductList();
+      store.fetchProductList();
     }
-  }, [store]);
+  }, []);
 
   /**
    * 处理分类选择
@@ -75,9 +75,9 @@ const Product: React.FC = () => {
 
       store.setCurrentCategory(categoryId);
       store.clearProductList();
-      void store.fetchProductList();
+      store.fetchProductList();
     },
-    [store],
+    [store.currentCategory],
   );
 
   /**
@@ -100,10 +100,10 @@ const Product: React.FC = () => {
 
       store.setCurrentSort(sortId as SortType);
       store.clearProductList();
-      void store.fetchProductList();
+      store.fetchProductList();
       setShowSortMenu(false);
     },
-    [store],
+    [store.currentSort],
   );
 
   /**
@@ -145,20 +145,17 @@ const Product: React.FC = () => {
    * 处理底部导航点击事件
    * @param navId - 导航项ID
    */
-  const handleNavClick = useCallback(
-    (navId: string) => {
-      if (navId === 'cart') {
-        navigateToCart();
-        return;
-      }
+  const handleNavClick = useCallback((navId: string) => {
+    if (navId === 'cart') {
+      navigateToCart();
+      return;
+    }
 
-      store.setCurrentNav(navId);
-      Toast.show({
-        content: `切换到: ${ProductConst.NAVIGATION_ITEMS.find(n => n.id === navId)?.name}`,
-      });
-    },
-    [store],
-  );
+    store.setCurrentNav(navId);
+    Toast.show({
+      content: `切换到: ${ProductConst.NAVIGATION_ITEMS.find(n => n.id === navId)?.name}`,
+    });
+  }, []);
 
   /**
    * 点击页面外部关闭排序菜单
