@@ -11,6 +11,9 @@ const Home: React.FC = () => {
   const store = useStore();
 
   useEffectOnce(() => {
+
+
+    
     console.log('Home 页面初始化');
   });
 
