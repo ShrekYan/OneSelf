@@ -1,5 +1,5 @@
 import type { ProductItem } from '@/types/product';
-import { Toast } from "antd-mobile";
+import { Toast } from 'antd-mobile';
 
 /**
  * 格式化价格显示
@@ -7,9 +7,9 @@ import { Toast } from "antd-mobile";
  * @returns 格式化后的价格字符串，保留两位小数
  */
 export const formatPrice = (price: number): string => {
-  return price.toLocaleString("zh-CN", {
+  return price.toLocaleString('zh-CN', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   });
 };
 
@@ -35,7 +35,7 @@ export const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) {
     return text;
   }
-  return text.slice(0, maxLength) + "…";
+  return text.slice(0, maxLength) + '…';
 };
 
 /**
@@ -51,8 +51,8 @@ export const navigateToProductDetail = (productId: string): void => {
  * 导航到购物车页面
  */
 export const navigateToCart = (): void => {
-  console.log("导航到购物车");
-  window.location.href = "/cart";
+  console.log('导航到购物车');
+  window.location.href = '/cart';
 };
 
 /**
@@ -68,34 +68,16 @@ export const navigateToCategory = (categoryId: string): void => {
  * 导航到商品搜索页面
  */
 export const navigateToSearch = (): void => {
-  console.log("导航到搜索页");
-  window.location.href = "/product/search";
+  console.log('导航到搜索页');
+  window.location.href = '/product/search';
 };
 
 /**
  * 导航到用户个人中心页面
  */
 export const navigateToProfile = (): void => {
-  console.log("导航到个人中心");
-  window.location.href = "/profile";
-};
-
-/**
- * 防抖函数工具
- * 在指定时间内多次调用只执行最次
- * @param func - 要执行的函数
- * @param delay - 延迟时间（毫秒）
- * @returns 防抖处理后的函数
- */
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  delay: number
-): ((...args: Parameters<T>) => void) => {
-  let timer: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
-  };
+  console.log('导航到个人中心');
+  window.location.href = '/profile';
 };
 
 /**
@@ -105,8 +87,8 @@ export const debounce = <T extends (...args: any[]) => any>(
 export const addToCart = (product: ProductItem): void => {
   console.log(`添加到购物车: ${product.title}`);
   Toast.show({
-    icon: "success",
-    content: "已加入购物车"
+    icon: 'success',
+    content: '已加入购物车',
   });
 };
 
@@ -117,8 +99,8 @@ export const addToCart = (product: ProductItem): void => {
 export const collectProduct = (product: ProductItem): void => {
   console.log(`收藏商品: ${product.title}`);
   Toast.show({
-    icon: "success",
-    content: "收藏成功"
+    icon: 'success',
+    content: '收藏成功',
   });
 };
 
@@ -140,6 +122,9 @@ export const getDiscountPrice = (product: ProductItem): number => {
  * @param currentPrice - 当前价格
  * @returns 折扣百分比
  */
-export const calculateDiscountPercent = (originalPrice: number, currentPrice: number): number => {
+export const calculateDiscountPercent = (
+  originalPrice: number,
+  currentPrice: number,
+): number => {
   return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 };

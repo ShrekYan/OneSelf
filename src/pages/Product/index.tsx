@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useObserver } from 'mobx-react';
-import { PullToRefresh, InfiniteScroll, Loading, Toast } from 'antd-mobile';
+import { Toast } from 'antd-mobile';
 import { useEffectOnce } from 'react-use';
 import { debounce } from 'es-toolkit';
 import useStore, { SortType } from './useStore';
@@ -12,7 +12,9 @@ import {
   addToCart,
   collectProduct,
 } from './handle';
-import { ProductCard } from './components/ProductCard';
+import SearchBar from './components/SearchBar';
+import FilterBar from './components/FilterBar';
+import ProductList from './components/ProductList';
 import styles from './index.module.scss';
 
 /**
@@ -142,6 +144,21 @@ const Product: React.FC = () => {
   );
 
   /**
+   * 处理刷新事件
+   */
+  const handleRefresh = useCallback(async () => {
+    store.setRefreshing(true);
+    await store.refreshProductList();
+  }, []);
+
+  /**
+   * 处理加载更多事件
+   */
+  const handleLoadMore = useCallback(async () => {
+    await store.loadMoreProductList();
+  }, []);
+
+  /**
    * 处理底部导航点击事件
    * @param navId - 导航项ID
    */
@@ -180,133 +197,36 @@ const Product: React.FC = () => {
     return (
       <div className={styles.container}>
         {/* 顶部搜索栏 */}
-        <div className={styles.searchBar}>
-          <div className={styles.searchInputContainer}>
-            <span className={styles.searchIcon}>🔍</span>
-            <input
-              ref={searchInputRef}
-              type="text"
-              className={styles.searchInput}
-              placeholder="搜索商品..."
-              onChange={handleSearchInputChange}
-              value={store.searchKeyword}
-            />
-            {store.searchKeyword && (
-              <div className={styles.clearButton} onClick={handleClearSearch}>
-                ✕
-              </div>
-            )}
-          </div>
-        </div>
+        <SearchBar
+          keyword={store.searchKeyword}
+          inputRef={searchInputRef}
+          onChange={handleSearchInputChange}
+          onClear={handleClearSearch}
+        />
 
         {/* 分类和排序栏 */}
-        <div className={styles.filterBar}>
-          <div className={styles.filterRow}>
-            <div className={styles.categoryNav}>
-              {ProductConst.CATEGORIES.map(category => (
-                <div
-                  key={category.id}
-                  className={`${styles.categoryItem} ${
-                    store.currentCategory === category.id ? styles.active : ''
-                  }`}
-                  onClick={() => handleCategorySelect(category.id)}
-                >
-                  {category.name}
-                </div>
-              ))}
-            </div>
-            <div className={styles.sortDropdown}>
-              <button
-                className={`${styles.sortButton} ${showSortMenu ? styles.active : ''}`}
-                onClick={handleSortMenuToggle}
-              >
-                {
-                  ProductConst.SORT_OPTIONS.find(
-                    s => s.id === store.currentSort,
-                  )?.name
-                }
-                <span className={styles.sortArrow}>▼</span>
-              </button>
-              {showSortMenu && (
-                <div className={styles.sortMenu}>
-                  {ProductConst.SORT_OPTIONS.map(option => (
-                    <div
-                      key={option.id}
-                      className={`${styles.sortOption} ${
-                        store.currentSort === option.id ? styles.active : ''
-                      }`}
-                      onClick={() => handleSortSelect(option.id)}
-                    >
-                      {option.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <FilterBar
+          currentCategory={store.currentCategory}
+          currentSort={store.currentSort}
+          showSortMenu={showSortMenu}
+          onCategorySelect={handleCategorySelect}
+          onSortMenuToggle={handleSortMenuToggle}
+          onSortSelect={handleSortSelect}
+        />
 
         {/* 商品列表容器 */}
-        <div className={styles.productListContainer}>
-          <PullToRefresh
-            onRefresh={async () => {
-              store.setRefreshing(true);
-              await store.refreshProductList();
-              Toast.show({
-                icon: 'success',
-                content: '刷新成功',
-              });
-            }}
-          >
-            {/* 加载中状态 */}
-            {store.loading && store.page === 1 ? (
-              <div className={styles.loadingContainer}>
-                <Loading color="primary" />
-              </div>
-            ) : /* 无数据状态 */ store.productList.length === 0 ? (
-              <div className={styles.noDataContainer}>
-                <div className={styles.noDataIcon}>🛍️</div>
-                <div className={styles.noDataText}>暂无商品</div>
-              </div>
-            ) : (
-              <InfiniteScroll
-                loadMore={async () => {
-                  await store.loadMoreProductList();
-                }}
-                hasMore={store.hasMore}
-                threshold={100}
-              >
-                {/* 商品瀑布流列表 */}
-                <div className={styles.productWaterfall}>
-                  {store.productList.map(product => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onCardClick={handleProductCardClick}
-                      onCollect={handleCollect}
-                      onAddToCart={handleAddToCart}
-                    />
-                  ))}
-                </div>
-
-                {/* 加载更多状态 */}
-                {store.loadingMore && (
-                  <div className={styles.loadingContainer}>
-                    <Loading color="primary" />
-                    <span style={{ marginLeft: 8 }}>加载中...</span>
-                  </div>
-                )}
-
-                {/* 没有更多数据提示 */}
-                {!store.hasMore && store.productList.length > 0 && (
-                  <div className={styles.noMoreContainer}>
-                    —— 没有更多商品了 ——
-                  </div>
-                )}
-              </InfiniteScroll>
-            )}
-          </PullToRefresh>
-        </div>
+        <ProductList
+          productList={store.productList}
+          loading={store.loading}
+          loadingMore={store.loadingMore}
+          hasMore={store.hasMore}
+          refreshing={store.refreshing}
+          onRefresh={handleRefresh}
+          onLoadMore={handleLoadMore}
+          onProductCardClick={handleProductCardClick}
+          onAddToCart={handleAddToCart}
+          onCollect={handleCollect}
+        />
 
         {/* 底部导航栏 */}
         <div className={styles.bottomNav}>
