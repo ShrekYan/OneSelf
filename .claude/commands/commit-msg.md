@@ -224,4 +224,6 @@ fix: correct typo in login button text
 
 2. **多个改动**: 如果一次提交包含多个不相关改动，建议分成多个 commit，每个 commit 对应一个逻辑改动。
 
-3. **中文**: 允许使用中文编写 body，但 header（type/scope/description）必须使用英文。
+3. **中文输出**: 所有说明、解释和 commit 的 body 部分都必须使用中文输出。
+
+4. **Header 格式**: header（type/scope/description）必须保持英文格式，type 和 description 必须全部小写。
