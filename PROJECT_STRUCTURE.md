@@ -31,14 +31,14 @@
 ├── .husky/                  # Git Hooks 配置
 ├── src/                     # 主源码目录
 │   ├── api/                 # API 接口层
+│   │   ├── core/            # Axios 扩展核心功能
+│   │   │   ├── api-utils.ts # API 工具函数
+│   │   │   ├── axios-instance.ts# Axios 实例配置
+│   │   │   ├── cancel-manager.ts# 请求取消管理器
+│   │   │   ├── request-cache.ts # 请求缓存工具
+│   │   │   └── types.ts     # API 通用类型定义
 │   │   ├── product/         # 业务模块示例 - 商品
-│   │   ├── api-utils.ts     # API 工具函数
-│   │   ├── axios-instance.ts# Axios 实例配置
-│   │   ├── cancel-manager.ts# 请求取消管理器
-│   │   ├── request-cache.ts # 请求缓存工具
-│   │   ├── types.ts         # API 通用类型定义
-│   │   ├── index.ts         # API 统一出口
-│   │   └── index.tsx        # axios 实例导出
+│   │   └── index.ts         # API 统一出口 (包含 core 和业务模块)
 │   ├── assets/              # 静态资源（图片、字体等）
 │   ├── components/          # 公共可复用组件
 │   │   ├── Button/          # 自定义按钮

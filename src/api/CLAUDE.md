@@ -4,14 +4,14 @@
 
 ```
 src/api/
-├── .claude.md           # 本文件，API 开发规范
+├── CLAUDE.md           # 本文件，API 开发规范
 ├── index.ts             # 统一导出所有 API 模块
-├── index.tsx            # axios 实例导出
-├── types.ts             # 通用类型定义
-├── axios-instance.ts    # axios 实例创建和拦截器配置
-├── request-cache.ts     # 请求缓存工具
-├── cancel-manager.ts    # 重复请求取消管理器
-├── api-utils.ts         # API 工具函数
+├── core/                # Axios 扩展核心功能
+│   ├── api-utils.ts     # API 工具函数
+│   ├── axios-instance.ts# Axios 实例配置
+│   ├── cancel-manager.ts# 请求取消管理器
+│   ├── request-cache.ts # 请求缓存工具
+│   └── types.ts         # API 通用类型定义
 └── [模块]/
     └── index.ts         # 按业务模块划分，每个模块一个目录
 ```

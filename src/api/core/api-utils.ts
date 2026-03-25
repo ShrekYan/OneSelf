@@ -1,4 +1,4 @@
-import api, { cache, cancelManager } from './axios-instance'
+import api, { cache, cancelManager } from './axios-instance';
 
 /**
  * API 工具方法集合
@@ -25,7 +25,7 @@ export const apiUtils = {
    * @param url - 基础 URL
    */
   setBaseURL: (url: string) => {
-    api.defaults.baseURL = url
+    api.defaults.baseURL = url;
   },
 
   /**
@@ -33,15 +33,15 @@ export const apiUtils = {
    * @param token - 认证令牌
    */
   setToken: (token: string) => {
-    api.defaults.headers.Authorization = `Bearer ${token}`
-    localStorage.setItem('token', token)
+    api.defaults.headers.Authorization = `Bearer ${token}`;
+    localStorage.setItem('token', token);
   },
 
   /**
    * 清除 token
    */
   clearToken: () => {
-    delete api.defaults.headers.Authorization
-    localStorage.removeItem('token')
+    delete api.defaults.headers.Authorization;
+    localStorage.removeItem('token');
   },
-}
+};
