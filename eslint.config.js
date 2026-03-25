@@ -11,38 +11,36 @@ export default tseslint.config(
     ignores: ['dist', 'eslint.config.js', '.history/**'],
   },
 
-  // 2. ESLint recommended rules
+  // 2. Node globals for config files
+  {
+    files: ['*.{js,ts,cjs,mjs}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+  },
+
+  // 3. ESLint recommended rules
   js.configs.recommended,
 
-  // 3. TypeScript recommended rules that require type-checking
-  ...tseslint.configs.recommendedTypeChecked,
+  // 4. TypeScript recommended rules
+  ...tseslint.configs.recommended,
 
-  // 4. Configuration to provide tsconfig.json path for type-aware rules
+  // 5. Configuration for type-aware rules (only for TS files)
   {
+    files: ['**/*.{ts,tsx}'],
+    extends: [...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
-        projectService: {
-          allowDefaultProject: ['*.config.js', '*.config.cjs', '*.config.mjs'],
-        },
+        project: ['./tsconfig.json', './tsconfig.node.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
 
-  // 5. Configuration files environment
-  {
-    files: ['*.config.js', '*.config.cjs', '*.config.mjs'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
-
-  // 6. React specific rules
+  // 5. React specific rules
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
@@ -56,17 +54,24 @@ export default tseslint.config(
     },
   },
 
-  // 6. Other custom rules (optional, as many are covered by recommended)
+  // 7. Generic custom rules
   {
     rules: {
       'no-console': 'off',
       'no-debugger': 'error',
       'eqeqeq': ['error', 'always'],
+    },
+  },
+
+  // 8. TypeScript-specific custom rules (type-aware)
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
       '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
     },
   },
 
-  // 7. Prettier config must be last to override other formatting rules
+  // 9. Prettier config must be last
   prettierConfig,
 );

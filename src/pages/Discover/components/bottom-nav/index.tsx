@@ -29,7 +29,7 @@ export const BottomNav: React.FC = () => {
   const activeNavId = getActiveNavId();
 
   const handleNavClick = (navId: BottomNavId): void => {
-    navigate(`/discover/${navId}`);
+    navigate(`/${navId}`);
   };
 
   // 渲染对应图标
