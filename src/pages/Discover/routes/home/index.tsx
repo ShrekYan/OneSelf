@@ -1,82 +1,89 @@
-/**
- * Home 首页
- * 包含顶部导航栏、分类标签、特色文章卡片、文章列表
- * 支持下拉刷新和无限加载
- */
-
-import React from 'react';
-import { useObserver } from 'mobx-react';
-import { PullToRefresh, InfiniteScroll, Toast } from 'antd-mobile';
-import { useEffectOnce } from 'react-use';
-import useStore from './useStore';
-import { TopBar } from './components/top-bar';
-import { CategoryTabs } from './components/category-tabs';
-import { FeaturedArticle } from './components/featured-article';
-import { ArticleListItem } from './components/article-list-item';
+import React, { useCallback } from 'react';
 import styles from './index.module.scss';
+import TopBar from './components/top-bar';
+import CategoryTabs from './components/category-tabs';
+import FeaturedArticle from './components/featured-article';
+import ArticleListItem from './components/article-list-item';
+import { MOCK_ARTICLES } from './constant';
 
-/**
- * Home 首页组件
- */
-const Home: React.FC = () => {
-  const store = useStore();
+const HomePage: React.FC = () => {
+  const handleArticleClick = useCallback((_articleId: string) => {
+    console.log('Navigate to article detail:', _articleId);
+    // TODO: 跳转到文章详情页
+  }, []);
 
-  useEffectOnce(() => {
-    store.fetchArticles();
-  });
+  const handleLikeClick = useCallback((_articleId: string) => {
+    console.log('Like article:', _articleId);
+    // TODO: 点赞文章
+  }, []);
 
-  const handleRefresh = async () => {
-    await store.refreshArticles();
-    Toast.show({
-      icon: 'success',
-      content: 'Refresh successful',
-    });
-  };
+  const handleCommentClick = useCallback((_articleId: string) => {
+    console.log('Open comments for article:', _articleId);
+    // TODO: 打开评论弹窗
+  }, []);
 
-  const handleLoadMore = async () => {
-    await store.loadMoreArticles();
-  };
+  const handleSeeAllClick = useCallback(() => {
+    console.log('Navigate to see all articles');
+    // TODO: 跳转到全部文章列表
+  }, []);
 
-  return useObserver(() => (
+  const handleTabChange = useCallback((_tabId: string) => {
+    console.log('Switch to category tab:', _tabId);
+    // TODO: 切换分类，加载对应文章
+  }, []);
+
+  const handleFeaturedBookmark = useCallback(() => {
+    console.log('Bookmark featured article');
+    // TODO: 收藏特色文章
+  }, []);
+
+  const handleFeaturedClick = useCallback(() => {
+    console.log('Navigate to featured article detail');
+    // TODO: 跳转到特色文章详情
+  }, []);
+
+  return (
     <div className={styles.container}>
+      {/* 顶部导航栏 */}
       <TopBar />
-      <CategoryTabs />
 
-      <PullToRefresh onRefresh={handleRefresh}>
-        <div className={styles.content}>
-          {/* 特色文章 */}
-          {store.featuredArticle && (
-            <FeaturedArticle article={store.featuredArticle} />
-          )}
+      {/* 分类标签栏 */}
+      <CategoryTabs onTabChange={handleTabChange} />
 
-          {/* Latest Articles 标题 */}
-          <div className={styles.latestHeader}>
-            <h2 className={styles.latestTitle}>Latest Articles</h2>
-            <a className={styles.seeAllLink}>See all</a>
-          </div>
+      {/* 特色文章横幅 */}
+      <FeaturedArticle
+        onBookmarkClick={handleFeaturedBookmark}
+        onArticleClick={handleFeaturedClick}
+      />
 
-          {/* 文章列表 */}
-          {store.articleList.map(article => (
-            <ArticleListItem key={article.id} article={article} />
-          ))}
-
-          {/* 无限加载指示器 */}
-          <InfiniteScroll
-            loadMore={handleLoadMore}
-            hasMore={store.hasMore}
-            threshold={100}
+      {/* Latest Articles 标题区域 */}
+      <section className={styles.latestSection}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Latest Articles</h2>
+          <button
+            className={styles.seeAllLink}
+            onClick={handleSeeAllClick}
+            type="button"
           >
-            {store.loadingMore && (
-              <div className={styles.loadMoreText}>Loading more...</div>
-            )}
-            {!store.hasMore && (
-              <div className={styles.noMoreText}>You've reached the end 👋</div>
-            )}
-          </InfiniteScroll>
+            See all
+          </button>
         </div>
-      </PullToRefresh>
+
+        {/* 文章列表 */}
+        <div className={styles.articleList}>
+          {MOCK_ARTICLES.map(article => (
+            <ArticleListItem
+              key={article.id}
+              article={article}
+              onClick={handleArticleClick}
+              onLikeClick={handleLikeClick}
+              onCommentClick={handleCommentClick}
+            />
+          ))}
+        </div>
+      </section>
     </div>
-  ));
+  );
 };
 
-export default Home;
+export default HomePage;

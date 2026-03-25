@@ -1,5 +1,6 @@
 // 颜色变量
 $primary-color: #1890ff;
+$primary-purple: #8848f9;
 $success-color: #52c41a;
 $warning-color: #faad14;
 $error-color: #ff4d4f;
@@ -15,6 +16,7 @@ $text-disabled: #ccc;
 $background-color: #f5f5f5;
 $background-white: #fff;
 $background-gray: #fafafa;
+$background-light: #f0f0f0;
 
 // 边框颜色
 $border-color: #e8e8e8;
@@ -55,9 +57,9 @@ $transition-base: 0.3s ease;
 $transition-slow: 0.5s ease;
 
 // 布局
-$header-height: 44px;
-$tab-bar-height: 50px;
-$sidebar-width: 280px;
+$header-height: 69px;
+$tab-bar-height: 78px;
+$sidebar-width: 438px;
 
 // 断点
 $breakpoint-xs: 320px;

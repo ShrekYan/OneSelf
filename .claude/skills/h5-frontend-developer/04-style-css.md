@@ -46,11 +46,33 @@ import style from './index.module.scss';
 
 ## 使用全局变量
 
-```scss
-@use '@/styles/variables.scss' as vars;
+**重要**: `$variables.scss` 已经通过 Vite `additionalData` 配置**自动全局注入**到每个 SCSS 文件中，**不需要手动导入**。
 
+直接使用变量即可：
+
+```scss
 .container {
-  background-color: vars.$background-color;
-  color: vars.$text-primary;
+  background-color: $background-color;
+  color: $text-primary;
 }
+```
+
+**为什么不需要手动导入？**
+
+在 `vite.config.ts` 中已配置：
+```typescript
+css: {
+  preprocessorOptions: {
+    scss: {
+      additionalData: `@import "@/styles/variables.scss";`,
+    },
+  },
+}
+```
+
+❌ **禁止**手动导入：
+```scss
+// 错误：会导致 Vite 自动插入的 @import 在 @use 之前，违反 SCSS 语法规则
+@use '@/styles/variables.scss' as *;
+@import '@/styles/variables.scss';
 ```

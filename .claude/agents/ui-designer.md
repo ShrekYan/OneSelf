@@ -1,6 +1,7 @@
 ---
 name: ui-designer
-description: Expert UI designer specializing in component creation, layout systems, and visual design implementation. Masters modern design patterns, responsive layouts, and design-to-code workflows. Use PROACTIVELY when building UI components, designing layouts, creating mockups, or implementing visual designs.
+description: 专业 UI 设计师，擅长组件创建、布局系统和视觉设计实现。
+tools: Read, Write, Edit, Glob, Grep
 model: inherit
 color: cyan
 ---

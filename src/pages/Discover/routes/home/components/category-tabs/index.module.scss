@@ -1,9 +1,11 @@
+ 
+
 .container {
-  position: sticky;
-  top: 44px;
-  z-index: 99;
+  padding: 33px 0 0;
   background-color: $background-white;
-  border-bottom: 1px solid $border-color;
+}
+
+.tabsScrollContainer {
   overflow: auto hidden;
   -webkit-overflow-scrolling: touch;
 
@@ -11,32 +13,31 @@
     display: none;
   }
 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.tabs {
+.tabsList {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 12px;
-  min-height: 48px;
+  gap: 20px;
+  padding: 0 33px;
+  min-width: fit-content;
 }
 
-.tabItem {
-  flex-shrink: 0;
-  padding: 8px 16px;
-  border-radius: $border-radius-full;
-  font-size: $font-size-base;
-  color: $text-secondary;
-  background-color: $background-gray;
+.tab {
+  padding: 16px 32px;
+  border-radius: 40px;
+  font-size: 30px;
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: all $transition-fast;
+  background-color: $background-light;
+  color: $text-secondary;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
-  &.active {
-    color: #fff;
-    background-color: #1a1a1a;
-    font-weight: 500;
+  &.selected {
+    background-color: $text-primary;
+    color: $background-white;
   }
 }

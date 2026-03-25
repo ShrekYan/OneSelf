@@ -1,44 +1,62 @@
-/**
- * 分类标签栏组件
- * 水平滚动的分类标签列表，支持切换高亮
- */
-
-import React from 'react';
-import { useObserver } from 'mobx-react';
-import { CATEGORY_TABS } from '../../constant';
-import useStore from '../../useStore';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
 
-/**
- * 分类标签栏组件
- * 显示可横向滚动的分类标签，支持点击切换
- */
-export const CategoryTabs = React.memo(() => {
-  const store = useStore();
+export interface CategoryTab {
+  id: string;
+  name: string;
+}
+
+interface CategoryTabsProps {
+  tabs?: CategoryTab[];
+  defaultSelectedId?: string;
+  onTabChange?: (tabId: string) => void;
+}
+
+const CategoryTabs: React.FC<CategoryTabsProps> = ({
+  tabs = [
+    { id: 'for-you', name: 'For You' },
+    { id: 'following', name: 'Following' },
+    { id: 'design', name: 'Design' },
+    { id: 'tech', name: 'Tech' },
+    { id: 'culture', name: 'Culture' },
+  ],
+  defaultSelectedId = 'for-you',
+  onTabChange,
+}) => {
+  const [selectedId, setSelectedId] = useState(defaultSelectedId);
 
   const handleTabClick = (tabId: string) => {
-    store.setActiveCategoryId(tabId);
+    setSelectedId(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
   };
 
-  return useObserver(() => (
+  return (
     <div className={styles.container}>
-      <div className={styles.tabs}>
-        {CATEGORY_TABS.map(tab => (
-          <button
-            key={tab.id}
-            className={classNames(
-              styles.tabItem,
-              tab.id === store.activeCategoryId && styles.active,
-            )}
-            onClick={() => handleTabClick(tab.id)}
-          >
-            {tab.name}
-          </button>
-        ))}
+      <div className={styles.tabsScrollContainer}>
+        <div className={styles.tabsList}>
+          {tabs.map(tab => {
+            const isSelected = tab.id === selectedId;
+            return (
+              <button
+                key={tab.id}
+                className={classNames(
+                  styles.tab,
+                  isSelected && styles.selected,
+                )}
+                onClick={() => handleTabClick(tab.id)}
+                type="button"
+              >
+                {tab.name}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
-  ));
-});
+  );
+};
 
 export default CategoryTabs;

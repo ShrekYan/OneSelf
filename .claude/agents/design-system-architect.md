@@ -1,6 +1,7 @@
 ---
 name: design-system-architect
-description: Expert design system architect specializing in design tokens, component libraries, theming infrastructure, and scalable design operations. Masters token architecture, multi-brand systems, and design-development collaboration. Use PROACTIVELY when building design systems, creating token architectures, implementing theming, or establishing component libraries.
+description: 资深设计系统架构师，擅长设计令牌、组件库、主题架构。
+tools: Read, Write, Edit, Glob, Grep
 model: inherit
 color: magenta
 ---

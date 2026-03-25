@@ -1,103 +1,97 @@
-/**
- * 特色文章大图卡片组件
- * 展示置顶/推荐文章的大图卡片，包含封面、标题、描述、作者信息和操作按钮
- */
-
 import React from 'react';
-import { useObserver } from 'mobx-react';
-import classNames from 'classnames';
-import useStore from '../../useStore';
-import type { ArticleItem } from '../../constant';
-import {
-  formatReadTime,
-  handleArticleSave,
-  useNavigationActions,
-} from '../../handle';
 import styles from './index.module.scss';
 
-/**
- * 特色文章卡片属性
- */
 interface FeaturedArticleProps {
-  article: ArticleItem;
+  category?: string;
+  title?: string;
+  authorName?: string;
+  authorAvatar?: string;
+  publishDate?: string;
+  readTime?: string;
+  coverImage?: string;
+  onBookmarkClick?: () => void;
+  onArticleClick?: () => void;
 }
 
-/**
- * 特色文章大图卡片组件
- */
-export const FeaturedArticle = React.memo(
-  ({ article }: FeaturedArticleProps) => {
-    const store = useStore();
-    const { navigateToArticleDetail } = useNavigationActions();
+const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
+  category = 'DESIGN',
+  title = 'The Future of Mobile Interface Design in 2024',
+  authorName = 'Sarah Drasner',
+  authorAvatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+  publishDate = 'Oct 24',
+  readTime = '5 min read',
+  coverImage = 'https://images.unsplash.com/photo-1558655146-d09347e54404?w=750&h=400&fit=crop',
+  onBookmarkClick,
+  onArticleClick,
+}) => {
+  const handleBookmarkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onBookmarkClick) {
+      onBookmarkClick();
+    }
+  };
 
-    const handleSaveClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      store.toggleSave(article.id);
-      handleArticleSave(article.id, article.isSaved);
-    };
-
-    const handleCardClick = () => {
-      navigateToArticleDetail(article.id);
-    };
-
-    return useObserver(() => (
-      <div className={styles.container} onClick={handleCardClick}>
-        <div className={styles.imageContainer}>
-          <img
-            src={article.coverImage}
-            alt={article.title}
-            className={styles.coverImage}
-            loading="lazy"
-          />
-          {/* 渐变遮罩，让文字更清晰可读 */}
-          <div className={styles.overlay}></div>
-
-          {/* 左上角分类标签 */}
-          {article.tags.length > 0 && (
-            <div className={styles.tags}>
-              {article.tags.map(tag => (
-                <span key={tag} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
+  return (
+    <div
+      className={styles.container}
+      onClick={onArticleClick}
+      role="article"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onArticleClick?.();
+        }
+      }}
+    >
+      <div className={styles.coverContainer}>
+        <img
+          src={coverImage}
+          alt={title}
+          className={styles.coverImage}
+          loading="lazy"
+        />
+        <div className={styles.categoryTag}>{category}</div>
+        <div
+          className={styles.bookmarkBtn}
+          onClick={handleBookmarkClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+              onBookmarkClick?.();
+            }
+          }}
+          aria-label="收藏"
+        >
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"
+              fill="white"
+            />
+          </svg>
+        </div>
+        <div className={styles.overlay}>
+          <h2 className={styles.title}>{title}</h2>
+          <div className={styles.footer}>
+            <div className={styles.authorInfo}>
+              <img
+                src={authorAvatar}
+                alt={authorName}
+                className={styles.authorAvatar}
+              />
+              <span className={styles.authorName}>{authorName}</span>
             </div>
-          )}
-
-          {/* 右侧保存按钮 */}
-          <button
-            className={classNames(
-              styles.saveButton,
-              article.isSaved && styles.saved,
-            )}
-            onClick={handleSaveClick}
-            title="Save"
-          >
-            {article.isSaved ? '🔖' : '📎'}
-          </button>
-
-          {/* 底部文字内容 - 叠加在图片上 */}
-          <div className={styles.content}>
-            <h2 className={styles.title}>{article.title}</h2>
-            <div className={styles.author}>
-              <div className={styles.authorInfo}>
-                <img
-                  src={article.author.avatar}
-                  alt={article.author.name}
-                  className={styles.avatar}
-                />
-                <div>
-                  <div className={styles.authorName}>{article.author.name}</div>
-                  <div className={styles.meta}>
-                    {article.publishDate} · {formatReadTime(article.readTime)}
-                  </div>
-                </div>
-              </div>
+            <div className={styles.meta}>
+              <span className={styles.metaItem}>{publishDate}</span>
+              <span className={styles.metaDivider}>•</span>
+              <span className={styles.metaItem}>{readTime}</span>
             </div>
           </div>
         </div>
       </div>
-    ));
-  },
-);
+    </div>
+  );
+};
 
 export default FeaturedArticle;

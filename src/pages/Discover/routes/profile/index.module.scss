@@ -1,13 +1,249 @@
 .container {
   min-height: 100vh;
-  background-color: $background-color;
+  background-color: #fff;
+  padding-bottom: calc($tab-bar-height + env(safe-area-inset-bottom));
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+// 顶部栏
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 42px;
+  padding-top: 16px;
+  border-bottom: 1px solid $border-color-light;
+}
+
+.avatarBadge {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background-color: #f3e8ff;
+  color: #7c3aed;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: calc($tab-bar-height + env(safe-area-inset-bottom));
+  font-size: 31px;
+  font-weight: 600;
 }
 
-.text {
-  color: $text-tertiary;
-  font-size: $font-size-base;
+.settingsIcon {
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+// 用户信息卡片
+.userCard {
+  background-color: #f8f8f8;
+  border-radius: 52px 52px 0 0;
+  padding: 65px 42px 49px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-bottom: 33px;
+}
+
+.avatar {
+  width: 208px;
+  height: 208px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  overflow: hidden;
+  background-color: $background-gray;
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+}
+
+.editButton {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 57px;
+  height: 57px;
+  border-radius: 50%;
+  background-color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userName {
+  font-size: 42px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.2;
+  margin: 0 0 13px;
+}
+
+.userHandle {
+  font-size: 26px;
+  color: #7c3aed;
+  margin: 0 0 21px;
+  font-weight: 500;
+}
+
+.userBio {
+  font-size: 23px;
+  color: #888;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0 0 36px;
+}
+
+// 统计数据
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.statNumber {
+  font-size: 36px;
+  font-weight: 700;
+  color: #111;
+}
+
+.statLabel {
+  font-size: 21px;
+  color: #888;
+}
+
+.statDivider {
+  width: 2px;
+  height: 47px;
+  background-color: #e8e8e8;
+}
+
+// 菜单列表
+.menuList {
+  padding: 42px 31px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 31px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 21px;
+  transition: opacity 0.2s ease;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.menuIcon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 31px;
+    height: 31px;
+  }
+}
+
+.menuText {
+  flex: 1;
+  font-size: 23px;
+  font-weight: 600;
+  color: #111;
+}
+
+.menuBadge {
+  padding: 8px 21px;
+  background-color: #f3f3f3;
+  color: #888;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 21px;
+  min-width: 42px;
+  text-align: center;
+}
+
+.menuArrow {
+  color: #888;
+  flex-shrink: 0;
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+// 退出登录
+.signOutWrapper {
+  padding: 42px 31px;
+}
+
+.signOutButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 23px 29px;
+  background-color: #fff1f1;
+  border: 1px solid #fee2e2;
+  border-radius: 21px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.signOutIcon {
+  width: 57px;
+  height: 57px;
+  border-radius: 50%;
+  background-color: #fecaca;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.signOutText {
+  font-size: 23px;
+  font-weight: 600;
+  color: #dc2626;
 }

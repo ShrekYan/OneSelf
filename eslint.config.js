@@ -3,11 +3,12 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default tseslint.config(
   // 1. Global ignores
   {
-    ignores: ['dist', 'eslint.config.js'],
+    ignores: ['dist', 'eslint.config.js', '.history/**'],
   },
 
   // 2. ESLint recommended rules
@@ -20,13 +21,28 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.node.json'],
+        projectService: {
+          allowDefaultProject: ['*.config.js', '*.config.cjs', '*.config.mjs'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
 
-  // 5. React specific rules
+  // 5. Configuration files environment
+  {
+    files: ['*.config.js', '*.config.cjs', '*.config.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+
+  // 6. React specific rules
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {

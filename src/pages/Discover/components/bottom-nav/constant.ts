@@ -2,15 +2,16 @@
  * 底部导航配置
  */
 
+export type BottomNavId = 'home' | 'explore' | 'saved' | 'profile';
+
 export interface BottomNavItem {
-  id: string;
+  id: BottomNavId;
   name: string;
-  icon: string;
 }
 
 export const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
-  { id: 'home', name: 'Home', icon: '🏠' },
-  { id: 'explore', name: 'Explore', icon: '⥁' },
-  { id: 'saved', name: 'Saved', icon: '🔖' },
-  { id: 'profile', name: 'Profile', icon: '👤' },
+  { id: 'home', name: 'Home' },
+  { id: 'explore', name: 'Explore' },
+  { id: 'saved', name: 'Saved' },
+  { id: 'profile', name: 'Profile' },
 ];

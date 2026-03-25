@@ -67,9 +67,6 @@ export default defineConfig(function (_a) {
                     additionalData: "@import \"@/styles/variables.scss\";",
                 },
             },
-            postcss: {
-                plugins: [],
-            },
         },
         server: {
             port: 3000,

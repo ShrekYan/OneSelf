@@ -1,52 +1,83 @@
-/**
- * 顶部导航栏组件
- * 包含 Discover 标题、搜索按钮、通知按钮
- */
-
 import React from 'react';
-import { useNavigationActions } from '../../handle';
-import { PAGE_TITLE } from '../../constant';
 import styles from './index.module.scss';
 
-/**
- * 顶部导航栏组件
- * 显示页面标题和操作按钮（搜索、通知）
- */
-export const TopBar = React.memo(() => {
-  const { navigateToSearch, navigateToNotifications } = useNavigationActions();
+interface TopBarProps {
+  title?: string;
+}
 
+const TopBar: React.FC<TopBarProps> = ({ title = 'Discover' }) => {
   const handleSearchClick = () => {
-    navigateToSearch();
+    console.log('Open search page');
+    // TODO: 打开搜索页面
   };
 
-  const handleNotificationsClick = () => {
-    navigateToNotifications();
+  const handleNotificationClick = () => {
+    console.log('Open notification center');
+    // TODO: 打开通知中心
+  };
+
+  const handleAvatarClick = () => {
+    console.log('Navigate to user profile');
+    // TODO: 跳转到个人主页
   };
 
   return (
-    <div className={styles.container}>
+    <header className={styles.header}>
       <div className={styles.leftSection}>
-        <div className={styles.userAvatar}>B</div>
-        <h1 className={styles.title}>{PAGE_TITLE}</h1>
+        <div
+          className={styles.avatar}
+          onClick={handleAvatarClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleAvatarClick();
+            }
+          }}
+        >
+          B
+        </div>
       </div>
-      <div className={styles.actions}>
-        <button
-          className={styles.actionButton}
+      <h1 className={styles.title}>{title}</h1>
+      <div className={styles.rightSection}>
+        <div
+          className={styles.iconBtn}
           onClick={handleSearchClick}
-          title="Search"
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleSearchClick();
+            }
+          }}
+          aria-label="搜索"
         >
-          🔍
-        </button>
-        <button
-          className={styles.actionButton}
-          onClick={handleNotificationsClick}
-          title="Notifications"
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </div>
+        <div
+          className={styles.iconBtn}
+          onClick={handleNotificationClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleNotificationClick();
+            }
+          }}
+          aria-label="通知"
         >
-          🔔<span className={styles.notificationDot}></span>
-        </button>
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <div className={styles.notificationDot} />
+        </div>
       </div>
-    </div>
+    </header>
   );
-});
+};
 
 export default TopBar;

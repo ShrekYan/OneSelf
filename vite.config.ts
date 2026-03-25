@@ -75,9 +75,6 @@ export default defineConfig(({ mode }) => {
           additionalData: `@import "@/styles/variables.scss";`,
         },
       },
-      postcss: {
-        plugins: [],
-      },
     },
 
     server: {
