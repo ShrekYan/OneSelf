@@ -171,3 +171,6 @@ browserslist: [
 6. **类型**: 必须为所有代码添加正确的 TypeScript 类型
 7. **移动端**: 使用 px 编写，会自动转换为 vw，设计稿基于 750px
 8. **组件**: 使用 Ant Design Mobile 组件，避免重复造轮子
+
+## MCP 使用规则
+- 涉及到框架 API 语法时，自动使用 Context7 查询最新文档

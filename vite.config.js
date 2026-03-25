@@ -4,6 +4,7 @@ import path from 'path';
 import checker from 'vite-plugin-checker';
 import { viteVConsole } from 'vite-plugin-vconsole';
 import removeConsole from 'vite-plugin-remove-console';
+// import compression from 'vite-plugin-compression2'
 //import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig(function (_a) {
     var mode = _a.mode;
@@ -12,12 +13,12 @@ export default defineConfig(function (_a) {
         plugins: [
             react({
                 babel: {
-                    plugins: ['babel-plugin-react-compiler']
-                }
+                    plugins: ['babel-plugin-react-compiler'],
+                },
             }),
             // TypeScript 检查
             checker({
-                typescript: true
+                typescript: true,
             }),
             // VConsole 插件（开发模式）
             viteVConsole({
@@ -26,8 +27,8 @@ export default defineConfig(function (_a) {
                 enabled: mode.includes('dev'),
                 config: {
                     maxLogNumber: 1000,
-                    theme: 'dark'
-                }
+                    theme: 'dark',
+                },
             }),
             // 移除控制台输出（生产模式）
             removeConsole(),
@@ -53,21 +54,22 @@ export default defineConfig(function (_a) {
                 '@/assets': path.resolve(__dirname, './src/assets'),
                 '@/styles': path.resolve(__dirname, './src/styles'),
                 '@/api': path.resolve(__dirname, './src/api'),
-                '@/types': path.resolve(__dirname, './src/types')
-            }
+                '@/types': path.resolve(__dirname, './src/types'),
+            },
         },
         css: {
             modules: {
-                generateScopedName: '[name]__[local]___[hash:base64:5]'
+                generateScopedName: '[name]__[local]___[hash:base64:5]',
+                localsConvention: 'camelCase',
             },
             preprocessorOptions: {
                 scss: {
-                    additionalData: "@import \"@/styles/variables.scss\";"
-                }
+                    additionalData: "@import \"@/styles/variables.scss\";",
+                },
             },
             postcss: {
-                plugins: []
-            }
+                plugins: [],
+            },
         },
         server: {
             port: 3000,
@@ -77,9 +79,9 @@ export default defineConfig(function (_a) {
                 '/api': {
                     target: env.VITE_API_BASE_URL,
                     changeOrigin: true,
-                    rewrite: function (path) { return path.replace(/^\/api/, ''); }
-                }
-            }
+                    rewrite: function (path) { return path.replace(/^\/api/, ''); },
+                },
+            },
         },
         build: {
             outDir: 'dist',
@@ -91,13 +93,13 @@ export default defineConfig(function (_a) {
                     manualChunks: {
                         vendor: ['react', 'react-dom'],
                         antd: ['antd-mobile'],
-                        utils: ['dayjs', 'axios', 'numeral']
-                    }
-                }
-            }
+                        utils: ['dayjs', 'axios', 'numeral'],
+                    },
+                },
+            },
         },
         optimizeDeps: {
-            include: ['react', 'react-dom', 'antd-mobile', 'dayjs']
-        }
+            include: ['react', 'react-dom', 'antd-mobile', 'dayjs'],
+        },
     };
 });

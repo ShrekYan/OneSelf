@@ -1,0 +1,42 @@
+.container {
+  position: sticky;
+  top: 44px;
+  z-index: 99;
+  background-color: $background-white;
+  border-bottom: 1px solid $border-color;
+  overflow: auto hidden;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  min-height: 48px;
+}
+
+.tabItem {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: $border-radius-full;
+  font-size: $font-size-base;
+  color: $text-secondary;
+  background-color: $background-gray;
+  border: none;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &.active {
+    color: #fff;
+    background-color: #1a1a1a;
+    font-weight: 500;
+  }
+}

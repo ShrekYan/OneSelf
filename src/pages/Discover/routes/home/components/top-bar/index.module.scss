@@ -1,0 +1,75 @@
+.container {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 16px;
+  background-color: $background-white;
+  border-bottom: 1px solid $border-color;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f0e6ff;
+  color: #6200ee;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: 600;
+  color: $text-primary;
+  line-height: 1.2;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.actionButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $border-radius-full;
+  font-size: 24px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:active {
+    background-color: $background-gray;
+  }
+}
+
+.notificationDot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $error-color;
+}
