@@ -22,7 +22,7 @@
 7. **移动端**: 基于 750px 设计稿编写 px，插件会自动转换为 vw。
 
 ## 📚 规范索引 (模块化拆分)
-- **专家级开发规范**: [.claude/skills/h5-frontend-developer.md](file:///.claude/skills/h5-frontend-developer.md)
+- **专家级开发规范**: [.claude/skills/h5-frontend-developer/h5-frontend-developer.md](file:///.claude/skills/h5-frontend-developer/h5-frontend-developer.md)
 - **API 详细规范**: [src/api/CLAUDE.md](file:///src/api/CLAUDE.md)
 - **公共组件规范**: [src/components/CLAUDE.md](file:///src/components/CLAUDE.md)
 - **代码审查清单**: [.claude/commands/review.md](file:///.claude/commands/review.md)
