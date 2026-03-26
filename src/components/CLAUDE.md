@@ -83,8 +83,8 @@ export default Button;
 ### 使用 CSS Modules
 
 - 样式文件名必须是 `index.module.scss`
-- **SCSS 文件中使用 kebab-case 命名 class**（如 `.search-bar`）
-- **TSX 文件中使用驼峰引用**（`styles.searchBar` 自动映射到 `.search-bar`）
+- **SCSS 文件中直接使用 camelCase 命名 class**（如 `.searchBar`）
+- **TSX 文件中使用相同的 camelCase 引用**（`styles.searchBar` 直接对应 `.searchBar`）
 - 不允许全局样式污染
 
 ```scss
@@ -96,15 +96,15 @@ export default Button;
   padding: 20px;
 }
 
-.search-bar {
-  .search-input {
+.searchBar {
+  .searchInput {
     // ...
   }
 }
 ```
 
 ```tsx
-// 在组件中引入 - 仍使用驼峰引用
+// 在组件中引入 - 命名保持一致
 import styles from './index.module.scss';
 
 <div className={styles.container}>

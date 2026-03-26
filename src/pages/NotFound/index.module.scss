@@ -1,7 +1,7 @@
 // 按照项目规范：使用组件前缀 + kebab-case 命名
 // 基于 750px 设计稿自动转换 vw
 
-.not-found-container {
+.notFoundContainer {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -10,7 +10,7 @@
   padding: 40px;
 }
 
-.not-found-content {
+.notFoundContent {
   text-align: center;
   background: #fff;
   padding: 80px 40px;
@@ -20,13 +20,13 @@
   width: 100%;
 }
 
-.not-found-icon {
+.notFoundIcon {
   font-size: 160px;
   color: #d9d9d9;
   margin-bottom: 40px;
 }
 
-.not-found-error-code {
+.notFoundErrorCode {
   font-size: 96px;
   font-weight: 700;
   color: #d9d9d9;
@@ -34,14 +34,14 @@
   line-height: 1;
 }
 
-.not-found-error-title {
+.notFoundErrorTitle {
   font-size: 40px;
   font-weight: 600;
   color: #333;
   margin-bottom: 24px;
 }
 
-.not-found-error-message {
+.notFoundErrorMessage {
   font-size: 28px;
   color: #666;
   line-height: 1.5;
@@ -49,7 +49,7 @@
   padding: 0 40px;
 }
 
-.not-found-button-group {
+.notFoundButtonGroup {
   justify-content: center;
   gap: 24px;
 }

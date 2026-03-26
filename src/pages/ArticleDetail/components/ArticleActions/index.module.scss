@@ -1,0 +1,91 @@
+.articleActionsContainer {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translate-x(-50%);
+  width: 100%;
+  max-width: 750px;
+  background: rgb(255 255 255 / 95%);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgb(0 0 0 / 6%);
+  padding: 20px 32px calc(20px + env(safe-area-inset-bottom));
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgb(0 0 0 / 8%);
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    .actionItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+      padding: 10px 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border-radius: 12px;
+
+      .icon {
+        font-size: 40px;
+        color: #667085;
+        transition: all 0.25s ease;
+      }
+
+      .label {
+        font-size: 22px;
+        color: #667085;
+        margin-top: 6px;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      &.active {
+        .icon {
+          background: linear-gradient(135deg, #ff6b8b 0%, #ff4d4f 100%);
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .label {
+          color: #ff4d4f;
+          font-weight: 500;
+        }
+      }
+
+      &:hover {
+        background: rgb(0 0 0 / 2%);
+        transform: translate-y(-2px);
+      }
+
+      &:active {
+        transform: translate-y(0);
+        opacity: 0.8;
+      }
+    }
+
+    .primaryAction {
+      flex: 1;
+      max-width: 200px;
+      background: linear-gradient(135deg, #4e5ba6 0%, #6b7bcd 100%);
+      border-radius: 40px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgb(78 91 166 / 35%);
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: translate-y(2px);
+        box-shadow: 0 2px 8px rgb(78 91 166 / 35%);
+      }
+    }
+  }
+}

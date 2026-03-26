@@ -1,0 +1,7 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8f9ff 0%, #f0f2f9 100%);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
+  max-width: 750px;
+  margin: 0 auto;
+}

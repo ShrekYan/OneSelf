@@ -165,11 +165,11 @@
     align-items: center;
     margin-bottom: 40px;
 
-    :global(.adm-checkbox) {
-      .adm-checkbox-icon {
+    :global(.admCheckbox) {
+      .admCheckboxIcon {
         border-color: #667eea;
 
-        &.adm-checkbox-icon-checked {
+        &.admCheckboxIconChecked {
           background: #667eea;
           border-color: #667eea;
         }

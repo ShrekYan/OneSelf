@@ -40,7 +40,7 @@
 
 ### 🔵 5. 样式规范（SCSS + CSS Modules）
 - [ ] 是否使用 `*.module.scss`？
-- [ ] class 命名是否为 kebab-case？
+- [ ] class 命名是否为 camelCase（SCSS 源码与 TS 引用保持一致）？
 - [ ] 是否基于 750px 设计稿用 px 编写（自动转 vw）？
 - [ ] 是否合理使用全局样式变量？
 

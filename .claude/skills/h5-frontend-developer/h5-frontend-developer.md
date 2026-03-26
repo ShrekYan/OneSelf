@@ -17,4 +17,7 @@ include: troubleshooting.md
 <!-- 引用基础规范 -->
 include: ../../rules/api-design.md
 include: ../../rules/typescript.md
+include: ../../rules/css-scss.md
+include: ../../rules/hooks-error-handling.md
+include: ../../rules/assets-resources.md
 include: ../../CLAUDE.md

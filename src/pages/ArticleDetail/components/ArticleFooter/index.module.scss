@@ -1,0 +1,39 @@
+.articleFooterContainer {
+  margin-top: 20px;
+  padding: 32px 24px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 4%);
+
+  .authorBio {
+    padding: 28px 24px;
+    background: linear-gradient(135deg, #f8faff 0%, #f5f8ff 100%);
+    border-radius: 16px;
+    border: 1px solid #e8f0fe;
+
+    .label {
+      font-size: 26px;
+      font-weight: 600;
+      color: #1d2129;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(180deg, #4e5ba6 0%, #8395f7 100%);
+        margin-right: 12px;
+        border-radius: 2px;
+      }
+    }
+
+    .bio {
+      font-size: 28px;
+      line-height: 1.8;
+      color: #4e5969;
+    }
+  }
+}

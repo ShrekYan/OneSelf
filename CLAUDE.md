@@ -14,7 +14,7 @@
 
 ## ⚖️ 黄金开发准则 (必读)
 1. **导入路径**: 始终使用路径别名 `@/xxx`，禁止相对路径。
-2. **样式管理**: 仅使用 `*.module.scss` (kebab-case class, camelCase TS)。
+2. **样式管理**: 仅使用 `*.module.scss`，**SCSS 源码和 TS 引用全部使用 camelCase**。
 3. **状态管理**: 使用 MobX + `useObserver` (Hook 写法)，**禁止使用 observer HOC**。
 4. **组件拆分**: 优先使用 `antd-mobile`；长页面必须按功能模块拆分子组件。
 5. **强类型**: 必须为所有代码（Props, API, Store）添加显式 TypeScript 类型。
@@ -22,11 +22,15 @@
 7. **移动端**: 基于 750px 设计稿编写 px，插件会自动转换为 vw。
 
 ## 📚 规范索引 (模块化拆分)
-- **专家级开发规范**: [.claude/skills/h5-frontend-developer/h5-frontend-developer.md](file:///.claude/skills/h5-frontend-developer/h5-frontend-developer.md)
-- **API 详细规范**: [src/api/CLAUDE.md](file:///src/api/CLAUDE.md)
-- **公共组件规范**: [src/components/CLAUDE.md](file:///src/components/CLAUDE.md)
-- **代码审查清单**: [.claude/commands/review.md](file:///.claude/commands/review.md)
-- **提交规范**: [commitlint.config.js](file:///commitlint.config.js)
+- **专家级开发规范**: [.claude/skills/h5-frontend-developer/h5-frontend-developer.md](.claude/skills/h5-frontend-developer/h5-frontend-developer.md)
+- **API 设计规范**: [.claude/rules/api-design.md](.claude/rules/api-design.md)
+- **TypeScript 规范**: [.claude/rules/typescript.md](.claude/rules/typescript.md)
+- **CSS/SCSS 规范**: [.claude/rules/css-scss.md](.claude/rules/css-scss.md)
+- **Hooks 与错误处理**: [.claude/rules/hooks-error-handling.md](.claude/rules/hooks-error-handling.md)
+- **静态资源规范**: [.claude/rules/assets-resources.md](.claude/rules/assets-resources.md)
+- **公共组件规范**: [src/components/CLAUDE.md](src/components/CLAUDE.md)
+- **代码审查清单**: [.claude/commands/review.md](.claude/commands/review.md)
+- **提交规范**: [commitlint.config.js](commitlint.config.js)
 
 ## ✅ 验证流程
 完成开发后，请务必依次执行：
