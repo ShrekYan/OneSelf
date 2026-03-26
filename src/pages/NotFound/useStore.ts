@@ -1,6 +1,9 @@
-import { useLocalObservable } from "mobx-react";
+import { useLocalObservable } from 'mobx-react';
 
-export interface MobxStoreType {
+/**
+ * NotFound 页面 Store 类型定义
+ */
+export interface NotFoundStoreType {
   errorCode: string;
   errorTitle: string;
   errorMessage: string;
@@ -8,18 +11,20 @@ export interface MobxStoreType {
   homeButtonText: string;
 }
 
-type UseMobxStoreType = () => MobxStoreType;
-
-const useMobxStore: UseMobxStoreType = () => {
-  const store = useLocalObservable<MobxStoreType>(() => ({
-    errorCode: "404",
-    errorTitle: "页面找不到了",
-    errorMessage: "您访问的页面不存在或已被移动",
-    backButtonText: "返回上页",
-    homeButtonText: "回到首页"
+/**
+ * NotFound 页面局部状态 Store
+ * 使用 MobX useLocalObservable 管理局部状态
+ */
+const useNotFoundStore = (): NotFoundStoreType => {
+  const store = useLocalObservable<NotFoundStoreType>(() => ({
+    errorCode: '404',
+    errorTitle: '页面找不到了',
+    errorMessage: '您访问的页面不存在或已被移动',
+    backButtonText: '返回上页',
+    homeButtonText: '回到首页',
   }));
 
   return store;
 };
 
-export default useMobxStore;
+export default useNotFoundStore;
