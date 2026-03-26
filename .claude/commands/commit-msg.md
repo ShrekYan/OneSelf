@@ -18,10 +18,10 @@
 
 ### 组成部分说明
 
-1. **type**: 提交类型，必须小写
-2. **scope**: 影响范围（可选），指明代码改动的领域/模块
-3. **description**: 简短描述，动词开头，全部小写（首字母不大写）
-4. **body**: 详细说明（可选），多行文本，解释改动原因和背景
+1. **type**: 提交类型，必须小写（保持英文）
+2. **scope**: 影响范围（可选），指明代码改动的领域/模块（中文/英文均可）
+3. **description**: 简短描述，动词开头，使用中文
+4. **body**: 详细说明（可选），多行文本，解释改动原因和背景（使用中文）
 5. **footer**: 脚注（可选），关联 Issue 或破坏性变更说明
 
 ---
@@ -62,33 +62,32 @@ scope 应当对应代码改动的业务模块或目录结构：
 
 **示例**:
 ```
-feat(discover): add new bottom navigation component
-fix(api): handle 401 unauthorized error correctly
-refactor(components): optimize card component rendering
+feat(discover): 添加全新底部导航组件
+fix(api): 正确处理 401 未授权错误
+refactor(components): 优化卡片组件渲染
 ```
 
 ---
 
 ## Description 书写规则
 
-1. **长度限制**: 建议 50 字符以内，最长不超过 72 字符
-2. **大小写**: 全部小写，首字母不大写
-3. **结尾**: 不加句号 `.`
-4. **语气**: 使用祈使语气，动词开头
-5. **清晰**: 准确描述改动内容，避免模糊词汇
+1. **长度限制**: 建议 20 个汉字以内，最长不超过 30 个汉字
+2. **结尾**: 不加句号 `。`
+3. **语气**: 使用祈使语气，动词开头
+4. **清晰**: 准确描述改动内容，避免模糊词汇
 
 **✅ 正确示例**:
 ```
-feat: add product filtering by category
-fix: correct image loading placeholder
-refactor: extract product card into separate component
+feat: 添加商品按分类筛选功能
+fix: 修复图片加载占位错误
+refactor: 提取商品卡片为独立组件
 ```
 
 **❌ 错误示例**:
 ```
-feat: Added product filtering （首字母大写）
-fix: bug fixed （不清晰）
-refactor: changes to product card. （结尾有句号）
+feat: 添加了商品按分类筛选功能。（结尾有句号）
+fix: 修复了一个bug （不清晰）
+refactor: 对商品卡片做了一些修改 （描述模糊）
 ```
 
 ---
@@ -146,7 +145,7 @@ the page parameter is now required.
 如果回滚之前的提交，格式如下：
 
 ```
-revert: commit: <原始提交信息>
+revert: 回滚: <原始提交信息>
 
 This reverts commit <原始 commit hash>.
 ```
@@ -159,9 +158,9 @@ This reverts commit <原始 commit hash>.
 
 - [ ] type 是否符合允许的类型？
 - [ ] scope 是否正确对应模块？
-- [ ] description 是否简洁清晰（< 72 字符）？
-- [ ] description 是否全部小写且不以句号结尾？
-- [ ] 是否符合 Conventional Commits 格式？
+- [ ] description 是否简洁清晰（< 30 个汉字）？
+- [ ] description 是否不以句号结尾？
+- [ ] 是否符合 `type(scope): description` 格式？
 - [ ] 破坏性变更是否已在 BREAKING CHANGE 中说明？
 - [ ] 关联 Issue 是否正确标注？
 
@@ -171,46 +170,46 @@ This reverts commit <原始 commit hash>.
 
 ### 示例 1: 新增功能
 ```
-feat(discover): add bottom navigation bar
+feat(discover): 添加底部导航栏
 
-implement new responsive bottom navigation with smooth transitions
-between tabs. supports badge for unread messages.
+实现了响应式底部导航，支持标签页之间的平滑过渡。
+支持未读消息徽章显示。
 
 Closes: #12
 ```
 
 ### 示例 2: 修复 Bug
 ```
-fix(api): handle network timeout error properly
+fix(api): 正确处理网络超时错误
 
-add retry logic for GET requests when network timeout occurs.
-prevents app from crashing on unstable network connections.
+为 GET 请求添加重试逻辑，网络超时时自动重试。
+防止应用在不稳定网络环境下崩溃。
 
 Fixes: #35
 ```
 
 ### 示例 3: 代码重构
 ```
-refactor(product): split product page into smaller components
+refactor(product): 将商品页面拆分为小组件
 
-split the large product page component into smaller reusable
-components: product-list, product-filter, product-card.
-improves code maintainability and enables component reuse.
+把大型商品页面组件拆分为多个可复用小组件：
+商品列表、商品筛选、商品卡片。
+提升了代码可维护性，支持组件复用。
 
-no functional changes.
+无功能性变更。
 ```
 
 ### 示例 4: 性能优化
 ```
-perf(images): implement lazy loading for product images
+perf(images): 实现商品图片懒加载
 
-use native lazy loading with intersection observer fallback.
-reduces initial page load time and network data usage.
+使用原生懒加载，降级方案使用 intersection observer。
+减少首屏加载时间和网络数据用量。
 ```
 
 ### 示例 5: 简单修复
 ```
-fix: correct typo in login button text
+fix: 修正登录按钮文字拼写错误
 ```
 
 ---
@@ -224,6 +223,10 @@ fix: correct typo in login button text
 
 2. **多个改动**: 如果一次提交包含多个不相关改动，建议分成多个 commit，每个 commit 对应一个逻辑改动。
 
-3. **中文输出**: 所有说明、解释和 commit 的 body 部分都必须使用中文输出。
+3. **输出语言**:
+   - `type`: 保持英文（兼容工具链）
+   - `scope`: 中文/英文均可
+   - `description`: **必须使用中文**
+   - `body` / `footer`: **必须使用中文**
 
-4. **Header 格式**: header（type/scope/description）必须保持英文格式，type 和 description 必须全部小写。
+4. **Header 格式**: 必须遵循 `type(<scope>): <description>` 格式。
