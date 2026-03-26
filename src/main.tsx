@@ -4,7 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd-mobile';
 import { unstableSetRender } from 'antd-mobile';
 import zhCN from 'antd-mobile/es/locales/zh-CN';
+import { ErrorBoundary } from 'react-error-boundary';
 import App from './App';
+import ErrorFallback from '@/components/ErrorFallback';
 import './styles/global.scss';
 import 'antd-mobile/es/global';
 
@@ -34,10 +36,12 @@ unstableSetRender((node, container) => {
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
-    <ConfigProvider locale={zhCN}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ConfigProvider>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ConfigProvider locale={zhCN}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ConfigProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

@@ -7,21 +7,16 @@ import Explore from '@/pages/Discover/routes/explore';
 import Saved from '@/pages/Discover/routes/saved';
 import Profile from '@/pages/Discover/routes/profile';
 
-// 其他页面懒加载
-const PCLogin = lazy(() => import('@/pages/PCLogin'));
 const Login = lazy(() => import('@/pages/login'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const Product = lazy(() => import('@/pages/Product'));
 const Discover = lazy(() => import('@/pages/Discover'));
 const About = lazy(() => import('@/pages/About'));
 const Help = lazy(() => import('@/pages/Help'));
+const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
 
 // 路由配置
 const routes = [
-  {
-    path: '/pc-login',
-    element: <PCLogin />,
-  },
   {
     path: '/login',
     element: <Login />,
@@ -29,6 +24,10 @@ const routes = [
   {
     path: '/product',
     element: <Product />,
+  },
+  {
+    path: '/article/:id',
+    element: <ArticleDetail />,
   },
   {
     path: '/',

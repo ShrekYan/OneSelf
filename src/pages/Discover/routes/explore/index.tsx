@@ -3,6 +3,7 @@ import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
 import { useHandleCategoryClick, fetchCategories } from './handle';
 import useExploreStore from './useStore';
+import CategoryCard from './components/CategoryCard';
 
 const ExplorePage: React.FC = () => {
   // 在组件顶层调用 Hook 获取 store
@@ -61,37 +62,15 @@ const ExplorePage: React.FC = () => {
           {exploreStore.loading ? (
             <div className={styles.loadingPlaceholder}>加载中...</div>
           ) : (
-            exploreStore.filteredCategories().map(category => (
-              <div
-                key={category.id}
-                className={`${styles.categoryCard} ${category.imageUrl ? styles.hasImage : ''}`}
-                onClick={() => onCategoryClick(category.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    onCategoryClick(category.id);
-                  }
-                }}
-              >
-                {category.imageUrl && (
-                  <div className={styles.categoryImage}>
-                    <img
-                      src={category.imageUrl}
-                      alt={category.name}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                <div className={styles.categoryOverlay} />
-                <div className={styles.categoryInfo}>
-                  <h3 className={styles.categoryName}>{category.name}</h3>
-                  <p className={styles.categoryCount}>
-                    {category.articleCount} Articles
-                  </p>
-                </div>
-              </div>
-            ))
+            exploreStore
+              .filteredCategories()
+              .map(category => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  onClick={onCategoryClick}
+                />
+              ))
           )}
         </div>
       </section>
