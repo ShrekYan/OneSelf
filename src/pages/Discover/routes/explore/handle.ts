@@ -109,7 +109,7 @@ export const fetchCategories = async (
     // store.setCategories(response);
 
     // 使用 Mock 数据
-    await new Promise(resolve => setTimeout(resolve, 500)); // 模拟网络延迟
+    await new Promise(resolve => setTimeout(resolve, 0)); // 模拟网络延迟
     store.setCategories(MOCK_CATEGORIES);
   } catch (error) {
     console.error('加载分类列表失败:', error);

@@ -61,6 +61,14 @@ export const PROFILE_MENU_ITEMS: MenuItem[] = [
     hasArrow: true,
     path: '/help',
   },
+  {
+    id: 'about-us',
+    title: 'About Us',
+    icon: 'info',
+    badge: undefined,
+    hasArrow: true,
+    path: '/about',
+  },
 ];
 
 // ==================== 默认用户信息 ====================

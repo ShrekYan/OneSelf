@@ -1,0 +1,56 @@
+.container {
+  background-color: #fff;
+  margin: 0 20px 30px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 6%);
+}
+
+.sectionTitle {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px;
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.featureIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.featureContent {
+  flex: 1;
+}
+
+.featureTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.featureDesc {
+  font-size: 24px;
+  line-height: 1.5;
+  color: #666;
+  margin: 0;
+}

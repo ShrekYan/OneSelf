@@ -10,6 +10,7 @@ const DiscoverHome = lazy(() => import('@/pages/Discover/routes/home'));
 const Explore = lazy(() => import('@/pages/Discover/routes/explore'));
 const Saved = lazy(() => import('@/pages/Discover/routes/saved'));
 const Profile = lazy(() => import('@/pages/Discover/routes/profile'));
+const About = lazy(() => import('@/pages/About'));
 
 // 路由配置
 const routes = [
@@ -34,6 +35,7 @@ const routes = [
       { path: 'explore', element: <Explore /> },
       { path: 'saved', element: <Saved /> },
       { path: 'profile', element: <Profile /> },
+      { path: 'about', element: <About /> },
     ],
   },
   {
