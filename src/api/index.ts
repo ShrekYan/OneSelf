@@ -4,6 +4,7 @@
  */
 
 import { productApi } from './product';
+import { userApi } from './user';
 
 // 导出核心类型定义
 export type { ApiResponse, RequestConfig, RequestMethod } from './core/types';
@@ -18,9 +19,10 @@ export { default as api, cache, cancelManager } from './core/axios-instance';
 export { apiUtils } from './core/api-utils';
 
 // 导出各业务模块 API
-export { productApi };
+export { productApi, userApi };
 
 // 默认导出包含所有 API 模块的对象
 export default {
   product: productApi,
+  user: userApi,
 };

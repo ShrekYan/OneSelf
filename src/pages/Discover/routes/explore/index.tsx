@@ -1,60 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
-import { useHandleCategoryClick } from './handle';
-
-interface Category {
-  id: string;
-  name: string;
-  articleCount: number;
-  imageUrl?: string;
-}
-
-const categories: Category[] = [
-  {
-    id: 'ui-ux-design',
-    name: 'UI/UX Design',
-    articleCount: 142,
-    imageUrl:
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop',
-  },
-  {
-    id: 'engineering',
-    name: 'Engineering',
-    articleCount: 284,
-    imageUrl:
-      'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=400&h=300&fit=crop',
-  },
-  {
-    id: 'productivity',
-    name: 'Productivity',
-    articleCount: 95,
-    imageUrl:
-      'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop',
-  },
-  {
-    id: 'life-culture',
-    name: 'Life & Culture',
-    articleCount: 213,
-  },
-  {
-    id: 'web3-crypto',
-    name: 'Web3 & Crypto',
-    articleCount: 87,
-  },
-  {
-    id: 'startups',
-    name: 'Startups',
-    articleCount: 164,
-    imageUrl:
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop',
-  },
-];
+import { useHandleCategoryClick, fetchCategories } from './handle';
+import useExploreStore from './useStore';
 
 const ExplorePage: React.FC = () => {
+  // 在组件顶层调用 Hook 获取 store
+  const exploreStore = useExploreStore();
   // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
   const onCategoryClick = useHandleCategoryClick();
 
-  return (
+  // 组件加载时获取分类数据
+  useEffect(() => {
+    void fetchCategories(exploreStore);
+  }, [exploreStore]);
+
+  return useObserver(() => (
     <div className={styles.container}>
       {/* 顶部导航栏 */}
       <header className={styles.header}>
@@ -97,41 +58,45 @@ const ExplorePage: React.FC = () => {
       <section className={styles.categoriesSection}>
         <h2 className={styles.sectionTitle}>Popular Categories</h2>
         <div className={styles.categoriesGrid}>
-          {categories.map(category => (
-            <div
-              key={category.id}
-              className={`${styles.categoryCard} ${category.imageUrl ? styles.hasImage : ''}`}
-              onClick={() => onCategoryClick(category.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onCategoryClick(category.id);
-                }
-              }}
-            >
-              {category.imageUrl && (
-                <div className={styles.categoryImage}>
-                  <img
-                    src={category.imageUrl}
-                    alt={category.name}
-                    loading="lazy"
-                  />
+          {exploreStore.loading ? (
+            <div className={styles.loadingPlaceholder}>加载中...</div>
+          ) : (
+            exploreStore.filteredCategories().map(category => (
+              <div
+                key={category.id}
+                className={`${styles.categoryCard} ${category.imageUrl ? styles.hasImage : ''}`}
+                onClick={() => onCategoryClick(category.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    onCategoryClick(category.id);
+                  }
+                }}
+              >
+                {category.imageUrl && (
+                  <div className={styles.categoryImage}>
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div className={styles.categoryOverlay} />
+                <div className={styles.categoryInfo}>
+                  <h3 className={styles.categoryName}>{category.name}</h3>
+                  <p className={styles.categoryCount}>
+                    {category.articleCount} Articles
+                  </p>
                 </div>
-              )}
-              <div className={styles.categoryOverlay} />
-              <div className={styles.categoryInfo}>
-                <h3 className={styles.categoryName}>{category.name}</h3>
-                <p className={styles.categoryCount}>
-                  {category.articleCount} Articles
-                </p>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
     </div>
-  );
+  ));
 };
 
 export default ExplorePage;

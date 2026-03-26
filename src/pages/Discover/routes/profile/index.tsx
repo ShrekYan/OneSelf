@@ -2,9 +2,15 @@
  * Profile 个人页面
  * @description 个人中心页面，显示用户信息和功能菜单
  */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
-import { useHandleMenuItemClick, useHandleSignOut } from './handle';
+import {
+  useHandleMenuItemClick,
+  useHandleSignOut,
+  fetchUserInfo,
+  loadMenuItems,
+} from './handle';
 import { PROFILE_MENU_ITEMS } from './constant';
 import useProfileStore from './useStore';
 
@@ -12,12 +18,18 @@ import useProfileStore from './useStore';
  * Profile 个人页面
  */
 const Profile: React.FC = () => {
-  // 在组件顶层调用 Hooks 获取处理函数
+  // 在组件顶层调用 Hooks 获取处理函数和 store
   const onMenuItemClick = useHandleMenuItemClick();
   const onSignOut = useHandleSignOut();
   const profileStore = useProfileStore();
 
-  return (
+  // 页面加载时获取数据
+  useEffect(() => {
+    fetchUserInfo(profileStore);
+    loadMenuItems(profileStore, PROFILE_MENU_ITEMS);
+  }, [profileStore]);
+
+  return useObserver(() => (
     <div className={styles.container}>
       {/* 顶部栏 */}
       <div className={styles.header}>
@@ -39,53 +51,73 @@ const Profile: React.FC = () => {
 
       {/* 用户信息卡片 */}
       <div className={styles.userCard}>
-        <div className={styles.avatarWrapper}>
-          <div className={styles.avatar}>
-            {/* 占位，实际使用用户头像 */}
-            <div className={styles.avatarPlaceholder} />
-          </div>
-          <div className={styles.editButton}>
-            <svg
-              width={26}
-              height={26}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth={2}
-            >
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
-          </div>
-        </div>
+        {profileStore.loading ? (
+          <div className={styles.loadingWrapper}></div>
+        ) : (
+          <>
+            <div className={styles.avatarWrapper}>
+              <div className={styles.avatar}>
+                {/* 占位，实际使用用户头像 */}
+                <div className={styles.avatarPlaceholder} />
+              </div>
+              <div className={styles.editButton}>
+                <svg
+                  width={26}
+                  height={26}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={2}
+                >
+                  <path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              </div>
+            </div>
 
-        <h1 className={styles.userName}>John Maker</h1>
-        <p className={styles.userHandle}>@johnmaker</p>
-        <p className={styles.userBio}>
-          Frontend engineer, UI designer, and tech enthusiast. I write about
-          modern web dev.
-        </p>
+            <h1 className={styles.userName}>
+              {profileStore.userInfo?.userName || 'John Maker'}
+            </h1>
+            <p className={styles.userHandle}>
+              {profileStore.userInfo?.userHandle || '@johnmaker'}
+            </p>
+            <p className={styles.userBio}>
+              {profileStore.userInfo?.userBio ||
+                'Frontend engineer, UI designer, and tech enthusiast. I write about modern web dev.'}
+            </p>
 
-        <div className={styles.stats}>
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>248</div>
-            <div className={styles.statLabel}>Followers</div>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>156</div>
-            <div className={styles.statLabel}>Following</div>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>12.4k</div>
-            <div className={styles.statLabel}>Likes</div>
-          </div>
-        </div>
+            <div className={styles.stats}>
+              <div className={styles.statItem}>
+                <div className={styles.statNumber}>
+                  {profileStore.userInfo?.stats.followers ?? 248}
+                </div>
+                <div className={styles.statLabel}>Followers</div>
+              </div>
+              <div className={styles.statDivider} />
+              <div className={styles.statItem}>
+                <div className={styles.statNumber}>
+                  {profileStore.userInfo?.stats.following ?? 156}
+                </div>
+                <div className={styles.statLabel}>Following</div>
+              </div>
+              <div className={styles.statDivider} />
+              <div className={styles.statItem}>
+                <div className={styles.statNumber}>
+                  {profileStore.userInfo?.stats.totalLikes
+                    ? profileStore.userInfo.stats.totalLikes >= 1000
+                      ? `${(profileStore.userInfo.stats.totalLikes / 1000).toFixed(1)}k`
+                      : profileStore.userInfo.stats.totalLikes
+                    : '12.4k'}
+                </div>
+                <div className={styles.statLabel}>Likes</div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 菜单列表 */}
       <div className={styles.menuList}>
-        {PROFILE_MENU_ITEMS.slice(0, 4).map(menu => (
+        {profileStore.menuItems.slice(0, 4).map(menu => (
           <div
             key={menu.id}
             className={styles.menuItem}
@@ -188,7 +220,7 @@ const Profile: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  ));
 };
 
 Profile.displayName = 'Profile';

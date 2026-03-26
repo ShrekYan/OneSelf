@@ -247,3 +247,12 @@
   font-weight: 600;
   color: #dc2626;
 }
+
+// 加载状态
+.loadingWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+  width: 100%;
+}

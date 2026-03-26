@@ -5,6 +5,7 @@
 
 import { Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
+import { MOCK_CATEGORIES } from './constant';
 import useExploreStore from './useStore';
 
 /**
@@ -98,14 +99,18 @@ export const handleClearSearchHistory = (
  * 加载分类列表数据
  * @param store - Explore store 实例
  */
-export const fetchCategories = (
+export const fetchCategories = async (
   store: ReturnType<typeof useExploreStore>,
-): void => {
+): Promise<void> => {
   store.setLoading(true);
   try {
-    // TODO: 调用 API 获取分类列表
+    // TODO: 替换为真实 API 调用
     // const response = await categoryApi.getList();
     // store.setCategories(response);
+
+    // 使用 Mock 数据
+    await new Promise(resolve => setTimeout(resolve, 500)); // 模拟网络延迟
+    store.setCategories(MOCK_CATEGORIES);
   } catch (error) {
     console.error('加载分类列表失败:', error);
     Toast.show({

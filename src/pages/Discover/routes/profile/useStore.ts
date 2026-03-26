@@ -8,12 +8,18 @@ import { useLocalObservable } from 'mobx-react';
 
 import type { MenuItem } from './constant';
 
+/**
+ * 用户统计数据接口
+ */
 export interface UserStats {
   followers: number;
   following: number;
   totalLikes: number;
 }
 
+/**
+ * 用户信息接口
+ */
 export interface UserInfo {
   userName: string;
   userHandle: string;
@@ -22,6 +28,9 @@ export interface UserInfo {
   stats: UserStats;
 }
 
+/**
+ * Profile Store 接口定义
+ */
 export interface ProfileStoreType {
   /** 用户信息 */
   userInfo: UserInfo | null;
@@ -48,6 +57,9 @@ export interface ProfileStoreType {
   clearUserInfo: () => void;
 }
 
+/**
+ * Profile Store Hook
+ */
 type UseProfileStoreType = () => ProfileStoreType;
 
 const useProfileStore: UseProfileStoreType = () => {

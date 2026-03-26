@@ -8,6 +8,7 @@
 - 使用 classnames 合并类名
 - 使用 react-use 提供的 Hook 简化开发（如 useEffectOnce）
 - 状态管理使用 `useLocalObservable` + `useObserver` 的组合方式
+- **MobX 响应式：统一使用 `useObserver` from `mobx-react` (Hook 写法)，禁止使用 `observer` from `mobx-react-lite` (HOC 写法)**
 
 ## 组件拆分核心原则
 

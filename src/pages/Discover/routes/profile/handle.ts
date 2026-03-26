@@ -5,19 +5,18 @@
 
 import { Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
+import api from '@/api';
+
 import type { MenuItem } from './constant';
 import type { UserInfo } from './useStore';
-import useProfileStore from './useStore';
+import type { ProfileStoreType } from './useStore';
 
 /**
  * 处理编辑按钮点击
  * @param store - Profile store 实例
  */
-export const handleEditClick = (
-  store: ReturnType<typeof useProfileStore>,
-): void => {
+export const handleEditClick = (store: ProfileStoreType): void => {
   store.setIsEditing(true);
-  console.log('Enter edit mode');
 };
 
 /**
@@ -25,26 +24,35 @@ export const handleEditClick = (
  * @param store - Profile store 实例
  * @param userInfo - 更新后的用户信息
  */
-export const handleSaveEdit = (
-  store: ReturnType<typeof useProfileStore>,
+export const handleSaveEdit = async (
+  store: ProfileStoreType,
   userInfo: Partial<UserInfo>,
-): void => {
-  store.updateUserInfo(userInfo);
-  store.setIsEditing(false);
-  Toast.show({
-    icon: 'success',
-    content: '保存成功',
-  });
-  console.log('User info updated:', userInfo);
+): Promise<void> => {
+  store.setLoading(true);
+  try {
+    await api.user.updateUserInfo(userInfo);
+    store.updateUserInfo(userInfo);
+    store.setIsEditing(false);
+    Toast.show({
+      icon: 'success',
+      content: '保存成功',
+    });
+  } catch (error) {
+    console.error('保存用户信息失败:', error);
+    Toast.show({
+      icon: 'fail',
+      content: '保存失败，请重试',
+    });
+  } finally {
+    store.setLoading(false);
+  }
 };
 
 /**
  * 取消编辑
  * @param store - Profile store 实例
  */
-export const handleCancelEdit = (
-  store: ReturnType<typeof useProfileStore>,
-): void => {
+export const handleCancelEdit = (store: ProfileStoreType): void => {
   store.setIsEditing(false);
 };
 
@@ -55,8 +63,6 @@ export const handleCancelEdit = (
 export const useHandleMenuItemClick = () => {
   const navigate = useNavigate();
   return (menu: MenuItem): void => {
-    console.log('Navigate to menu:', menu.id);
-
     if (menu.path) {
       navigate(menu.path);
     }
@@ -67,7 +73,6 @@ export const useHandleMenuItemClick = () => {
  * 处理设置点击
  */
 export const handleSettingsClick = (): void => {
-  console.log('Navigate to settings');
   // TODO: 跳转到设置页面
 };
 
@@ -77,16 +82,22 @@ export const handleSettingsClick = (): void => {
  */
 export const useHandleSignOut = () => {
   const navigate = useNavigate();
-  return (store: ReturnType<typeof useProfileStore>): void => {
-    console.log('Sign out user');
-    store.clearUserInfo();
-    // TODO: 清除本地存储的 token 等信息
-    Toast.show({
-      icon: 'success',
-      content: '已退出登录',
-    });
-    // 跳转到登录页
-    navigate('/login');
+  return async (store: ProfileStoreType): Promise<void> => {
+    try {
+      await api.user.signOut();
+      store.clearUserInfo();
+      Toast.show({
+        icon: 'success',
+        content: '已退出登录',
+      });
+      // 跳转到登录页
+      navigate('/login');
+    } catch (error) {
+      console.error('退出登录失败:', error);
+      // 即使 API 失败，仍然清除本地状态并跳转
+      store.clearUserInfo();
+      navigate('/login');
+    }
   };
 };
 
@@ -94,14 +105,11 @@ export const useHandleSignOut = () => {
  * 加载用户信息
  * @param store - Profile store 实例
  */
-export const fetchUserInfo = (
-  store: ReturnType<typeof useProfileStore>,
-): void => {
+export const fetchUserInfo = async (store: ProfileStoreType): Promise<void> => {
   store.setLoading(true);
   try {
-    // TODO: 调用 API 获取用户信息
-    // const response = await userApi.getUserInfo();
-    // store.setUserInfo(response);
+    const response = await api.user.getUserInfo();
+    store.setUserInfo(response.userInfo);
   } catch (error) {
     console.error('加载用户信息失败:', error);
     Toast.show({
@@ -119,7 +127,7 @@ export const fetchUserInfo = (
  * @param menuItems - 菜单项配置
  */
 export const loadMenuItems = (
-  store: ReturnType<typeof useProfileStore>,
+  store: ProfileStoreType,
   menuItems: MenuItem[],
 ): void => {
   store.setMenuItems(menuItems);
@@ -132,7 +140,7 @@ export const loadMenuItems = (
  * @param badge - 徽章数值
  */
 export const updateMenuItemBadge = (
-  store: ReturnType<typeof useProfileStore>,
+  store: ProfileStoreType,
   menuId: string,
   badge: number | undefined,
 ): void => {
