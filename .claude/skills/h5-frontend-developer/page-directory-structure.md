@@ -7,7 +7,8 @@ src/pages/[PageName]/
 ├── index.tsx                    # 页面主入口（只做组件组合）
 ├── index.module.scss           # 仅页面最外层容器样式
 ├── types.ts                     # 跨组件共享的数据类型定义
-├── constant.ts                  # 常量配置聚合导出
+├── constant.ts                  # 常量配置聚合导出（仅非展示性常量）
+├── schema.ts                    # (可选) Zod 表单验证 Schema（仅含表单页面需要）
 ├── mock.ts                      # Mock 数据 / 静态业务数据
 ├── useStore.ts                  # 页面级 MobX 局部状态（useLocalObservable）
 └── components/                 # 页面内子组件目录
@@ -31,7 +32,8 @@ src/pages/[PageName]/
 | `index.tsx` | 导入组件 → 组合布局 → 处理页面级事件 | 不写大量内联样式/HTML |
 | `index.module.scss` | 页面根容器样式（背景、间距、最大宽度） | 不放各个子组件的样式 |
 | `types.ts` | 集中定义**跨组件共享**的数据结构 | 组件私有 Props 不要放这里 |
-| `constant.ts` | 聚合导出常量配置 | 不存放大量数据 |
+| `constant.ts` | 聚合导出**非展示性**常量、枚举、配置项 | **禁止存放页面展示文案**，展示文案直接写在 JSX |
+| `schema.ts` | Zod 表单验证 Schema 定义 + 类型派生 | 没有表单验证的页面不要创建此文件 |
 | `mock.ts` | 存放 Mock 数据 / 静态业务数据 | 开发环境真实接口对接后可移除 |
 | `useStore.ts` | MobX 管理页面局部状态 | 不需要全局状态时才用这个 |
 | `components/` | 存放拆分后的功能区块组件 | 不放非组件文件 |
@@ -267,27 +269,69 @@ export const APP_INFO: AppInfo = { /* ... */ };
 ### 7. constant.ts - 常量配置
 
 ```typescript
-import { FEATURES, LINKS, APP_INFO } from './mock';
-
 /**
  * 页面常量定义
+ * 仅存放非展示性常量、枚举、配置项
+ * 页面展示文案请直接写在 JSX 中
  */
 
-// 聚合导出，方便外部访问
-export const PageNameConst = {
-  FEATURES,
-  LINKS,
-  APP_INFO,
-} as const;
+/** 列表请求每页条数 */
+export const PAGE_SIZE = 10;
+
+/** 登录状态枚举 */
+export type LoginStatus = 'idle' | 'loading' | 'success' | 'error';
+
+/** 最大密码长度限制 */
+export const MAX_PASSWORD_LENGTH = 20;
 ```
 
 **要点：**
-- ✅ 聚合导出各种常量
+- ✅ 只存放**非展示性常量、枚举、配置项**（如分页大小、状态枚举、长度限制、API 路径等）
+- ❌ **禁止存放页面展示文案**（按钮文字、placeholder、标题等直接写在 JSX 中）
+- ✅ 只有当多个组件共享同一个常量时，才需要抽取到这里
 - ✅ 保持和 `mock.ts` 分离，职责清晰
 
 ---
 
-### 8. useStore.ts - MobX 局部状态
+### 8. schema.ts - Zod 表单验证 Schema
+
+```typescript
+/**
+ * 登录表单 Zod 验证 Schema
+ */
+import { z } from 'zod';
+
+/** 登录表单验证 Schema */
+export const loginSchema = z.object({
+  account: z
+    .string()
+    .min(1, '请输入手机号/用户名')
+    .max(30, '账号长度不能超过30个字符'),
+  password: z
+    .string()
+    .min(6, '密码长度不能少于6位')
+    .max(20, '密码长度不能超过20位'),
+  agreeTerms: z
+    .literal(true, {
+      errorMap: () => ({ message: '请同意用户协议和隐私政策' }),
+    }),
+});
+
+/** 登录表单数据类型（从 Zod Schema 派生） */
+export type LoginFormData = z.infer<typeof loginSchema>;
+```
+
+**要点：**
+- ✅ **仅用于** Zod 表单验证 Schema 定义
+- ✅ 使用 `z.infer` 派生 TypeScript 类型，避免重复定义
+- ✅ 一个页面多个表单可以在同一个 `schema.ts` 中定义多个 Schema
+- ✅ 只有包含表单验证的页面才需要创建此文件
+- ❌ 没有表单验证的页面不要创建此文件
+- ❌ 不要把非 Schema 类型定义放在这里，普通类型请放在 `types.ts`
+
+---
+
+### 9. useStore.ts - MobX 局部状态
 
 ```typescript
 import { useLocalObservable } from 'mobx-react';
@@ -336,6 +380,7 @@ export default usePageStore;
 - [ ] `types.ts` 存放跨组件共享数据类型
 - [ ] `mock.ts` 存放 Mock/静态数据
 - [ ] `constant.ts` 聚合导出常量
+- [ ] `schema.ts` 有表单验证时才创建，存放 Zod Schema（无表单则不需要）
 - [ ] `useStore.ts` MobX 局部状态
 - [ ] `components/index.ts` 统一导出子组件
 - [ ] 每个子组件 `ComponentName/index.tsx` + `index.module.scss`
