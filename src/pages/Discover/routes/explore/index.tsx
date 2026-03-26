@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './index.module.scss';
+import { useHandleCategoryClick } from './handle';
 
 interface Category {
   id: string;
@@ -50,10 +51,8 @@ const categories: Category[] = [
 ];
 
 const ExplorePage: React.FC = () => {
-  const handleCategoryClick = (_id: string) => {
-    console.log('Navigate to category:', _id);
-    // TODO: 跳转到分类文章列表页面
-  };
+  // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
+  const onCategoryClick = useHandleCategoryClick();
 
   return (
     <div className={styles.container}>
@@ -102,12 +101,12 @@ const ExplorePage: React.FC = () => {
             <div
               key={category.id}
               className={`${styles.categoryCard} ${category.imageUrl ? styles.hasImage : ''}`}
-              onClick={() => handleCategoryClick(category.id)}
+              onClick={() => onCategoryClick(category.id)}
               role="button"
               tabIndex={0}
               onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                  handleCategoryClick(category.id);
+                  onCategoryClick(category.id);
                 }
               }}
             >

@@ -12,6 +12,8 @@ export interface ArticleItem {
   comments: number;
   coverImage?: string;
   hasCover?: boolean;
+  isLiked?: boolean;
+  savedAt?: string;
 }
 
 interface ArticleListItemProps {

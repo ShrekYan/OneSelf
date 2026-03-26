@@ -20,6 +20,7 @@ export const MOCK_ARTICLES: ArticleItem[] = [
     coverImage:
       'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=300&h=300&fit=crop',
     hasCover: true,
+    isLiked: false,
   },
   {
     id: '2',
@@ -35,6 +36,7 @@ export const MOCK_ARTICLES: ArticleItem[] = [
     coverImage:
       'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&h=300&fit=crop',
     hasCover: true,
+    isLiked: true,
   },
   {
     id: '3',
@@ -48,6 +50,7 @@ export const MOCK_ARTICLES: ArticleItem[] = [
     likes: 567,
     comments: 28,
     hasCover: false,
+    isLiked: false,
   },
   {
     id: '4',
@@ -61,5 +64,6 @@ export const MOCK_ARTICLES: ArticleItem[] = [
     likes: 1024,
     comments: 156,
     hasCover: false,
+    isLiked: false,
   },
 ];

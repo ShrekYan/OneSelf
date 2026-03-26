@@ -5,12 +5,11 @@ import CategoryTabs from './components/category-tabs';
 import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
 import { MOCK_ARTICLES } from './constant';
+import { useHandleArticleClick } from './handle';
 
 const HomePage: React.FC = () => {
-  const handleArticleClick = useCallback((_articleId: string) => {
-    console.log('Navigate to article detail:', _articleId);
-    // TODO: 跳转到文章详情页
-  }, []);
+  // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
+  const onArticleClick = useHandleArticleClick();
 
   const handleLikeClick = useCallback((_articleId: string) => {
     console.log('Like article:', _articleId);
@@ -75,7 +74,7 @@ const HomePage: React.FC = () => {
             <ArticleListItem
               key={article.id}
               article={article}
-              onClick={handleArticleClick}
+              onClick={onArticleClick}
               onLikeClick={handleLikeClick}
               onCommentClick={handleCommentClick}
             />
