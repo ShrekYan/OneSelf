@@ -7,7 +7,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ copyright }) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.footerContainer}>
       <p className={styles.copyright}>{copyright}</p>
     </div>
   );

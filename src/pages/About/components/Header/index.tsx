@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ appName, version }) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.headerContainer}>
       <div className={styles.logoWrapper}>
         <svg
           className={styles.logo}

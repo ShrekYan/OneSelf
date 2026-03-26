@@ -7,7 +7,7 @@ interface DescriptionProps {
 
 const Description: React.FC<DescriptionProps> = ({ description }) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.descriptionContainer}>
       <h2 className={styles.sectionTitle}>关于我们</h2>
       <p className={styles.descriptionText}>{description}</p>
     </div>
