@@ -1,14 +1,16 @@
 import React from 'react';
 import styles from './index.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 interface TopBarProps {
   title?: string;
 }
 
 const TopBar: React.FC<TopBarProps> = ({ title = 'Discover' }) => {
+  const navigate = useNavigate();
+
   const handleSearchClick = () => {
-    console.log('Open search page');
-    // TODO: 打开搜索页面
+    navigate('/search');
   };
 
   const handleNotificationClick = () => {

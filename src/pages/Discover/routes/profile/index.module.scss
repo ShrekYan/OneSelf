@@ -1,6 +1,9 @@
 .container {
   min-height: 100vh;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-x: visible;
   padding-bottom: calc($tab-bar-height + env(safe-area-inset-bottom));
   max-width: 750px;
   margin: 0 auto;
@@ -8,11 +11,15 @@
 
 // 顶部栏
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 26px 42px;
-  padding-top: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top));
   border-bottom: 1px solid $border-color-light;
 }
 

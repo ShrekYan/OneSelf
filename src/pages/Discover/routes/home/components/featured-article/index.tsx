@@ -20,7 +20,7 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
   authorAvatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
   publishDate = 'Oct 24',
   readTime = '5 min read',
-  coverImage = 'https://images.unsplash.com/photo-1558655146-d09347e54404?w=750&h=400&fit=crop',
+  coverImage = 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=750&h=400&fit=crop',
   onBookmarkClick,
   onArticleClick,
 }) => {

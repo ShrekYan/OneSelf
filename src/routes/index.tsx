@@ -6,6 +6,7 @@ import DiscoverHome from '@/pages/Discover/routes/home';
 import Explore from '@/pages/Discover/routes/explore';
 import Saved from '@/pages/Discover/routes/saved';
 import Profile from '@/pages/Discover/routes/profile';
+import Search from '@/pages/Discover/routes/search';
 
 const Login = lazy(() => import('@/pages/login'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -28,6 +29,10 @@ const routes = [
   {
     path: '/article/:id',
     element: <ArticleDetail />,
+  },
+  {
+    path: '/search',
+    element: <Search />,
   },
   {
     path: '/',

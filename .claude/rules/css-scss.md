@@ -85,9 +85,12 @@ font-size: 10vw;
 ## SCSS 使用规范
 
 ### @import 顺序
-1. 变量文件 (`@import '@/styles/variables';`)
-2. 工具混入 (`@import '@/styles/mixins';`)
-3. 其他
+> **重要**: `$variables` 和 `mixins` 已经通过 `additionalData` 在全局注入，**不需要手动 import**，直接使用即可！
+
+如果需要导入其他 SCSS 文件，按以下顺序：
+1. 全局变量（已自动注入，无需导入）
+2. 工具混入（已自动注入，无需导入）
+3. 其他局部导入
 
 ### 嵌套规则
 - 嵌套深度不超过 **3 层**
