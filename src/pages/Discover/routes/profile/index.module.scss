@@ -41,6 +41,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.2s ease;
+
+  &:active {
+    opacity: 0.7;
+  }
 
   svg {
     width: 42px;
@@ -89,6 +94,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.2s ease;
+
+  &:active {
+    opacity: 0.7;
+  }
 }
 
 .userName {

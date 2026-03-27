@@ -5,7 +5,7 @@
 
 import { Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
-import api from '@/api';
+import { DEFAULT_USER_INFO } from './constant';
 
 import type { MenuItem } from './constant';
 import type { UserInfo } from './useStore';
@@ -30,7 +30,8 @@ export const handleSaveEdit = async (
 ): Promise<void> => {
   store.setLoading(true);
   try {
-    await api.user.updateUserInfo(userInfo);
+    // Mock: 延迟模拟网络请求
+    await new Promise(resolve => setTimeout(resolve, 500));
     store.updateUserInfo(userInfo);
     store.setIsEditing(false);
     Toast.show({
@@ -84,7 +85,8 @@ export const useHandleSignOut = () => {
   const navigate = useNavigate();
   return async (store: ProfileStoreType): Promise<void> => {
     try {
-      await api.user.signOut();
+      // Mock: 延迟模拟网络请求
+      await new Promise(resolve => setTimeout(resolve, 300));
       store.clearUserInfo();
       Toast.show({
         icon: 'success',
@@ -108,8 +110,9 @@ export const useHandleSignOut = () => {
 export const fetchUserInfo = async (store: ProfileStoreType): Promise<void> => {
   store.setLoading(true);
   try {
-    const response = await api.user.getUserInfo();
-    store.setUserInfo(response.userInfo);
+    // Mock: 延迟模拟网络请求，使用默认 mock 数据
+    await new Promise(resolve => setTimeout(resolve, 300));
+    store.setUserInfo(DEFAULT_USER_INFO);
   } catch (error) {
     console.error('加载用户信息失败:', error);
     Toast.show({
