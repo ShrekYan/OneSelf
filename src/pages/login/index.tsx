@@ -55,7 +55,7 @@ const Login: React.FC = () => {
       if (apiResult.success) {
         Toast.show({
           icon: 'success',
-          content: '登录成功！',
+          content: 'Login successful!',
         });
         // 这里可以保存 token 并跳转到首页
         setTimeout(() => {
@@ -64,21 +64,23 @@ const Login: React.FC = () => {
       } else {
         Toast.show({
           icon: 'fail',
-          content: apiResult.message || '登录失败，请检查账号和密码',
+          content:
+            apiResult.message ||
+            'Login failed, please check your account and password',
         });
       }
     } catch (error) {
-      console.error('登录错误:', error);
+      console.error('Login error:', error);
       Toast.show({
         icon: 'fail',
-        content: '登录失败，请稍后重试',
+        content: 'Login failed, please try again later',
       });
     }
   });
 
   return useObserver(() => {
     return (
-      <div className={styles.container}>
+      <div className={styles.loginRoot}>
         {/* Logo 和标题区域 */}
         <div className={styles.logoSection}>
           <div className={styles.logo}>
@@ -91,7 +93,7 @@ const Login: React.FC = () => {
               <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
             </svg>
           </div>
-          <h1 className={styles.appName}>欢迎登录</h1>
+          <h1 className={styles.appName}>Welcome</h1>
         </div>
 
         {/* 表单区域 */}
@@ -100,7 +102,7 @@ const Login: React.FC = () => {
             {/* 账号输入框 */}
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="account">
-                手机号/用户名
+                Phone/Username
               </label>
               <div className={styles.inputWrapper}>
                 <span className={styles.inputIcon}>
@@ -116,7 +118,7 @@ const Login: React.FC = () => {
                 <input
                   id="account"
                   type="text"
-                  placeholder="请输入手机号/用户名"
+                  placeholder="Enter phone or username"
                   className={styles.input}
                   {...register('account')}
                   disabled={store.isLoading || isSubmitting}
@@ -130,7 +132,7 @@ const Login: React.FC = () => {
             {/* 密码输入框 */}
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="password">
-                密码
+                Password
               </label>
               <div className={styles.inputWrapper}>
                 <span className={styles.inputIcon}>
@@ -147,7 +149,7 @@ const Login: React.FC = () => {
                 <input
                   id="password"
                   type={store.showPassword ? 'text' : 'password'}
-                  placeholder="请输入密码"
+                  placeholder="Enter password"
                   className={styles.input}
                   {...register('password')}
                   disabled={store.isLoading || isSubmitting}
@@ -200,7 +202,7 @@ const Login: React.FC = () => {
                   handleForgotPassword();
                 }}
               >
-                忘记密码
+                Forgot Password
               </a>
             </div>
 
@@ -212,7 +214,7 @@ const Login: React.FC = () => {
                 onChange={checked => setValue('agreeTerms', checked)}
               />
               <span className={styles.agreementText}>
-                我已阅读并同意{' '}
+                I have read and agree to{' '}
                 <a
                   href="#"
                   className={styles.link}
@@ -221,9 +223,9 @@ const Login: React.FC = () => {
                     handleUserAgreement();
                   }}
                 >
-                  《用户协议》
+                  User Agreement
                 </a>
-                {' 和 '}
+                {' and '}
                 <a
                   href="#"
                   className={styles.link}
@@ -232,7 +234,7 @@ const Login: React.FC = () => {
                     handlePrivacyPolicy();
                   }}
                 >
-                  《隐私政策》
+                  Privacy Policy
                 </a>
               </span>
             </div>
@@ -248,7 +250,7 @@ const Login: React.FC = () => {
               className={styles.loginButton}
               disabled={store.isLoading || isSubmitting}
             >
-              {store.isLoading || isSubmitting ? '登录中...' : '登录'}
+              {store.isLoading || isSubmitting ? 'Logging in...' : 'Login'}
             </button>
           </form>
         </div>
@@ -256,7 +258,7 @@ const Login: React.FC = () => {
         {/* 底部注册链接 */}
         <div className={styles.footerSection}>
           <span className={styles.registerText}>
-            还没有账号？
+            Don't have an account?
             <a
               href="#"
               className={styles.registerLink}
@@ -265,7 +267,7 @@ const Login: React.FC = () => {
                 handleRegister();
               }}
             >
-              立即注册
+              Sign Up
             </a>
           </span>
         </div>

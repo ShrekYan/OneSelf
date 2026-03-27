@@ -1,90 +1,86 @@
 .articleActionsContainer {
   position: fixed;
-  left: 50%;
-  bottom: 0;
-  transform: translate-x(-50%);
-  width: 100%;
-  max-width: 750px;
-  background: rgb(255 255 255 / 95%);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgb(0 0 0 / 6%);
-  padding: 20px 32px calc(20px + env(safe-area-inset-bottom));
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  will-change: transform;
+  touch-action: none;
+  border-radius: 32px;
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 3px 16px rgb(0 0 0 / 12%);
+  border: 1px solid rgb(0 0 0 / 5%);
   z-index: 100;
-  box-shadow: 0 -4px 20px rgb(0 0 0 / 8%);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  user-select: none;
+  user-select: none;
+
+  &.isDragging {
+    transition: none;
+    opacity: 0.8;
+    cursor: grabbing;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 18%);
+  }
 
   .actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 3px;
+    padding: 5px 6px;
 
     .actionItem {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 80px;
-      padding: 10px 0;
+      padding: 3px 4px;
       border: none;
       background: transparent;
       cursor: pointer;
-      transition: all 0.25s ease;
-      border-radius: 12px;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      min-height: 40px;
+      min-width: 40px;
 
       .icon {
-        font-size: 40px;
-        color: #667085;
-        transition: all 0.25s ease;
+        font-size: 22px;
+        color: $text-secondary;
+        transition: all 0.2s ease;
       }
 
       .label {
-        font-size: 22px;
-        color: #667085;
-        margin-top: 6px;
-        font-weight: 500;
-        transition: all 0.25s ease;
+        font-size: 13px;
+        color: $text-secondary;
+        margin-top: 0;
+        font-weight: 400;
+        transition: all 0.2s ease;
+        line-height: 1;
       }
 
       &.active {
+        background: rgba($primary-purple, 0.08);
+
         .icon {
-          background: linear-gradient(135deg, #ff6b8b 0%, #ff4d4f 100%);
-          background-clip: text;
+          background: linear-gradient(135deg, $primary-purple 0%, #a77bfa 100%);
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
 
         .label {
-          color: #ff4d4f;
+          color: $primary-purple;
           font-weight: 500;
         }
       }
 
       &:hover {
-        background: rgb(0 0 0 / 2%);
-        transform: translate-y(-2px);
+        background: rgb(0 0 0 / 4%);
       }
 
       &:active {
-        transform: translate-y(0);
-        opacity: 0.8;
-      }
-    }
-
-    .primaryAction {
-      flex: 1;
-      max-width: 200px;
-      background: linear-gradient(135deg, #4e5ba6 0%, #6b7bcd 100%);
-      border-radius: 40px;
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgb(78 91 166 / 35%);
-      transition: all 0.2s ease;
-
-      &:active {
-        transform: translate-y(2px);
-        box-shadow: 0 2px 8px rgb(78 91 166 / 35%);
+        opacity: 0.75;
+        background: rgb(0 0 0 / 6%);
       }
     }
   }

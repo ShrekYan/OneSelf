@@ -23,7 +23,7 @@ const ArticleDetail: React.FC = () => {
   const handleToggleLike = (): void => {
     store.toggleLike();
     Toast.show({
-      content: store.article.isLiked ? '已点赞' : '已取消点赞',
+      content: store.article.isLiked ? 'Liked' : 'Unliked',
       duration: 1500,
     });
   };
@@ -31,27 +31,27 @@ const ArticleDetail: React.FC = () => {
   const handleToggleCollect = (): void => {
     store.toggleCollect();
     Toast.show({
-      content: store.article.isCollected ? '已收藏' : '已取消收藏',
+      content: store.article.isCollected ? 'Saved' : 'Unsaved',
       duration: 1500,
     });
   };
 
   const handleCommentClick = (): void => {
     Toast.show({
-      content: '评论功能开发中',
+      content: 'Comments feature is under development',
       duration: 1500,
     });
   };
 
   const handleShareClick = (): void => {
     Toast.show({
-      content: '分享功能开发中',
+      content: 'Share feature is under development',
       duration: 1500,
     });
   };
 
   return useObserver(() => (
-    <div className={styles.container}>
+    <div className={styles.articleDetailRoot}>
       <ArticleHeader
         title={store.article.title}
         publishTime={store.article.publishTime}

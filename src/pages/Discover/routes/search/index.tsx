@@ -51,14 +51,14 @@ const SearchPage: React.FC = () => {
   );
 
   return useObserver(() => (
-    <div className={styles.container}>
+    <div className={styles.searchRoot}>
       {/* 顶部搜索栏 */}
       <header className={styles.searchBar}>
         <button
           className={styles.backBtn}
           onClick={handleGoBack}
           type="button"
-          aria-label="返回"
+          aria-label="Go back"
         >
           <svg viewBox="0 0 24 24">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -75,7 +75,7 @@ const SearchPage: React.FC = () => {
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="搜索文章、分类..."
+            placeholder="Search articles, categories..."
             value={searchStore.searchKeyword}
             onChange={e => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -89,7 +89,7 @@ const SearchPage: React.FC = () => {
           disabled={searchStore.searchKeyword.trim().length === 0}
           type="button"
         >
-          搜索
+          Search
         </button>
       </header>
 
@@ -99,7 +99,7 @@ const SearchPage: React.FC = () => {
           {/* 热门搜索推荐 */}
           {searchStore.hotSearches.length > 0 && (
             <section className={styles.hotSection}>
-              <h2 className={styles.sectionTitle}>热门搜索</h2>
+              <h2 className={styles.sectionTitle}>Trending Searches</h2>
               <div className={styles.hotTags}>
                 {searchStore.hotSearches.map(item => (
                   <button
@@ -119,13 +119,13 @@ const SearchPage: React.FC = () => {
           {searchStore.searchHistory.length > 0 && (
             <section className={styles.historySection}>
               <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>搜索历史</h2>
+                <h2 className={styles.sectionTitle}>Search History</h2>
                 <button
                   className={styles.clearBtn}
                   onClick={handleClearHistory}
                   type="button"
                 >
-                  清空
+                  Clear All
                 </button>
               </div>
 
@@ -148,7 +148,7 @@ const SearchPage: React.FC = () => {
                     <div
                       className={styles.deleteIcon}
                       onClick={e => handleDeleteHistory(keyword, e)}
-                      aria-label="删除"
+                      aria-label="Delete"
                     >
                       <svg viewBox="0 0 24 24">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -169,7 +169,7 @@ const SearchPage: React.FC = () => {
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
-                <p className={styles.emptyText}>还没有搜索记录</p>
+                <p className={styles.emptyText}>No search history yet</p>
               </div>
             )}
         </>
@@ -177,19 +177,19 @@ const SearchPage: React.FC = () => {
         /* 已搜索，显示结果区域 */
         <section className={styles.resultSection}>
           {searchStore.loading ? (
-            <div>加载中...</div>
+            <div className={styles.loadingText}>Loading...</div>
           ) : searchStore.searchResults.length === 0 ? (
             <div className={styles.emptyState}>
               <svg viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="9" />
                 <line x1="18" y1="18" x2="6" y2="6" />
               </svg>
-              <p className={styles.emptyText}>未找到相关结果</p>
+              <p className={styles.emptyText}>No results found</p>
             </div>
           ) : (
             <div>
-              {/* 搜索结果列表将在这里渲染，占位 */}
-              搜索结果展示区域 - 待实现
+              {/* Search result list will be rendered here, placeholder */}
+              Search results area - to be implemented
             </div>
           )}
         </section>

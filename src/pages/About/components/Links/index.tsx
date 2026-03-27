@@ -11,7 +11,7 @@ interface LinksProps {
 const Links: React.FC<LinksProps> = ({ links, onLinkClick }) => {
   return (
     <div className={styles.linksContainer}>
-      <h2 className={styles.sectionTitle}>联系我们</h2>
+      <h2 className={styles.sectionTitle}>Contact Us</h2>
       {links.map(link => (
         <div
           key={link.id}

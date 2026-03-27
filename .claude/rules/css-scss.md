@@ -17,10 +17,6 @@
 
 ```scss
 // ✅ 正确
-.container {
-  display: flex;
-}
-
 .searchBar {
   .searchInput {
     // ...
@@ -35,6 +31,41 @@
 #search-bar {
   // ID 选择器禁止使用
 }
+```
+
+### 根容器命名特殊规则
+
+为了避免 `.container` 过度复用导致搜索结果污染，**每个组件/页面的根容器必须使用组件前缀命名**：
+
+| 场景 | 所在目录 | 根容器命名规则 | 示例 |
+|------|----------|---------------|------|
+| **页面根容器** | `src/pages/[PageName]/` | `{pageName}Root` | `About` → `.aboutRoot` |
+| **页面内子组件** | `src/pages/.../components/[ComponentName]/` | `{componentName}Root` | `ArticleListItem` → `.articleListItemRoot` |
+| **全局公共组件** | `src/components/[ComponentName]/` | `{componentName}Root` | `LazyImage` → `.lazyImageRoot` |
+| **Discover 分页** | `src/pages/Discover/routes/[RouteName]/` | `{routeName}Root` | `profile` → `.profileRoot` |
+
+**规则细节**：
+1. 只有根容器需要遵循此规则，内部元素保持原有灵活命名规则不变
+2. 大小写转换：PascalCase 目录 → 首字母小写 camelCase
+   - `ArticleListItem` → `articleListItemRoot`
+   - `bottom-nav` (kebab-case) → `bottomNavRoot`
+3. 完全兼容现有规范：依然是 camelCase，不违反当前 CSS/SCSS 规范
+4. 渐进式迁移：新建文件必须遵守，旧文件逐步修改
+
+```scss
+// ✅ 正确 - About 页面根容器
+.aboutRoot {
+  padding: 16px;
+}
+```
+
+```tsx
+// TSX 引用方式不变
+import styles from './index.module.scss';
+
+<div className={styles.aboutRoot}>
+  {/* 内容 */}
+</div>
 ```
 
 ### CSS 属性顺序
@@ -170,6 +201,7 @@ import styles from './index.module.scss';
 
 - [ ] 文件命名是否为 `index.module.scss`？
 - [ ] class 选择器是否使用 camelCase？
+- [ ] **根容器是否遵循命名规则**（`{componentName}Root`）？
 - [ ] 是否使用 px 单位（不是手动 vw）？
 - [ ] 点击元素尺寸是否 ≥ 44px？
 - [ ] 嵌套深度是否 ≤ 3 层？

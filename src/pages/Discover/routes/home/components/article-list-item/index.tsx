@@ -1,4 +1,5 @@
 import React from 'react';
+import { LazyImage } from '@/components';
 import styles from './index.module.scss';
 
 export interface ArticleItem {
@@ -72,7 +73,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
   if (!hasCover) {
     return (
       <div
-        className={styles.container}
+        className={styles.articleListItemRoot}
         onClick={handleClick}
         role="article"
         tabIndex={0}
@@ -84,7 +85,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
             <p className={styles.description}>{description}</p>
             <div className={styles.footer}>
               <div className={styles.authorInfo}>
-                <img
+                <LazyImage
                   src={authorAvatar}
                   alt={authorName}
                   className={styles.authorAvatar}
@@ -138,7 +139,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
 
   return (
     <div
-      className={styles.container}
+      className={styles.articleListItemRoot}
       onClick={handleClick}
       role="article"
       tabIndex={0}
@@ -150,7 +151,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
           <p className={styles.description}>{description}</p>
           <div className={styles.footer}>
             <div className={styles.authorInfo}>
-              <img
+              <LazyImage
                 src={authorAvatar}
                 alt={authorName}
                 className={styles.authorAvatar}
@@ -199,11 +200,10 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
         </div>
         {coverImage && hasCover && (
           <div className={styles.coverContainer}>
-            <img
+            <LazyImage
               src={coverImage}
               alt={title}
               className={styles.coverImage}
-              loading="lazy"
             />
           </div>
         )}

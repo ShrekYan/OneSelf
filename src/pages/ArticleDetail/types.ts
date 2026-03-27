@@ -1,9 +1,9 @@
 /**
- * 文章详情页面类型定义
+ * Article detail page type definitions
  */
 
 /**
- * 文章作者信息
+ * Article author information
  */
 export interface ArticleAuthor {
   id: string;
@@ -13,7 +13,7 @@ export interface ArticleAuthor {
 }
 
 /**
- * 文章统计信息
+ * Article statistics
  */
 export interface ArticleStats {
   readCount: number;
@@ -23,7 +23,7 @@ export interface ArticleStats {
 }
 
 /**
- * 文章标签
+ * Article tag
  */
 export interface ArticleTag {
   id: string;
@@ -31,7 +31,7 @@ export interface ArticleTag {
 }
 
 /**
- * 文章详情数据结构
+ * Article detail data structure
  */
 export interface ArticleDetail {
   id: string;

@@ -12,6 +12,5 @@ export interface BottomNavItem {
 export const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { id: 'home', name: 'Home' },
   { id: 'explore', name: 'Explore' },
-  { id: 'saved', name: 'Saved' },
   { id: 'profile', name: 'Profile' },
 ];

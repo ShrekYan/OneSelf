@@ -15,9 +15,9 @@ const App: React.FC = () => {
     <GlobalStoreProvider>
       <div className="app-container">
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          {isLoading && <Loading tip="加载中..." />}
+          {isLoading && <Loading tip="loading..." />}
           <div className="app-content">
-            <Suspense fallback={<Loading tip="页面加载中..." />}>
+            <Suspense fallback={<Loading tip="loading..." />}>
               {element}
             </Suspense>
           </div>

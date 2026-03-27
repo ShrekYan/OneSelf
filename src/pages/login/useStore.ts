@@ -63,7 +63,7 @@ const useLoginStore: UseLoginStoreType = () => {
           this.isLoading = false;
         });
       } catch (error) {
-        console.error('登录失败:', error);
+        console.error('Login failed:', error);
         runInAction(() => {
           this.isLoading = false;
         });

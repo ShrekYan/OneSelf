@@ -8,64 +8,64 @@ import type { ArticleDetail } from './types';
 
 export const MOCK_ARTICLE_DETAIL: ArticleDetail = {
   id: 'article-001',
-  title: '如何写出可维护的 React 组件 - 前端最佳实践分享',
+  title: 'How to Write Maintainable React Components - Best Practices',
   summary:
-    '本文分享了一些在大型项目中编写可维护 React 组件的实践经验，从组件设计、目录结构到状态管理，全方位提升代码质量。',
+    'This article shares practical experience for writing maintainable React components in large projects, from component design and folder structure to state management, improving code quality comprehensively.',
   content: `
-# 如何写出可维护的 React 组件
+# How to Write Maintainable React Components
 
-在大型前端项目中，代码的可维护性比短期的开发速度更加重要。本文将分享一些我在实际项目中总结的最佳实践。
+In large frontend projects, code maintainability is more important than short-term development speed. This article shares best practices I've summarized from real-world projects.
 
-## 1. 组件拆分原则
+## 1. Component Splitting Principles
 
-一个组件只做一件事。如果一个组件超过了 300 行，就应该考虑拆分。
+One component should do only one thing. If a component exceeds 300 lines, you should consider splitting it.
 
-### 拆分的信号：
-- 组件中有多个独立的功能区块
-- 某个部分可以被复用
-- 注释把代码分成了多个部分
+### Signs for Splitting:
+- Multiple independent functional blocks in one component
+- A specific part can be reused elsewhere
+- Comments divide the code into multiple sections
 
-## 2. 目录结构规范
+## 2. Directory Structure Guidelines
 
-好的目录结构能让新来的同事一眼就找到需要修改的地方。我们项目现在使用的结构是：
+A good directory structure helps new team members find what they need to modify quickly. The structure we use in our project is:
 
 \`\`\`
 ComponentName/
-├── index.tsx           # 组件代码
-└── index.module.scss  # 组件样式
+├── index.tsx           # Component code
+└── index.module.scss  # Component styles
 \`\`\`
 
-每个组件独立自治，包含自己的逻辑和样式，修改的时候只需要进入这个文件夹即可。
+Each component is self-contained with its own logic and styles. You only need to enter this folder when making changes.
 
-## 3. TypeScript 类型安全
+## 3. TypeScript Type Safety
 
-不要滥用 any，给所有的 Props 和数据都加上正确的类型。类型系统是最好的文档。
+Don't abuse any. Give correct types to all Props and data. The type system is the best documentation.
 
-### 推荐做法：
-- 使用 interface 定义组件 Props
-- 使用联合类型代替 enum
-- 利用 TypeScript 的类型推断减少冗余声明
+### Recommended Practices:
+- Use interface to define component Props
+- Use union types instead of enum
+- Leverage TypeScript type inference to reduce redundant declarations
 
-## 4. 状态管理的选择
+## 4. State Management Selection
 
-不是所有状态都需要放到全局 Store。
+Not all state needs to go into the global Store.
 
-- 组件内部状态：useState / useLocalObservable
-- 页面级状态：MobX Store
-- 全局共享状态：Root Store
+- Component internal state: useState / useLocalObservable
+- Page-level state: MobX Store
+- Global shared state: Root Store
 
-## 总结
+## Summary
 
-写出可维护的代码是一种习惯，需要长期的练习和总结。希望这些经验对你有所帮助。
+Writing maintainable code is a habit that requires long-term practice and reflection. I hope these experiences help you.
   `,
   coverImage:
     'https://via.placeholder.com/750x400/667eea/ffffff?text=Article+Cover',
-  publishTime: '2024-03-26 10:00',
+  publishTime: 'Mar 26, 2024 10:00',
   author: {
     id: 'author-001',
-    name: '前端开发者',
+    name: 'Frontend Developer',
     avatar: 'https://via.placeholder.com/80x80/f5f5f5/666?text=AV',
-    bio: '热爱技术，分享成长',
+    bio: 'Passionate about technology, sharing and growing',
   },
   stats: {
     readCount: 1234,
@@ -75,8 +75,8 @@ ComponentName/
   },
   tags: [
     { id: 'tag-1', name: 'React' },
-    { id: 'tag-2', name: '前端' },
-    { id: 'tag-3', name: '最佳实践' },
+    { id: 'tag-2', name: 'Frontend' },
+    { id: 'tag-3', name: 'Best Practices' },
   ],
   isCollected: false,
   isLiked: false,

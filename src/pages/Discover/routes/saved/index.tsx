@@ -9,7 +9,7 @@ import styles from './index.module.scss';
  * Saved 收藏页面
  */
 const Saved: React.FC = () => (
-  <div className={styles.container}>
+  <div className={styles.savedRoot}>
     <p className={styles.text}>Saved - Coming Soon</p>
   </div>
 );

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDraggable } from '@/hooks/useDraggable';
 import styles from './index.module.scss';
 
 interface ArticleActionsProps {
@@ -29,8 +30,68 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
     return String(count);
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
+  const [safeArea] = useState({
+    top: 0, // No top safe area - allow drag to top edge
+    bottom:
+      0 +
+      (parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--safe-area-inset-bottom',
+        ),
+        10,
+      ) || 0),
+    left: 0,
+    right: 0,
+  });
+
+  // Get container size and calculate initial position (left side vertical center)
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    setContainerSize({ width, height });
+
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
+    const initialX = screenWidth - width; // Snap to left edge
+    const initialY = screenHeight - height; // Vertical center
+
+    setInitialPosition({ x: initialX, y: initialY });
+  }, [safeArea.bottom, safeArea.top, safeArea.left]);
+
+  const { x, y, isDragging, bindDrag } = useDraggable({
+    initialX: initialPosition.x,
+    initialY: initialPosition.y,
+    containerWidth: containerSize.width,
+    containerHeight: containerSize.height,
+    enableSnap: true,
+    snapThreshold: 80,
+    safeTop: safeArea.top,
+    safeBottom: safeArea.bottom,
+    safeLeft: safeArea.left,
+    safeRight: safeArea.right,
+  });
+
+  // Bind the element to hammer
+  useEffect(() => {
+    if (containerRef.current) {
+      bindDrag(containerRef.current);
+    }
+  }, [bindDrag]);
+
   return (
-    <div className={styles.articleActionsContainer}>
+    <div
+      ref={containerRef}
+      className={`${styles.articleActionsContainer} ${isDragging ? styles.isDragging : ''}`}
+      style={{
+        transform: `translate(${x}px, ${y}px)`,
+      }}
+    >
       <div className={styles.actions}>
         <button
           type="button"
@@ -39,8 +100,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
         >
           {isLiked ? (
             <svg
-              width="36"
-              height="36"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="currentColor"
               stroke="currentColor"
@@ -51,8 +112,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             </svg>
           ) : (
             <svg
-              width="36"
-              height="36"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -72,8 +133,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
         >
           {isCollected ? (
             <svg
-              width="36"
-              height="36"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="currentColor"
               stroke="currentColor"
@@ -84,8 +145,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             </svg>
           ) : (
             <svg
-              width="36"
-              height="36"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -104,8 +165,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
           onClick={onCommentClick}
         >
           <svg
-            width="36"
-            height="36"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -114,7 +175,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
-          <span className={styles.label}>评论</span>
+          <span className={styles.label}>Comments</span>
         </button>
 
         <button
@@ -123,8 +184,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
           onClick={onShareClick}
         >
           <svg
-            width="36"
-            height="36"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -137,7 +198,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
           </svg>
-          <span className={styles.label}>分享</span>
+          <span className={styles.label}>Share</span>
         </button>
       </div>
     </div>

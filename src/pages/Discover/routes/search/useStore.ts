@@ -6,32 +6,32 @@ import type { HotSearchItem } from './constant';
  * Search 页面 Store 类型定义
  */
 export interface SearchStoreType {
-  /** 当前搜索关键词 */
+  /** Current search keyword */
   searchKeyword: string;
-  /** 搜索历史记录 */
+  /** Search history records */
   searchHistory: string[];
-  /** 热门搜索数据 */
+  /** Trending search data */
   hotSearches: HotSearchItem[];
-  /** 搜索结果列表 */
+  /** Search result list */
   searchResults: unknown[];
-  /** 加载状态 */
+  /** Loading state */
   loading: boolean;
-  /** 是否已执行搜索 */
+  /** Whether search has been executed */
   hasSearched: boolean;
 
-  /** 设置搜索关键词 */
+  /** Set search keyword */
   setSearchKeyword: (keyword: string) => void;
-  /** 添加搜索历史 */
+  /** Add search history */
   addSearchHistory: (keyword: string) => void;
-  /** 移除单条搜索历史 */
+  /** Remove a single search history */
   removeSearchHistory: (keyword: string) => void;
-  /** 清空所有搜索历史 */
+  /** Clear all search history */
   clearSearchHistory: () => void;
-  /** 设置加载状态 */
+  /** Set loading state */
   setLoading: (loading: boolean) => void;
-  /** 设置搜索状态 */
+  /** Set search state */
   setHasSearched: (hasSearched: boolean) => void;
-  /** 设置搜索结果 */
+  /** Set search results */
   setSearchResults: (results: unknown[]) => void;
 }
 
@@ -59,7 +59,7 @@ const useSearchStore: UseSearchStoreType = initialHotSearches => {
     addSearchHistory(keyword: string) {
       const trimmedKeyword = keyword.trim();
       if (!trimmedKeyword) return;
-      // 移除重复，添加到最前面，最多保留 10 条
+      // Remove duplicates, add to front, keep max 10 items
       const filtered = this.searchHistory.filter(
         item => item !== trimmedKeyword,
       );

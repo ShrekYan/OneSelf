@@ -195,7 +195,7 @@ const Product: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={styles.container}>
+      <div className={styles.productRoot}>
         {/* 顶部搜索栏 */}
         <SearchBar
           keyword={store.searchKeyword}

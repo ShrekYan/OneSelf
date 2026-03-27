@@ -1,6 +1,7 @@
 .articleContentContainer {
   margin-top: 20px;
-  padding: 0 24px 32px;
+  padding-top: 0;
+  padding: 0 33px 32px;
   background-color: #fff;
   border-radius: 20px;
   box-shadow: 0 4px 20px rgb(0 0 0 / 4%);
@@ -9,12 +10,12 @@
     padding-top: 32px;
     font-size: 30px;
     line-height: 2;
-    color: #333f51;
+    color: $text-secondary;
 
     h1 {
       font-size: 40px;
       font-weight: 700;
-      color: #1d2129;
+      color: $text-primary;
       margin: 40px 0 20px;
       letter-spacing: -0.5px;
       padding-bottom: 12px;
@@ -24,7 +25,7 @@
     h2 {
       font-size: 36px;
       font-weight: 600;
-      color: #1d2129;
+      color: $text-primary;
       margin: 36px 0 16px;
       letter-spacing: -0.3px;
     }
@@ -32,20 +33,20 @@
     h3 {
       font-size: 32px;
       font-weight: 600;
-      color: #1d2129;
+      color: $text-primary;
       margin: 32px 0 14px;
     }
 
     p {
       margin: 20px 0;
-      color: #333f51;
+      color: $text-secondary;
     }
 
     code {
       padding: 4px 10px;
       font-size: 26px;
-      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
-      color: #4e5ba6;
+      background: linear-gradient(135deg, #f5f0ff 0%, #f0ebff 100%);
+      color: $primary-purple;
       border-radius: 6px;
       font-weight: 500;
     }
@@ -68,9 +69,9 @@
     blockquote {
       margin: 28px 0;
       padding: 20px 24px;
-      color: #4e5969;
-      background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
-      border-left: 6px solid #36cffd;
+      color: $text-secondary;
+      background: linear-gradient(135deg, #f3f0ff 0%, #f8f5ff 100%);
+      border-left: 6px solid $primary-purple;
       border-radius: 8px;
       font-style: italic;
     }
@@ -88,19 +89,19 @@
 
       li {
         margin: 12px 0;
-        color: #333f51;
+        color: $text-secondary;
       }
     }
 
     a {
-      color: #4e5ba6;
+      color: $primary-purple;
       text-decoration: none;
-      border-bottom: 1px solid #4e5ba6;
+      border-bottom: 1px solid $primary-purple;
       transition: all 0.2s;
 
       &:hover {
-        color: #364fc7;
-        border-bottom-color: #364fc7;
+        color: color.adjust($primary-purple, $lightness: -10%);
+        border-bottom-color: color.adjust($primary-purple, $lightness: -10%);
       }
     }
 

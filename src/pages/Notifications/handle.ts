@@ -53,8 +53,9 @@ export const useHandleLongPress = (store: NotificationsStoreType) => {
 export const useHandleDelete = (store: NotificationsStoreType) => {
   const handleDelete = async (id: string) => {
     const confirmed = await Dialog.confirm({
-      title: '删除消息',
-      content: '确定要删除这条消息吗？删除后无法恢复。',
+      title: 'Delete Notification',
+      content:
+        'Are you sure you want to delete this notification? This cannot be undone.',
     });
 
     if (confirmed) {
@@ -87,8 +88,8 @@ export const useHandleMarkAllAsRead = (store: NotificationsStoreType) => {
     if (store.unreadCount === 0) return;
 
     const confirmed = await Dialog.confirm({
-      title: '全部已读',
-      content: '确定要标记所有消息为已读吗？',
+      title: 'Read All',
+      content: 'Are you sure you want to mark all notifications as read?',
     });
 
     if (confirmed) {

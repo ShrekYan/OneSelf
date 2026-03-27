@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 // 四个主页直接导入，预先加载（不使用懒加载，提升切换体验）
 import DiscoverHome from '@/pages/Discover/routes/home';
 import Explore from '@/pages/Discover/routes/explore';
-import Saved from '@/pages/Discover/routes/saved';
+//import Saved from '@/pages/Discover/routes/saved';
 import Profile from '@/pages/Discover/routes/profile';
 import Search from '@/pages/Discover/routes/search';
 
@@ -47,7 +47,6 @@ const routes = [
       { index: true, element: <Navigate to="/home" replace /> },
       { path: 'home', element: <DiscoverHome /> },
       { path: 'explore', element: <Explore /> },
-      { path: 'saved', element: <Saved /> },
       { path: 'profile', element: <Profile /> },
       { path: 'about', element: <About /> },
     ],

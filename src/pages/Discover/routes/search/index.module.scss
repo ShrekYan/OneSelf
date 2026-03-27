@@ -1,4 +1,4 @@
-.container {
+.searchRoot {
   min-height: 100vh;
   background-color: $background-color;
   display: flex;
@@ -270,4 +270,11 @@
 .resultSection {
   flex: 1;
   padding: 20px 30px;
+}
+
+.loadingText {
+  font-size: 32px;
+  color: $text-secondary;
+  text-align: center;
+  padding: 60px 0;
 }

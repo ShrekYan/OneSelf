@@ -1,66 +1,37 @@
 import React from 'react';
+import classNames from 'classnames';
 import { LoadingConst } from './constant';
-import { getSizeClass } from './handle';
+import styles from './index.module.scss';
 
 interface LoadingProps {
   tip?: string;
   size?: 'small' | 'middle' | 'large';
+  className?: string;
+  /** 是否是全屏加载 */
+  fullScreen?: boolean;
 }
 
 const Loading: React.FC<LoadingProps> = ({
   tip = LoadingConst.DEFAULT_TIP,
   size = LoadingConst.SIZE.LARGE,
+  className,
+  fullScreen = true,
 }) => {
-  const sizeValue = getSizeClass(size);
-
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.1)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-      }}
+      className={classNames(
+        styles.loadingRoot,
+        fullScreen && styles.fullScreen,
+        className,
+      )}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          background: 'transparent',
-          padding: '24px 32px',
-          borderRadius: '12px',
-          boxShadow: 'none',
-        }}
-      >
-        <div
-          style={{
-            width: sizeValue,
-            height: sizeValue,
-            border: '3px solid #f3f3f3',
-            borderTop: '3px solid #1890ff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-          }}
-        />
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-        {tip && <div style={{ fontSize: '14px', color: '#666666' }}>{tip}</div>}
+      <div className={styles.content}>
+        <div className={classNames(styles.spinner, styles[size])} />
+        {tip && <div className={styles.tip}>{tip}</div>}
       </div>
     </div>
   );
 };
 
 export default Loading;
+export type { LoadingProps };

@@ -1,6 +1,6 @@
 /**
- * 搜索页面事件处理函数
- * @description 抽离业务逻辑，保持组件简洁
+ * Search page event handlers
+ * @description Extract business logic to keep component clean
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import type { SearchStoreType } from './useStore';
 
 /**
- * 处理搜索提交
+ * Handle search submission
  */
 export const useHandleSearchSubmit = (store: SearchStoreType) => {
   const handleSearchSubmit = () => {
@@ -34,7 +34,7 @@ export const useHandleSearchSubmit = (store: SearchStoreType) => {
 };
 
 /**
- * 处理热门搜索点击
+ * Handle trending search click
  */
 export const useHandleHotSearchClick = (store: SearchStoreType) => {
   const handleSearchSubmit = useHandleSearchSubmit(store);
@@ -48,20 +48,20 @@ export const useHandleHotSearchClick = (store: SearchStoreType) => {
 };
 
 /**
- * 处理搜索历史点击
+ * Handle search history click
  */
 export const useHandleHistoryClick = () => {
   const handleHistoryClick = (keyword: string) => {
-    // 点击历史关键词，跳转到搜索结果页面或直接搜索
+    // Click on history keyword, navigate to search results or search directly
     console.log('Search from history:', keyword);
-    // TODO: 实现搜索结果跳转或直接搜索
+    // TODO: Implement search result navigation or direct search
   };
 
   return handleHistoryClick;
 };
 
 /**
- * 返回上一页
+ * Go back to previous page
  */
 export const useHandleGoBack = () => {
   const navigate = useNavigate();

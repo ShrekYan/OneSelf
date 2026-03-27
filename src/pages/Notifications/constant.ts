@@ -38,9 +38,9 @@ export interface NotificationTab {
 
 /** 默认标签配置 */
 export const NOTIFICATION_TABS: NotificationTab[] = [
-  { key: 'all', title: '全部' },
-  { key: 'unread', title: '未读' },
-  { key: 'read', title: '已读' },
+  { key: 'all', title: 'All' },
+  { key: 'unread', title: 'Unread' },
+  { key: 'read', title: 'Read' },
 ];
 
 /**
@@ -50,8 +50,8 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '1',
     type: 'like',
-    title: '赞了你的文章',
-    content: 'React 19 新特性详解',
+    title: 'liked your article',
+    content: 'React 19 New Features Explained',
     fromUser: {
       id: 'u1',
       name: 'Sarah Chen',
@@ -59,7 +59,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a1',
-      title: 'React 19 新特性详解',
+      title: 'React 19 New Features Explained',
     },
     isRead: false,
     createdAt: '2024-03-26T10:30:00Z',
@@ -67,8 +67,8 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '2',
     type: 'comment',
-    title: '评论了你的文章',
-    content: '非常好的文章，受益匪浅！学习了很多新知识点。',
+    title: 'commented on your article',
+    content: 'Great article, learned a lot! Many new insights.',
     fromUser: {
       id: 'u2',
       name: 'Ming Li',
@@ -76,7 +76,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a1',
-      title: 'React 19 新特性详解',
+      title: 'React 19 New Features Explained',
     },
     isRead: false,
     createdAt: '2024-03-26T09:15:00Z',
@@ -84,7 +84,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '3',
     type: 'follow',
-    title: '关注了你',
+    title: 'followed you',
     fromUser: {
       id: 'u3',
       name: 'Alex Wang',
@@ -96,16 +96,17 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '4',
     type: 'system',
-    title: '系统通知',
-    content: '你的文章「TypeScript 进阶指南」已经被精选到首页推荐',
+    title: 'System Notification',
+    content:
+      'Your article "TypeScript Advanced Guide" has been featured on the homepage',
     isRead: false,
     createdAt: '2024-03-25T15:20:00Z',
   },
   {
     id: '5',
     type: 'like',
-    title: '赞了你的文章',
-    content: 'MobX 状态管理最佳实践',
+    title: 'liked your article',
+    content: 'MobX State Management Best Practices',
     fromUser: {
       id: 'u4',
       name: 'Lina Zhang',
@@ -113,7 +114,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a2',
-      title: 'MobX 状态管理最佳实践',
+      title: 'MobX State Management Best Practices',
     },
     isRead: true,
     createdAt: '2024-03-25T12:10:00Z',
@@ -121,8 +122,9 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '6',
     type: 'comment',
-    title: '评论了你的文章',
-    content: '请问这个案例在实际项目中如何使用？能否给出更多示例？',
+    title: 'commented on your article',
+    content:
+      'How would you use this pattern in a real project? Can you give more examples?',
     fromUser: {
       id: 'u5',
       name: 'David Liu',
@@ -130,7 +132,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a2',
-      title: 'MobX 状态管理最佳实践',
+      title: 'MobX State Management Best Practices',
     },
     isRead: true,
     createdAt: '2024-03-24T20:30:00Z',
@@ -138,15 +140,16 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '7',
     type: 'system',
-    title: '新版本更新通知',
-    content: 'V2.0.0 版本已经发布，新增了很多功能，快来体验吧！',
+    title: 'Version Update Notification',
+    content:
+      'V2.0.0 has been released with many new features, come and experience it!',
     isRead: true,
     createdAt: '2024-03-24T10:00:00Z',
   },
   {
     id: '8',
     type: 'follow',
-    title: '关注了你',
+    title: 'followed you',
     fromUser: {
       id: 'u6',
       name: 'Emma Johnson',
@@ -158,8 +161,8 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '9',
     type: 'like',
-    title: '赞了你的文章',
-    content: 'CSS Grid 布局完全指南',
+    title: 'liked your article',
+    content: 'The Complete Guide to CSS Grid Layout',
     fromUser: {
       id: 'u7',
       name: 'Ryan Brown',
@@ -167,7 +170,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a3',
-      title: 'CSS Grid 布局完全指南',
+      title: 'The Complete Guide to CSS Grid Layout',
     },
     isRead: true,
     createdAt: '2024-03-23T09:15:00Z',
@@ -175,8 +178,8 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '10',
     type: 'comment',
-    title: '评论了你的文章',
-    content: '这篇文章写得非常清楚，我终于学会了 Grid 布局！',
+    title: 'commented on your article',
+    content: 'This article is very clear, I finally understand Grid layout!',
     fromUser: {
       id: 'u8',
       name: 'Sophia Liu',
@@ -184,7 +187,7 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
     },
     targetArticle: {
       id: 'a3',
-      title: 'CSS Grid 布局完全指南',
+      title: 'The Complete Guide to CSS Grid Layout',
     },
     isRead: true,
     createdAt: '2024-03-22T14:30:00Z',
@@ -192,15 +195,16 @@ export const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
     id: '11',
     type: 'system',
-    title: '恭喜获得新成就',
-    content: '你已经连续发布 10 篇文章，解锁「创作达人」成就',
+    title: 'Congratulations on your new achievement',
+    content:
+      'You have published 10 consecutive articles, unlocked "Content Creator" achievement',
     isRead: true,
     createdAt: '2024-03-21T08:00:00Z',
   },
   {
     id: '12',
     type: 'follow',
-    title: '关注了你',
+    title: 'followed you',
     fromUser: {
       id: 'u9',
       name: 'Chris Evans',

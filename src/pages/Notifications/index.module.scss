@@ -1,96 +1,139 @@
-.notificationsContainer {
+/**
+ * 消息通知页面样式
+ * 设计稿: 750px 宽度
+ * 参考 profile 页面风格设计
+ */
+
+.notificationsRoot {
   min-height: 100vh;
-  background-color: #f7f8fa;
-  display: flex;
-  flex-direction: column;
-  max-width: 750px;
-  margin: 0 auto;
+  background-color: #fff;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.notificationsHeader {
+/* 顶部导航栏 */
+.header {
   position: sticky;
-  top: 0;
+  top:0;
+  left:0;
   z-index: 10;
+  background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 88px;
-  padding-top: env(safe-area-inset-top);
-  padding-left: 24px;
-  padding-right: 24px;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
+  padding: 20px 24px;
+  padding-top: calc(12px + env(safe-area-inset-top));
 }
 
-.notificationsBackBtn {
+.backBtn {
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 88px;
-  height: 88px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #333;
-  cursor: pointer;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: #666;
+  }
 
   &:active {
     opacity: 0.6;
   }
 }
 
-.notificationsTitle {
-  flex: 1;
-  text-align: center;
-  margin: 0;
+.pageTitle {
+  position: relative;
+  left:35px;
   font-size: 36px;
-  font-weight: 600;
-  color: #333;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-left: 10px;
 }
 
-.notificationsMarkAllBtn {
-  padding: 12px 24px;
+.markAllPlaceholder {
+  width: 48px;
+}
+
+.markAllBtn {
+  padding: 8px 20px;
   border: none;
   background: transparent;
   font-size: 28px;
   color: $primary-purple;
   cursor: pointer;
-  border-radius: 8px;
-  min-width: 120px;
-  height: 64px;
+  border-radius: 24px;
+  height: 48px;
+  white-space: nowrap;
 
   &:active {
-    background-color: rgba(136, 72, 249, 0.1);
+    background-color: rgb(136 72 249 / 10%);
   }
 }
 
-.notificationsMarkAllPlaceholder {
-  min-width: 120px;
+/* 自定义 Tabs */
+.tabsContainer {
+  margin: 0 16px 16px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 28px;
+  display: flex;
+  gap: 8px;
 }
 
-.notificationsTabsWrapper {
-  position: sticky;
-  top: calc(88px + env(safe-area-inset-top));
-  z-index: 9;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
-}
-
-.notificationsContent {
+.tabItem {
   flex: 1;
-  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 20px;
+  font-size: 30px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &.active {
+    background-color: #fff;
+    color: #1a1a1a;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    margin-left: 8px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 12px;
+    line-height: 1;
+  }
+}
+
+/* 内容区域 */
+.content {
+  flex: 1;
 }
 
 .notificationsList {
-  background-color: #fff;
+  margin: 0 16px;
+  background-color: #f5f5f5;
+  border-radius: 32px;
+  overflow: hidden;
 }
 
-.notificationsEmptyState {
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 200px 40px;
+  padding: 120px 40px;
   color: #999;
 
   svg {
@@ -98,57 +141,57 @@
   }
 }
 
-.notificationsEmptyText {
+.emptyText {
   margin: 0;
   font-size: 30px;
 }
 
 /* 底部弹出菜单 */
-.notificationsPopupBody {
+.popupBody {
   padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
 }
 
-.notificationsActionMenu {
+.actionMenu {
   padding: 16px;
 }
 
-.notificationsActionItem {
+.actionItem {
   display: flex;
   align-items: center;
   gap: 24px;
   width: 100%;
-  padding: 32px;
+  padding: 24px 28px;
   border: none;
   background: transparent;
   font-size: 32px;
   color: #333;
   cursor: pointer;
-  border-radius: 16px;
+  border-radius: 24px;
 
   &:active {
     background-color: #f5f5f5;
   }
 }
 
-.notificationsActionItemDelete {
+.actionItemDelete {
   display: flex;
   align-items: center;
   gap: 24px;
   width: 100%;
-  padding: 32px;
+  padding: 24px 28px;
   border: none;
   background: transparent;
   font-size: 32px;
   color: #ff4d4f;
   cursor: pointer;
-  border-radius: 16px;
+  border-radius: 24px;
 
   &:active {
-    background-color: rgba(255, 77, 79, 0.1);
+    background-color: rgb(255 77 79 / 10%);
   }
 }
 
-.notificationsLoadingMore {
+.loadingMore {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,7 +200,7 @@
   color: #999;
 }
 
-.notificationsNoMore {
+.noMore {
   display: flex;
   align-items: center;
   justify-content: center;

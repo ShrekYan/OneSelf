@@ -43,9 +43,9 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({
         </div>
         <div className={styles.stats}>
           <span className={styles.statItem}>
-            {formatReadCount(stats.readCount)} 阅读
+            {formatReadCount(stats.readCount)} reads
           </span>
-          <span className={styles.statItem}>{stats.commentCount} 评论</span>
+          <span className={styles.statItem}>{stats.commentCount} comments</span>
         </div>
       </div>
 

@@ -15,40 +15,40 @@ export interface LoginApiResponse {
  */
 export const handleForgotPassword = (): void => {
   Toast.show({
-    content: '跳转到忘记密码页面',
+    content: 'Navigate to forgot password page',
     position: 'bottom',
   });
   console.log('Navigate to forgot password page');
 };
 
 /**
- * 处理注册点击
+ * Handle register click
  */
 export const handleRegister = (): void => {
   Toast.show({
-    content: '跳转到注册页面',
+    content: 'Navigate to register page',
     position: 'bottom',
   });
   console.log('Navigate to register page');
 };
 
 /**
- * 处理用户协议点击
+ * Handle user agreement click
  */
 export const handleUserAgreement = (): void => {
   Toast.show({
-    content: '打开用户协议页面',
+    content: 'Open user agreement page',
     position: 'bottom',
   });
   console.log('Open user agreement page');
 };
 
 /**
- * 处理隐私政策点击
+ * Handle privacy policy click
  */
 export const handlePrivacyPolicy = (): void => {
   Toast.show({
-    content: '打开隐私政策页面',
+    content: 'Open privacy policy page',
     position: 'bottom',
   });
   console.log('Open privacy policy page');
@@ -72,6 +72,6 @@ export const mockLoginApi = async (
   return {
     success: true,
     token: 'mock-jwt-token-' + Date.now(),
-    message: '登录成功',
+    message: 'Login successful',
   };
 };

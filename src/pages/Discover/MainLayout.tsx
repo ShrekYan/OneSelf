@@ -14,7 +14,7 @@ import styles from './index.module.scss';
  */
 const MainLayout: React.FC = () => {
   return (
-    <div className={styles.container}>
+    <div className={styles.discoverRoot}>
       {/* 子路由内容在这里渲染 */}
       <Outlet />
       {/* 底部导航栏 - 始终显示不销毁 */}

@@ -10,7 +10,7 @@ interface FeaturesProps {
 const Features: React.FC<FeaturesProps> = ({ features }) => {
   return (
     <div className={styles.featuresContainer}>
-      <h2 className={styles.sectionTitle}>产品特色</h2>
+      <h2 className={styles.sectionTitle}>Features</h2>
       <div className={styles.featuresList}>
         {features.map(feature => (
           <div key={feature.id} className={styles.featureItem}>

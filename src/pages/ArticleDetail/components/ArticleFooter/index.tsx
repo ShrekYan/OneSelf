@@ -13,7 +13,7 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ authorBio }) => {
   return (
     <div className={styles.articleFooterContainer}>
       <div className={styles.authorBio}>
-        <div className={styles.label}>关于作者</div>
+        <div className={styles.label}>About the Author</div>
         <div className={styles.bio}>{authorBio}</div>
       </div>
     </div>

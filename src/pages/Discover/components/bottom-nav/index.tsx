@@ -108,7 +108,7 @@ export const BottomNav: React.FC = () => {
 
   return (
     <>
-      <div className={styles.container}>
+      <div className={styles.bottomNavRoot}>
         <div className={styles.content}>
           {BOTTOM_NAV_ITEMS.map(item => {
             const isActive = item.id === activeNavId;

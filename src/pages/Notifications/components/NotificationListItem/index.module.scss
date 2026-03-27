@@ -1,33 +1,43 @@
-.notificationListItemContainer {
+/**
+ * 消息列表项样式
+ * 遵循整体设计风格
+ */
+
+.notificationListItemRoot {
   position: relative;
   display: flex;
   align-items: center;
   min-height: 144px;
-  padding: 24px 24px 24px 32px;
+  padding: 24px 20px;
   background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:active {
     background-color: #f5f5f5;
   }
 }
 
-.notificationListItemUnreadDot {
+.unreadDot {
   position: absolute;
   top: 24px;
-  left: 16px;
+  left: 8px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
   background-color: $primary-purple;
 }
 
-.notificationListItemAvatarWrapper {
+.avatarWrapper {
   flex-shrink: 0;
   margin-right: 24px;
 }
 
-.notificationListItemAvatar {
+.avatar {
   width: 88px;
   height: 88px;
   border-radius: 50%;
@@ -35,7 +45,7 @@
   background-color: #f0f0f0;
 }
 
-.notificationListItemTypeIcon {
+.typeIcon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,66 +54,68 @@
   border-radius: 50%;
 
   svg {
+    width: 36px;
+    height: 36px;
     color: #fff;
   }
 }
 
-.notificationListItemTypeIconLike {
+.typeIconLike {
   background-color: #ff6b6b;
 }
 
-.notificationListItemTypeIconComment {
+.typeIconComment {
   background-color: #4dabf7;
 }
 
-.notificationListItemTypeIconFollow {
+.typeIconFollow {
   background-color: #51cf66;
 }
 
-.notificationListItemTypeIconSystem {
-  background-color: #ffd43b;
+.typeIconSystem {
+  background-color: #f3e8ff;
 
   svg {
-    color: #333;
+    color: #7c3aed;
   }
 }
 
-.notificationListItemContent {
+.content {
   flex: 1;
   min-width: 0;
 }
 
-.notificationListItemHeader {
+.header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 8px;
 }
 
-.notificationListItemTitle {
+.title {
   font-size: 30px;
   font-weight: 500;
-  color: #333;
+  color: #1a1a1a;
   line-height: 1.4;
 }
 
-.notificationListItemUserName {
+.userName {
   font-weight: 600;
-  color: #222;
+  color: #1a1a1a;
 }
 
-.notificationListItemTime {
+.time {
   flex-shrink: 0;
   margin-left: 16px;
   font-size: 26px;
-  color: #999;
+  color: #888;
 }
 
-.notificationListItemContentText {
+.contentText {
   font-size: 28px;
   color: #666;
   line-height: 1.5;
-  margin: 12px 0 0 0;
+  margin: 12px 0 0;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -111,13 +123,13 @@
   -webkit-box-orient: vertical;
 }
 
-.notificationListItemArrow {
+.arrow {
   flex-shrink: 0;
   margin-left: 16px;
   color: #ccc;
 }
 
-/* 未读消息背景稍微提亮 */
-.notificationListItemUnread {
+/* 未读消息样式 */
+.unread {
   background-color: #f8f9ff;
 }

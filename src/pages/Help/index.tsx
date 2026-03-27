@@ -56,14 +56,16 @@ const Help: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={styles.container}>
-        {/* 头部标题 */}
+      <div className={styles.helpRoot}>
+        {/* Header Title */}
         <div className={styles.header}>
-          <h1 className={styles.title}>帮助中心</h1>
-          <p className={styles.subtitle}>常见问题解答，快速解决您的问题</p>
+          <h1 className={styles.title}>Help Center</h1>
+          <p className={styles.subtitle}>
+            Frequently asked questions to quickly solve your problems
+          </p>
         </div>
 
-        {/* FAQ 折叠面板 */}
+        {/* FAQ Collapse Panel */}
         <div className={styles.faqContainer}>
           <Collapse
             accordion={true}
@@ -82,20 +84,20 @@ const Help: React.FC = () => {
           </Collapse>
         </div>
 
-        {/* 联系信息 */}
+        {/* Contact Information */}
         <div className={styles.contactSection}>
-          <h3 className={styles.contactTitle}>联系方式</h3>
+          <h3 className={styles.contactTitle}>Contact Us</h3>
           <div className={styles.contactInfo}>
             <div className={styles.contactItem} onClick={onEmailClick}>
-              <span className={styles.label}>邮箱：</span>
+              <span className={styles.label}>Email: </span>
               <span className={styles.value}>{store.contactInfo.email}</span>
             </div>
             <div className={styles.contactItem} onClick={onPhoneClick}>
-              <span className={styles.label}>电话：</span>
+              <span className={styles.label}>Phone: </span>
               <span className={styles.value}>{store.contactInfo.phone}</span>
             </div>
             <div className={styles.contactItem}>
-              <span className={styles.label}>工作时间：</span>
+              <span className={styles.label}>Working Hours: </span>
               <span className={styles.value}>
                 {store.contactInfo.workingHours}
               </span>
@@ -103,20 +105,20 @@ const Help: React.FC = () => {
           </div>
         </div>
 
-        {/* 版本信息 */}
+        {/* Version Information */}
         <div className={styles.versionSection}>
-          <h3 className={styles.versionTitle}>版本信息</h3>
+          <h3 className={styles.versionTitle}>Version Information</h3>
           <div className={styles.versionInfo}>
             <div className={styles.versionItem}>
-              <span className={styles.label}>当前版本：</span>
+              <span className={styles.label}>Current Version: </span>
               <span className={styles.value}>{store.appVersion.version}</span>
             </div>
             <div className={styles.versionItem}>
-              <span className={styles.label}>构建日期：</span>
+              <span className={styles.label}>Build Date: </span>
               <span className={styles.value}>{store.appVersion.buildDate}</span>
             </div>
             <div className={styles.versionItem}>
-              <span className={styles.label}>更新日期：</span>
+              <span className={styles.label}>Last Updated: </span>
               <span className={styles.value}>
                 {store.appVersion.updateDate}
               </span>
@@ -124,9 +126,10 @@ const Help: React.FC = () => {
           </div>
         </div>
 
-        {/* 页脚 */}
+        {/* Footer */}
         <div className={styles.footer}>
-          如果以上内容没有解决您的问题，欢迎通过上方联系方式联系我们
+          If the above content doesn't solve your problem, please feel free to
+          contact us through the information above
         </div>
       </div>
     );

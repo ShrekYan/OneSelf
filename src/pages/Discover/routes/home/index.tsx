@@ -42,7 +42,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.homeRoot}>
       {/* 顶部导航栏 */}
       <TopBar />
 

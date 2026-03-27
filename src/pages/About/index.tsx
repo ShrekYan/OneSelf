@@ -21,7 +21,7 @@ const About: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={styles.container}>
+      <div className={styles.aboutRoot}>
         <Header appName={store.appName} version={store.version} />
         <Description description={store.description} />
         <Features features={store.features} />

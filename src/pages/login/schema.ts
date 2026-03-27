@@ -5,14 +5,16 @@ import z from 'zod';
  * 使用 zod 进行表单验证
  */
 export const loginSchema = z.object({
-  account: z.string().min(1, '手机号/用户名不能为空').trim(),
+  account: z.string().min(1, 'Phone/Username is required').trim(),
   password: z
     .string()
-    .min(6, '密码至少需要6个字符')
-    .max(32, '密码不能超过32个字符')
+    .min(6, 'Password must be at least 6 characters')
+    .max(32, 'Password cannot exceed 32 characters')
     .trim(),
   agreeTerms: z.literal<boolean>(true, {
-    errorMap: () => ({ message: '请先同意用户协议和隐私政策' }),
+    errorMap: () => ({
+      message: 'Please agree to the User Agreement and Privacy Policy',
+    }),
   }),
 });
 

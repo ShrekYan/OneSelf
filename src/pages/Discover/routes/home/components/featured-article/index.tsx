@@ -1,5 +1,6 @@
 import React from 'react';
 import { Swiper } from 'antd-mobile';
+import { LazyImage } from '@/components';
 import styles from './index.module.scss';
 import type { FeaturedArticleItem } from '../../constant';
 
@@ -33,7 +34,7 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.featuredArticleRoot}>
       <div className={styles.swiperContainer}>
         <Swiper
           className={styles.swiper}
@@ -54,11 +55,10 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
                 tabIndex={0}
                 onKeyDown={e => handleArticleKeyDown(e, item.id)}
               >
-                <img
+                <LazyImage
                   src={item.coverImage}
                   alt={item.title}
                   className={styles.coverImage}
-                  loading="lazy"
                 />
                 <div className={styles.categoryTag}>{item.category}</div>
                 <div
@@ -80,7 +80,7 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
                   <h2 className={styles.title}>{item.title}</h2>
                   <div className={styles.footer}>
                     <div className={styles.authorInfo}>
-                      <img
+                      <LazyImage
                         src={item.authorAvatar}
                         alt={item.authorName}
                         className={styles.authorAvatar}
