@@ -6,8 +6,11 @@ import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
 import { MOCK_ARTICLES } from './constant';
 import { useHandleArticleClick } from './handle';
+import { useGlobalStore } from '@/store/index';
 
 const HomePage: React.FC = () => {
+  const globalStore = useGlobalStore();
+  console.log(globalStore);
   // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
   const onArticleClick = useHandleArticleClick();
 

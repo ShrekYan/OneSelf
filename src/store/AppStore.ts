@@ -1,17 +1,28 @@
-import { runInAction } from 'mobx'
-import { useLocalObservable } from 'mobx-react'
+import { runInAction } from 'mobx';
+import { useLocalObservable } from 'mobx-react';
 
-export interface MobxStoreType {
-  isLoading: boolean
-  userInfo: Record<string, any> | null
-  token: string
-  setLoading: (value: boolean) => void
-  setUserInfo: (info: Record<string, any> | null) => void
-  setToken: (token: string) => void
-  reset: () => void
+/**
+ * 用户信息接口
+ */
+export interface UserInfo {
+  uid: string;
+  nickname?: string;
+  avatar?: string;
+  email?: string;
+  [key: string]: unknown;
 }
 
-type UseMobxStoreType = () => MobxStoreType
+export interface MobxStoreType {
+  isLoading: boolean;
+  userInfo: UserInfo | null;
+  token: string;
+  setLoading: (value: boolean) => void;
+  setUserInfo: (info: UserInfo | null) => void;
+  setToken: (token: string) => void;
+  reset: () => void;
+}
+
+type UseMobxStoreType = () => MobxStoreType;
 
 const useMobxStore: UseMobxStoreType = () => {
   const store = useLocalObservable<MobxStoreType>(() => ({
@@ -21,32 +32,32 @@ const useMobxStore: UseMobxStoreType = () => {
 
     setLoading(value: boolean) {
       runInAction(() => {
-        store.isLoading = value
-      })
+        store.isLoading = value;
+      });
     },
 
-    setUserInfo(info: Record<string, any> | null) {
+    setUserInfo(info: UserInfo | null) {
       runInAction(() => {
-        store.userInfo = info
-      })
+        store.userInfo = info;
+      });
     },
 
     setToken(token: string) {
       runInAction(() => {
-        store.token = token
-      })
+        store.token = token;
+      });
     },
 
     reset() {
       runInAction(() => {
-        store.isLoading = false
-        store.userInfo = null
-        store.token = ''
-      })
-    }
-  }))
+        store.isLoading = false;
+        store.userInfo = null;
+        store.token = '';
+      });
+    },
+  }));
 
-  return store
-}
+  return store;
+};
 
-export default useMobxStore
+export default useMobxStore;
