@@ -72,6 +72,7 @@ src/
 - **CSS/SCSS 规范**: [.claude/rules/css-scss.md](.claude/rules/css-scss.md)
 - **Hooks 与错误处理**: [.claude/rules/hooks-error-handling.md](.claude/rules/hooks-error-handling.md)
 - **静态资源规范**: [.claude/rules/assets-resources.md](.claude/rules/assets-resources.md)
+- **第三方库规范**: [.claude/rules/third-party-libraries.md](.claude/rules/third-party-libraries.md)
 - **公共组件规范**: [src/components/CLAUDE.md](src/components/CLAUDE.md)
 - **代码审查清单**: [.claude/commands/review.md](.claude/commands/review.md)
 - **提交规范**: [commitlint.config.js](commitlint.config.js)

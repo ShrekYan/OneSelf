@@ -79,9 +79,46 @@
   }
 }
 
+.versionSection {
+  margin: 0 24px 40px;
+  padding: 32px 28px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 6%);
+
+  .versionTitle {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px;
+  }
+
+  .versionInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .versionItem {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      color: #666;
+
+      .label {
+        width: 120px;
+        color: #999;
+      }
+
+      .value {
+        color: #333;
+      }
+    }
+  }
+}
+
 .footer {
   text-align: center;
-  padding: 60px 32px 40px;
+  padding: 20px 32px 40px;
   color: #999;
   font-size: 22px;
   line-height: 1.6;

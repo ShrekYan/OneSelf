@@ -6,6 +6,7 @@ import React from 'react';
 import { useObserver } from 'mobx-react';
 import { Collapse } from 'antd-mobile';
 import useHelpStore from './useStore';
+import { handleEmailClick, handlePhoneClick } from './handle';
 import styles from './index.module.scss';
 
 /**
@@ -37,6 +38,20 @@ const Help: React.FC = () => {
         <br />
       </React.Fragment>
     ));
+  };
+
+  /**
+   * 处理邮箱点击
+   */
+  const onEmailClick = (): void => {
+    handleEmailClick(store.contactInfo.email);
+  };
+
+  /**
+   * 处理电话点击
+   */
+  const onPhoneClick = (): void => {
+    handlePhoneClick(store.contactInfo.phone);
   };
 
   return useObserver(() => {
@@ -71,11 +86,11 @@ const Help: React.FC = () => {
         <div className={styles.contactSection}>
           <h3 className={styles.contactTitle}>联系方式</h3>
           <div className={styles.contactInfo}>
-            <div className={styles.contactItem}>
+            <div className={styles.contactItem} onClick={onEmailClick}>
               <span className={styles.label}>邮箱：</span>
               <span className={styles.value}>{store.contactInfo.email}</span>
             </div>
-            <div className={styles.contactItem}>
+            <div className={styles.contactItem} onClick={onPhoneClick}>
               <span className={styles.label}>电话：</span>
               <span className={styles.value}>{store.contactInfo.phone}</span>
             </div>
@@ -83,6 +98,27 @@ const Help: React.FC = () => {
               <span className={styles.label}>工作时间：</span>
               <span className={styles.value}>
                 {store.contactInfo.workingHours}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 版本信息 */}
+        <div className={styles.versionSection}>
+          <h3 className={styles.versionTitle}>版本信息</h3>
+          <div className={styles.versionInfo}>
+            <div className={styles.versionItem}>
+              <span className={styles.label}>当前版本：</span>
+              <span className={styles.value}>{store.appVersion.version}</span>
+            </div>
+            <div className={styles.versionItem}>
+              <span className={styles.label}>构建日期：</span>
+              <span className={styles.value}>{store.appVersion.buildDate}</span>
+            </div>
+            <div className={styles.versionItem}>
+              <span className={styles.label}>更新日期：</span>
+              <span className={styles.value}>
+                {store.appVersion.updateDate}
               </span>
             </div>
           </div>

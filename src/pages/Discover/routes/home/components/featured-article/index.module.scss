@@ -2,10 +2,41 @@
 
 .container {
   margin: 33px;
-  cursor: pointer;
+}
+
+.swiperContainer {
+  border-radius: 26px;
+  overflow: hidden;
+  height: 520px;
+
+  :global(.adm-swiper-track) {
+    height: 100%;
+  }
+}
+
+.swiper {
+  height: 100%;
+}
+
+.indicator {
+  bottom: 16px;
+
+  .adm-indicator-dot {
+    background-color: rgb(255 255 255 / 40%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &.adm-indicator-dot-active {
+      background-color: white;
+      width: 20px;
+      border-radius: 4px;
+    }
+  }
 }
 
 .coverContainer {
+  cursor: pointer;
   position: relative;
   border-radius: 26px;
   overflow: hidden;

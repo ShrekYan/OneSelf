@@ -3,7 +3,10 @@
     "allow": [
       "Read",
       "Write",
-      "Edit"
+      "Edit",
+      "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(npx prisma migrate *)"
     ],
     "deny": [
       "Bash(rm -rf *)",

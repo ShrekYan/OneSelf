@@ -4,13 +4,10 @@ import TopBar from './components/top-bar';
 import CategoryTabs from './components/category-tabs';
 import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
-import { MOCK_ARTICLES } from './constant';
+import { MOCK_ARTICLES, MOCK_FEATURED_ARTICLES } from './constant';
 import { useHandleArticleClick } from './handle';
-import { useGlobalStore } from '@/store/index';
 
 const HomePage: React.FC = () => {
-  const globalStore = useGlobalStore();
-  console.log(globalStore);
   // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
   const onArticleClick = useHandleArticleClick();
 
@@ -34,13 +31,13 @@ const HomePage: React.FC = () => {
     // TODO: 切换分类，加载对应文章
   }, []);
 
-  const handleFeaturedBookmark = useCallback(() => {
-    console.log('Bookmark featured article');
+  const handleFeaturedBookmark = useCallback((articleId: string) => {
+    console.log('Bookmark featured article:', articleId);
     // TODO: 收藏特色文章
   }, []);
 
-  const handleFeaturedClick = useCallback(() => {
-    console.log('Navigate to featured article detail');
+  const handleFeaturedClick = useCallback((articleId: string) => {
+    console.log('Navigate to featured article detail:', articleId);
     // TODO: 跳转到特色文章详情
   }, []);
 
@@ -54,6 +51,7 @@ const HomePage: React.FC = () => {
 
       {/* 特色文章横幅 */}
       <FeaturedArticle
+        articles={MOCK_FEATURED_ARTICLES}
         onBookmarkClick={handleFeaturedBookmark}
         onArticleClick={handleFeaturedClick}
       />

@@ -45,3 +45,12 @@ export const CONTACT_INFO = {
   phone: '400-xxx-xxxx',
   workingHours: '周一至周日 9:00-18:00',
 };
+
+/**
+ * 应用版本信息
+ */
+export const APP_VERSION = {
+  version: '1.0.0',
+  buildDate: '2024-01-01',
+  updateDate: '2024-01-01',
+};
