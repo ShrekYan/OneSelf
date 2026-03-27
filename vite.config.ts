@@ -78,7 +78,8 @@ export default defineConfig(({ mode }) => {
     },
 
     server: {
-      port: 3000,
+      host: '0.0.0.0',
+      port: 5173,
       open: true,
       cors: true,
       proxy: {
@@ -96,6 +97,11 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild',
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
+        external: [
+          /\.test\.(ts|tsx)$/,
+          /\.spec\.(ts|tsx)$/,
+          /src\/__mocks__\/.*/,
+        ],
         output: {
           manualChunks: {
             vendor: ['react', 'react-dom'],

@@ -35,6 +35,7 @@ build
 # Testing
 coverage
 .nyc_output
+.vitest/
 
 # Misc
 *.tsbuildinfo
