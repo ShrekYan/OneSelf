@@ -1,6 +1,8 @@
 import React from 'react';
 import { useObserver } from 'mobx-react';
+import { useNavigate } from 'react-router-dom';
 import styles from './index.module.scss';
+import { LazyImage } from '@/components';
 import useProfileStore from './useStore';
 import { MENU_ITEMS } from './constant';
 import {
@@ -67,6 +69,22 @@ const ArrowRightIcon = () => (
   </svg>
 );
 
+const HelpCircleIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const InfoIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
+
 /**
  * 根据图标名称获取对应的 SVG 组件
  */
@@ -80,6 +98,10 @@ const getIconComponent = (iconName: string) => {
       return <StatsIcon />;
     case 'settings':
       return <SettingsIcon />;
+    case 'help':
+      return <HelpCircleIcon />;
+    case 'about':
+      return <InfoIcon />;
     default:
       return <PencilIcon />;
   }
@@ -92,11 +114,22 @@ const Profile: React.FC = () => {
   const profileStore = useProfileStore();
   const onMenuItemClick = useHandleMenuItemClick();
   const onSignOut = useHandleSignOut();
+  const navigate = useNavigate();
 
   const { userInfo } = profileStore;
 
+  // 处理帮助点击
+  const handleHelpClick = () => {
+    navigate('/help');
+  };
+
+  // 处理关于我们点击
+  const handleAboutClick = () => {
+    navigate('/about');
+  };
+
   return useObserver(() => (
-    <div className={styles.container}>
+    <div className={styles.profileRoot}>
       {/* 顶部栏 */}
       <header className={styles.header}>
         <div className={styles.logoB}>B</div>
@@ -113,7 +146,7 @@ const Profile: React.FC = () => {
       {/* 用户信息卡片 */}
       <section className={styles.userCard}>
         <div className={styles.avatarWrapper}>
-          <img
+          <LazyImage
             src={userInfo.avatar}
             alt={userInfo.name}
             className={styles.avatar}
@@ -172,6 +205,34 @@ const Profile: React.FC = () => {
             )}
           </div>
         ))}
+
+        {/* 帮助 */}
+        <div
+          className={styles.menuItem}
+          onClick={handleHelpClick}
+          role="button"
+          tabIndex={0}
+        >
+          <div className={styles.iconWrapper}>{getIconComponent('help')}</div>
+          <div className={styles.title}>Help</div>
+          <div className={styles.arrow}>
+            <ArrowRightIcon />
+          </div>
+        </div>
+
+        {/* 关于我们 */}
+        <div
+          className={styles.menuItem}
+          onClick={handleAboutClick}
+          role="button"
+          tabIndex={0}
+        >
+          <div className={styles.iconWrapper}>{getIconComponent('about')}</div>
+          <div className={styles.title}>About</div>
+          <div className={styles.arrow}>
+            <ArrowRightIcon />
+          </div>
+        </div>
       </section>
 
       {/* 退出登录 */}
