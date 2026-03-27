@@ -8,13 +8,14 @@ import Saved from '@/pages/Discover/routes/saved';
 import Profile from '@/pages/Discover/routes/profile';
 import Search from '@/pages/Discover/routes/search';
 
-const Login = lazy(() => import('@/pages/login'));
+const Login = lazy(() => import('@/pages/Login'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const Product = lazy(() => import('@/pages/Product'));
 const Discover = lazy(() => import('@/pages/Discover'));
 const About = lazy(() => import('@/pages/About'));
 const Help = lazy(() => import('@/pages/Help'));
 const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
+const Notifications = lazy(() => import('@/pages/Notifications'));
 
 // 路由配置
 const routes = [
@@ -33,6 +34,10 @@ const routes = [
   {
     path: '/search',
     element: <Search />,
+  },
+  {
+    path: '/notifications',
+    element: <Notifications />,
   },
   {
     path: '/',

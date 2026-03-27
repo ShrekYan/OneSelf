@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useObserver } from 'mobx-react';
 import { Checkbox, Toast } from 'antd-mobile';
-import useLoginStore from './useStore';
+import useLoginStore from './useStore.ts';
 import { loginSchema, type LoginFormData } from './schema';
 import {
   handleForgotPassword,
@@ -15,7 +15,7 @@ import {
   handleUserAgreement,
   handlePrivacyPolicy,
   mockLoginApi,
-} from './handle';
+} from './handle.ts';
 import styles from './index.module.scss';
 
 /**

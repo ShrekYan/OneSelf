@@ -1,0 +1,123 @@
+.notificationListItemContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 144px;
+  padding: 24px 24px 24px 32px;
+  background-color: #fff;
+  transition: background-color 0.2s;
+
+  &:active {
+    background-color: #f5f5f5;
+  }
+}
+
+.notificationListItemUnreadDot {
+  position: absolute;
+  top: 24px;
+  left: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: $primary-purple;
+}
+
+.notificationListItemAvatarWrapper {
+  flex-shrink: 0;
+  margin-right: 24px;
+}
+
+.notificationListItemAvatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.notificationListItemTypeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+
+  svg {
+    color: #fff;
+  }
+}
+
+.notificationListItemTypeIconLike {
+  background-color: #ff6b6b;
+}
+
+.notificationListItemTypeIconComment {
+  background-color: #4dabf7;
+}
+
+.notificationListItemTypeIconFollow {
+  background-color: #51cf66;
+}
+
+.notificationListItemTypeIconSystem {
+  background-color: #ffd43b;
+
+  svg {
+    color: #333;
+  }
+}
+
+.notificationListItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.notificationListItemHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.notificationListItemTitle {
+  font-size: 30px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+}
+
+.notificationListItemUserName {
+  font-weight: 600;
+  color: #222;
+}
+
+.notificationListItemTime {
+  flex-shrink: 0;
+  margin-left: 16px;
+  font-size: 26px;
+  color: #999;
+}
+
+.notificationListItemContentText {
+  font-size: 28px;
+  color: #666;
+  line-height: 1.5;
+  margin: 12px 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.notificationListItemArrow {
+  flex-shrink: 0;
+  margin-left: 16px;
+  color: #ccc;
+}
+
+/* 未读消息背景稍微提亮 */
+.notificationListItemUnread {
+  background-color: #f8f9ff;
+}

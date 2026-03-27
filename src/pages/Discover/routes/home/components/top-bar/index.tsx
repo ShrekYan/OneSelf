@@ -14,8 +14,7 @@ const TopBar: React.FC<TopBarProps> = ({ title = 'Discover' }) => {
   };
 
   const handleNotificationClick = () => {
-    console.log('Open notification center');
-    // TODO: 打开通知中心
+    navigate('/notifications');
   };
 
   const handleAvatarClick = () => {

@@ -1,5 +1,17 @@
 {
-  "permissions": {},
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm *)",
+      "Bash(sudo *)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
   "enabledMcpjsonServers": [
     "figma"
   ],

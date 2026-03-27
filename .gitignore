@@ -40,3 +40,4 @@ coverage
 *.tsbuildinfo
 stats.html
 .history
+.claude/settings.local.json
