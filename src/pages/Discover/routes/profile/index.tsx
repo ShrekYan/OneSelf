@@ -1,238 +1,193 @@
-/**
- * Profile 个人页面
- * @description 个人中心页面，显示用户信息和功能菜单
- */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
+import useProfileStore from './useStore';
+import { MENU_ITEMS } from './constant';
 import {
   useHandleMenuItemClick,
   useHandleSignOut,
-  fetchUserInfo,
-  loadMenuItems,
+  handleEditAvatar,
 } from './handle';
-import { PROFILE_MENU_ITEMS } from './constant';
-import useProfileStore from './useStore';
 
 /**
- * Profile 个人页面
+ * SVG 图标组件
+ */
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
+const PencilIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
+const BookmarkIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const StatsIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+const SignOutIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+);
+
+const GearIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+/**
+ * 根据图标名称获取对应的 SVG 组件
+ */
+const getIconComponent = (iconName: string) => {
+  switch (iconName) {
+    case 'edit':
+      return <PencilIcon />;
+    case 'bookmark':
+      return <BookmarkIcon />;
+    case 'stats':
+      return <StatsIcon />;
+    case 'settings':
+      return <SettingsIcon />;
+    default:
+      return <PencilIcon />;
+  }
+};
+
+/**
+ * Profile 个人资料页面
  */
 const Profile: React.FC = () => {
-  // 在组件顶层调用 Hooks 获取处理函数和 store
+  const profileStore = useProfileStore();
   const onMenuItemClick = useHandleMenuItemClick();
   const onSignOut = useHandleSignOut();
-  const profileStore = useProfileStore();
 
-  // 页面加载时获取数据
-  useEffect(() => {
-    fetchUserInfo(profileStore);
-    loadMenuItems(profileStore, PROFILE_MENU_ITEMS);
-  }, [profileStore]);
+  const { userInfo } = profileStore;
 
   return useObserver(() => (
     <div className={styles.container}>
       {/* 顶部栏 */}
-      <div className={styles.header}>
-        <div className={styles.avatarBadge}>B</div>
-        <div className={styles.settingsIcon}>
-          <svg
-            width={32}
-            height={32}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 2.37-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37 1.024.22 2.071-.417 2.572-1.065z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+      <header className={styles.header}>
+        <div className={styles.logoB}>B</div>
+        <div
+          className={styles.settingsBtn}
+          onClick={() => {}}
+          role="button"
+          tabIndex={0}
+        >
+          <GearIcon />
         </div>
-      </div>
+      </header>
 
       {/* 用户信息卡片 */}
-      <div className={styles.userCard}>
-        {profileStore.loading ? (
-          <div className={styles.loadingWrapper}></div>
-        ) : (
-          <>
-            <div className={styles.avatarWrapper}>
-              <div className={styles.avatar}>
-                {/* 占位，实际使用用户头像 */}
-                <div className={styles.avatarPlaceholder} />
-              </div>
-              <div className={styles.editButton}>
-                <svg
-                  width={26}
-                  height={26}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth={2}
-                >
-                  <path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-              </div>
-            </div>
-
-            <h1 className={styles.userName}>
-              {profileStore.userInfo?.userName || 'John Maker'}
-            </h1>
-            <p className={styles.userHandle}>
-              {profileStore.userInfo?.userHandle || '@johnmaker'}
-            </p>
-            <p className={styles.userBio}>
-              {profileStore.userInfo?.userBio ||
-                'Frontend engineer, UI designer, and tech enthusiast. I write about modern web dev.'}
-            </p>
-
-            <div className={styles.stats}>
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>
-                  {profileStore.userInfo?.stats.followers ?? 248}
-                </div>
-                <div className={styles.statLabel}>Followers</div>
-              </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>
-                  {profileStore.userInfo?.stats.following ?? 156}
-                </div>
-                <div className={styles.statLabel}>Following</div>
-              </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
-                <div className={styles.statNumber}>
-                  {profileStore.userInfo?.stats.totalLikes
-                    ? profileStore.userInfo.stats.totalLikes >= 1000
-                      ? `${(profileStore.userInfo.stats.totalLikes / 1000).toFixed(1)}k`
-                      : profileStore.userInfo.stats.totalLikes
-                    : '12.4k'}
-                </div>
-                <div className={styles.statLabel}>Likes</div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+      <section className={styles.userCard}>
+        <div className={styles.avatarWrapper}>
+          <img
+            src={userInfo.avatar}
+            alt={userInfo.name}
+            className={styles.avatar}
+          />
+          <div
+            className={styles.editBtn}
+            onClick={handleEditAvatar}
+            role="button"
+            tabIndex={0}
+          >
+            <EditIcon />
+          </div>
+        </div>
+        <h1 className={styles.userName}>{userInfo.name}</h1>
+        <div className={styles.username}>{userInfo.username}</div>
+        <p className={styles.bio}>{userInfo.bio}</p>
+        <div className={styles.stats}>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>
+              {userInfo.stats.followers}
+            </span>
+            <span className={styles.statLabel}>Followers</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>
+              {userInfo.stats.following}
+            </span>
+            <span className={styles.statLabel}>Following</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>{userInfo.stats.likes}</span>
+            <span className={styles.statLabel}>Likes</span>
+          </div>
+        </div>
+      </section>
 
       {/* 菜单列表 */}
-      <div className={styles.menuList}>
-        {profileStore.menuItems.slice(0, 4).map(menu => (
+      <section className={styles.menuList}>
+        {MENU_ITEMS.map(item => (
           <div
-            key={menu.id}
+            key={item.id}
             className={styles.menuItem}
-            onClick={() => onMenuItemClick(menu)}
+            onClick={() => onMenuItemClick(item)}
+            role="button"
+            tabIndex={0}
           >
-            <div className={styles.menuIcon}>
-              {/* 根据 icon 名称渲染对应图标 - 此处保持现有 SVG 结构 */}
-              {menu.id === 'my-articles' && (
-                <svg
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-              )}
-              {menu.id === 'saved-reading' && (
-                <svg
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                </svg>
-              )}
-              {menu.id === 'reading-stats' && (
-                <svg
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-              )}
-              {menu.id === 'preferences' && (
-                <svg
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 2.37-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37 1.024.22 2.071-.417 2.572-1.065z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              )}
-              {menu.id === 'help-center' && (
-                <svg
-                  width={24}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-              )}
+            <div className={styles.iconWrapper}>
+              {getIconComponent(item.icon)}
             </div>
-            <span className={styles.menuText}>{menu.title}</span>
-            {menu.badge !== undefined && menu.badge > 0 && (
-              <span className={styles.menuBadge}>{menu.badge}</span>
-            )}
-            {menu.hasArrow && (
-              <svg
-                className={styles.menuArrow}
-                width={26}
-                height={26}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+            <div className={styles.title}>{item.title}</div>
+            {item.badge && <div className={styles.badge}>{item.badge}</div>}
+            {item.hasArrow && (
+              <div className={styles.arrow}>
+                <ArrowRightIcon />
+              </div>
             )}
           </div>
         ))}
-      </div>
+      </section>
 
       {/* 退出登录 */}
-      <div className={styles.signOutWrapper}>
+      <section className={styles.signOutWrapper}>
         <div
-          className={styles.signOutButton}
-          onClick={() => onSignOut(profileStore)}
+          className={styles.signOutBtn}
+          onClick={onSignOut}
+          role="button"
+          tabIndex={0}
         >
-          <div className={styles.signOutIcon}>
-            <svg
-              width={26}
-              height={26}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+          <div className={styles.iconWrapper}>
+            <SignOutIcon />
           </div>
-          <span className={styles.signOutText}>Sign Out</span>
+          <div className={styles.text}>Sign Out</div>
         </div>
-      </div>
+      </section>
     </div>
   ));
 };

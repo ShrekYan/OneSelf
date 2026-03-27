@@ -1,12 +1,10 @@
-/**
- * Explore 探索模块状态管理
- * @description 使用 MobX 管理分类列表、搜索关键词等状态
- */
-
 import { useLocalObservable } from 'mobx-react';
 
 import type { Category } from './constant';
 
+/**
+ * Explore 页面 Store 类型定义
+ */
 export interface ExploreStoreType {
   /** 分类列表 */
   categories: Category[];
@@ -35,6 +33,10 @@ export interface ExploreStoreType {
 
 type UseExploreStoreType = () => ExploreStoreType;
 
+/**
+ * Explore 页面 Store Hook
+ * @description 使用 MobX 管理分类列表、搜索关键词等状态
+ */
 const useExploreStore: UseExploreStoreType = () => {
   const store = useLocalObservable<ExploreStoreType>(() => ({
     categories: [],
@@ -55,11 +57,13 @@ const useExploreStore: UseExploreStoreType = () => {
     },
 
     addSearchHistory(keyword: string) {
-      if (!keyword.trim()) return;
-      // 移除重复
-      const filtered = this.searchHistory.filter(item => item !== keyword);
-      // 添加到最前面
-      this.searchHistory = [keyword, ...filtered].slice(0, 10);
+      const trimmedKeyword = keyword.trim();
+      if (!trimmedKeyword) return;
+      // 移除重复，添加到最前面，最多保留 10 条
+      const filtered = this.searchHistory.filter(
+        item => item !== trimmedKeyword,
+      );
+      this.searchHistory = [trimmedKeyword, ...filtered].slice(0, 10);
     },
 
     removeSearchHistory(keyword: string) {

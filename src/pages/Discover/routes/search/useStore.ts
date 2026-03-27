@@ -1,12 +1,10 @@
-/**
- * Search 搜索模块状态管理
- * @description 使用 MobX 管理搜索关键词、搜索历史、搜索结果等状态
- */
-
 import { useLocalObservable } from 'mobx-react';
 
 import type { HotSearchItem } from './constant';
 
+/**
+ * Search 页面 Store 类型定义
+ */
 export interface SearchStoreType {
   /** 当前搜索关键词 */
   searchKeyword: string;
@@ -41,6 +39,10 @@ type UseSearchStoreType = (
   initialHotSearches: HotSearchItem[],
 ) => SearchStoreType;
 
+/**
+ * Search 页面 Store Hook
+ * @description 使用 MobX 管理搜索关键词、搜索历史、搜索结果等状态
+ */
 const useSearchStore: UseSearchStoreType = initialHotSearches => {
   const store = useLocalObservable<SearchStoreType>(() => ({
     searchKeyword: '',

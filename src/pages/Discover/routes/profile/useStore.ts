@@ -1,122 +1,62 @@
-/**
- * Profile 个人中心模块状态管理
- * @description 使用 MobX 管理用户信息、菜单等状态
- */
-
-import { runInAction } from 'mobx';
 import { useLocalObservable } from 'mobx-react';
 
-import type { MenuItem } from './constant';
-
 /**
- * 用户统计数据接口
+ * 用户统计数据
  */
 export interface UserStats {
   followers: number;
   following: number;
-  totalLikes: number;
+  likes: string;
 }
 
 /**
- * 用户信息接口
+ * 用户信息
  */
 export interface UserInfo {
-  userName: string;
-  userHandle: string;
-  userBio: string;
-  avatarUrl: string;
+  name: string;
+  username: string;
+  bio: string;
+  avatar: string;
   stats: UserStats;
 }
 
 /**
- * Profile Store 接口定义
+ * Profile 页面 Store 类型定义
  */
 export interface ProfileStoreType {
   /** 用户信息 */
-  userInfo: UserInfo | null;
-  /** 菜单项列表 */
-  menuItems: MenuItem[];
+  userInfo: UserInfo;
   /** 加载状态 */
   loading: boolean;
-  /** 是否正在编辑 */
-  isEditing: boolean;
 
-  /** 设置用户信息 */
-  setUserInfo: (userInfo: UserInfo) => void;
-  /** 更新部分用户信息 */
-  updateUserInfo: (partial: Partial<UserInfo>) => void;
-  /** 设置菜单项 */
-  setMenuItems: (items: MenuItem[]) => void;
   /** 设置加载状态 */
-  setLoading: (loading: boolean) => void;
-  /** 设置编辑状态 */
-  setIsEditing: (editing: boolean) => void;
-  /** 更新徽章数 */
-  updateMenuItemBadge: (menuId: string, badge: number | undefined) => void;
-  /** 清空用户信息（退出登录） */
-  clearUserInfo: () => void;
+  setLoading: (state: boolean) => void;
 }
 
-/**
- * Profile Store Hook
- */
 type UseProfileStoreType = () => ProfileStoreType;
 
+/**
+ * Profile 页面 Store Hook
+ */
 const useProfileStore: UseProfileStoreType = () => {
   const store = useLocalObservable<ProfileStoreType>(() => ({
-    userInfo: null,
-    menuItems: [],
+    userInfo: {
+      name: 'John Maker',
+      username: '@johnmaker',
+      bio: 'Frontend engineer, UI designer, and tech enthusiast. I write about modern web dev.',
+      avatar:
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
+      stats: {
+        followers: 248,
+        following: 156,
+        likes: '12.4k',
+      },
+    },
+
     loading: false,
-    isEditing: false,
 
-    setUserInfo(userInfo: UserInfo) {
-      runInAction(() => {
-        store.userInfo = userInfo;
-      });
-    },
-
-    updateUserInfo(partial: Partial<UserInfo>) {
-      runInAction(() => {
-        if (store.userInfo) {
-          store.userInfo = { ...store.userInfo, ...partial };
-        }
-      });
-    },
-
-    setMenuItems(items: MenuItem[]) {
-      runInAction(() => {
-        store.menuItems = items;
-      });
-    },
-
-    setLoading(loading: boolean) {
-      runInAction(() => {
-        store.loading = loading;
-      });
-    },
-
-    setIsEditing(editing: boolean) {
-      runInAction(() => {
-        store.isEditing = editing;
-      });
-    },
-
-    updateMenuItemBadge(menuId: string, badge: number | undefined) {
-      runInAction(() => {
-        const index = store.menuItems.findIndex(item => item.id === menuId);
-        if (index !== -1) {
-          store.menuItems[index] = {
-            ...store.menuItems[index],
-            badge,
-          };
-        }
-      });
-    },
-
-    clearUserInfo() {
-      runInAction(() => {
-        store.userInfo = null;
-      });
+    setLoading(state: boolean) {
+      this.loading = state;
     },
   }));
 

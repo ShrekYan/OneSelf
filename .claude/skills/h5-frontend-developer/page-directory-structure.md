@@ -368,6 +368,8 @@ export default usePageStore;
 
 **要点：**
 - ✅ 使用 `useLocalObservable`（MobX Hook 写法）
+- ✅ **必须使用对象字面量写法，禁止页面级 useStore.ts 使用 class 写法**
+- ⚠️ 例外：**全局 Store** (`src/store/`) 允许使用 `class` + `makeAutoObservable`
 - ✅ 禁止使用 observer HOC，必须用 `useObserver`
 - ✅ 页面局部状态，不需要放到全局 Store
 

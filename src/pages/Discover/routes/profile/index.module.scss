@@ -1,275 +1,251 @@
+/**
+ * Profile 个人资料页面样式
+ * 设计稿: 750px 宽度
+ */
+
 .container {
   min-height: 100vh;
   background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  overflow-x: visible;
-  padding-bottom: calc($tab-bar-height + env(safe-area-inset-bottom));
-  max-width: 750px;
-  margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-// 顶部栏
+/* 顶部栏 */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #fff;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 26px 42px;
-  padding-top: calc(16px + env(safe-area-inset-top));
-  border-bottom: 1px solid $border-color-light;
+  justify-content: space-between;
+  padding: 20px 24px;
+  padding-top: calc(12px + env(safe-area-inset-top));
 }
 
-.avatarBadge {
-  width: 65px;
-  height: 65px;
+.logoB {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: #f3e8ff;
-  color: #7c3aed;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 31px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: bold;
+  color: #7c3aed;
 }
 
-.settingsIcon {
-  color: $text-secondary;
+.settingsBtn {
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s ease;
-
-  &:active {
-    opacity: 0.7;
-  }
 
   svg {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
+    color: #666;
+  }
+
+  &:active {
+    opacity: 0.6;
   }
 }
 
-// 用户信息卡片
+/* 用户信息卡片 */
 .userCard {
-  background-color: #f8f8f8;
-  border-radius: 52px 52px 0 0;
-  padding: 65px 42px 49px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0 16px 32px;
+  padding: 32px 24px 40px;
+  background-color: #f5f5f5;
+  border-radius: 48px;
+  text-align: center;
 }
 
 .avatarWrapper {
   position: relative;
-  margin-bottom: 33px;
-}
+  display: inline-block;
+  margin-bottom: 24px;
 
-.avatar {
-  width: 208px;
-  height: 208px;
-  border-radius: 50%;
-  border: 4px solid #fff;
-  overflow: hidden;
-  background-color: $background-gray;
-}
+  .avatar {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    object-fit: cover;
+  }
 
-.avatarPlaceholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
-}
+  .editBtn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #7c3aed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
 
-.editButton {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 57px;
-  height: 57px;
-  border-radius: 50%;
-  background-color: #7c3aed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease;
+    svg {
+      width: 32px;
+      height: 32px;
+      color: #fff;
+    }
 
-  &:active {
-    opacity: 0.7;
+    &:active {
+      opacity: 0.8;
+    }
   }
 }
 
 .userName {
-  font-size: 42px;
-  font-weight: 700;
-  color: #111;
+  font-size: 48px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 12px;
   line-height: 1.2;
-  margin: 0 0 13px;
 }
 
-.userHandle {
-  font-size: 26px;
+.username {
+  font-size: 28px;
   color: #7c3aed;
-  margin: 0 0 21px;
-  font-weight: 500;
+  margin-bottom: 24px;
+  line-height: 1.3;
 }
 
-.userBio {
-  font-size: 23px;
+.bio {
+  font-size: 28px;
   color: #888;
-  text-align: center;
   line-height: 1.5;
-  margin: 0 0 36px;
+  margin-bottom: 40px;
 }
 
-// 统计数据
+/* 统计数据 */
 .stats {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  gap: 0;
 }
 
 .statItem {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  text-align: center;
+  padding: 0 16px;
+
+  &:not(:last-child) {
+    border-right: 1px solid #e0e0e0;
+  }
+
+  .statNumber {
+    font-size: 42px;
+    font-weight: bold;
+    color: #1a1a1a;
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .statLabel {
+    font-size: 24px;
+    color: #888;
+    line-height: 1;
+  }
 }
 
-.statNumber {
-  font-size: 36px;
-  font-weight: 700;
-  color: #111;
-}
-
-.statLabel {
-  font-size: 21px;
-  color: #888;
-}
-
-.statDivider {
-  width: 2px;
-  height: 47px;
-  background-color: #e8e8e8;
-}
-
-// 菜单列表
+/* 菜单列表 */
 .menuList {
-  padding: 42px 31px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 31px;
+  padding: 0 16px;
 }
 
 .menuItem {
   display: flex;
   align-items: center;
-  gap: 21px;
-  transition: opacity 0.2s ease;
+  padding: 20px 0;
+
+  .iconWrapper {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: #f3e8ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 24px;
+
+    svg {
+      width: 36px;
+      height: 36px;
+      color: #7c3aed;
+    }
+  }
+
+  .title {
+    flex: 1;
+    font-size: 32px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .badge {
+    padding: 8px 24px;
+    background-color: #f5f5f5;
+    border-radius: 24px;
+    font-size: 24px;
+    color: #666;
+    font-weight: 500;
+    margin-right: 16px;
+  }
+
+  .arrow {
+    width: 24px;
+    height: 24px;
+    color: #888;
+  }
 
   &:active {
     opacity: 0.7;
   }
 }
 
-.menuIcon {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  background-color: #f3e8ff;
-  color: #7c3aed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg {
-    width: 31px;
-    height: 31px;
-  }
-}
-
-.menuText {
-  flex: 1;
-  font-size: 23px;
-  font-weight: 600;
-  color: #111;
-}
-
-.menuBadge {
-  padding: 8px 21px;
-  background-color: #f3f3f3;
-  color: #888;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 21px;
-  min-width: 42px;
-  text-align: center;
-}
-
-.menuArrow {
-  color: #888;
-  flex-shrink: 0;
-
-  svg {
-    width: 26px;
-    height: 26px;
-  }
-}
-
-// 退出登录
+/* 退出登录按钮 */
 .signOutWrapper {
-  padding: 42px 31px;
+  padding: 32px 16px;
 }
 
-.signOutButton {
+.signOutBtn {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 23px 29px;
-  background-color: #fff1f1;
-  border: 1px solid #fee2e2;
-  border-radius: 21px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+  width: 100%;
+  padding: 24px 28px;
+  background-color: #fff5f5;
+  border: 1px solid #fdd;
+  border-radius: 32px;
+
+  .iconWrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #fecaca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+
+    svg {
+      width: 32px;
+      height: 32px;
+      color: #dc2626;
+    }
+  }
+
+  .text {
+    flex: 1;
+    font-size: 32px;
+    font-weight: 600;
+    color: #dc2626;
+    text-align: left;
+  }
 
   &:active {
-    opacity: 0.7;
+    opacity: 0.8;
   }
-}
-
-.signOutIcon {
-  width: 57px;
-  height: 57px;
-  border-radius: 50%;
-  background-color: #fecaca;
-  color: #dc2626;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg {
-    width: 26px;
-    height: 26px;
-  }
-}
-
-.signOutText {
-  font-size: 23px;
-  font-weight: 600;
-  color: #dc2626;
-}
-
-// 加载状态
-.loadingWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 0;
-  width: 100%;
 }
