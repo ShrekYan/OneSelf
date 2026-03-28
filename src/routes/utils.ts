@@ -25,19 +25,19 @@ export const enhanceRoutes = (
     const currentPath = route.path ?? '';
     const fullPath = (parentPath + '/' + currentPath).replace(/\/+/g, '/');
     // 创建新的 handle 对象，添加元数据
-    const newHandle = {
-      ...(route.handle as Record<string, unknown>),
+    const newHandle: RouteHandleMeta = {
+      ...(route.handle as RouteHandleMeta),
       fullPath,
       pageName: route.pageName,
       keepAlive: route.keepAlive,
-    } as RouteHandleMeta;
+    };
 
     // 对于 index 路由（没有 children）
     if ('index' in route && route.index) {
       return {
         ...route,
         handle: newHandle,
-      } as RouteConfig;
+      };
     }
 
     // 有 children 的普通路由
@@ -50,7 +50,7 @@ export const enhanceRoutes = (
       ...route,
       handle: newHandle,
       children,
-    } as RouteConfig;
+    };
   });
 };
 

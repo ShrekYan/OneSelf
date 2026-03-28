@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import type { RouteConfig } from '@/router/types';
-import { KeepAliveLayout } from '@/router/components/KeepAliveLayout';
-import { RouteInterceptor } from '@/router/components/RouteInterceptor';
+import type { RouteConfig } from '@/routes/types';
+import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
+import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
 const Login = React.lazy(() => import('@/pages/Login'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
@@ -81,4 +81,4 @@ const publicRoutes: RouteConfig[] = [
   // 根路径重定向已经在 discover 模块处理
 ];
 
-export default publicRoutes;
+export { publicRoutes };

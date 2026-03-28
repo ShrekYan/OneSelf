@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import type { RouteConfig } from '@/router/types';
-import { KeepAliveLayout } from '@/router/components/KeepAliveLayout';
-import { RouteInterceptor } from '@/router/components/RouteInterceptor';
+import type { RouteConfig } from '@/routes/types';
+import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
+import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
 const ArticleDetail = React.lazy(() => import('@/pages/ArticleDetail'));
 const Search = React.lazy(() => import('@/pages/Discover/routes/search'));
@@ -70,4 +70,4 @@ const articleRoutes: RouteConfig[] = [
   },
 ];
 
-export default articleRoutes;
+export { articleRoutes };

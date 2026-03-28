@@ -5,9 +5,10 @@
 
 import React from 'react';
 // import { Navigate } from 'react-router-dom';
-import type { RouteConfig } from '@/router/types';
-import { KeepAliveLayout } from '@/router/components/KeepAliveLayout';
-import { RouteInterceptor } from '@/router/components/RouteInterceptor';
+import type { RouteConfig } from '@/routes/types';
+import type { RouteConfigInfo } from '@/routes/components/RouteInterceptor';
+import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
+import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
 // Discover 主容器
 import Discover from '@/pages/Discover';
@@ -25,7 +26,7 @@ const createCachedElement = (
   pageName: string,
   cacheKey: string,
 ): React.ReactElement => {
-  const routeConfig: RouteConfig = {
+  const routeConfig: RouteConfigInfo = {
     path: cacheKey,
     pageName,
     keepAlive: true,
@@ -85,4 +86,4 @@ const discoverRoutes: RouteConfig[] = [
   },
 ];
 
-export default discoverRoutes;
+export { discoverRoutes };

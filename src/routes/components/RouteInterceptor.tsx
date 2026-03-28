@@ -5,10 +5,18 @@
  */
 
 import React from 'react';
-import type { RouteConfig } from '../types';
+import type { RouteConfig } from '@/routes/types';
+
+/**
+ * 路由配置信息，只需要 RouteConfig 的必要字段
+ */
+export type RouteConfigInfo = Pick<
+  RouteConfig,
+  'path' | 'pageName' | 'keepAlive'
+>;
 
 export interface RouteInterceptorProps {
-  routeConfig: RouteConfig;
+  routeConfig: RouteConfigInfo;
   children: React.ReactElement;
 }
 

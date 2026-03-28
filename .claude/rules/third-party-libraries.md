@@ -83,7 +83,7 @@ const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>
 
 **基本规则**:
 - ✅ 使用 v6 新 API: `createBrowserRouter` + `RouterProvider`
-- ✅ 路由配置统一放在 `src/router/` 目录
+- ✅ 路由配置统一放在 `src/routes/` 目录
 - ✅ 使用 `useNavigate()` 代替旧的 `useHistory()`
 - ✅ 动态路由参数使用 `useParams()` 获取
 - ✅ 路由懒加载使用 `lazy()` + `Suspense`

@@ -36,7 +36,7 @@ src/components/
 | **目录名** | PascalCase | `LazyImage` 不是 `lazy-image` |
 | **组件名** | 和目录名一致，PascalCase | `const LazyImage: React.FC<Props> = (...)` |
 | **样式文件** | 固定 `index.module.scss` | - |
-| **根容器 class** | `{componentNameRoot}` (首字母小写 camelCase) | `.lazyImageRoot` |
+| **根容器 class** | `{componentName}Container` (首字母小写 camelCase) | `.lazyImageContainer` |
 
 ---
 
@@ -102,7 +102,7 @@ export default LazyImage;
 ```scss
 // LazyImage 组件
 // ✅ 正确
-.lazyImageRoot {
+.lazyImageContainer {
   // 样式
 }
 
@@ -126,7 +126,7 @@ interface LazyImageProps {
 
 const LazyImage: React.FC<LazyImageProps> = ({ className, ...rest }) => {
   return (
-    <div className={classNames(styles.lazyImageRoot, className)}>
+    <div className={classNames(styles.lazyImageContainer, className)}>
       {/* ... */}
     </div>
   );
@@ -211,7 +211,7 @@ interface UserAvatarProps {
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ src, size = 40, onClick }) => {
   return (
-    <div className={styles.userAvatarRoot} style={{ width: size, height: size }}>
+    <div className={styles.userAvatarContainer} style={{ width: size, height: size }}>
       <img src={src} alt="avatar" onClick={onClick} />
     </div>
   );
@@ -312,7 +312,7 @@ import ErrorFallback from '@/components/ErrorFallback';
 创建公共组件后请检查：
 
 - [ ] 目录结构是否正确？(`index.tsx` + `index.module.scss`)
-- [ ] 命名是否符合规范？(目录 PascalCase，根容器 camelCase 后缀 Root)
+- [ ] 命名是否符合规范？(目录 PascalCase，根容器 camelCase 后缀 Container)
 - [ ] 是否定义了完整的 Props 接口？
 - [ ] 是否保持纯组件，没有依赖 MobX 或全局 Store？
 - [ ] 根容器 class 是否遵循命名规则？

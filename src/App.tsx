@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GlobalStoreProvider } from '@/store';
 import { AliveScope } from 'react-activation';
-import { AppRouter } from '@/router';
+import { AppRouter } from '@/routes';
 import ErrorFallback from './components/ErrorFallback';
 import Loading from './components/Loading';
 import './styles/global.scss';

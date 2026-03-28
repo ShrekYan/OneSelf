@@ -5,17 +5,18 @@
 
 import { useRoutes } from 'react-router-dom';
 import { enhanceRoutes } from './utils';
-import discoverRoutes from './modules/discover.routes.tsx';
-import articleRoutes from './modules/article.routes.tsx';
-import publicRoutes from './modules/public.routes.tsx';
+import { discoverRoutes } from './modules/discover.routes';
+import { articleRoutes } from './modules/article.routes';
+import { publicRoutes } from './modules/public.routes';
 import type { RouteConfig } from './types';
 
 // 合并所有路由并增强（自动生成 fullPath 到 handle）
-const enhancedRoutes: RouteConfig[] = enhanceRoutes([
+const allRoutes: RouteConfig[] = [
   ...discoverRoutes,
   ...articleRoutes,
   ...publicRoutes,
-]);
+];
+const enhancedRoutes = enhanceRoutes(allRoutes);
 
 /**
  * 应用路由器组件
