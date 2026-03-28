@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { Dialog } from 'antd-mobile';
+import { userApi } from '@/api';
 import type { ProfileStoreType } from './useStore';
 import type { MenuItem } from './constant';
 
@@ -43,10 +45,27 @@ export const useHandleMenuItemClick = () => {
 export const useHandleSignOut = () => {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    // TODO: 清除 token 等用户信息，跳转到登录页
-    console.log('Sign out');
-    navigate('/login');
+  const handleSignOut = async () => {
+    const confirmed = await Dialog.confirm({
+      title: 'Confirm Sign Out',
+      content:
+        'Are you sure you want to sign out? You will need to sign in again to access your personal account information after signing out.',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      try {
+        await userApi.signOut();
+        // 清除本地存储的 token
+        localStorage.removeItem('token');
+        // 跳转到登录页面
+        navigate('/login');
+      } catch (error) {
+        console.error('Sign out failed:', error);
+        // Error is automatically handled by API interceptor with Toast prompt
+      }
+    }
   };
 
   return handleSignOut;
