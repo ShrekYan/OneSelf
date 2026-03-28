@@ -5,18 +5,11 @@
 - **Vite** + **MobX** (useLocalObservable + useObserver)
 - **Ant Design Mobile** (UI 库) + **SCSS Modules** (样式)
 
-## 项目目录结构
-- `src/api/`: API 接口定义与 Axios 实例
-- `src/components/`: 全局公共组件
-- `src/pages/`: 业务页面
-- `src/store/`: 全局状态管理
-- `src/types/`: 全局 TypeScript 类型
-
 ## 页面组织规范
 每个页面目录应包含：
 - `index.tsx`: 主组件（必须使用 `useObserver`）
 - `useStore.ts`: 页面级 MobX 状态
-- `handle.ts`: 业务逻辑函数（处理跳转、API 调用等）
+- `handle.ts`: 业务逻辑函数（处理跳转、纯函数逻辑）
 - `constant.ts`: 常量定义
 - `index.module.scss`: 页面样式
 - `components/`: 页面专用子组件

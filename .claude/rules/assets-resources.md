@@ -2,6 +2,8 @@
 
 本文档定义 `src/assets/` 目录下图片、字体、图标等静态资源的存放规则。
 
+> 基础目录命名规则遵循 `CLAUDE.md` 主指南约定。
+
 ---
 
 ## 目录结构
@@ -11,45 +13,6 @@ src/assets/
 ├── images/     # 业务图片、照片、背景图
 ├── icons/      # SVG 图标文件
 └── fonts/      # 字体文件
-```
-
----
-
-## 命名规范
-
-### images/ - 业务图片
-- 存放：jpg、png、gif、webp 等格式
-- 命名：**kebab-case**（短横线分隔）
-- 示例：
-  - `banner-bg.jpg`
-  - `user-avatar-default.png`
-  - `empty-state.webp`
-
-### icons/ - SVG 图标
-- 存放：独立的 SVG 图标文件
-- 命名：**kebab-case**，以 `-icon` 结尾
-- 示例：
-  - `close-icon.svg`
-  - `search-icon.svg`
-  - `arrow-left-icon.svg`
-
-### fonts/ - 字体文件
-- 存放：woff、woff2、ttf、iconfont 等字体
-- 命名：保持原始包命名或使用 kebab-case
-
----
-
-## 导入规范
-
-- **必须使用路径别名**：`@/assets/` 开头
-- **禁止使用相对路径**：`../../assets/xxx.png`
-
-```typescript
-// ✅ 正确
-import bannerBg from '@/assets/images/banner-bg.jpg';
-
-// ❌ 错误
-import bannerBg from '../../../../assets/images/banner-bg.jpg';
 ```
 
 ---

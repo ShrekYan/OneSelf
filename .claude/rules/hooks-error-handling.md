@@ -3,13 +3,20 @@
 ## 自定义 Hooks 规范
 
 ### 目录结构
-- 所有自定义 Hooks 放在 `src/hooks/` 目录
-- **一个 Hook 一个文件**，按功能拆分
-- 文件名：`useXXX.ts`（小驼峰命名）
 
-### 命名规范
+按 Hook 的类型（通用技术 Hook vs 业务 Hook）分目录存放：
+
+| Hook 类型 | 存放位置 | 说明 |
+|-----------|----------|------|
+| **通用技术 Hook** | `src/hooks/useXxx.ts` | 与业务无关，解决通用技术问题，可跨页面/项目复用 |
+| **页面专用业务 Hook** | `src/pages/[Page]/hooks/useXxx.ts` | 当前页面专用的业务逻辑 Hook，仅在该页面使用 |
+| **跨页面业务 Hook** | `src/hooks/useXxx.ts` 或 `src/api/[module]/hooks/useXxx.ts` | 多个页面复用的业务逻辑 Hook |
+
+通用规则：
+- **一个 Hook 一个文件**，按功能拆分
+- 文件名：`useXxx.ts`（小驼峰命名，必须以 `use` 开头）
 - 函数名必须以 `use` 开头，遵循 React Hooks 规则
-- 采用小驼峰命名：`useLoading`、`useLocalStorage`、`useScroll`
+- 渐进式设计：默认先放在页面内，真正需要跨页面复用再提升到全局
 
 ### TypeScript 要求
 - 必须为所有参数和返回值定义完整的类型
