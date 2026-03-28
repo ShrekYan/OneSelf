@@ -7,15 +7,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useObserver } from 'mobx-react';
 import { Checkbox, Toast } from 'antd-mobile';
-import useLoginStore from './useStore.ts';
+import { useLoginStore } from './useStore';
 import { loginSchema, type LoginFormData } from './schema';
 import {
   handleForgotPassword,
   handleRegister,
   handleUserAgreement,
   handlePrivacyPolicy,
-  mockLoginApi,
-} from './handle.ts';
+} from './handle';
 import styles from './index.module.scss';
 
 /**
@@ -49,8 +48,7 @@ const Login: React.FC = () => {
    */
   const onSubmit = handleSubmit(async (formData: LoginFormData) => {
     try {
-      await store.login(formData);
-      const apiResult = await mockLoginApi(formData);
+      const apiResult = await store.login(formData);
 
       if (apiResult.success) {
         Toast.show({

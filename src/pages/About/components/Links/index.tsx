@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './index.module.scss';
 import { getIcon } from '../icons';
-import type { Link } from '../../types';
+import type { Link } from '../../constant';
 
 interface LinksProps {
   links: Link[];
-  onLinkClick: (id: string) => void;
+  onLinkClick: (link: Link) => void;
 }
 
 const Links: React.FC<LinksProps> = ({ links, onLinkClick }) => {
@@ -16,7 +16,7 @@ const Links: React.FC<LinksProps> = ({ links, onLinkClick }) => {
         <div
           key={link.id}
           className={styles.linkItem}
-          onClick={() => onLinkClick(link.id)}
+          onClick={() => onLinkClick(link)}
         >
           <div className={styles.linkLeft}>
             <div className={styles.linkIcon}>{getIcon(link.iconKey)}</div>

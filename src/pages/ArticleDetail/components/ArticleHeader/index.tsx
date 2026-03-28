@@ -1,11 +1,8 @@
 import React from 'react';
 import { Avatar } from 'antd-mobile';
 import styles from './index.module.scss';
-import type {
-  ArticleAuthor,
-  ArticleStats,
-  ArticleTag,
-} from '@/pages/ArticleDetail/types';
+import { formatReadCount } from '../../handle';
+import type { ArticleAuthor, ArticleStats, ArticleTag } from '../../types';
 
 interface ArticleHeaderProps {
   title: string;
@@ -22,13 +19,6 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({
   stats,
   tags,
 }) => {
-  const formatReadCount = (count: number): string => {
-    if (count > 10000) {
-      return `${(count / 10000).toFixed(1)}w`;
-    }
-    return String(count);
-  };
-
   return (
     <div className={styles.articleHeaderContainer}>
       <h1 className={styles.title}>{title}</h1>

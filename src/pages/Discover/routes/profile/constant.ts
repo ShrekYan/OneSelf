@@ -2,13 +2,13 @@
  * Profile 页面常量定义
  */
 
-export interface MenuItem {
+export type MenuItem = {
   id: string;
   icon: string;
   title: string;
   badge?: string;
   hasArrow?: boolean;
-}
+};
 
 /**
  * 菜单项配置

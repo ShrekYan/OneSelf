@@ -5,8 +5,11 @@
 import React from 'react';
 import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
-import useAboutStore from './useStore';
+import { useAboutStore } from './useStore';
+import * as handle from './handle';
 import { Header, Description, Features, Links, Footer } from './components';
+
+import type { Link } from './constant';
 
 /**
  * 关于我们页面
@@ -14,18 +17,17 @@ import { Header, Description, Features, Links, Footer } from './components';
 const About: React.FC = () => {
   const store = useAboutStore();
 
-  const handleLinkClick = (id: string): void => {
-    // 这里可以根据 id 处理不同的跳转逻辑
-    console.log('Link clicked:', id);
+  const onLinkClick = (link: Link): void => {
+    handle.handleLinkClick(link);
   };
 
   return useObserver(() => {
     return (
-      <div className={styles.aboutRoot}>
+      <div className={styles.aboutContainer}>
         <Header appName={store.appName} version={store.version} />
         <Description description={store.description} />
         <Features features={store.features} />
-        <Links links={store.links} onLinkClick={handleLinkClick} />
+        <Links links={store.links} onLinkClick={onLinkClick} />
         <Footer copyright={store.copyright} />
       </div>
     );

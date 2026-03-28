@@ -1,24 +1,11 @@
 /**
  * Discover Home 页面业务处理函数
- * @description 存放文章点击、点赞、评论等事件处理逻辑
+ * @description 存放文章点击、点赞、评论等事件处理逻辑（纯函数）
  */
 
 import { Toast } from 'antd-mobile';
-import { useNavigate } from 'react-router-dom';
-import useHomeStore from './useStore';
 
-/**
- * 处理文章点击事件
- * @description 使用柯里化，在组件顶层获取 navigate
- * 跳转到文章详情页
- */
-export const useHandleArticleClick = () => {
-  const navigate = useNavigate();
-  return (articleId: string): void => {
-    console.log('Navigate to article detail:', articleId);
-    navigate(`/article/${articleId}`);
-  };
-};
+import type { HomeStoreType } from '../home/useStore';
 
 /**
  * 处理文章点赞/取消点赞
@@ -26,7 +13,7 @@ export const useHandleArticleClick = () => {
  * @param articleId - 文章ID
  */
 export const handleLikeClick = (
-  store: ReturnType<typeof useHomeStore>,
+  store: HomeStoreType,
   articleId: string,
 ): void => {
   store.toggleLike(articleId);
@@ -66,17 +53,15 @@ export const handleSeeAllClick = (): void => {
  * @param categoryId - 分类ID
  */
 export const handleTabChange = (
-  store: ReturnType<typeof useHomeStore>,
+  store: HomeStoreType,
   categoryId: string,
 ): void => {
   store.setActiveCategory(categoryId);
   console.log('Switch to category tab:', categoryId);
-  // TODO: 加载对应分类的文章
 };
 
 /**
  * 处理特色文章收藏点击
- * @description 使用柯里化，在组件顶层获取 navigate
  */
 export const handleFeaturedBookmark = (articleId: string): void => {
   console.log('Bookmark featured article:', articleId);
@@ -89,63 +74,9 @@ export const handleFeaturedBookmark = (articleId: string): void => {
 
 /**
  * 处理特色文章点击
- * @description 使用柯里化，在组件顶层获取 navigate
  * 跳转到特色文章详情页
  */
-export const handleFeaturedClick = (): void => {
-  console.log('Navigate to featured article detail');
+export const handleFeaturedClick = (articleId: string): void => {
+  console.log('Navigate to featured article detail:', articleId);
   // TODO: 跳转到特色文章详情
-};
-
-/**
- * 加载文章列表数据
- * @param store - Home store 实例
- */
-export const fetchArticles = (store: ReturnType<typeof useHomeStore>): void => {
-  store.setLoading(true);
-  try {
-    // TODO: 调用 API 获取文章列表
-    // const response = await articleApi.getList({
-    //   page: store.currentPage,
-    //   pageSize: store.pageSize,
-    //   categoryId: store.activeCategoryId,
-    // });
-    // store.setArticles(response.list);
-    // store.setHasMore(response.hasMore);
-  } catch (error) {
-    console.error('加载文章列表失败:', error);
-    Toast.show({
-      icon: 'fail',
-      content: '加载失败，请重试',
-    });
-  } finally {
-    store.setLoading(false);
-  }
-};
-
-/**
- * 加载更多文章
- * @param store - Home store 实例
- */
-export const loadMoreArticles = (
-  store: ReturnType<typeof useHomeStore>,
-): void => {
-  if (store.loading || !store.hasMore) return;
-
-  try {
-    // TODO: 调用 API 加载更多文章
-    // const response = await articleApi.getList({
-    //   page: store.currentPage + 1,
-    //   pageSize: store.pageSize,
-    //   categoryId: store.activeCategoryId,
-    // });
-    // store.appendArticles(response.list);
-    // store.setHasMore(response.hasMore);
-  } catch (error) {
-    console.error('加载更多文章失败:', error);
-    Toast.show({
-      icon: 'fail',
-      content: '加载更多失败，请重试',
-    });
-  }
 };

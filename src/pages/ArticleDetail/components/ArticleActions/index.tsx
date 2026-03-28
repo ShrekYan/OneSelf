@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDraggable } from '@/hooks/useDraggable';
+import { formatCount } from '../../handle';
 import styles from './index.module.scss';
 
 interface ArticleActionsProps {
@@ -23,13 +24,6 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
   onCommentClick,
   onShareClick,
 }) => {
-  const formatCount = (count: number): string => {
-    if (count > 10000) {
-      return `${(count / 10000).toFixed(1)}w`;
-    }
-    return String(count);
-  };
-
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });

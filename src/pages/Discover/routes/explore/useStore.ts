@@ -1,6 +1,9 @@
 import { useLocalObservable } from 'mobx-react';
+import { Toast } from 'antd-mobile';
 
-import type { Category } from './constant';
+import { MOCK_CATEGORIES } from './mock';
+import { MAX_SEARCH_HISTORY } from './constant';
+import type { Category } from './types';
 
 /**
  * Explore 页面 Store 类型定义
@@ -29,6 +32,8 @@ export interface ExploreStoreType {
   clearSearchHistory: () => void;
   /** 筛选分类（根据搜索关键词） */
   filteredCategories: () => Category[];
+  /** 加载分类列表数据 */
+  fetchCategories: () => Promise<void>;
 }
 
 type UseExploreStoreType = () => ExploreStoreType;
@@ -59,11 +64,14 @@ const useExploreStore: UseExploreStoreType = () => {
     addSearchHistory(keyword: string) {
       const trimmedKeyword = keyword.trim();
       if (!trimmedKeyword) return;
-      // 移除重复，添加到最前面，最多保留 10 条
+      // 移除重复，添加到最前面
       const filtered = this.searchHistory.filter(
         item => item !== trimmedKeyword,
       );
-      this.searchHistory = [trimmedKeyword, ...filtered].slice(0, 10);
+      this.searchHistory = [trimmedKeyword, ...filtered].slice(
+        0,
+        MAX_SEARCH_HISTORY,
+      );
     },
 
     removeSearchHistory(keyword: string) {
@@ -80,6 +88,27 @@ const useExploreStore: UseExploreStoreType = () => {
       return this.categories.filter(category =>
         category.name.toLowerCase().includes(keyword),
       );
+    },
+
+    async fetchCategories(): Promise<void> {
+      this.setLoading(true);
+      try {
+        // TODO: 替换为真实 API 调用
+        // const response = await categoryApi.getList();
+        // this.setCategories(response);
+
+        // 使用 Mock 数据
+        await new Promise(resolve => setTimeout(resolve, 0)); // 模拟网络延迟
+        this.setCategories(MOCK_CATEGORIES);
+      } catch (error) {
+        console.error('加载分类列表失败:', error);
+        Toast.show({
+          icon: 'fail',
+          content: '加载分类失败，请重试',
+        });
+      } finally {
+        this.setLoading(false);
+      }
     },
   }));
 

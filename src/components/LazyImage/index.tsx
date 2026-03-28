@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import styles from './index.module.scss';
 
 /**
@@ -60,7 +61,10 @@ export const LazyImage = React.memo<LazyImageProps>(
     }, [onLoad]);
 
     return (
-      <div ref={containerRef} className={className}>
+      <div
+        ref={containerRef}
+        className={classNames(styles.lazyImageRoot, className)}
+      >
         {isVisible && (
           <img
             src={src}

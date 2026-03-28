@@ -1,6 +1,5 @@
 import { useLocalObservable } from 'mobx-react';
-import { FAQ_LIST, CONTACT_INFO, APP_VERSION } from './constant';
-import type { FAQItem } from './constant';
+import { FAQ_LIST, CONTACT_INFO, APP_VERSION, type FAQItem } from './constant';
 
 export interface HelpStoreType {
   faqList: FAQItem[];
@@ -18,9 +17,7 @@ export interface HelpStoreType {
   setActiveKey: (key: string | null) => void;
 }
 
-type UseHelpStoreType = () => HelpStoreType;
-
-const useHelpStore: UseHelpStoreType = () => {
+export const useHelpStore = (): HelpStoreType => {
   const store = useLocalObservable<HelpStoreType>(() => ({
     faqList: FAQ_LIST,
     contactInfo: CONTACT_INFO,
@@ -34,5 +31,3 @@ const useHelpStore: UseHelpStoreType = () => {
 
   return store;
 };
-
-export default useHelpStore;

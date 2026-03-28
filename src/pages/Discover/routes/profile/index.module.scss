@@ -3,7 +3,7 @@
  * 设计稿: 750px 宽度
  */
 
-.profileRoot {
+.profileContainer {
   min-height: 100vh;
   background-color: #fff;
   padding-bottom: env(safe-area-inset-bottom);
@@ -201,8 +201,10 @@
   }
 
   .arrow {
-    width: 24px;
-    height: 24px;
+    position: relative;
+    left:-25px;
+    width: 30px;
+    height: 30px;
     color: #888;
   }
 

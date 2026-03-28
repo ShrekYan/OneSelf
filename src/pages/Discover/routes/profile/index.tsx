@@ -3,13 +3,11 @@ import { useObserver } from 'mobx-react';
 import { useNavigate } from 'react-router-dom';
 import styles from './index.module.scss';
 import { LazyImage } from '@/components';
-import useProfileStore from './useStore';
+import { useProfileStore } from './useStore';
 import { MENU_ITEMS } from './constant';
-import {
-  useHandleMenuItemClick,
-  useHandleSignOut,
-  handleEditAvatar,
-} from './handle';
+import { useHandleMenuItemClick } from './hooks/useHandleMenuItemClick';
+import { useHandleSignOut } from './hooks/useHandleSignOut';
+import { handleEditAvatar } from './handle';
 
 /**
  * SVG 图标组件
@@ -129,7 +127,7 @@ const Profile: React.FC = () => {
   };
 
   return useObserver(() => (
-    <div className={styles.profileRoot}>
+    <div className={styles.profileContainer}>
       {/* 顶部栏 */}
       <header className={styles.header}>
         <div className={styles.logoB}>B</div>

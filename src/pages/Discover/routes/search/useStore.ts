@@ -35,15 +35,13 @@ export interface SearchStoreType {
   setSearchResults: (results: unknown[]) => void;
 }
 
-type UseSearchStoreType = (
-  initialHotSearches: HotSearchItem[],
-) => SearchStoreType;
-
 /**
  * Search 页面 Store Hook
  * @description 使用 MobX 管理搜索关键词、搜索历史、搜索结果等状态
  */
-const useSearchStore: UseSearchStoreType = initialHotSearches => {
+export function useSearchStore(
+  initialHotSearches: HotSearchItem[],
+): SearchStoreType {
   const store = useLocalObservable<SearchStoreType>(() => ({
     searchKeyword: '',
     searchHistory: [],
@@ -88,6 +86,4 @@ const useSearchStore: UseSearchStoreType = initialHotSearches => {
   }));
 
   return store;
-};
-
-export default useSearchStore;
+}

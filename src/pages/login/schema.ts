@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 /**
  * 登录表单验证 Schema

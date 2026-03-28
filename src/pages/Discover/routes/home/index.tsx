@@ -1,59 +1,38 @@
-import React, { useCallback } from 'react';
+import React, { useEffect } from 'react';
+import { useObserver } from 'mobx-react';
 import styles from './index.module.scss';
 import TopBar from './components/top-bar';
 import CategoryTabs from './components/category-tabs';
 import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
-import { MOCK_ARTICLES, MOCK_FEATURED_ARTICLES } from './constant';
-import { useHandleArticleClick } from './handle';
+import { MOCK_FEATURED_ARTICLES } from './constant';
+import { useHomeStore } from './useStore';
+import { useHandleArticleClick } from './hooks/useHandleArticleClick';
+import * as handle from './handle';
 
 const HomePage: React.FC = () => {
-  // 在组件顶层调用 Hook 获取 navigate，返回实际处理函数
+  const store = useHomeStore();
   const onArticleClick = useHandleArticleClick();
 
-  const handleLikeClick = useCallback((_articleId: string) => {
-    console.log('Like article:', _articleId);
-    // TODO: 点赞文章
-  }, []);
+  useEffect(() => {
+    store.fetchArticles();
+  }, [store]);
 
-  const handleCommentClick = useCallback((_articleId: string) => {
-    console.log('Open comments for article:', _articleId);
-    // TODO: 打开评论弹窗
-  }, []);
-
-  const handleSeeAllClick = useCallback(() => {
-    console.log('Navigate to see all articles');
-    // TODO: 跳转到全部文章列表
-  }, []);
-
-  const handleTabChange = useCallback((_tabId: string) => {
-    console.log('Switch to category tab:', _tabId);
-    // TODO: 切换分类，加载对应文章
-  }, []);
-
-  const handleFeaturedBookmark = useCallback((articleId: string) => {
-    console.log('Bookmark featured article:', articleId);
-    // TODO: 收藏特色文章
-  }, []);
-
-  const handleFeaturedClick = useCallback((articleId: string) => {
-    console.log('Navigate to featured article detail:', articleId);
-    // TODO: 跳转到特色文章详情
-  }, []);
-
-  return (
+  return useObserver(() => (
     <div className={styles.homeRoot}>
       {/* 顶部导航栏 */}
       <TopBar />
 
       {/* 分类标签栏 */}
-      <CategoryTabs onTabChange={handleTabChange} />
+      <CategoryTabs
+        onTabChange={tabId => handle.handleTabChange(store, tabId)}
+      />
 
       {/* 特色文章横幅 */}
       <FeaturedArticle
         articles={MOCK_FEATURED_ARTICLES}
-        onBookmarkClick={handleFeaturedBookmark}
-        onArticleClick={handleFeaturedClick}
+        onBookmarkClick={handle.handleFeaturedBookmark}
+        onArticleClick={handle.handleFeaturedClick}
       />
 
       {/* Latest Articles 标题区域 */}
@@ -62,7 +41,7 @@ const HomePage: React.FC = () => {
           <h2 className={styles.sectionTitle}>Latest Articles</h2>
           <button
             className={styles.seeAllLink}
-            onClick={handleSeeAllClick}
+            onClick={handle.handleSeeAllClick}
             type="button"
           >
             See all
@@ -71,19 +50,21 @@ const HomePage: React.FC = () => {
 
         {/* 文章列表 */}
         <div className={styles.articleList}>
-          {MOCK_ARTICLES.map(article => (
+          {store.articles.map(article => (
             <ArticleListItem
               key={article.id}
               article={article}
               onClick={onArticleClick}
-              onLikeClick={handleLikeClick}
-              onCommentClick={handleCommentClick}
+              onLikeClick={() => handle.handleLikeClick(store, article.id)}
+              onCommentClick={handle.handleCommentClick}
             />
           ))}
         </div>
       </section>
     </div>
-  );
+  ));
 };
+
+HomePage.displayName = 'HomePage';
 
 export default HomePage;

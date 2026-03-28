@@ -1,6 +1,5 @@
 import { useLocalObservable } from 'mobx-react';
-import { FEATURES, LINKS, APP_INFO } from './mock';
-import type { Feature, Link } from './types';
+import { FEATURES, LINKS, APP_INFO, type Feature, type Link } from './constant';
 
 export interface AboutStoreType {
   appName: string;
@@ -11,9 +10,7 @@ export interface AboutStoreType {
   links: Link[];
 }
 
-type UseAboutStoreType = () => AboutStoreType;
-
-const useAboutStore: UseAboutStoreType = () => {
+export const useAboutStore = (): AboutStoreType => {
   const store = useLocalObservable<AboutStoreType>(() => ({
     appName: APP_INFO.name,
     version: APP_INFO.version,
@@ -25,5 +22,3 @@ const useAboutStore: UseAboutStoreType = () => {
 
   return store;
 };
-
-export default useAboutStore;

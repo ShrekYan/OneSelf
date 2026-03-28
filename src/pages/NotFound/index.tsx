@@ -5,9 +5,10 @@
 import React from 'react';
 import { Button, Space } from 'antd-mobile';
 import { useObserver } from 'mobx-react';
-import useNotFoundStore from './useStore';
+
 import { NotFoundConst } from './constant';
-import { navigateBack, navigateToHome } from './handle';
+import { useNotFoundStore } from './useStore';
+import { useNavigateBack, useNavigateToHome } from './hooks/useNavigation';
 import styles from './index.module.scss';
 
 /**
@@ -15,6 +16,8 @@ import styles from './index.module.scss';
  */
 const NotFound: React.FC = () => {
   const store = useNotFoundStore();
+  const handleNavigateBack = useNavigateBack();
+  const handleNavigateToHome = useNavigateToHome();
 
   return useObserver(() => (
     <div className={styles.notFoundContainer}>
@@ -27,10 +30,10 @@ const NotFound: React.FC = () => {
         <p className={styles.notFoundErrorMessage}>{store.errorMessage}</p>
 
         <Space block className={styles.notFoundButtonGroup}>
-          <Button color="primary" size="large" onClick={navigateBack}>
+          <Button color="primary" size="large" onClick={handleNavigateBack}>
             {store.backButtonText}
           </Button>
-          <Button size="large" onClick={navigateToHome}>
+          <Button size="large" onClick={handleNavigateToHome}>
             {store.homeButtonText}
           </Button>
         </Space>

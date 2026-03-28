@@ -6,7 +6,7 @@
 import React from 'react';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-import type { Category } from '@/pages/Discover/routes/explore/constant';
+import type { Category } from '@/pages/Discover/routes/explore/types';
 import styles from './index.module.scss';
 
 export interface CategoryCardProps {
@@ -40,7 +40,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
   return (
     <div
       ref={cardRef}
-      className={`${styles.categoryCard} ${hasImage ? styles.hasImage : ''} ${
+      className={`${styles.categoryCardRoot} ${hasImage ? styles.hasImage : ''} ${
         isVisible ? styles.visible : ''
       }`}
       onClick={handleClick}
@@ -69,5 +69,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
     </div>
   );
 };
+
+CategoryCard.displayName = 'CategoryCard';
 
 export default CategoryCard;

@@ -5,7 +5,7 @@
 import React from 'react';
 import { useObserver } from 'mobx-react';
 import { Collapse } from 'antd-mobile';
-import useHelpStore from './useStore';
+import { useHelpStore } from './useStore';
 import { handleEmailClick, handlePhoneClick } from './handle';
 import styles from './index.module.scss';
 
@@ -56,7 +56,7 @@ const Help: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <div className={styles.helpRoot}>
+      <div className={styles.helpContainer}>
         {/* Header Title */}
         <div className={styles.header}>
           <h1 className={styles.title}>Help Center</h1>

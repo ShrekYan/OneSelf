@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
-import styles from './index.module.scss';
-import { useHandleCategoryClick, fetchCategories } from './handle';
-import useExploreStore from './useStore';
-import CategoryCard from './components/CategoryCard';
 import { useNavigate } from 'react-router-dom';
 
+import styles from './index.module.scss';
+import useExploreStore from './useStore';
+import { useHandleCategoryClick } from './hooks/useHandleCategoryClick';
+import { CategoryCard } from './components';
+
+/**
+ * Explore 探索页面
+ * @description 发现内容，按分类浏览文章
+ */
 const ExplorePage: React.FC = () => {
   // 在组件顶层调用 Hook 获取 store
   const exploreStore = useExploreStore();
@@ -15,7 +20,7 @@ const ExplorePage: React.FC = () => {
 
   // 组件加载时获取分类数据
   useEffect(() => {
-    void fetchCategories(exploreStore);
+    void exploreStore.fetchCategories();
   }, [exploreStore]);
 
   const handleSearchClick = () => {
@@ -56,7 +61,7 @@ const ExplorePage: React.FC = () => {
         <div className={styles.bannerIcon}>
           <svg viewBox="0 0 24 24" aria-label="书本">
             <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+            <path d="M2 17l10 5 10-5" />
           </svg>
         </div>
         <h2 className={styles.bannerTitle}>Find your next read</h2>
@@ -87,5 +92,7 @@ const ExplorePage: React.FC = () => {
     </div>
   ));
 };
+
+ExplorePage.displayName = 'ExplorePage';
 
 export default ExplorePage;

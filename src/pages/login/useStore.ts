@@ -1,6 +1,14 @@
-import { runInAction } from 'mobx';
 import { useLocalObservable } from 'mobx-react';
 import type { LoginFormData } from './schema';
+
+/**
+ * 登录 API 响应类型
+ */
+export interface LoginApiResponse {
+  success: boolean;
+  token?: string;
+  message?: string;
+}
 
 /**
  * 登录页面状态管理接口
@@ -15,17 +23,37 @@ export interface LoginStoreType {
   togglePasswordVisibility: () => void;
 
   // 业务方法
-  login: (formData: LoginFormData) => Promise<void>;
+  login: (formData: LoginFormData) => Promise<LoginApiResponse>;
 }
 
-type UseLoginStoreType = () => LoginStoreType;
+/**
+ * 模拟登录 API 请求
+ * @param formData - 登录表单数据
+ * @returns Promise<LoginApiResponse>
+ */
+const mockLoginApi = async (
+  formData: LoginFormData,
+): Promise<LoginApiResponse> => {
+  // 模拟网络请求
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  // 这里可以添加模拟验证逻辑
+  console.log('Mock login API called with:', formData);
+
+  // 默认返回成功
+  return {
+    success: true,
+    token: 'mock-jwt-token-' + Date.now(),
+    message: 'Login successful',
+  };
+};
 
 /**
  * 移动端登录模块状态管理 Hook
  * 使用 MobX 进行状态管理，包含登录功能
  * 表单验证由 react-hook-form 处理
  */
-const useLoginStore: UseLoginStoreType = () => {
+export const useLoginStore = () => {
   const store = useLocalObservable<LoginStoreType>(() => ({
     isLoading: false,
     showPassword: false,
@@ -51,22 +79,15 @@ const useLoginStore: UseLoginStoreType = () => {
      * @returns Promise
      */
     async login(formData: LoginFormData) {
-      console.log('Login form data:', formData);
-      runInAction(() => {
-        this.isLoading = true;
-      });
+      this.isLoading = true;
 
       try {
-        // 模拟登录请求
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        runInAction(() => {
-          this.isLoading = false;
-        });
+        const result = await mockLoginApi(formData);
+        this.isLoading = false;
+        return result;
       } catch (error) {
         console.error('Login failed:', error);
-        runInAction(() => {
-          this.isLoading = false;
-        });
+        this.isLoading = false;
         throw error;
       }
     },
@@ -74,5 +95,3 @@ const useLoginStore: UseLoginStoreType = () => {
 
   return store;
 };
-
-export default useLoginStore;

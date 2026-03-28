@@ -1,19 +1,22 @@
 import React from 'react';
 import classNames from 'classnames';
-import { LoadingConst } from './constant';
 import styles from './index.module.scss';
+
+const DEFAULT_TIP = '加载中...';
+
+type LoadingSize = 'small' | 'middle' | 'large';
 
 interface LoadingProps {
   tip?: string;
-  size?: 'small' | 'middle' | 'large';
+  size?: LoadingSize;
   className?: string;
   /** 是否是全屏加载 */
   fullScreen?: boolean;
 }
 
 const Loading: React.FC<LoadingProps> = ({
-  tip = LoadingConst.DEFAULT_TIP,
-  size = LoadingConst.SIZE.LARGE,
+  tip = DEFAULT_TIP,
+  size = 'large',
   className,
   fullScreen = true,
 }) => {

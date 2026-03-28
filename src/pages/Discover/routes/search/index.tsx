@@ -3,12 +3,10 @@ import { useObserver } from 'mobx-react';
 
 import styles from './index.module.scss';
 import { HOT_SEARCHES } from './constant';
-import useSearchStore from './useStore';
-import {
-  useHandleSearchSubmit,
-  useHandleHotSearchClick,
-  useHandleGoBack,
-} from './handle';
+import { useSearchStore } from './useStore';
+import { useHandleSearchSubmit } from './hooks/useHandleSearchSubmit';
+import { useHandleHotSearchClick } from './hooks/useHandleHotSearchClick';
+import { useHandleGoBack } from './hooks/useHandleGoBack';
 
 const SearchPage: React.FC = () => {
   // 在组件顶层调用 Hook 获取 store

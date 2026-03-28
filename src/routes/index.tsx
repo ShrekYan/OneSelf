@@ -10,7 +10,6 @@ import Search from '@/pages/Discover/routes/search';
 
 const Login = lazy(() => import('@/pages/Login'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
-const Product = lazy(() => import('@/pages/Product'));
 const Discover = lazy(() => import('@/pages/Discover'));
 const About = lazy(() => import('@/pages/About'));
 const Help = lazy(() => import('@/pages/Help'));
@@ -22,10 +21,6 @@ const routes = [
   {
     path: '/login',
     element: <Login />,
-  },
-  {
-    path: '/product',
-    element: <Product />,
   },
   {
     path: '/article/:id',
