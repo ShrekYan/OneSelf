@@ -1,15 +1,14 @@
-import React, { useState, Suspense } from 'react';
-import { useRoutes } from 'react-router-dom';
+import React, { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GlobalStoreProvider } from '@/store';
-import routes from './routes';
+import { AliveScope } from 'react-activation';
+import { AppRouter } from '@/router';
 import ErrorFallback from './components/ErrorFallback';
 import Loading from './components/Loading';
 import './styles/global.scss';
 
 const App: React.FC = () => {
   const [isLoading] = useState(false);
-  const element = useRoutes(routes);
 
   return (
     <GlobalStoreProvider>
@@ -17,9 +16,9 @@ const App: React.FC = () => {
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {isLoading && <Loading tip="loading..." />}
           <div className="app-content">
-            <Suspense fallback={<Loading tip="loading..." />}>
-              {element}
-            </Suspense>
+            <AliveScope>
+              <AppRouter />
+            </AliveScope>
           </div>
         </ErrorBoundary>
       </div>

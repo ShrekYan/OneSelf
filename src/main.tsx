@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd-mobile';
@@ -35,13 +34,11 @@ unstableSetRender((node, container) => {
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
-  <React.StrictMode>
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <ConfigProvider locale={zhCN}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ConfigProvider>
-    </ErrorBoundary>
-  </React.StrictMode>,
+  <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ConfigProvider locale={zhCN}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ConfigProvider>
+  </ErrorBoundary>,
 );

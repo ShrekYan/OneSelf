@@ -8,14 +8,22 @@ import ArticleListItem from './components/article-list-item';
 import { MOCK_FEATURED_ARTICLES } from './constant';
 import { useHomeStore } from './useStore';
 import { useHandleArticleClick } from './hooks/useHandleArticleClick';
+//import { useActivate, useUnactivate } from "react-activation";
 import * as handle from './handle';
 
 const HomePage: React.FC = () => {
   const store = useHomeStore();
   const onArticleClick = useHandleArticleClick();
 
+  //  useActivate(() => {
+  //       console.log("HomePage: didActivate");
+  //   });
+
+  //   useUnactivate(() => {
+  //       console.log("HomePage: willUnactivate");
+  //   });
+
   useEffect(() => {
-    console.log('123');
     store.fetchArticles();
   }, [store]);
 

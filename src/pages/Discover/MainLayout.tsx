@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { BottomNav } from './components/bottom-nav';
-import { CachedRoutes } from './components/CachedRoutes';
+import { Outlet } from 'react-router-dom';
 import styles from './index.module.scss';
 
 /**
@@ -15,10 +15,11 @@ import styles from './index.module.scss';
  * 底部导航切换时，已访问页面保持不卸载，提升切换体验
  */
 const MainLayout: React.FC = () => {
+  console.log('MainLayout: didActivate');
   return (
     <div className={styles.discoverRoot}>
       {/* 子路由内容在这里渲染 - 支持缓存 */}
-      <CachedRoutes />
+      <Outlet />
       {/* 底部导航栏 - 始终显示不销毁 */}
       <BottomNav />
     </div>
