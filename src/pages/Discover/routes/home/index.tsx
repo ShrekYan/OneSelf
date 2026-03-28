@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
   const onArticleClick = useHandleArticleClick();
 
   useEffect(() => {
+    console.log('123');
     store.fetchArticles();
   }, [store]);
 

@@ -35,6 +35,7 @@ const routes = [
     element: <Notifications />,
   },
   { path: '/help', element: <Help /> },
+  { path: 'about', element: <About /> },
   {
     path: '/',
     element: <Discover />,
@@ -43,7 +44,6 @@ const routes = [
       { path: 'home', element: <DiscoverHome /> },
       { path: 'explore', element: <Explore /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'about', element: <About /> },
     ],
   },
   {

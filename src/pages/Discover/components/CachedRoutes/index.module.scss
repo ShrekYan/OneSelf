@@ -1,0 +1,21 @@
+/**
+ * 路由缓存样式 - 纯 CSS 方案
+ * 非激活页面通过 display: none 完全隐藏，但是保持 DOM 存在
+ */
+
+.cachedRoutesContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.cachedPage {
+  width: 100%;
+  height: 100%;
+
+  // 非激活页面完全隐藏不占位
+  // 但是 DOM 保持存在，组件不卸载
+  &:not([data-active="true"]) {
+    display: none;
+  }
+}

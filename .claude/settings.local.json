@@ -6,7 +6,8 @@
       "Edit",
       "Bash(git push *)",
       "Bash(npm install *)",
-      "Bash(npx prisma migrate *)"
+      "Bash(npx prisma migrate *)",
+      "mcp__pixso__design_to_code"
     ],
     "deny": [
       "Bash(rm -rf *)",
@@ -15,8 +16,8 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "figma"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

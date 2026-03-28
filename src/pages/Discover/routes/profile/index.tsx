@@ -1,6 +1,7 @@
 import React from 'react';
 import { useObserver } from 'mobx-react';
 import { useNavigate } from 'react-router-dom';
+import CountUp from 'react-countup';
 import styles from './index.module.scss';
 import { LazyImage } from '@/components';
 import { useProfileStore } from './useStore';
@@ -116,6 +117,24 @@ const Profile: React.FC = () => {
 
   const { userInfo } = profileStore;
 
+  // 解析数字用于动画
+  const parseNumber = (value: number | string): number => {
+    if (typeof value === 'number') return value;
+    const match = value.match(/^([\d.]+)/);
+    return match ? parseFloat(match[1]) : 0;
+  };
+
+  // 获取显示格式（保留单位）
+  const getLikesSuffix = (): string => {
+    if (
+      typeof userInfo.stats.likes === 'string' &&
+      userInfo.stats.likes.includes('k')
+    ) {
+      return 'k';
+    }
+    return '';
+  };
+
   // 处理帮助点击
   const handleHelpClick = () => {
     navigate('/help');
@@ -164,18 +183,25 @@ const Profile: React.FC = () => {
         <div className={styles.stats}>
           <div className={styles.statItem}>
             <span className={styles.statNumber}>
-              {userInfo.stats.followers}
+              <CountUp start={0} end={userInfo.stats.followers} duration={1} />
             </span>
             <span className={styles.statLabel}>Followers</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statNumber}>
-              {userInfo.stats.following}
+              <CountUp start={0} end={userInfo.stats.following} duration={1} />
             </span>
             <span className={styles.statLabel}>Following</span>
           </div>
           <div className={styles.statItem}>
-            <span className={styles.statNumber}>{userInfo.stats.likes}</span>
+            <span className={styles.statNumber}>
+              <CountUp
+                start={0}
+                end={parseNumber(userInfo.stats.likes)}
+                duration={1}
+                suffix={getLikesSuffix()}
+              />
+            </span>
             <span className={styles.statLabel}>Likes</span>
           </div>
         </div>
