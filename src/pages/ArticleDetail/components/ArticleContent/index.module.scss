@@ -100,8 +100,8 @@
       transition: all 0.2s;
 
       &:hover {
-        color: color.adjust($primary-purple, $lightness: -10%);
-        border-bottom-color: color.adjust($primary-purple, $lightness: -10%);
+        color: #7036d3;
+        border-bottom-color: #7036d3;
       }
     }
 

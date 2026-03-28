@@ -57,9 +57,8 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
     setContainerSize({ width, height });
 
     const screenHeight = window.innerHeight;
-    const screenWidth = window.innerWidth;
-    const initialX = screenWidth - width; // Snap to left edge
-    const initialY = screenHeight - height; // Vertical center
+    const initialX = window.innerWidth - width - 16; // Snap to left edge (x = 0)
+    const initialY = screenHeight - height; // Vertical center (50%)
 
     setInitialPosition({ x: initialX, y: initialY });
   }, [safeArea.bottom, safeArea.top, safeArea.left]);
