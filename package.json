@@ -135,12 +135,12 @@
         ">0.3%, ios >= 9"
     ],
     "lint-staged": {
-        "*.{ts,tsx}": [
+        "!(.claude)/**/*.{ts,tsx}": [
             "prettier --write",
             "eslint --fix",
             "eslint --max-warnings=0"
         ],
-        "*.{css,scss}": [
+        "!(.claude)/**/*.{css,scss}": [
             "stylelint --fix"
         ]
     }
