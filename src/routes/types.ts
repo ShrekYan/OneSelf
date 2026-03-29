@@ -4,11 +4,14 @@
  */
 
 import type { IndexRouteObject, NonIndexRouteObject } from 'react-router-dom';
+import type { RouteHandleMeta } from './utils';
 
 /**
  * 扩展 IndexRouteObject 添加自定义配置
  */
-interface IndexRouteConfig extends IndexRouteObject {
+interface IndexRouteConfig extends Omit<IndexRouteObject, 'handle'> {
+  /** 路由元数据，包含完整路径等信息 */
+  handle?: RouteHandleMeta;
   /** 是否需要缓存（KeepAlive）*/
   keepAlive?: boolean;
   /** 页面名称（用于日志、标题）*/
@@ -19,7 +22,9 @@ interface IndexRouteConfig extends IndexRouteObject {
 /**
  * 扩展 NonIndexRouteObject 添加自定义配置
  */
-interface NonIndexRouteConfig extends NonIndexRouteObject {
+interface NonIndexRouteConfig extends Omit<NonIndexRouteObject, 'handle'> {
+  /** 路由元数据，包含完整路径等信息 */
+  handle?: RouteHandleMeta;
   /** 是否需要缓存（KeepAlive）*/
   keepAlive?: boolean;
   /** 页面名称（用于日志、标题）*/

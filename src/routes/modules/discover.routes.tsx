@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-// import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import type { RouteConfig } from '@/routes/types';
 import type { RouteConfigInfo } from '@/routes/components/RouteInterceptor';
 import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
@@ -50,14 +50,13 @@ const discoverRoutes: RouteConfig[] = [
       keepAlive: false,
     },
     children: [
-      //TODO:XXX
-      // {
-      //   index: true,
-      //   element: <Navigate to="/home" replace />,
-      //   handle: {
-      //     pageName: '重定向到首页',
-      //   },
-      // },
+      {
+        index: true,
+        element: <Navigate to="/home" replace />,
+        handle: {
+          pageName: '重定向到首页',
+        },
+      },
       {
         path: '/home',
         element: createCachedElement(DiscoverHome, '首页', '/home'),

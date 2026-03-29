@@ -8,8 +8,11 @@ import type { RouteConfig } from './types';
  * 路由元数据，自动添加到 handle 中
  */
 export interface RouteHandleMeta {
-  fullPath: string;
+  /** 完整路径，由 enhanceRoutes 自动生成 */
+  fullPath?: string;
+  /** 页面名称，用户手动配置 */
   pageName?: string;
+  /** 是否缓存，用户手动配置 */
   keepAlive?: boolean;
 }
 
@@ -26,7 +29,7 @@ export const enhanceRoutes = (
     const fullPath = (parentPath + '/' + currentPath).replace(/\/+/g, '/');
     // 创建新的 handle 对象，添加元数据
     const newHandle: RouteHandleMeta = {
-      ...(route.handle as RouteHandleMeta),
+      ...(route.handle || {}),
       fullPath,
       pageName: route.pageName,
       keepAlive: route.keepAlive,

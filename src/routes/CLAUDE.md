@@ -50,10 +50,12 @@ const routeItem: RouteConfig = {
       </KeepAliveLayout>
     </RouteInterceptor>
   ),
+  pageName: '页面名称',        // 顶层配置（也可以只放 handle 中）
   handle: {
     pageName: '页面名称',   // 用于标题、日志
     keepAlive: false,     // 是否缓存：Tab 页 true，其他 false
   },
+  // fullPath 由 enhanceRoutes 自动生成，不需要手动配置！
 };
 ```
 
@@ -84,15 +86,59 @@ RouteInterceptor (路由守卫)
 | `RouteInterceptor` | 登录校验、权限检查、日志埋点 |
 | `KeepAliveLayout` | 根据 `keepAlive` 决定是否启用缓存 |
 
-### 6. 类型扩展
+### 6. 类型扩展与类型安全
 
-`RouteConfig` 在 React Router `RouteObject` 基础上扩展：
+`RouteConfig` 在 React Router `RouteObject` 基础上扩展，通过 `Omit` 移除原有 `handle` 并重新定义，保证完全类型安全：
 
 ```ts
-interface RouteConfig {
-  keepAlive?: boolean;      // 是否需要缓存
-  pageName?: string;        // 页面名称（用于标题、日志）
-  children?: RouteConfig[]; // 支持嵌套路由
+// types.ts 中的类型定义结构
+import type { IndexRouteObject, NonIndexRouteObject } from 'react-router-dom';
+import type { RouteHandleMeta } from './utils';
+
+interface IndexRouteConfig extends Omit<IndexRouteObject, 'handle'> {
+  handle?: RouteHandleMeta;
+  keepAlive?: boolean;
+  pageName?: string;
+  children?: undefined;
+}
+
+interface NonIndexRouteConfig extends Omit<NonIndexRouteObject, 'handle'> {
+  handle?: RouteHandleMeta;
+  keepAlive?: boolean;
+  pageName?: string;
+  children?: RouteConfig[];
+}
+
+export type RouteConfig = IndexRouteConfig | NonIndexRouteConfig;
+```
+
+**RouteHandleMeta 结构**:
+```ts
+export interface RouteHandleMeta {
+  fullPath?: string;  // ✅ 自动生成，不需要手动填写
+  pageName?: string;  // 页面名称
+  keepAlive?: boolean;// 是否缓存
+}
+```
+
+### 7. 类型安全最佳实践 (避开 @typescript-eslint/no-unsafe-assignment)
+
+| 问题场景 | 错误原因 | 规避方式 |
+|----------|----------|----------|
+| `RouteConfigInfo` | `Pick<RouteConfig, ...>` 从联合类型 Pick 导致类型不安全 | 直接定义独立接口，不要从联合类型 Pick |
+| `handle` 字段 | React Router 原生 `handle` 是 `unknown` 类型 | 必须用 `Omit` 移除原类型重新定义 |
+| `route.handle` 展开 | `route.handle` 可能为 `undefined` | 使用 `...(route.handle || {})` 兜底 |
+
+**RouteInterceptor 中 RouteConfigInfo 正确写法**:
+```ts
+// ❌ 错误 - 从联合类型 Pick 导致不安全赋值
+export type RouteConfigInfo = Pick<RouteConfig, 'path' | 'pageName' | 'keepAlive'>;
+
+// ✅ 正确 - 直接定义接口
+export interface RouteConfigInfo {
+  path: string;
+  pageName?: string;
+  keepAlive?: boolean;
 }
 ```
 
@@ -101,6 +147,8 @@ interface RouteConfig {
 - [ ] 是否按业务模块正确拆分到 `modules/`？
 - [ ] 是否同时嵌套 `RouteInterceptor` + `KeepAliveLayout`？
 - [ ] `handle` 是否包含 `pageName` 和 `keepAlive`？
+- [ ] `fullPath` 是否**没有**手动填写（由 `enhanceRoutes` 自动生成）？
 - [ ] `keepAlive` 是否按场景正确设置（仅 Tab 为 true）？
 - [ ] 非 Tab 页面是否使用 `React.lazy` 懒加载？
 - [ ] 新模块是否已在 `index.tsx` 导入合并？
+- [ ] 是否避免了从 `RouteConfig` 联合类型 `Pick` 字段？
