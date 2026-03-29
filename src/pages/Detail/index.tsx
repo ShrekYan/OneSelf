@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Toast } from 'antd-mobile';
 import { useDetailStore } from './useStore';
 import { ArticleActionBar } from '@/components/ArticleActionBar';
+import { LazyImage } from '@/components/LazyImage';
 import styles from './index.module.scss';
 
 const Detail2Page: React.FC = () => {
@@ -12,10 +13,6 @@ const Detail2Page: React.FC = () => {
 
   const handleGoBack = () => {
     navigate(-1);
-  };
-
-  const handleShare = () => {
-    Toast.show({ content: '分享功能开发中' });
   };
 
   const handleMore = () => {
@@ -48,38 +45,6 @@ const Detail2Page: React.FC = () => {
             </svg>
           </button>
           <div className={styles.rightActions}>
-            <button className={styles.navButton} onClick={handleShare}>
-              <svg
-                className={styles.icon}
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="18" cy="5" r="2" fill="currentColor" />
-                <circle cx="6" cy="12" r="2" fill="currentColor" />
-                <circle cx="18" cy="19" r="2" fill="currentColor" />
-                <line
-                  x1="8.59"
-                  y1="13.51"
-                  x2="15.42"
-                  y2="17.49"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <line
-                  x1="15.41"
-                  y1="6.51"
-                  x2="8.59"
-                  y2="10.49"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
             <button className={styles.navButton} onClick={handleMore}>
               <svg
                 className={styles.icon}
@@ -100,15 +65,15 @@ const Detail2Page: React.FC = () => {
         <main className={styles.main}>
           {/* 封面图片 */}
           <div className={styles.coverWrapper}>
-            <img
+            <LazyImage
               className={styles.coverImage}
               src={store.article.coverUrl}
               alt={store.article.title}
             />
           </div>
 
-          {/* 内容区域 */}
-          <div className={styles.contentWrapper}>
+          {/* 文章元信息 - 需要吸顶：分类+标题+作者信息 */}
+          <div className={styles.articleMetaWrapper}>
             {/* 分类标签 */}
             {store.article.category && (
               <span className={styles.categoryTag}>
@@ -130,7 +95,7 @@ const Detail2Page: React.FC = () => {
                     className={styles.publishMeta}
                   >{`${store.article.publishAt} • ${store.article.readTime} min read`}</span>
                 </div>
-                <img
+                <LazyImage
                   className={styles.avatar}
                   src={store.article.author.avatar}
                   alt={store.article.author.name}
@@ -142,57 +107,51 @@ const Detail2Page: React.FC = () => {
             </div>
 
             <hr className={styles.divider} />
+          </div>
 
-            {/* 文章正文 */}
-            <div className={styles.articleContent}>
-              {store.article.content.map((block, index) => {
-                if (block.type === 'heading' && block.level === 2) {
-                  return (
-                    <h2
-                      key={index}
-                      className={`${styles.heading} ${styles.h2}`}
-                    >
-                      {block.text}
-                    </h2>
-                  );
-                }
-                if (block.type === 'heading' && block.level === 3) {
-                  return (
-                    <h3
-                      key={index}
-                      className={`${styles.heading} ${styles.h3}`}
-                    >
-                      {block.text}
-                    </h3>
-                  );
-                }
-                if (block.type === 'paragraph') {
-                  return (
-                    <p key={index} className={styles.paragraph}>
-                      {block.text}
-                    </p>
-                  );
-                }
-                if (block.type === 'quote') {
-                  return (
-                    <blockquote key={index} className={styles.quote}>
-                      {block.text}
-                    </blockquote>
-                  );
-                }
-                if (block.type === 'image' && block.imageUrl) {
-                  return (
-                    <img
-                      key={index}
-                      className={styles.contentImage}
-                      src={block.imageUrl}
-                      alt=""
-                    />
-                  );
-                }
-                return null;
-              })}
-            </div>
+          {/* 文章正文 - 独立容器，继续滚动 */}
+          <div className={styles.articleContent}>
+            {store.article.content.map((block, index) => {
+              if (block.type === 'heading' && block.level === 2) {
+                return (
+                  <h2 key={index} className={`${styles.heading} ${styles.h2}`}>
+                    {block.text}
+                  </h2>
+                );
+              }
+              if (block.type === 'heading' && block.level === 3) {
+                return (
+                  <h3 key={index} className={`${styles.heading} ${styles.h3}`}>
+                    {block.text}
+                  </h3>
+                );
+              }
+              if (block.type === 'paragraph') {
+                return (
+                  <p key={index} className={styles.paragraph}>
+                    {block.text}
+                  </p>
+                );
+              }
+              if (block.type === 'quote') {
+                return (
+                  <blockquote key={index} className={styles.quote}>
+                    {block.text}
+                  </blockquote>
+                );
+              }
+              if (block.type === 'image' && block.imageUrl) {
+                return (
+                  <LazyImage
+                    key={index}
+                    className={styles.contentImage}
+                    src={block.imageUrl}
+                    alt=""
+                  />
+                );
+              }
+              return null;
+            })}
           </div>
         </main>
       )}

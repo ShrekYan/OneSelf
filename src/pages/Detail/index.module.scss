@@ -3,17 +3,16 @@
   width: 100%;
   min-height: 100vh;
   background-color: #fff;
-  position: relative;
-  display: flex;
-  flex-direction: column;
   overflow-x: hidden;
   box-shadow: 0 0 4px rgb(0 0 0 / 10%);
 }
 
 // 顶部导航栏
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
   width: 100%;
   background-color: rgb(255 255 255 / 80%);
@@ -64,7 +63,6 @@
 // 主内容区
 .main {
   flex: 1;
-  overflow-y: auto;
 }
 
 // 封面图片 - 匹配设计稿尺寸
@@ -72,6 +70,7 @@
   width: 100%;
   height: 468px;
   position: relative;
+  padding-top: 89px;
 }
 
 .coverImage {
@@ -80,14 +79,16 @@
   object-fit: cover;
 }
 
-// 内容区域 - 设计稿中内容区域从 top 418 开始，覆盖在封面上方
-.contentWrapper {
-  position: relative;
+// 文章元信息（吸顶部分）- 分类+标题+作者信息需要吸顶
+.articleMetaWrapper {
+  position: sticky;
+  top: 89px;
   margin-top: -50px;
   background-color: #fff;
   border-top-left-radius: 48px;
   border-top-right-radius: 48px;
-  padding: 68px 31px 512px;
+  padding: 32px 31px 24px;
+  z-index: 40;
 }
 
 // 分类标签 - 匹配设计稿
@@ -135,6 +136,7 @@
     border-radius: 9999px;
     object-fit: cover;
     border: 1px solid #e0dfdf;
+    overflow: hidden;
   }
 
   .authorMeta {
@@ -186,8 +188,10 @@
   margin: 0 0 32px;
 }
 
-// 文章内容 - 匹配设计稿字体大小
+// 文章正文 - 独立容器，在元信息下方继续滚动
 .articleContent {
+  background-color: #fff;
+  padding: 0 31px 512px;
   color: #202020;
 
   .paragraph:first-child {

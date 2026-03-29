@@ -30,10 +30,12 @@ export const KeepAliveLayout: React.FC<KeepAliveLayoutProps> = ({
   if (keepAlive) {
     return (
       <KeepAlive id={cacheKey} cacheKey={cacheKey} name={cacheKey}>
-        <Suspense fallback={<Loading tip="加载中..." />}>{children}</Suspense>
+        <Suspense fallback={<Loading tip="loading..." />}>{children}</Suspense>
       </KeepAlive>
     );
   }
 
-  return <Suspense fallback={<Loading tip="加载中..." />}>{children}</Suspense>;
+  return (
+    <Suspense fallback={<Loading tip="loading..." />}>{children}</Suspense>
+  );
 };
