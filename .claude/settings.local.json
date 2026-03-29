@@ -4,15 +4,10 @@
       "Read",
       "Write",
       "Edit",
-      "Bash(git push *)",
-      "Bash(npm install *)",
-      "Bash(npx prisma migrate *)",
+      "Bash(*)",
       "mcp__pixso__design_to_code"
     ],
     "deny": [
-      "Bash(rm -rf *)",
-      "Bash(rm *)",
-      "Bash(sudo *)"
     ],
     "defaultMode": "acceptEdits"
   },
