@@ -1,66 +1,81 @@
 /**
- * Detail1 页面常量定义
+ * 文章详情页面常量
  */
 
-/**
- * 文章详情信息 - 对应设计稿内容
- */
 export interface ArticleDetail {
-  coverImage: string;
-  categoryTag: string;
+  id: string;
   title: string;
+  category: string;
+  coverUrl: string;
   author: {
     name: string;
     avatar: string;
   };
-  publishDate: string;
-  readTime: string;
-  sections: ArticleSection[];
-  quote: string;
-  interaction: {
-    likeCount: number;
-    commentCount: number;
+  publishAt: string;
+  readTime: number;
+  content: ArticleContentBlock[];
+  stats: {
+    likes: number;
+    favorites: number;
+    isLiked: boolean;
+    isFavorited: boolean;
   };
+  isFollowing: boolean;
 }
 
-export interface ArticleSection {
-  heading?: string;
-  content: string;
-}
+export type ArticleContentBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'heading'; level: 1 | 2 | 3; text: string }
+  | { type: 'quote'; text: string }
+  | { type: 'image'; imageUrl: string };
 
-/**
- * 设计稿中的实际数据
- */
-export const ARTICLE_DETAIL: ArticleDetail = {
-  coverImage: '',
-  categoryTag: 'DESIGN',
+// 默认模拟数据 - 匹配 Pixso 设计稿内容和数据
+export const mockArticleDetail: ArticleDetail = {
+  id: '1',
   title: 'The Future of Mobile Interface Design in 2024',
+  category: 'Design',
+  coverUrl:
+    'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=750&h=468&fit=crop',
   author: {
     name: 'Sarah Drasner',
-    avatar: '',
+    avatar:
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face',
   },
-  publishDate: 'Oct 24',
-  readTime: '5 min read',
-  sections: [
+  publishAt: 'Oct 24',
+  readTime: 5,
+  content: [
     {
-      content:
-        'Exploring the new paradigms of gesture-based navigation and spacial design systems. As we move further into the decade, the way we interact with mobile devices is fundamentally changing.',
+      type: 'paragraph',
+      text: 'Exploring the new paradigms of gesture-based navigation and invisible UI that are reshaping how we interact with our devices.',
     },
     {
-      heading: 'The Rise of Invisible Interfaces',
-      content:
-        'Gone are the days of cluttered navigation bars and explicit buttons for every single action. The modern mobile interface relies heavily on intuitive gestures that feel highly organic to the user.',
+      type: 'heading',
+      level: 2,
+      text: 'The Rise of Invisible Interfaces',
     },
     {
-      heading: 'Spatial Computing Influences',
-      content:
-        'With the advent of AR headsets, 2D mobile screens are beginning to adopt depth, heavy use of z-index layering, and materials like glass and acrylic that respond to the environment behind them.',
+      type: 'paragraph',
+      text: "Gone are the days of cluttered navigation bars and explicit buttons. The trend is moving towards subtle, context-aware interfaces that disappear when you don't need them.",
+    },
+    {
+      type: 'heading',
+      level: 2,
+      text: 'Spatial Computing Influences',
+    },
+    {
+      type: 'quote',
+      text: "The best interface is no interface. It's fluid, predictable, and responds to natural human movement.",
+    },
+    {
+      type: 'paragraph',
+      text: 'With the advent of AR headsets, 2D mobile screens are beginning to incorporate spatial thinking. Designers are now thinking in three dimensions even for flat surfaces.',
     },
   ],
-  quote:
-    "\"The best interface is no interface. It's fluid, predictive, and stays completely out of the user's way until it's needed.\"",
-  interaction: {
-    likeCount: 1200,
-    commentCount: 89,
+  stats: {
+    likes: 89,
+    favorites: 1200,
+    isLiked: false,
+    isFavorited: false,
   },
+  isFollowing: false,
 };

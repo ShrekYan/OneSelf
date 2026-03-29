@@ -1,232 +1,370 @@
-.detail1Container {
+// 文章详情页面根容器 - 匹配 750 设计稿
+.detail2Container {
+  width: 100%;
   min-height: 100vh;
   background-color: #fff;
-  padding-bottom: calc(40px + env(safe-area-inset-bottom));
-  max-width: 750px;
-  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-shadow: 0 0 4px rgb(0 0 0 / 10%);
 }
 
-/* 顶部导航栏 */
-.topNav {
-  position: fixed;
+// 顶部导航栏
+.header {
+  position: sticky;
   top: 0;
-  left: 0;
+  z-index: 50;
   width: 100%;
-  max-width: 750px;
-  z-index: 100;
-  height: 88px;
+  background-color: rgb(255 255 255 / 80%);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgb(224 223 223 / 40%);
+}
+
+.headerContent {
   display: flex;
+  height: 89px;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background-color: transparent;
+}
 
-  .navLeft,
-  .navRight {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+.navButton {
+  padding: 8px;
+  margin: -8px;
+  width: 62px;
+  height: 62px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #202020;
+  cursor: pointer;
+  transition: background-color 0.2s;
 
-    &:active {
-      opacity: 0.7;
-    }
+  &:active {
+    background-color: rgb(245 245 245 / 50%);
+  }
 
-    .icon {
-      font-size: 32px;
-      color: #fff;
-    }
+  .icon {
+    width: 37px;
+    height: 37px;
+    display: block;
   }
 }
 
-/* 封面图 */
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+// 主内容区
+.main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+// 封面图片 - 匹配设计稿尺寸
+.coverWrapper {
+  width: 100%;
+  height: 468px;
+  position: relative;
+}
+
 .coverImage {
   width: 100%;
-  height: 420px;
-  background-color: #f0f0f0;
-  background-size: cover;
-  background-position: center;
-  position: relative;
+  height: 100%;
+  object-fit: cover;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 120px;
-    background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 30%));
-    border-radius: 0 0 40px 40px;
+// 内容区域 - 设计稿中内容区域从 top 418 开始，覆盖在封面上方
+.contentWrapper {
+  position: relative;
+  margin-top: -50px;
+  background-color: #fff;
+  border-top-left-radius: 48px;
+  border-top-right-radius: 48px;
+  padding: 68px 31px 512px;
+}
+
+// 分类标签 - 匹配设计稿
+.categoryTag {
+  display: inline-block;
+  padding: 6px 18px;
+  background-color: rgb(136 72 249 / 10%);
+  color: #8848f9;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 9999px;
+  margin-bottom: 16px;
+  line-height: 25px;
+}
+
+// 文章标题 - 匹配设计稿字体大小
+.articleTitle {
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #202020;
+  margin-bottom: 32px;
+}
+
+// 作者信息栏 - 匹配设计稿尺寸
+.authorBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgb(224 223 223 / 50%);
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .avatar {
+    width: 75px;
+    height: 75px;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 1px solid #e0dfdf;
   }
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0 0 40px 40px;
+  .authorMeta {
+    display: flex;
+    flex-direction: column;
+
+    .authorName {
+      font-size: 25px;
+      font-weight: 700;
+      color: #202020;
+      line-height: 37px;
+    }
+
+    .publishMeta {
+      font-size: 21px;
+      color: #7f7f7f;
+      line-height: 31px;
+    }
   }
 }
 
-/* 内容区域 */
-.content {
-  padding: 32px 24px 24px;
+.followButton {
+  padding: 9px 24px;
+  background-color: #202020;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  line-height: 31px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 50px;
+  min-width: 117px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  /* 分类标签 */
-  .categoryTag {
-    display: inline-block;
-    padding: 8px 20px;
-    background-color: #f0eef6;
-    color: #6344c9;
-    font-size: 24px;
-    font-weight: 500;
-    border-radius: 20px;
-    margin-bottom: 20px;
+  &:active {
+    background-color: rgb(32 32 32 / 80%);
+    opacity: 0.8;
   }
+}
 
-  /* 文章标题 */
-  .articleTitle {
-    font-size: 52px;
-    font-weight: 700;
-    color: #1a1a1a;
-    line-height: 1.2;
-    margin-bottom: 32px;
-  }
+.divider {
+  border: none;
+  height: 1px;
+  background-color: rgb(224 223 223 / 50%);
+  margin: 0 0 32px;
+}
 
-  /* 作者信息区 */
-  .authorBar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
+// 文章内容 - 匹配设计稿字体大小
+.articleContent {
+  color: #202020;
 
-    .authorAvatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background-color: #e0e0e0;
-      overflow: hidden;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .authorInfo {
-      flex: 1;
-
-      .authorName {
-        font-size: 30px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 6px;
-      }
-
-      .meta {
-        font-size: 24px;
-        color: #888;
-      }
-    }
-
-    .followButton {
-      padding: 12px 28px;
-      background-color: #333;
-      color: #fff;
-      font-size: 26px;
-      font-weight: 500;
-      border-radius: 40px;
-      cursor: pointer;
-
-      &:active {
-        opacity: 0.8;
-      }
-    }
-  }
-
-  .divider {
-    height: 1px;
-    background-color: #e8e8e8;
-    margin-bottom: 32px;
-  }
-
-  /* 正文段落 */
-  .paragraph {
+  .paragraph:first-child {
     font-size: 28px;
-    line-height: 1.7;
-    color: #666;
+    line-height: 1.6;
+    color: #7f7f7f;
     margin-bottom: 32px;
   }
 
-  /* 小节标题 */
-  .sectionHeading {
-    font-size: 36px;
+  .heading {
     font-weight: 700;
-    color: #1a1a1a;
-    line-height: 1.3;
-    margin: 32px 0 20px;
+    color: #202020;
+    line-height: 1.4;
+
+    &.h2 {
+      font-size: 31px;
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+
+    &.h3 {
+      font-size: 25px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
   }
 
-  /* 引用块 */
-  .quoteBlock {
-    margin: 40px 0;
-    padding: 32px 24px;
-    background-color: #f8f8f8;
+  .paragraph {
+    font-size: 25px;
+    line-height: 1.6;
+    color: #202020;
+    margin-bottom: 32px;
+  }
+
+  .quote {
+    margin: 50px 0;
+    padding: 37px 43px;
+    background-color: #f6f6f6;
+    border-left: 4px solid #8848f9;
     border-radius: 16px;
-    border-left: 6px solid #a855f7;
-    position: relative;
+    font-size: 28px;
+    font-weight: 500;
+    font-style: italic;
+    color: #202020;
+  }
 
-    .quoteText {
-      font-size: 30px;
-      line-height: 1.6;
-      color: #333;
-      font-style: italic;
-      font-weight: 500;
-    }
+  .contentImage {
+    width: 100%;
+    border-radius: 16px;
+    margin: 32px 0;
+  }
+}
 
-    /* 悬浮互动栏 */
-    .interactionBar {
-      position: absolute;
-      top: -28px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      background-color: #333;
-      border-radius: 40px;
-      padding: 12px 24px;
-      gap: 32px;
+// 底部互动栏 - 严格匹配设计稿结构
+.actionBar {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 50;
+  pointer-events: none;
+}
 
-      .interactionItem {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
+.actionBarContent {
+  pointer-events: auto;
+  max-width: 500px;
+  width: 100%;
+  background-color: rgb(32 32 32 / 90%);
+  backdrop-filter: blur(20px);
+  padding: 18px 37px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
+  height: 71px;
+}
 
-        .icon {
-          font-size: 28px;
-          color: #fff;
-        }
+.leftStats {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
 
-        .count {
-          font-size: 24px;
-          color: #fff;
-          font-weight: 400;
-        }
+.rightIcons {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
 
-        &:active {
-          opacity: 0.7;
-        }
-      }
+.iconButton {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgb(255 255 255 / 90%);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 9999px;
+  transition: all 0.2s;
 
-      .divider {
-        width: 1px;
-        height: 28px;
-        background-color: rgb(255 255 255 / 30%);
-        margin: 0;
-      }
-    }
+  &:active {
+    background-color: rgb(255 255 255 / 10%);
+    color: #fff;
+  }
+
+  .actionIcon {
+    width: 34px;
+    height: 34px;
+    display: block;
+  }
+}
+
+.statsButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: rgb(255 255 255 / 90%);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  min-width: 34px;
+  min-height: 34px;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &.active {
+    color: #fff;
+  }
+
+  .actionIcon {
+    width: 34px;
+    height: 34px;
+    display: block;
+    stroke: currentcolor;
+    fill: none;
+  }
+
+  .actionCount {
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 31px;
+  }
+}
+
+.verticalDivider {
+  width: 1px;
+  height: 34px;
+  background-color: rgb(255 255 255 / 20%);
+}
+
+// 适配平板和桌面 - 设计稿本身是 480px 移动端
+@media (width >= 768px) {
+  .detail2Container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+// 适配安全区域
+@media (width <= 750px) {
+  .detail2Container {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .actionBar {
+    bottom: calc(24px + env(safe-area-inset-bottom));
   }
 }

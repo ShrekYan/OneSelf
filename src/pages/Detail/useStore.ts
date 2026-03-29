@@ -1,20 +1,52 @@
 import { useLocalObservable } from 'mobx-react';
-import { ARTICLE_DETAIL, type ArticleDetail } from './constant';
+import { useEffect } from 'react';
+import type { ArticleDetail } from './constant';
+import { mockArticleDetail } from './constant';
 
-export interface Detail1StoreType {
+export interface DetailStore {
   loading: boolean;
-  articleDetail: ArticleDetail;
+  article: ArticleDetail | null;
+  isLiked: boolean;
+  isCollected: boolean;
   setLoading: (state: boolean) => void;
+  setArticle: (data: ArticleDetail) => void;
+  toggleLike: () => void;
+  toggleCollect: () => void;
 }
 
-export const useDetail1Store = (): Detail1StoreType => {
-  const store = useLocalObservable<Detail1StoreType>(() => ({
-    loading: false,
-    articleDetail: ARTICLE_DETAIL,
-    setLoading: function (state: boolean) {
-      this.loading = state;
+export function useDetailStore() {
+  const store = useLocalObservable<DetailStore>(() => ({
+    loading: true,
+    article: null,
+    isLiked: false,
+    isCollected: false,
+
+    setLoading: (state: boolean): void => {
+      store.loading = state;
+    },
+
+    setArticle: (data: ArticleDetail): void => {
+      store.article = data;
+      store.isLiked = data.stats.isLiked;
+      store.isCollected = data.stats.isFavorited;
+    },
+
+    toggleLike: (): void => {
+      store.isLiked = !store.isLiked;
+    },
+
+    toggleCollect: (): void => {
+      store.isCollected = !store.isCollected;
     },
   }));
 
+  useEffect(() => {
+    // 模拟加载数据
+    setTimeout(() => {
+      store.setLoading(false);
+      store.setArticle(mockArticleDetail);
+    }, 500);
+  }, []);
+
   return store;
-};
+}

@@ -1,150 +1,212 @@
-/**
- * Detail1 详情页面
- * @description 根据 Pixso 设计稿生成的详情页面
- */
 import React from 'react';
 import { useObserver } from 'mobx-react';
 import { useNavigate } from 'react-router-dom';
 import { Toast } from 'antd-mobile';
+import { useDetailStore } from './useStore';
+import { ArticleActionBar } from '@/components/ArticleActionBar';
 import styles from './index.module.scss';
-import { useDetail1Store } from './useStore';
-import * as handle from './handle';
 
-import type { ArticleSection } from './constant';
-
-/**
- * 格式化数字，超过 1000 显示 k
- */
-const formatNumber = (num: number): string => {
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}k`;
-  }
-  return String(num);
-};
-
-/**
- * 详情页面组件
- */
-const Detail1: React.FC = () => {
+const Detail2Page: React.FC = () => {
   const navigate = useNavigate();
-  const store = useDetail1Store();
-  const { articleDetail } = store;
+  const store = useDetailStore();
 
-  const onBackClick = (): void => {
+  const handleGoBack = () => {
     navigate(-1);
   };
 
-  const onMoreClick = (): void => {
-    handle.handleMoreOptions();
-  };
-
-  const onFollowClick = async (): Promise<void> => {
-    const confirmed = await handle.confirmFollow();
-    if (confirmed) {
-      Toast.show({ content: '关注成功' });
-    }
-  };
-
-  const onLikeClick = (): void => {
-    Toast.show({ content: '点赞成功' });
-  };
-
-  const onCommentClick = (): void => {
-    Toast.show({ content: '评论功能开发中' });
-  };
-
-  const onCollectClick = (): void => {
-    Toast.show({ content: '收藏成功' });
-  };
-
-  const onShareClick = (): void => {
+  const handleShare = () => {
     Toast.show({ content: '分享功能开发中' });
   };
 
+  const handleMore = () => {
+    Toast.show({ content: '更多功能开发中' });
+  };
+
+  const handleFollow = () => {
+    Toast.show({ content: '关注成功' });
+  };
+
   return useObserver(() => (
-    <div className={styles.detail1Container}>
-      {/* 顶部导航栏 */}
-      <div className={styles.topNav}>
-        <div className={styles.navLeft} onClick={onBackClick}>
-          <span className={styles.icon}>‹</span>
-        </div>
-        <div className={styles.navRight} onClick={onMoreClick}>
-          <span className={styles.icon}>⋯</span>
-        </div>
-      </div>
-
-      {/* 封面图 */}
-      <div className={styles.coverImage}>
-        {/* 如果有图片 URL 可以在这里使用 img 标签 */}
-      </div>
-
-      {/* 内容区域 */}
-      <div className={styles.content}>
-        {/* 分类标签 */}
-        <div className={styles.categoryTag}>{articleDetail.categoryTag}</div>
-
-        {/* 文章标题 */}
-        <h1 className={styles.articleTitle}>{articleDetail.title}</h1>
-
-        {/* 作者信息 */}
-        <div className={styles.authorBar}>
-          <div className={styles.authorAvatar}>{/* 作者头像 */}</div>
-          <div className={styles.authorInfo}>
-            <div className={styles.authorName}>{articleDetail.author.name}</div>
-            <div className={styles.meta}>
-              {articleDetail.publishDate} • {articleDetail.readTime}
-            </div>
+    <div className={styles.detail2Container}>
+      {/* 顶部导航栏 - 匹配设计稿顺序：返回左，更多+分享右 */}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <button className={styles.navButton} onClick={handleGoBack}>
+            <svg
+              className={styles.icon}
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 12H5M5 12L12 19M5 12L12 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <div className={styles.rightActions}>
+            <button className={styles.navButton} onClick={handleShare}>
+              <svg
+                className={styles.icon}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="18" cy="5" r="2" fill="currentColor" />
+                <circle cx="6" cy="12" r="2" fill="currentColor" />
+                <circle cx="18" cy="19" r="2" fill="currentColor" />
+                <line
+                  x1="8.59"
+                  y1="13.51"
+                  x2="15.42"
+                  y2="17.49"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <line
+                  x1="15.41"
+                  y1="6.51"
+                  x2="8.59"
+                  y2="10.49"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button className={styles.navButton} onClick={handleMore}>
+              <svg
+                className={styles.icon}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                <circle cx="19" cy="12" r="2" fill="currentColor" />
+                <circle cx="5" cy="12" r="2" fill="currentColor" />
+              </svg>
+            </button>
           </div>
-          <div className={styles.followButton} onClick={onFollowClick}>
-            Follow
-          </div>
         </div>
+      </header>
 
-        <div className={styles.divider} />
+      {store.article && (
+        <main className={styles.main}>
+          {/* 封面图片 */}
+          <div className={styles.coverWrapper}>
+            <img
+              className={styles.coverImage}
+              src={store.article.coverUrl}
+              alt={store.article.title}
+            />
+          </div>
 
-        {/* 文章正文 */}
-        {articleDetail.sections.map(
-          (section: ArticleSection, index: number) => (
-            <React.Fragment key={index}>
-              {section.heading && (
-                <h2 className={styles.sectionHeading}>{section.heading}</h2>
-              )}
-              <p className={styles.paragraph}>{section.content}</p>
-            </React.Fragment>
-          ),
-        )}
-
-        {/* 引用块 */}
-        <div className={styles.quoteBlock}>
-          {/* 悬浮互动栏 */}
-          <div className={styles.interactionBar}>
-            <div className={styles.interactionItem} onClick={onLikeClick}>
-              <span className={styles.icon}>♡</span>
-              <span className={styles.count}>
-                {formatNumber(articleDetail.interaction.likeCount)}
+          {/* 内容区域 */}
+          <div className={styles.contentWrapper}>
+            {/* 分类标签 */}
+            {store.article.category && (
+              <span className={styles.categoryTag}>
+                {store.article.category}
               </span>
+            )}
+
+            {/* 文章标题 */}
+            <h1 className={styles.articleTitle}>{store.article.title}</h1>
+
+            {/* 作者信息 - 设计稿顺序：[文字信息 + 头像] 左，Follow 按钮右 */}
+            <div className={styles.authorBar}>
+              <div className={styles.authorInfo}>
+                <div className={styles.authorMeta}>
+                  <span className={styles.authorName}>
+                    {store.article.author.name}
+                  </span>
+                  <span
+                    className={styles.publishMeta}
+                  >{`${store.article.publishAt} • ${store.article.readTime} min read`}</span>
+                </div>
+                <img
+                  className={styles.avatar}
+                  src={store.article.author.avatar}
+                  alt={store.article.author.name}
+                />
+              </div>
+              <button className={styles.followButton} onClick={handleFollow}>
+                Follow
+              </button>
             </div>
-            <div className={styles.interactionItem} onClick={onCommentClick}>
-              <span className={styles.icon}>💬</span>
-              <span className={styles.count}>
-                {String(articleDetail.interaction.commentCount)}
-              </span>
-            </div>
-            <div className={styles.divider} />
-            <div className={styles.interactionItem} onClick={onCollectClick}>
-              <span className={styles.icon}>🗒</span>
-            </div>
-            <div className={styles.interactionItem} onClick={onShareClick}>
-              <span className={styles.icon}>⟲</span>
+
+            <hr className={styles.divider} />
+
+            {/* 文章正文 */}
+            <div className={styles.articleContent}>
+              {store.article.content.map((block, index) => {
+                if (block.type === 'heading' && block.level === 2) {
+                  return (
+                    <h2
+                      key={index}
+                      className={`${styles.heading} ${styles.h2}`}
+                    >
+                      {block.text}
+                    </h2>
+                  );
+                }
+                if (block.type === 'heading' && block.level === 3) {
+                  return (
+                    <h3
+                      key={index}
+                      className={`${styles.heading} ${styles.h3}`}
+                    >
+                      {block.text}
+                    </h3>
+                  );
+                }
+                if (block.type === 'paragraph') {
+                  return (
+                    <p key={index} className={styles.paragraph}>
+                      {block.text}
+                    </p>
+                  );
+                }
+                if (block.type === 'quote') {
+                  return (
+                    <blockquote key={index} className={styles.quote}>
+                      {block.text}
+                    </blockquote>
+                  );
+                }
+                if (block.type === 'image' && block.imageUrl) {
+                  return (
+                    <img
+                      key={index}
+                      className={styles.contentImage}
+                      src={block.imageUrl}
+                      alt=""
+                    />
+                  );
+                }
+                return null;
+              })}
             </div>
           </div>
-          <div className={styles.quoteText}>{articleDetail.quote}</div>
-        </div>
-      </div>
+        </main>
+      )}
+
+      {/* 底部互动栏 - 严格匹配设计稿结构：[点赞+收藏] 左，分隔线，[更多+分享] 右 */}
+      {store.article && (
+        <footer className={styles.actionBar}>
+          <ArticleActionBar likeCount={10} commentCount={10} />
+        </footer>
+      )}
     </div>
   ));
 };
 
-Detail1.displayName = 'Detail1';
+Detail2Page.displayName = 'Detail2Page';
 
-export default Detail1;
+export default Detail2Page;

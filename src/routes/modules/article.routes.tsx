@@ -7,9 +7,9 @@ import type { RouteConfig } from '@/routes/types';
 import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
 import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
-const ArticleDetail = React.lazy(() => import('@/pages/ArticleDetail'));
 const Search = React.lazy(() => import('@/pages/Discover/routes/search'));
 const Notifications = React.lazy(() => import('@/pages/Notifications'));
+const ArticleDetail = React.lazy(() => import('@/pages/Detail'));
 
 const articleRoutes: RouteConfig[] = [
   {

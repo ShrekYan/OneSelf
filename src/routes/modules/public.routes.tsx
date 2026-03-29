@@ -12,8 +12,6 @@ const Login = React.lazy(() => import('@/pages/Login'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
 const About = React.lazy(() => import('@/pages/About'));
 const Help = React.lazy(() => import('@/pages/Help'));
-const Detail = React.lazy(() => import('@/pages/ArticleDetail'));
-const Detail1 = React.lazy(() => import('@/pages/Detail'));
 
 const publicRoutes: RouteConfig[] = [
   {
@@ -61,42 +59,6 @@ const publicRoutes: RouteConfig[] = [
     ),
     handle: {
       pageName: '帮助',
-      keepAlive: false,
-    },
-  },
-  {
-    path: '/detail/:id',
-    element: (
-      <RouteInterceptor
-        routeConfig={{
-          path: '/detail/:id',
-          pageName: '详情',
-          keepAlive: false,
-        }}
-      >
-        <KeepAliveLayout keepAlive={false} cacheKey="/detail/:id">
-          <Detail />
-        </KeepAliveLayout>
-      </RouteInterceptor>
-    ),
-    handle: {
-      pageName: '详情',
-      keepAlive: false,
-    },
-  },
-  {
-    path: '/detail1',
-    element: (
-      <RouteInterceptor
-        routeConfig={{ path: '/detail1', pageName: '详情1', keepAlive: false }}
-      >
-        <KeepAliveLayout keepAlive={false} cacheKey="/detail1">
-          <Detail1 />
-        </KeepAliveLayout>
-      </RouteInterceptor>
-    ),
-    handle: {
-      pageName: '详情1',
       keepAlive: false,
     },
   },
