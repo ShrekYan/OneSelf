@@ -1,10 +1,13 @@
 import React from 'react';
-import { Button, Space } from 'antd-mobile';
+import { Button } from 'antd-mobile';
+import classNames from 'classnames';
+import styles from './index.module.scss';
 
-const DEFAULT_ERROR_TITLE = '页面出错了';
-const RETRY_BUTTON_TEXT = '重试';
-const REFRESH_BUTTON_TEXT = '刷新页面';
-const ERROR_ICON = '⚠️';
+const DEFAULT_ERROR_TITLE = 'Something Went Wrong';
+const DEFAULT_ERROR_DESCRIPTION =
+  'An unexpected error occurred. Please try again or refresh the page.';
+const RETRY_BUTTON_TEXT = 'Try Again';
+const REFRESH_BUTTON_TEXT = 'Refresh Page';
 
 const handleRetry = (resetErrorBoundary: () => void): void => {
   resetErrorBoundary();
@@ -14,90 +17,76 @@ const handleRefresh = (): void => {
   window.location.reload();
 };
 
-interface ErrorFallbackProps {
+export interface ErrorFallbackProps {
   error: Error;
   resetErrorBoundary: () => void;
+  className?: string;
+  title?: string;
+  description?: string;
 }
 
 const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,
   resetErrorBoundary,
+  className,
+  title = DEFAULT_ERROR_TITLE,
+  description = DEFAULT_ERROR_DESCRIPTION,
 }) => {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f5f5f5',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          textAlign: 'center',
-          background: '#ffffff',
-          padding: '40px 20px',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-          maxWidth: '400px',
-          width: '100%',
-        }}
-      >
-        <div
-          style={{
-            fontSize: '64px',
-            color: '#ff4d4f',
-            marginBottom: '16px',
-          }}
-        >
-          {ERROR_ICON}
+    <div className={classNames(styles.errorFallbackContainer, className)}>
+      <div className={styles.errorCard}>
+        <div className={styles.errorIcon}>
+          <svg
+            width="120"
+            height="120"
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="60"
+              cy="60"
+              r="57"
+              stroke="#ff4d4f"
+              strokeWidth="6"
+              fill="none"
+            />
+            <path
+              d="M38 38L82 82M82 38L38 82"
+              stroke="#ff4d4f"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </div>
-        <h1
-          style={{
-            fontSize: '20px',
-            fontWeight: 600,
-            color: '#333333',
-            marginBottom: '12px',
-          }}
-        >
-          {DEFAULT_ERROR_TITLE}
-        </h1>
-        <div
-          style={{
-            background: '#fff2f0',
-            color: '#ff4d4f',
-            padding: '12px 16px',
-            borderRadius: '6px',
-            fontSize: '14px',
-            lineHeight: 1.5,
-            marginBottom: '24px',
-            textAlign: 'left',
-            maxHeight: '150px',
-            overflowY: 'auto',
-            border: '1px solid #ffccc7',
-          }}
-        >
-          {error.message}
-        </div>
-
-        <Space block>
+        <h1 className={styles.errorTitle}>{title}</h1>
+        <p className={styles.errorDescription}>{description}</p>
+        {error.message && (
+          <div className={styles.errorDetails}>{error.message}</div>
+        )}
+        <div className={styles.buttonGroup}>
           <Button
+            block
             color="primary"
             size="large"
+            className={styles.retryButton}
             onClick={() => handleRetry(resetErrorBoundary)}
           >
             {RETRY_BUTTON_TEXT}
           </Button>
-          <Button size="large" onClick={handleRefresh}>
+          <Button
+            block
+            size="large"
+            className={styles.refreshButton}
+            onClick={handleRefresh}
+          >
             {REFRESH_BUTTON_TEXT}
           </Button>
-        </Space>
+        </div>
       </div>
     </div>
   );
 };
 
 export default ErrorFallback;
-export type { ErrorFallbackProps };

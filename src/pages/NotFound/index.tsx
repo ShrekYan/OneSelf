@@ -1,42 +1,43 @@
 /**
- * 404 未找到页面
- * @description 用户访问不存在路由时展示的错误页面，提供返回上页和回到首页操作
+ * 404 Not Found Page
+ * @description Error page displayed when user visits a non-existent route, provides return to home action
  */
 import React from 'react';
-import { Button, Space } from 'antd-mobile';
+import { Button } from 'antd-mobile';
 import { useObserver } from 'mobx-react';
+import { ReactComponent as NotFoundIllustration } from '@/assets/icons/404-illustration.svg';
 
-import { NotFoundConst } from './constant';
 import { useNotFoundStore } from './useStore';
-import { useNavigateBack, useNavigateToHome } from './hooks/useNavigation';
+import { useNavigateToHome } from './hooks/useNavigation';
 import styles from './index.module.scss';
 
 /**
- * 404 未找到页面组件
+ * 404 Not Found Page Component
  */
 const NotFound: React.FC = () => {
   const store = useNotFoundStore();
-  const handleNavigateBack = useNavigateBack();
   const handleNavigateToHome = useNavigateToHome();
 
   return useObserver(() => (
     <div className={styles.notFoundContainer}>
       <div className={styles.notFoundContent}>
-        <div className={styles.notFoundIcon}>
-          {NotFoundConst.ERROR_ICONS.NOT_FOUND}
+        <div className={styles.notFoundIllustration}>
+          <NotFoundIllustration className={styles.illustrationSvg} />
         </div>
-        <h1 className={styles.notFoundErrorCode}>{store.errorCode}</h1>
-        <p className={styles.notFoundErrorTitle}>{store.errorTitle}</p>
-        <p className={styles.notFoundErrorMessage}>{store.errorMessage}</p>
+        <h1 className={styles.notFoundTitle}>{store.errorTitle}</h1>
+        <p className={styles.notFoundDescription}>{store.errorMessage}</p>
 
-        <Space block className={styles.notFoundButtonGroup}>
-          <Button color="primary" size="large" onClick={handleNavigateBack}>
-            {store.backButtonText}
-          </Button>
-          <Button size="large" onClick={handleNavigateToHome}>
+        <div className={styles.notFoundButtonWrapper}>
+          <Button
+            block
+            color="primary"
+            size="large"
+            onClick={handleNavigateToHome}
+            className={styles.backToHomeButton}
+          >
             {store.homeButtonText}
           </Button>
-        </Space>
+        </div>
       </div>
     </div>
   ));

@@ -42,10 +42,8 @@ export function useDetailStore() {
 
   useEffect(() => {
     // 模拟加载数据
-    setTimeout(() => {
-      store.setLoading(false);
-      store.setArticle(mockArticleDetail);
-    }, 500);
+    store.setLoading(false);
+    store.setArticle(mockArticleDetail);
   }, []);
 
   return store;

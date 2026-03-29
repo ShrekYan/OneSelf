@@ -18,10 +18,11 @@ export type NotFoundStoreType = {
 export function useNotFoundStore(): NotFoundStoreType {
   const store = useLocalObservable<NotFoundStoreType>(() => ({
     errorCode: '404',
-    errorTitle: '页面找不到了',
-    errorMessage: '您访问的页面不存在或已被移动',
-    backButtonText: '返回上页',
-    homeButtonText: '回到首页',
+    errorTitle: 'Page Not Found',
+    errorMessage:
+      'The page you are looking for does not exist or has been moved',
+    backButtonText: 'Go Back',
+    homeButtonText: 'Back to Home',
   }));
 
   return store;
