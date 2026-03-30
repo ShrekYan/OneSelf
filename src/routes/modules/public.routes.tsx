@@ -12,8 +12,42 @@ const Login = React.lazy(() => import('@/pages/Login'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
 const About = React.lazy(() => import('@/pages/About'));
 const Help = React.lazy(() => import('@/pages/Help'));
+const TransactionRecord = React.lazy(() => import('@/pages/TransactionRecord'));
+const ResultDetail = React.lazy(() => import('@/pages/ResultDetail'));
 
 const publicRoutes: RouteConfig[] = [
+  {
+    path: '/transactionRecord',
+    element: (
+      <RouteInterceptor
+        routeConfig={{ path: '/transactionRecord', pageName: '交易记录', keepAlive: false }}
+      >
+        <KeepAliveLayout keepAlive={false} cacheKey="/transactionRecord">
+          <TransactionRecord />
+        </KeepAliveLayout>
+      </RouteInterceptor>
+    ),
+    handle: {
+      pageName: '交易记录',
+      keepAlive: false,
+    },
+  },
+  {
+    path: '/result-detail',
+    element: (
+      <RouteInterceptor
+        routeConfig={{ path: '/result-detail', pageName: '购买结果', keepAlive: false }}
+      >
+        <KeepAliveLayout keepAlive={false} cacheKey="/result-detail">
+          <ResultDetail />
+        </KeepAliveLayout>
+      </RouteInterceptor>
+    ),
+    handle: {
+      pageName: '购买结果',
+      keepAlive: false,
+    },
+  },
   {
     path: '/login',
     element: (
