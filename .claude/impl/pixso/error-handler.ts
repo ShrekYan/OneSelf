@@ -13,6 +13,8 @@ export type PixsoErrorType =
   | 'tokenExceeded'     // Token 超限 - 结果已保存到本地文件
   | 'rateLimit'         // 频率限制
   | 'serverError'       // 服务端错误
+  | 'dslWriteError'     // DSL 写入临时文件失败（引号转义问题）
+  | 'dslParseError'     // DSL JSON 解析失败（文件损坏）
   | 'unknown';          // 未知错误
 
 /**
@@ -46,6 +48,8 @@ export function shouldRetry(error: ClassifiedError): boolean {
     case 'rateLimit':
       return retryCount < 2;
     case 'serverError':
+      return retryCount < 1;
+    case 'dslWriteError':
       return retryCount < 1;
     default:
       return false;
@@ -154,6 +158,28 @@ export function classifyError(errorMessage: string): ClassifiedError {
     };
   }
 
+  // DSL 写入/解析错误
+  if (
+    lowerMessage.includes('failed to write dsl') ||
+    lowerMessage.includes('unexpected token') ||
+    lowerMessage.includes('json parse failed') ||
+    lowerMessage.includes('syntaxerror: unexpected token')
+  ) {
+    return {
+      type: 'dslWriteError',
+      message: '写入 DSL 临时文件失败（引号转义问题）',
+      retryCount: 0,
+    };
+  }
+
+  if (lowerMessage.includes('json parse error')) {
+    return {
+      type: 'dslParseError',
+      message: '解析 DSL JSON 失败（文件损坏）',
+      retryCount: 0,
+    };
+  }
+
   // 未知错误
   return {
     type: 'unknown',
@@ -255,6 +281,25 @@ Pixso 服务端处理请求时发生错误，重试后仍然失败。
 **建议解决方案**:
 1. 等待一段时间后重新尝试
 2. 如果问题持续，请检查 Pixso 服务状态`;
+
+    case 'dslWriteError':
+      return `## ❌ Pixso 调用失败: DSL 写入错误
+
+写入 DSL 临时文件失败，通常是由于 JSON 引号转义问题导致。
+
+**建议解决方案**:
+1. 清理 /tmp/pixso-dsl.json 后重试
+2. 如果问题重复出现，请检查 /tmp 目录权限
+3. 手动使用 heredoc 方式写入`;
+
+    case 'dslParseError':
+      return `## ❌ Pixso 调用失败: DSL 解析错误
+
+DSL JSON 文件损坏，无法解析。
+
+**建议解决方案**:
+1. 删除损坏的临时文件并重试
+2. 如果问题持续，检查 MCP 返回结果是否完整`;
 
     case 'unknown':
       return `## ❌ Pixso 调用失败: 未知错误

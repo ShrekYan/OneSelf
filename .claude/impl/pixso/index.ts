@@ -5,11 +5,13 @@
 import { classifyError, ClassifiedError, shouldRetry, getRetryDelay, formatUserMessage } from './error-handler';
 import { readLargeFile, checkFileExists } from './large-file-reader';
 import { scaleDimensions, validateDsl, calculateScale } from './dsl-parser';
+import { writeDslSafely, validateDslFile, WriteResult } from './dsl-writer';
 
 // 导出所有模块
 export * from './error-handler';
 export * from './large-file-reader';
 export * from './dsl-parser';
+export * from './dsl-writer';
 
 /**
  * Pixso 调用结果

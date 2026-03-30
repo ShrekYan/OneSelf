@@ -71,11 +71,88 @@ flowchart TD
 - 填充颜色（如果有）
 - 文字内容 + 字体大小（如果是 PARAGRAPH）
 
-**命令示例**：
-```python
+## 两种场景区别对待：
+
+### 场景 A：MCP 直接返回成功（DSL 较小，token 未超限）
+
+使用 **stdin 管道 + Node.js** 写入，完全避开 Bash 引号解析问题：
+
+```bash
+# 将 JSON 通过 stdin 传给写入脚本，避免 Bash 转义
+cat << 'EOF' | node .claude/impl/pixso/bin/write-dsl.cjs /tmp/pixso-dsl.json
+JSON_CONTENT
+EOF
+```
+
+然后打印树结构：
+
+```bash
+# 直接打印完整树结构，使用已经写入的文件
 python3 -c "
 import json
 dsl = json.load(open('/tmp/pixso-dsl.json'))
+nodes = dsl['pixDslNodes']
+scale = 750 / ORIGINAL_WIDTH
+
+def walk_node(guid, indent=0):
+    for node in nodes:
+        if node.get('parentGuid') == guid:
+            name = node.get('name', '').strip() or node['type']
+            w = int(node['width'] * scale)
+            h = int(node['height'] * scale)
+            t = int(node.get('top', 0) * scale)
+            l = int(node.get('left', 0) * scale)
+            print('  ' * indent + '- %s:' % name)
+            print('  ' * (indent+1) + 'size: %dx%d, pos: top=%d, left=%d' % (w, h, t, l))
+            if 'fillPaints' in node and len(node['fillPaints']) > 0:
+                for i, p in enumerate(node['fillPaints']):
+                    if 'color' in p:
+                        c = p['color']
+                        r = int(c['r'])
+                        g = int(c['g'])
+                        b = int(c['b'])
+                        a = c.get('a', 1)
+                        print('  ' * (indent+1) + 'fill: #%02x%02x%02x, alpha=%s' % (r, g, b, a))
+            if 'strokePaints' in node and len(node['strokePaints']) > 0:
+                for i, p in enumerate(node['strokePaints']):
+                    if 'color' in p:
+                        c = p['color']
+                        r = int(c['r'])
+                        g = int(c['g'])
+                        b = int(c['b'])
+                        a = c.get('a', 1)
+                        print('  ' * (indent+1) + 'stroke: #%02x%02x%02x, alpha=%s' % (r, g, b, a))
+            if node['type'] == 'PARAGRAPH' and 'nodeText' in node:
+                fs = int(node.get('fontSize', 14) * scale)
+                text = node['nodeText'][:80]
+                print('  ' * (indent+1) + 'text: \"%s...\"' % text)
+                print('  ' * (indent+1) + 'fontSize: %dpx' % fs)
+                if 'fillPaints' in node and len(node['fillPaints']) > 0:
+                    c = node['fillPaints'][0]['color']
+                    r = int(c['r'])
+                    g = int(c['g'])
+                    b = int(c['b'])
+                    print('  ' * (indent+1) + 'color: #%02x%02x%02x' % (r, g, b))
+            walk_node(node['guid'], indent + 1)
+
+walk_node(ROOT_GUID)
+"
+```
+
+**优势**：
+- 完全避开 Bash 引号解析问题，任何 JSON 都能正确写入
+- stdin 管道没有命令行长度限制，支持更大的 DSL
+- 内置 JSON 验证，提前发现问题
+
+### 场景 B：Token 超限（MCP 返回本地文件路径）
+
+**MCP 服务端已经将完整 JSON 写入了本地文件**，直接使用该文件即可，不需要重新写入：
+
+```bash
+# 直接使用 MCP 已写入的文件 /path/to/localfile，不需要重新写入
+python3 -c "
+import json
+dsl = json.load(open('/path/to/localfile'))
 nodes = dsl['pixDslNodes']
 scale = 750 / ORIGINAL_WIDTH
 
@@ -150,22 +227,27 @@ round to integer pixels
 
 ---
 
+## 📜 遵循项目开发规范
+
+以下项目规范必须严格遵守：
+
+include: ../skills/h5-frontend-developer/h5-frontend-developer.md
+
+---
+
 ## 📋 生成完成后必须检查清单
 
-生成代码后，必须逐项勾选核对，**全部通过才能交给用户**：
-
+### Pixso 特有检查项（必须全部通过）
 - [ ] **结构层级**：HTML 层级完全匹配 DSL 树结构吗？
 - [ ] **元素顺序**：每个容器内子元素顺序和 DSL 一致吗？
 - [ ] **尺寸**：所有宽度高度都是缩放后的整数像素吗？
 - [ ] **字体大小**：每个文字节点的字体大小都从 DSL 提取并正确缩放了吗？
 - [ ] **颜色**：背景色和文字颜色都从 DSL 提取了吗？使用正确十六进制吗？
 - [ ] **位置关系**：负margin、圆角覆盖等特殊定位正确实现了吗？
-- [ ] **根容器命名**：页面根容器 `{pageName}Container` 符合 CSS 规范吗？
-- [ ] **class 命名**：全部使用 camelCase 吗？
-- [ ] **TypeScript**：所有类型都正确声明了吗？没有 `any` 吗？
-- [ ] **安全区域**：底部适配了 `env(safe-area-inset-bottom)` 吗？
-- [ ] **点击反馈**：可点击元素添加了 `:active { opacity: 0.7/0.8; }` 吗？
-- [ ] **点击区域**：可点击元素最小尺寸 ≥ 44px × 44px 吗？
+- [ ] **设计缩放**：所有尺寸已正确缩放到 750px 设计稿基准吗？
+
+### 通用规范检查
+已通过上方 `include` 引入的 `h5-frontend-developer` 规范自动覆盖
 
 ---
 
@@ -181,50 +263,6 @@ round to integer pixels
 
 ---
 
-## 设计规范对齐
-
-生成代码严格遵循项目规范：
-- **设计稿基准**: 强制缩放到 750px 宽度，输出 `px` 单位由插件自动转 `vw`
-- **TypeScript**: 所有类型显式声明，零 `any`
-- **样式**: `index.module.scss` + `camelCase` 命名
-- **目录结构**: 遵循 `pages/` 和 `components/` 约定
-- **状态管理**: 遵循 MobX `useLocalObservable` 规范
-
----
-
-## 项目规范对齐
-
-### 页面目录结构（pages/[PageName]/）
-
-```
-src/pages/[PageName]/
-├── index.tsx        # 页面入口（只做渲染和组合）
-├── useStore.ts      # 页面局部状态（MobX）
-├── constant.ts      # 页面常量和类型定义
-├── handle.ts        # 纯事件处理函数
-├── index.module.scss # 页面样式
-└── components/      # 可选：拆分的子组件
-```
-
-### 样式规范（CSS Modules）
-
-- 根容器必须命名 `{pageName}Container`（PascalCase → camelCase）
-- 所有 class 使用 camelCase
-- 嵌套深度 ≤ 3 层
-- 使用 px 单位，禁止手动 vw
-
-详见 [.claude/rules/css-scss.md](../../rules/css-scss.md)
-
-### TypeScript 规范
-
-- 所有参数返回值必须显式类型声明
-- 类型导出使用 `export type`
-- 零 `any`，使用 `unknown` + 类型守卫
-
-详见 [.claude/rules/typescript.md](../../rules/typescript.md)
-
----
-
 ## 使用示例
 
 ```
@@ -237,10 +275,12 @@ src/pages/[PageName]/
 
 ## 实现模块
 
-- [error-handler.ts](./pixso-impl/error-handler.ts) - 错误分类与检测
-- [large-file-reader.ts](./pixso-impl/large-file-reader.ts) - 大文件分块读取
-- [dsl-parser.ts](./pixso-impl/dsl-parser.ts) - DSL 解析 + 尺寸缩放
-- [index.ts](./pixso-impl/index.ts) - 入口整合
+- [error-handler.ts](../impl/pixso/error-handler.ts) - 错误分类与检测
+- [large-file-reader.ts](../impl/pixso/large-file-reader.ts) - 大文件分块读取
+- [dsl-parser.ts](../impl/pixso/dsl-parser.ts) - DSL 解析 + 尺寸缩放
+- [dsl-writer.ts](../impl/pixso/dsl-writer.ts) - 安全写入 DSL（解决引号转义问题）
+- [bin/write-dsl.cjs](../impl/pixso/bin/write-dsl.cjs) - 命令行写入入口
+- [index.ts](../impl/pixso/index.ts) - 入口整合
 
 ---
 

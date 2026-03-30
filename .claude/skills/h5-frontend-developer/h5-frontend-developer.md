@@ -19,5 +19,7 @@ include: ../../rules/api-design.md
 include: ../../rules/typescript.md
 include: ../../rules/css-scss.md
 include: ../../rules/hooks-error-handling.md
+include: ../../rules/handle-ts.md
 include: ../../rules/assets-resources.md
-include: ../../CLAUDE.md
+include: ../../rules/third-party-libraries.md
+include: ../../../CLAUDE.md

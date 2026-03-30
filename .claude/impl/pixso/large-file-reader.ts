@@ -54,7 +54,7 @@ export async function readLargeFile(
     });
 
     rl.on('line', (line) => {
-      content += line;
+      content += line + '\n';
     });
 
     rl.on('close', () => {

@@ -10,3 +10,9 @@ export type { LoadingProps } from './Loading';
 
 export { default as ErrorFallback } from './ErrorFallback';
 export type { ErrorFallbackProps } from './ErrorFallback';
+
+export { ArticleActionBar } from './ArticleActionBar';
+export type { ArticleActionBarProps } from './ArticleActionBar';
+
+export { default as ArticleAuthorBar } from './ArticleAuthorBar';
+export type { ArticleAuthorBarProps } from './ArticleAuthorBar';
