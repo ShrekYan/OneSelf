@@ -9,6 +9,7 @@ import { KeepAliveLayout } from '@/routes/components/KeepAliveLayout';
 import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
 const Login = React.lazy(() => import('@/pages/Login'));
+const Register = React.lazy(() => import('@/pages/Register'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
 const About = React.lazy(() => import('@/pages/About'));
 const Help = React.lazy(() => import('@/pages/Help'));
@@ -20,7 +21,11 @@ const publicRoutes: RouteConfig[] = [
     path: '/transactionRecord',
     element: (
       <RouteInterceptor
-        routeConfig={{ path: '/transactionRecord', pageName: '交易记录', keepAlive: false }}
+        routeConfig={{
+          path: '/transactionRecord',
+          pageName: '交易记录',
+          keepAlive: false,
+        }}
       >
         <KeepAliveLayout keepAlive={false} cacheKey="/transactionRecord">
           <TransactionRecord />
@@ -36,7 +41,11 @@ const publicRoutes: RouteConfig[] = [
     path: '/result-detail',
     element: (
       <RouteInterceptor
-        routeConfig={{ path: '/result-detail', pageName: '购买结果', keepAlive: false }}
+        routeConfig={{
+          path: '/result-detail',
+          pageName: '购买结果',
+          keepAlive: false,
+        }}
       >
         <KeepAliveLayout keepAlive={false} cacheKey="/result-detail">
           <ResultDetail />
@@ -61,6 +70,22 @@ const publicRoutes: RouteConfig[] = [
     ),
     handle: {
       pageName: '登录',
+      keepAlive: false,
+    },
+  },
+  {
+    path: '/register',
+    element: (
+      <RouteInterceptor
+        routeConfig={{ path: '/register', pageName: '注册', keepAlive: false }}
+      >
+        <KeepAliveLayout keepAlive={false} cacheKey="/register">
+          <Register />
+        </KeepAliveLayout>
+      </RouteInterceptor>
+    ),
+    handle: {
+      pageName: '注册',
       keepAlive: false,
     },
   },

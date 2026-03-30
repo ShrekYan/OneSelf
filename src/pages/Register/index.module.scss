@@ -1,0 +1,256 @@
+/* 注册页面根容器 */
+.registerContainer {
+  min-height: 100vh;
+  padding: 0 40px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Logo 区域 */
+.logoSection {
+  padding-top: 80px;
+  padding-bottom: 60px;
+  text-align: center;
+
+  .logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgb(102 126 234 / 30%);
+
+    svg {
+      width: 50px;
+      height: 50px;
+      color: #fff;
+    }
+  }
+
+  .appName {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+}
+
+/* 表单区域 */
+.formSection {
+  flex: 1;
+
+  .form {
+    width: 100%;
+  }
+
+  /* 输入框组 */
+  .formGroup {
+    margin-bottom: 28px;
+
+    .label {
+      display: block;
+      font-size: 28px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 16px;
+    }
+
+    .inputWrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .inputIcon {
+        position: absolute;
+        left: 24px;
+        width: 32px;
+        height: 32px;
+        color: #999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .input {
+        width: 100%;
+        height: 96px;
+        padding-left: 72px;
+        padding-right: 80px;
+        font-size: 28px;
+        border: 2px solid #e8e8e8;
+        border-radius: 16px;
+        background: #fafafa;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: #667eea;
+          background: #fff;
+          outline: none;
+        }
+
+        &::placeholder {
+          color: #ccc;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      /* 验证码特殊样式 - 给按钮留出空间 */
+      .inputWithCodeBtn {
+        padding-right: 220px;
+      }
+
+      .passwordToggle {
+        position: absolute;
+        right: 24px;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      /* 获取验证码按钮 */
+      .codeButton {
+        position: absolute;
+        right: 8px;
+        height: 80px;
+        padding: 0 24px;
+        font-size: 24px;
+        font-weight: 500;
+        color: #fff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        min-width: 140px;
+        transition: all 0.3s ease;
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.98);
+        }
+      }
+    }
+
+    /* 错误提示 */
+    .errorText {
+      margin-top: 12px;
+      font-size: 24px;
+      color: #ff4d4f;
+    }
+  }
+
+  /* 协议勾选 */
+  .agreementRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 36px;
+
+    :global(.admCheckbox) {
+      .admCheckboxIcon {
+        border-color: #667eea;
+
+        &.admCheckboxIconChecked {
+          background: #667eea;
+          border-color: #667eea;
+        }
+      }
+    }
+
+    .agreementText {
+      margin-left: 12px;
+      font-size: 24px;
+      color: #999;
+      line-height: 1.4;
+
+      .link {
+        color: #667eea;
+        text-decoration: none;
+      }
+    }
+  }
+
+  /* 注册按钮 */
+  .registerButton {
+    width: 100%;
+    height: 88px;
+    font-size: 32px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 44px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgb(102 126 234 / 40%);
+    transition: all 0.3s ease;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+      box-shadow: 0 4px 12px rgb(102 126 234 / 40%);
+    }
+  }
+}
+
+/* 底部登录链接 */
+.footerSection {
+  padding: 40px 0;
+  text-align: center;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+
+  .loginText {
+    font-size: 26px;
+    color: #999;
+
+    .loginLink {
+      color: #667eea;
+      font-weight: 500;
+      text-decoration: none;
+      margin-left: 8px;
+
+      &:active {
+        opacity: 0.7;
+      }
+    }
+  }
+}

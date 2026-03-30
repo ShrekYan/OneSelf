@@ -23,6 +23,17 @@
       "type": "http",
       "url": "http://127.0.0.1:3667/mcp",
       "headers": {}
+    },
+    "apifox": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "apifox-mcp-server@latest",
+        "--project-id=8010949"
+      ],
+      "env": {
+        "APIFOX_ACCESS_TOKEN": "afxp_59beffV55bwljcTQnzYw8YY6ChSTBjJVDvwZ"
+      }
     }
   }
 }

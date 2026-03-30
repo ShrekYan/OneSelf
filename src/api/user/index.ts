@@ -50,6 +50,33 @@ export interface UpdateUserInfoResponse {
 }
 
 /**
+ * 发送验证码请求参数
+ */
+export interface SendCodeParams {
+  mobile: string;
+  type: 'register' | 'login' | 'reset';
+}
+
+/**
+ * 注册请求参数
+ */
+export interface RegisterParams {
+  mobile: string;
+  code: string;
+  password: string;
+  nickname: string;
+}
+
+/**
+ * 注册响应
+ */
+export interface RegisterResponse {
+  success: boolean;
+  token?: string;
+  message?: string;
+}
+
+/**
  * 用户 API 模块
  */
 export const userApi = {
@@ -74,5 +101,21 @@ export const userApi = {
    */
   signOut: async (): Promise<{ success: boolean }> => {
     return await api.post('/api/v1/auth/sign-out');
+  },
+
+  /**
+   * 发送验证码
+   */
+  sendCode: async (
+    params: SendCodeParams,
+  ): Promise<{ success: boolean; message?: string }> => {
+    return await api.post('/api/v1/auth/send-code', params);
+  },
+
+  /**
+   * 用户注册
+   */
+  register: async (params: RegisterParams): Promise<RegisterResponse> => {
+    return await api.post('/api/v1/auth/register', params);
   },
 };
