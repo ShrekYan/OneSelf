@@ -52,25 +52,55 @@ export async function writeDslSafely(dsl: unknown, filePath: string): Promise<Wr
 }
 
 /**
+ * 预处理 JSON 内容：去除 BOM 和清理控制字符
+ */
+export function preprocessJsonContent(content: string): string {
+  // 去除 UTF-8 BOM
+  let result = content.replace(/^\uFEFF/, '');
+  // 清理控制字符（保留 \n \r \t）
+  result = result.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+  return result;
+}
+
+/**
  * 检查文件是否为有效 JSON
  */
 export async function validateDslFile(filePath: string): Promise<{ valid: boolean; error?: string }> {
-  try {
-    if (!(await checkFileExists(filePath))) {
-      return { valid: false, error: 'File does not exist' };
+  const maxRetries = 3;
+  const retryDelayMs = 100;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (!(await checkFileExists(filePath))) {
+        return { valid: false, error: 'File does not exist' };
+      }
+      const content = await fs.promises.readFile(filePath, 'utf8');
+      if (content.trim().length === 0) {
+        // 等待一下再重试，可能文件还在写入
+        if (attempt < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+          continue;
+        }
+        return { valid: false, error: 'File is empty' };
+      }
+      // 预处理：去除 BOM 和清理控制字符
+      const processed = preprocessJsonContent(content);
+      JSON.parse(processed);
+      return { valid: true };
+    } catch (error) {
+      // 最后一次尝试才返回错误，否则重试
+      if (attempt < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
-    const content = await fs.promises.readFile(filePath, 'utf8');
-    if (content.trim().length === 0) {
-      return { valid: false, error: 'File is empty' };
-    }
-    JSON.parse(content);
-    return { valid: true };
-  } catch (error) {
-    return {
-      valid: false,
-      error: error instanceof Error ? error.message : String(error),
-    };
   }
+
+  return { valid: false, error: 'Max retries exceeded' };
 }
 
 /**

@@ -19,10 +19,21 @@ export interface LargeFileReadOptions {
 }
 
 /**
+ * 预处理 JSON 内容：去除 BOM 和清理控制字符
+ */
+function preprocessJsonContent(content: string): string {
+  // 去除 UTF-8 BOM
+  let result = content.replace(/^\uFEFF/, '');
+  // 清理控制字符（保留 \n \r \t）
+  result = result.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+  return result;
+}
+
+/**
  * 流式读取大文件
  * @param filePath 文件路径
  * @param options 读取选项
- * @returns 完整文件内容
+ * @returns 完整文件内容（已预处理：去 BOM、清理控制字符）
  */
 export async function readLargeFile(
   filePath: string,
@@ -65,8 +76,10 @@ export async function readLargeFile(
     });
 
     rl.on('close', () => {
-      logger.debug(`Completed readLargeFile: ${filePath}, ${content.length} chars`);
-      resolve(content);
+      // 预处理：去除 BOM 和清理控制字符
+      const processed = preprocessJsonContent(content);
+      logger.debug(`Completed readLargeFile: ${filePath}, ${processed.length} chars (preprocessed)`);
+      resolve(processed);
     });
 
     rl.on('error', (err) => {
