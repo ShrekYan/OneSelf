@@ -46,7 +46,8 @@ export async function processPixsoResult(
   if (error.type === 'tokenExceeded' && error.context?.localFilePath) {
     const filePath = error.context.localFilePath;
 
-    if (!checkFileExists(filePath)) {
+    if (!(await checkFileExists(filePath))) {
+      logger.error(`Local file not found: ${filePath}`);
       return {
         success: false,
         error,
@@ -58,11 +59,13 @@ export async function processPixsoResult(
     }
 
     try {
+      logger.info(`Reading large DSL from local file: ${filePath}`);
       const content = await readLargeFile(filePath);
       const dsl = JSON.parse(content);
 
       const validation = validateDsl(dsl);
       if (!validation.valid) {
+        logger.error(`DSL validation failed`, validation.errors);
         return {
           success: false,
           error,
@@ -70,13 +73,16 @@ export async function processPixsoResult(
         };
       }
 
+      const kbSize = Math.round(Buffer.byteLength(content, 'utf8') / 1024);
+      logger.info(`Successfully read DSL from local file, size=${kbSize}KB`);
       return {
         success: true,
         dsl,
-        userMessage: `✅ 成功从本地文件读取 Pixso 设计 (${Math.round(Buffer.byteLength(content, 'utf8') / 1024)} KB)`,
+        userMessage: `✅ 成功从本地文件读取 Pixso 设计 (${kbSize} KB)`,
       };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      logger.error(`Failed to read local file`, err instanceof Error ? err : msg);
       return {
         success: false,
         error,
@@ -93,27 +99,42 @@ export async function processPixsoResult(
   };
 }
 
+import { getConfig } from './config';
+import { logger } from './logger';
+
 /**
- * 归一化 DSL 尺寸到 750px 设计稿标准
+ * 归一化 DSL 尺寸到项目设计稿标准
  */
 export function normalizeDslDimensions<T extends { width: number; height: number }>(
   dsl: T,
   originalDesignWidth: number,
-  targetWidth: number = 750
+  targetWidth?: number
 ): T {
-  const scale = calculateScale(originalDesignWidth, targetWidth);
+  const config = getConfig();
+  const finalTargetWidth = targetWidth ?? config.defaultTargetWidth;
+  const scale = calculateScale(originalDesignWidth, finalTargetWidth);
   const scaled = scaleDimensions(dsl, originalDesignWidth, {
-    targetWidth,
+    targetWidth: finalTargetWidth,
     roundToInt: true,
   });
 
-  return {
+  const result = {
     ...dsl,
     width: scaled.width,
     height: scaled.height,
-    x: 'x' in dsl ? scaled.x : (dsl as unknown as { x: number }).x,
-    y: 'y' in dsl ? scaled.y : (dsl as unknown as { y: number }).y,
-  };
+  } as T;
+
+  // 只有当原对象存在 x/y 属性时才添加
+  if ('x' in dsl) {
+    (result as { x: number }).x = scaled.x;
+  }
+  if ('y' in dsl) {
+    (result as { y: number }).y = scaled.y;
+  }
+
+  logger.debug(`Normalized dimensions: ${(dsl as { width: number }).width}x${(dsl as { height: number }).height} -> ${scaled.width}x${scaled.height}`);
+
+  return result;
 }
 
 /**
@@ -128,11 +149,15 @@ export function delay(ms: number): Promise<void> {
  */
 export async function callWithRetry<T>(
   callFn: () => Promise<T>,
-  maxRetries: number = 3
+  maxRetries?: number
 ): Promise<{ success: true; data: T } | { success: false; lastError: string }> {
+  const config = getConfig();
+  const finalMaxRetries = maxRetries ?? config.maxRetries;
   let retryCount = 0;
 
-  while (retryCount <= maxRetries) {
+  logger.debug(`Starting callWithRetry, maxRetries=${finalMaxRetries}`);
+
+  while (retryCount <= finalMaxRetries) {
     try {
       const data = await callFn();
       return { success: true, data };
@@ -141,11 +166,15 @@ export async function callWithRetry<T>(
       const classified = classifyError(errorMsg);
       classified.retryCount = retryCount;
 
-      if (!shouldRetry(classified) || retryCount >= maxRetries) {
+      logger.debug(`Attempt ${retryCount + 1} failed: ${errorMsg}`);
+
+      if (!shouldRetry(classified) || retryCount >= finalMaxRetries) {
+        logger.error(`All ${finalMaxRetries + 1} attempts failed`, classified);
         return { success: false, lastError: formatUserMessage(classified) };
       }
 
       const waitMs = getRetryDelay(classified);
+      logger.info(`Retrying after ${waitMs}ms...`);
       await delay(waitMs);
       retryCount++;
     }

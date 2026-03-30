@@ -199,17 +199,39 @@ export function validateDsl(dsl: unknown): {
 }
 
 /**
- * 扁平化 DSL 树，收集所有节点
+ * DSL 基础节点接口
  */
-export function flattenDsl(
-  node: Record<string, unknown>,
-  result: Record<string, unknown>[] = []
-): Record<string, unknown>[] {
+export interface DslNode {
+  children?: unknown[];
+  [key: string]: unknown;
+}
+
+/**
+ * 扁平化 DSL 树，收集所有节点
+ * 支持循环引用检测，遇到循环引用自动跳过
+ */
+export function flattenDsl<T extends DslNode>(
+  node: T | null | undefined,
+  result: T[] = [],
+  seen = new WeakSet<object>()
+): T[] {
+  if (!node || typeof node !== 'object') {
+    return result;
+  }
+
+  // 检测循环引用
+  if (seen.has(node)) {
+    return result;
+  }
+  seen.add(node);
+
   result.push(node);
 
   if (Array.isArray(node.children)) {
     node.children.forEach(child => {
-      flattenDsl(child as Record<string, unknown>, result);
+      if (child && typeof child === 'object') {
+        flattenDsl(child as T, result, seen);
+      }
     });
   }
 

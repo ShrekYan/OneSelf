@@ -5,12 +5,14 @@
 
 import * as fs from 'fs';
 import * as readline from 'readline';
+import { getConfig } from './config';
+import { logger } from './logger';
 
 /**
  * 大文件读取选项
  */
 export interface LargeFileReadOptions {
-  /** 最大文件大小限制（字节），默认 1GB */
+  /** 最大文件大小限制（字节），默认从配置读取 */
   maxSizeBytes?: number;
   /** 文件编码，默认 utf8 */
   encoding?: BufferEncoding;
@@ -26,18 +28,23 @@ export async function readLargeFile(
   filePath: string,
   options: LargeFileReadOptions = {}
 ): Promise<string> {
+  const config = getConfig();
   const {
-    maxSizeBytes = 1024 * 1024 * 1024, // 默认 1GB
+    maxSizeBytes = config.maxFileSizeBytes,
     encoding = 'utf8',
   } = options;
 
+  logger.debug(`Starting readLargeFile: ${filePath}, maxSizeBytes=${maxSizeBytes}`);
+
   // 先检查文件是否存在
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`File not found: ${filePath}`);
+  try {
+    await fs.promises.access(filePath, fs.constants.R_OK);
+  } catch {
+    throw new Error(`File not found or not readable: ${filePath}`);
   }
 
   // 检查文件大小
-  const stats = fs.statSync(filePath);
+  const stats = await fs.promises.stat(filePath);
   if (stats.size > maxSizeBytes) {
     throw new Error(
       `File too large (${Math.round(stats.size / 1024 / 1024)} MB), ` +
@@ -58,11 +65,13 @@ export async function readLargeFile(
     });
 
     rl.on('close', () => {
+      logger.debug(`Completed readLargeFile: ${filePath}, ${content.length} chars`);
       resolve(content);
     });
 
     rl.on('error', (err) => {
       rl.close();
+      logger.error(`readLargeFile error: ${filePath}`, err);
       reject(err);
     });
   });
@@ -71,9 +80,9 @@ export async function readLargeFile(
 /**
  * 检查文件是否存在且可访问
  */
-export function checkFileExists(filePath: string): boolean {
+export async function checkFileExists(filePath: string): Promise<boolean> {
   try {
-    fs.accessSync(filePath, fs.constants.R_OK);
+    await fs.promises.access(filePath, fs.constants.R_OK);
     return true;
   } catch {
     return false;
@@ -83,9 +92,9 @@ export function checkFileExists(filePath: string): boolean {
 /**
  * 获取文件大小（字节）
  */
-export function getFileSize(filePath: string): number {
+export async function getFileSize(filePath: string): Promise<number> {
   try {
-    const stats = fs.statSync(filePath);
+    const stats = await fs.promises.stat(filePath);
     return stats.size;
   } catch {
     return -1;

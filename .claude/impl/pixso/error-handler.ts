@@ -56,17 +56,21 @@ export function shouldRetry(error: ClassifiedError): boolean {
   }
 }
 
+import { getConfig } from './config';
+
 /**
  * 获取重试延迟（毫秒）- 指数退避
  */
 export function getRetryDelay(error: ClassifiedError): number {
+  const config = getConfig();
   const { type, retryCount } = error;
+  const baseDelay = config.baseRetryDelayMs;
 
   // 指数退避: 2^retryCount * baseDelay
   if (type === 'rateLimit') {
-    return Math.pow(2, retryCount) * 5000; // 5s, 10s
+    return Math.pow(2, retryCount) * (baseDelay * 5); // 5x base delay for rate limit
   }
-  return Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+  return Math.pow(2, retryCount) * baseDelay;
 }
 
 /**
@@ -188,15 +192,32 @@ export function classifyError(errorMessage: string): ClassifiedError {
   };
 }
 
+import * as path from 'path';
+
 /**
  * 从错误信息中提取本地文件路径
  * 格式: ...Output has been saved to /path/to/file.txt
+ * 支持 Unix (/开头) 和 Windows (C:\ 开头) 路径
  */
 export function extractFilePath(errorMessage: string): string | null {
-  // 匹配 /Users/.../*.txt 路径
-  const pathRegex = /(\/Users\/[^\s]+\/mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
-  const match = errorMessage.match(pathRegex);
-  return match?.[1] ?? null;
+  // 匹配任意绝对路径:
+  // - Unix: /开头
+  // - Windows: C:\ 或 D:\ 等盘符开头
+  // 文件名格式: mcp-pixso-get_node_dsl-*.txt
+  const unixPathRegex = /(\/[^\s]*mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
+  const windowsPathRegex = /([A-Za-z]:\\[^]*mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
+
+  let match = errorMessage.match(unixPathRegex);
+  if (match) {
+    return path.normalize(match[1]);
+  }
+
+  match = errorMessage.match(windowsPathRegex);
+  if (match) {
+    return path.normalize(match[1]);
+  }
+
+  return null;
 }
 
 /**

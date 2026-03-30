@@ -4,6 +4,7 @@
  */
 
 import * as fs from 'fs';
+import { logger } from './logger';
 
 /**
  * 写入结果
@@ -19,14 +20,15 @@ export interface WriteResult {
  * @param dsl DSL 对象
  * @param filePath 输出文件路径
  */
-export function writeDslSafely(dsl: unknown, filePath: string): WriteResult {
+export async function writeDslSafely(dsl: unknown, filePath: string): Promise<WriteResult> {
   try {
     const content = JSON.stringify(dsl, null, 2);
-    fs.writeFileSync(filePath, content, 'utf8');
+    await fs.promises.writeFile(filePath, content, 'utf8');
 
-    // 验证写入
-    const stat = fs.statSync(filePath);
+    // 验证写入：只检查文件大小，不重复读取整个文件
+    const stat = await fs.promises.stat(filePath);
     if (stat.size === 0) {
+      logger.error(`Write failed: file is empty after writing: ${filePath}`);
       return {
         success: false,
         bytesWritten: 0,
@@ -34,15 +36,13 @@ export function writeDslSafely(dsl: unknown, filePath: string): WriteResult {
       };
     }
 
-    // 验证 JSON 可解析
-    const readBack = fs.readFileSync(filePath, 'utf8');
-    JSON.parse(readBack);
-
+    logger.debug(`Write completed: ${filePath}, ${stat.size} bytes`);
     return {
       success: true,
       bytesWritten: stat.size,
     };
   } catch (error) {
+    logger.error(`Write failed: ${filePath}`, error instanceof Error ? error : String(error));
     return {
       success: false,
       bytesWritten: 0,
@@ -54,12 +54,12 @@ export function writeDslSafely(dsl: unknown, filePath: string): WriteResult {
 /**
  * 检查文件是否为有效 JSON
  */
-export function validateDslFile(filePath: string): { valid: boolean; error?: string } {
+export async function validateDslFile(filePath: string): Promise<{ valid: boolean; error?: string }> {
   try {
-    if (!fs.existsSync(filePath)) {
+    if (!(await checkFileExists(filePath))) {
       return { valid: false, error: 'File does not exist' };
     }
-    const content = fs.readFileSync(filePath, 'utf8');
+    const content = await fs.promises.readFile(filePath, 'utf8');
     if (content.trim().length === 0) {
       return { valid: false, error: 'File is empty' };
     }
@@ -70,5 +70,17 @@ export function validateDslFile(filePath: string): { valid: boolean; error?: str
       valid: false,
       error: error instanceof Error ? error.message : String(error),
     };
+  }
+}
+
+/**
+ * 检查文件是否存在
+ */
+async function checkFileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.promises.access(filePath, fs.constants.R_OK);
+    return true;
+  } catch {
+    return false;
   }
 }

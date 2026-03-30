@@ -13,6 +13,3 @@ export type { ErrorFallbackProps } from './ErrorFallback';
 
 export { ArticleActionBar } from './ArticleActionBar';
 export type { ArticleActionBarProps } from './ArticleActionBar';
-
-export { default as ArticleAuthorBar } from './ArticleAuthorBar';
-export type { ArticleAuthorBarProps } from './ArticleAuthorBar';
