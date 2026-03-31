@@ -9,5 +9,5 @@ export interface Category {
   id: string;
   name: string;
   articleCount: number;
-  imageUrl?: string;
+  imageUrl?: string | null;
 }

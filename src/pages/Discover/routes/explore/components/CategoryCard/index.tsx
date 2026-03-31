@@ -54,7 +54,11 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
       {/* 图片：只有可见后才开始加载 */}
       {hasImage && isVisible && (
         <div className={styles.categoryImage}>
-          <img src={category.imageUrl} alt={category.name} loading="lazy" />
+          <img
+            src={category.imageUrl ?? ''}
+            alt={category.name}
+            loading="lazy"
+          />
         </div>
       )}
 

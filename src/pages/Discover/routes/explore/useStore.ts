@@ -1,7 +1,7 @@
 import { useLocalObservable } from 'mobx-react';
 import { Toast } from 'antd-mobile';
+import { articleApi } from '@/api';
 
-import { MOCK_CATEGORIES } from './mock';
 import { MAX_SEARCH_HISTORY } from './constant';
 import type { Category } from './types';
 
@@ -93,13 +93,8 @@ const useExploreStore: UseExploreStoreType = () => {
     async fetchCategories(): Promise<void> {
       this.setLoading(true);
       try {
-        // TODO: 替换为真实 API 调用
-        // const response = await categoryApi.getList();
-        // this.setCategories(response);
-
-        // 使用 Mock 数据
-        await new Promise(resolve => setTimeout(resolve, 0)); // 模拟网络延迟
-        this.setCategories(MOCK_CATEGORIES);
+        const response = await articleApi.listCategories();
+        this.setCategories(response.list);
       } catch (error) {
         console.error('加载分类列表失败:', error);
         Toast.show({
