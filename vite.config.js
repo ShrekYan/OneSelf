@@ -87,6 +87,11 @@ export default defineConfig(function (_a) {
             minify: 'esbuild',
             chunkSizeWarningLimit: 1000,
             rollupOptions: {
+                external: [
+                    /\.test\.(ts|tsx)$/,
+                    /\.spec\.(ts|tsx)$/,
+                    /src\/__mocks__\/.*/,
+                ],
                 output: {
                     manualChunks: {
                         vendor: ['react', 'react-dom'],
