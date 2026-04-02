@@ -3,6 +3,7 @@ import {
   CategoryListResponseDto,
   CategoryItemDto,
   HotKeywordsResponseDto,
+  HotKeywordDto,
 } from './dto';
 
 // Mock 分类数据，与前端保持一致
@@ -69,17 +70,6 @@ const MOCK_CATEGORIES: CategoryItemDto[] = [
   },
 ];
 
-const HOT_KEYWORDS = [
-  'React 19',
-  'Next.js',
-  'TypeScript',
-  'Tailwind CSS',
-  'MobX',
-  '性能优化',
-  '设计系统',
-  '微前端',
-];
-
 @Injectable()
 export class CategoryService {
   getList(): Promise<CategoryListResponseDto> {
@@ -90,6 +80,10 @@ export class CategoryService {
   }
 
   getHotKeywords(): Promise<HotKeywordsResponseDto> {
-    return Promise.resolve({ keywords: HOT_KEYWORDS });
+    const keywords: HotKeywordDto[] = MOCK_CATEGORIES.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+    return Promise.resolve({ keywords });
   }
 }

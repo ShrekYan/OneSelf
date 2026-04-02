@@ -2,13 +2,15 @@
  * Handle hot search tag click
  */
 import type { SearchStoreType } from '../useStore';
+import type { HotSearchItem } from '../constant';
 import { useHandleSearchSubmit } from './useHandleSearchSubmit';
 
 export const useHandleHotSearchClick = (store: SearchStoreType) => {
   const handleSearchSubmit = useHandleSearchSubmit(store);
 
-  const handleHotSearchClick = (keyword: string) => {
-    store.setSearchKeyword(keyword);
+  const handleHotSearchClick = (item: HotSearchItem) => {
+    store.setSearchKeyword(item.name);
+    store.setCurrentCategoryId(item.id);
     handleSearchSubmit();
   };
 

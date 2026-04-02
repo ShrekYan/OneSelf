@@ -6,6 +6,8 @@
 import { productApi } from './product';
 import { userApi } from './user';
 import { articleApi } from './article';
+import { categoryApi } from './category';
+import type { AxiosInstance } from 'axios';
 
 // 导出核心类型定义
 export type { ApiResponse, RequestConfig, RequestMethod } from './core/types';
@@ -18,13 +20,28 @@ export { CancelManager } from './core/cancel-manager';
 // 导出 Axios 实例和管理器
 export { default as api, cache, cancelManager } from './core/axios-instance';
 export { apiUtils } from './core/api-utils';
+import api from './core/axios-instance';
 
 // 导出各业务模块 API
-export { productApi, userApi, articleApi };
+export { productApi, userApi, articleApi, categoryApi };
 
-// 默认导出包含所有 API 模块的对象
-export default {
-  product: productApi,
-  user: userApi,
-  article: articleApi,
-};
+/**
+ * 默认导出对象聚合 axios 实例 和 所有业务模块 API
+ * 使用方式:
+ * - import api from '@/api';  - api.get(...) 调用接口
+ * - import api from '@/api';  - api.category.getHotKeywords() 调用业务 API
+ */
+interface DefaultApi extends AxiosInstance {
+  product: typeof productApi;
+  user: typeof userApi;
+  article: typeof articleApi;
+  category: typeof categoryApi;
+}
+
+const defaultApi = api as DefaultApi;
+defaultApi.product = productApi;
+defaultApi.user = userApi;
+defaultApi.article = articleApi;
+defaultApi.category = categoryApi;
+
+export default defaultApi;

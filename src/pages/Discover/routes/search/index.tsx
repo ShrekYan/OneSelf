@@ -1,25 +1,41 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useObserver } from 'mobx-react';
 
 import styles from './index.module.scss';
-import { HOT_SEARCHES } from './constant';
 import { useSearchStore } from './useStore';
 import { useHandleSearchSubmit } from './hooks/useHandleSearchSubmit';
 import { useHandleHotSearchClick } from './hooks/useHandleHotSearchClick';
 import { useHandleGoBack } from './hooks/useHandleGoBack';
+import { useThrottledSearch } from './hooks/useThrottledSearch';
+import SearchResultList from './components/SearchResultList';
 
 const SearchPage: React.FC = () => {
   // 在组件顶层调用 Hook 获取 store
-  const searchStore = useSearchStore(HOT_SEARCHES);
+  const searchStore = useSearchStore();
   // 获取事件处理函数
   const handleSearchSubmit = useHandleSearchSubmit(searchStore);
   const handleHotSearchClick = useHandleHotSearchClick(searchStore);
   const handleGoBack = useHandleGoBack();
+  // 实时搜索节流
+  useThrottledSearch(searchStore);
+
+  // 搜索框 ref 用于清空后自动聚焦
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 组件挂载时获取热门搜索数据
+  useEffect(() => {
+    searchStore.fetchHotSearches();
+  }, [searchStore]);
 
   // 处理输入框变化
   const handleInputChange = useCallback(
     (value: string) => {
       searchStore.setSearchKeyword(value);
+      // If search content is cleared and currently showing results,
+      // automatically go back to trending searches view
+      if (value === '' && searchStore.hasSearched) {
+        searchStore.setHasSearched(false);
+      }
     },
     [searchStore],
   );
@@ -48,6 +64,14 @@ const SearchPage: React.FC = () => {
     [handleSearchSubmit],
   );
 
+  // 处理清空搜索
+  const handleClearSearch = useCallback(() => {
+    searchStore.setSearchKeyword('');
+    searchStore.setHasSearched(false);
+    searchStore.setCurrentCategoryId(null);
+    searchInputRef.current?.focus();
+  }, [searchStore]);
+
   return useObserver(() => (
     <div className={styles.searchRoot}>
       {/* 顶部搜索栏 */}
@@ -71,6 +95,7 @@ const SearchPage: React.FC = () => {
             </svg>
           </div>
           <input
+            ref={searchInputRef}
             type="text"
             className={styles.searchInput}
             placeholder="Search articles, categories..."
@@ -79,6 +104,19 @@ const SearchPage: React.FC = () => {
             onKeyDown={handleKeyDown}
             autoFocus
           />
+          {searchStore.searchKeyword.trim().length > 0 && (
+            <button
+              className={styles.clearBtn}
+              onClick={handleClearSearch}
+              type="button"
+              aria-label="Clear search"
+            >
+              <svg viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
         </div>
 
         <button
@@ -95,7 +133,12 @@ const SearchPage: React.FC = () => {
       {!searchStore.hasSearched ? (
         <>
           {/* 热门搜索推荐 */}
-          {searchStore.hotSearches.length > 0 && (
+          {searchStore.hotSearchesLoading ? (
+            <section className={styles.hotSection}>
+              <h2 className={styles.sectionTitle}>Trending Searches</h2>
+              <div className={styles.loadingText}>Loading...</div>
+            </section>
+          ) : searchStore.hotSearches.length > 0 ? (
             <section className={styles.hotSection}>
               <h2 className={styles.sectionTitle}>Trending Searches</h2>
               <div className={styles.hotTags}>
@@ -103,15 +146,15 @@ const SearchPage: React.FC = () => {
                   <button
                     key={item.id}
                     className={styles.hotTag}
-                    onClick={() => handleHotSearchClick(item.keyword)}
+                    onClick={() => handleHotSearchClick(item)}
                     type="button"
                   >
-                    {item.keyword}
+                    {item.name}
                   </button>
                 ))}
               </div>
             </section>
-          )}
+          ) : null}
 
           {/* 搜索历史记录 */}
           {searchStore.searchHistory.length > 0 && (
@@ -174,22 +217,11 @@ const SearchPage: React.FC = () => {
       ) : (
         /* 已搜索，显示结果区域 */
         <section className={styles.resultSection}>
-          {searchStore.loading ? (
-            <div className={styles.loadingText}>Loading...</div>
-          ) : searchStore.searchResults.length === 0 ? (
-            <div className={styles.emptyState}>
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" />
-                <line x1="18" y1="18" x2="6" y2="6" />
-              </svg>
-              <p className={styles.emptyText}>No results found</p>
-            </div>
-          ) : (
-            <div>
-              {/* Search result list will be rendered here, placeholder */}
-              Search results area - to be implemented
-            </div>
-          )}
+          <SearchResultList
+            data={searchStore.searchResults}
+            loading={searchStore.loading}
+            hasSearched={searchStore.hasSearched}
+          />
         </section>
       )}
     </div>

@@ -2,8 +2,8 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 // Type 是 Swagger 的 DTO 类构造函数
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TypeConstructor = new (...args: any[]) => object;
+
+type TypeConstructor = new (...args: unknown[]) => object;
 
 export interface ApiResponseOptions {
   description?: string;

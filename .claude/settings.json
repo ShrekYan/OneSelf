@@ -41,8 +41,7 @@
     ],
     "ask": [
       "Bash(git push *)",
-      "Bash(npm install *)",
-      "Bash(npx prisma migrate *)"
+      "Bash(npm install *)"
     ],
     "defaultMode": "acceptEdits"
   },

@@ -1,28 +1,32 @@
 /**
  * Handle search form submission
  */
+import { useCallback } from 'react';
+import { debounce } from 'es-toolkit';
 import type { SearchStoreType } from '../useStore';
 
 export const useHandleSearchSubmit = (store: SearchStoreType) => {
-  const handleSearchSubmit = () => {
-    const keyword = store.searchKeyword.trim();
-    if (!keyword) return;
+  const handleSearchSubmit = useCallback(
+    debounce(async () => {
+      const keyword = store.searchKeyword.trim();
 
-    // 添加到搜索历史
-    store.addSearchHistory(keyword);
-    store.setHasSearched(true);
+      // If there's no categoryId selected (this is a manual keyword search),
+      // and keyword is empty, don't proceed
+      if (store.currentCategoryId === null && !keyword) {
+        return;
+      }
 
-    // TODO: 调用搜索接口获取结果
+      // If this is a manual keyword search (no category selected),
+      // add to search history
+      if (store.currentCategoryId === null) {
+        store.addSearchHistory(keyword);
+      }
 
-    console.log('Search for:', keyword);
-    store.setLoading(true);
-
-    // 模拟加载
-    setTimeout(() => {
-      store.setLoading(false);
-      store.setSearchResults([]);
-    }, 500);
-  };
+      store.setHasSearched(true);
+      await store.fetchSearchResults();
+    }, 300),
+    [store],
+  );
 
   return handleSearchSubmit;
 };
