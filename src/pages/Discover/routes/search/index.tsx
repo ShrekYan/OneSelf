@@ -6,7 +6,7 @@ import { useSearchStore } from './useStore';
 import { useHandleSearchSubmit } from './hooks/useHandleSearchSubmit';
 import { useHandleHotSearchClick } from './hooks/useHandleHotSearchClick';
 import { useHandleGoBack } from './hooks/useHandleGoBack';
-import { useThrottledSearch } from './hooks/useThrottledSearch';
+import { useDebouncedSearch } from './hooks/useDebouncedSearch';
 import SearchResultList from './components/SearchResultList';
 
 const SearchPage: React.FC = () => {
@@ -16,8 +16,8 @@ const SearchPage: React.FC = () => {
   const handleSearchSubmit = useHandleSearchSubmit(searchStore);
   const handleHotSearchClick = useHandleHotSearchClick(searchStore);
   const handleGoBack = useHandleGoBack();
-  // 实时搜索节流
-  useThrottledSearch(searchStore);
+  // 实时搜索防抖 - 返回防抖后的搜索函数
+  const debouncedSearch = useDebouncedSearch(searchStore);
 
   // 搜索框 ref 用于清空后自动聚焦
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -31,13 +31,20 @@ const SearchPage: React.FC = () => {
   const handleInputChange = useCallback(
     (value: string) => {
       searchStore.setSearchKeyword(value);
+      // If user manually edits after selecting a category, clear categoryId
+      // because this becomes a keyword search now
+      if (searchStore.currentCategoryId !== null) {
+        searchStore.setCurrentCategoryId(null);
+      }
       // If search content is cleared and currently showing results,
       // automatically go back to trending searches view
       if (value === '' && searchStore.hasSearched) {
         searchStore.setHasSearched(false);
       }
+      // Debounced real-time search - condition check inside debounce
+      debouncedSearch(value);
     },
-    [searchStore],
+    [searchStore, debouncedSearch],
   );
 
   // 处理清空历史
