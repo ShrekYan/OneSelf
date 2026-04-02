@@ -1,7 +1,7 @@
 # Git 提交信息生成命令
 
 **触发**: `/commit` （不带参数）或 `/commit 描述信息`
-**行为**: 读取当前 `git status` 中的改动，分析文件变更，按照 [.claude/skills/commit-msg.md](.claude/skills/commit-msg.md) 规范生成符合 Conventional Commits 的提交信息，然后执行 `git commit`。
+**行为**: 读取当前 `git status` 中的改动，分析文件变更，按照 [.claude/skills/commit.md](.claude/skills/commit.md) 规范生成符合 Conventional Commits 的提交信息，然后执行 `git commit`。
 
 ---
 

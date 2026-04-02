@@ -57,6 +57,7 @@ export const handleTabChange = (
   categoryId: string,
 ): void => {
   store.setActiveCategory(categoryId);
+  store.fetchArticles();
   console.log('Switch to category tab:', categoryId);
 };
 

@@ -1,18 +1,19 @@
 import React from 'react';
 import { LazyImage } from '@/components';
 import styles from './index.module.scss';
+import type { ArticleItem } from '../../constant';
 import type { ArticleItem as ApiArticleItem } from '@/types/article';
 
 // 文章列表项类型 = API 返回类型 + 本地点赞状态
-type ArticleItem = ApiArticleItem & {
-  isLiked?: boolean;
-};
+type ArticleListItemData = ArticleItem &
+  Partial<ApiArticleItem> & {
+    isLiked?: boolean;
+  };
 
 interface ArticleListItemProps {
-  article: ArticleItem;
+  article: ArticleListItemData;
   onClick?: (articleId: string) => void;
   onLikeClick?: (articleId: string) => void;
-  onCommentClick?: (articleId: string) => void;
 }
 
 const formatNumber = (num: number): string => {
@@ -26,7 +27,6 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
   article,
   onClick,
   onLikeClick,
-  onCommentClick,
 }) => {
   const {
     id,
@@ -35,8 +35,8 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
     authorName = 'Unknown',
     authorAvatar = '',
     readTime,
-    likes,
-    commentsCount,
+    likes = 0,
+    commentsCount = 0,
     coverUrl,
   } = article;
 
@@ -58,15 +58,12 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
 
   const handleComment = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onCommentClick) {
-      onCommentClick(id);
-    }
   };
 
   if (!hasCover) {
     return (
       <div
-        className={styles.articleListItemRoot}
+        className={styles.articleListItemContainer}
         onClick={handleClick}
         role="article"
         tabIndex={0}
@@ -112,7 +109,6 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.stopPropagation();
-                      onCommentClick?.(id);
                     }
                   }}
                   aria-label={`${commentsCount} 评论`}
@@ -132,7 +128,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
 
   return (
     <div
-      className={styles.articleListItemRoot}
+      className={styles.articleListItemContainer}
       onClick={handleClick}
       role="article"
       tabIndex={0}
@@ -178,7 +174,6 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.stopPropagation();
-                    onCommentClick?.(id);
                   }
                 }}
                 aria-label={`${commentsCount} 评论`}
@@ -204,5 +199,7 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
     </div>
   );
 };
+
+ArticleListItem.displayName = 'ArticleListItem';
 
 export default React.memo(ArticleListItem);

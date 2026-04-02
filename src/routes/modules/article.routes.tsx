@@ -10,6 +10,7 @@ import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 const Search = React.lazy(() => import('@/pages/Discover/routes/search'));
 const Notifications = React.lazy(() => import('@/pages/Notifications'));
 const ArticleDetail = React.lazy(() => import('@/pages/Detail'));
+const ArticleList = React.lazy(() => import('@/pages/ArticleList'));
 
 const articleRoutes: RouteConfig[] = [
   {
@@ -65,6 +66,26 @@ const articleRoutes: RouteConfig[] = [
     ),
     handle: {
       pageName: '消息通知',
+      keepAlive: false,
+    },
+  },
+  {
+    path: '/articles',
+    element: (
+      <RouteInterceptor
+        routeConfig={{
+          path: '/articles',
+          pageName: '文章列表',
+          keepAlive: false,
+        }}
+      >
+        <KeepAliveLayout keepAlive={false} cacheKey="/articles">
+          <ArticleList />
+        </KeepAliveLayout>
+      </RouteInterceptor>
+    ),
+    handle: {
+      pageName: '文章列表',
       keepAlive: false,
     },
   },

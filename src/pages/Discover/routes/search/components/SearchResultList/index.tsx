@@ -58,7 +58,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
                 )}
                 <div className={styles.meta}>
                   <span className={styles.category}>
-                    {article.categoryName}
+                    {article.category.name}
                   </span>
                   <span className={styles.divider}>·</span>
                   <span className={styles.views}>{article.views} views</span>

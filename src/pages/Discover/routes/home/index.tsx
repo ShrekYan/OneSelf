@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
+import { DotLoading } from 'antd-mobile';
 import styles from './index.module.scss';
 import TopBar from './components/top-bar';
 import CategoryTabs from './components/category-tabs';
 import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
-import { MOCK_FEATURED_ARTICLES } from './constant';
 import { useHomeStore } from './useStore';
 import { useHandleArticleClick } from './hooks/useHandleArticleClick';
 //import { useActivate, useUnactivate } from "react-activation";
@@ -25,6 +25,8 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     store.fetchArticles();
+    store.fetchFeaturedArticles();
+    store.fetchCategories();
   }, [store]);
 
   return useObserver(() => (
@@ -34,12 +36,14 @@ const HomePage: React.FC = () => {
 
       {/* 分类标签栏 */}
       <CategoryTabs
+        tabs={store.categories}
+        defaultSelectedId={store.activeCategoryId}
         onTabChange={tabId => handle.handleTabChange(store, tabId)}
       />
 
       {/* 特色文章横幅 */}
       <FeaturedArticle
-        articles={MOCK_FEATURED_ARTICLES}
+        articles={store.featuredArticles}
         onBookmarkClick={handle.handleFeaturedBookmark}
         onArticleClick={handle.handleFeaturedClick}
       />
@@ -58,6 +62,26 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* 文章列表 */}
+        {store.loading && store.articles.length === 0 && (
+          <div className={styles.loadingContainer}>
+            <DotLoading color="primary" />
+          </div>
+        )}
+        {!store.loading && store.articles.length === 0 && (
+          <div className={styles.emptyContainer}>
+            <svg
+              viewBox="0 0 24 24"
+              width="48"
+              height="48"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="9" strokeWidth="2" />
+              <line x1="18" y1="18" x2="6" y2="6" strokeWidth="2" />
+            </svg>
+            <p className={styles.emptyText}>No articles found</p>
+          </div>
+        )}
         <div className={styles.articleList}>
           {store.articles.map(article => (
             <ArticleListItem

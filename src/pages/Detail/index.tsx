@@ -23,6 +23,14 @@ const Detail2Page: React.FC = () => {
     Toast.show({ content: '关注成功' });
   };
 
+  const handleToggleLike = () => {
+    store.toggleLike();
+  };
+
+  const handleToggleCollect = () => {
+    store.toggleCollect();
+  };
+
   return useObserver(() => (
     <div className={styles.detail2Container}>
       {/* 顶部导航栏 - 匹配设计稿顺序：返回左，更多+分享右 */}
@@ -67,7 +75,7 @@ const Detail2Page: React.FC = () => {
           <div className={styles.coverWrapper}>
             <LazyImage
               className={styles.coverImage}
-              src={store.article.coverUrl}
+              src={store.article.coverUrl || ''}
               alt={store.article.title}
             />
           </div>
@@ -77,7 +85,7 @@ const Detail2Page: React.FC = () => {
             {/* 分类标签 */}
             {store.article.category && (
               <span className={styles.categoryTag}>
-                {store.article.category}
+                {store.article.category.name}
               </span>
             )}
 
@@ -93,7 +101,7 @@ const Detail2Page: React.FC = () => {
                   </span>
                   <span
                     className={styles.publishMeta}
-                  >{`${store.article.publishAt} • ${store.article.readTime} min read`}</span>
+                  >{`${store.article.publishAt ? new Date(store.article.publishAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''} • ${store.article.readTime || 1} min read`}</span>
                 </div>
                 <LazyImage
                   className={styles.avatar}
@@ -101,9 +109,11 @@ const Detail2Page: React.FC = () => {
                   alt={store.article.author.name}
                 />
               </div>
-              <button className={styles.followButton} onClick={handleFollow}>
-                Follow
-              </button>
+              {store.article.isFollowing !== false && (
+                <button className={styles.followButton} onClick={handleFollow}>
+                  Follow
+                </button>
+              )}
             </div>
 
             <hr className={styles.divider} />
@@ -150,6 +160,21 @@ const Detail2Page: React.FC = () => {
                   />
                 );
               }
+              if (
+                block.type === 'list' &&
+                block.items &&
+                block.items.length > 0
+              ) {
+                return (
+                  <ul key={index} className={styles.listBlock}>
+                    {block.items.map((item, idx) => (
+                      <li key={idx} className={styles.listItem}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                );
+              }
               return null;
             })}
           </div>
@@ -159,7 +184,14 @@ const Detail2Page: React.FC = () => {
       {/* 底部互动栏 - 严格匹配设计稿结构：[点赞+收藏] 左，分隔线，[更多+分享] 右 */}
       {store.article && (
         <footer className={styles.actionBar}>
-          <ArticleActionBar likeCount={10} commentCount={10} />
+          <ArticleActionBar
+            likeCount={store.article.likes || 0}
+            commentCount={store.article.commentsCount || 0}
+            isLiked={store.isLiked}
+            onLikeClick={handleToggleLike}
+            isCollected={store.isCollected}
+            onCollectClick={handleToggleCollect}
+          />
         </footer>
       )}
     </div>

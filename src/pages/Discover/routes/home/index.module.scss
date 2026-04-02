@@ -47,3 +47,35 @@
 .articleList {
   padding-bottom: 40px;
 }
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.loadingMoreContainer {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: $text-secondary;
+
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+.emptyText {
+  font-size: 28px;
+  margin: 0;
+  opacity: 0.5;
+}

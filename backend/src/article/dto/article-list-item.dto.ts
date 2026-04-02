@@ -24,6 +24,15 @@ export class ArticleListItemDto {
   @ApiProperty({ type: ArticleCategoryInfoDto, description: '分类信息' })
   category: ArticleCategoryInfoDto;
 
+  @ApiProperty({ description: '作者ID' })
+  authorId: string;
+
+  @ApiProperty({ description: '作者名称', required: false })
+  authorName?: string;
+
+  @ApiProperty({ description: '作者头像URL', required: false })
+  authorAvatar?: string;
+
   @ApiProperty({ type: [String], description: '标签' })
   tags: string[];
 
@@ -38,4 +47,10 @@ export class ArticleListItemDto {
 
   @ApiProperty({ description: '发布时间' })
   publishedAt: string;
+
+  @ApiProperty({ description: '是否置顶（特色文章）', required: false })
+  isTop?: boolean;
+
+  @ApiProperty({ description: '阅读时间（分钟）', required: false })
+  readTime?: number;
 }

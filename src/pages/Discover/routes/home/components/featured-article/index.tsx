@@ -33,6 +33,28 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
     }
   };
 
+  /**
+   * 格式化 ISO 日期为 "Oct 24" 格式
+   */
+  const formatDate = (publishedAt: string): string => {
+    const date = new Date(publishedAt);
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return `${months[date.getMonth()]} ${date.getDate()}`;
+  };
+
   return (
     <div className={styles.featuredArticleRoot}>
       <div className={styles.swiperContainer}>
@@ -56,7 +78,7 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
                 onKeyDown={e => handleArticleKeyDown(e, item.id)}
               >
                 <LazyImage
-                  src={item.coverImage}
+                  src={item.coverUrl}
                   alt={item.title}
                   className={styles.coverImage}
                 />
@@ -91,10 +113,12 @@ const FeaturedArticle: React.FC<FeaturedArticleProps> = ({
                     </div>
                     <div className={styles.meta}>
                       <span className={styles.metaItem}>
-                        {item.publishDate}
+                        {formatDate(item.publishedAt)}
                       </span>
                       <span className={styles.metaDivider}>•</span>
-                      <span className={styles.metaItem}>{item.readTime}</span>
+                      <span className={styles.metaItem}>
+                        {item.readTime} min read
+                      </span>
                     </div>
                   </div>
                 </div>

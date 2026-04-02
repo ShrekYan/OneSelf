@@ -36,6 +36,97 @@ export interface ArticleListResponse {
 }
 
 /**
+ * 特色文章项（与后端 FeaturedArticleItemDto 完全对应）
+ */
+export interface FeaturedArticleItem {
+  id: string;
+  title: string;
+  summary?: string;
+  coverUrl?: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  authorId: string;
+  authorName?: string;
+  authorAvatar?: string;
+  tags: string[];
+  views: number;
+  likes: number;
+  commentsCount: number;
+  publishedAt: string;
+  isTop?: boolean;
+  readTime: number; // 必填，特色文章特有
+}
+
+/**
+ * 获取特色文章列表响应
+ */
+export interface FeaturedArticleListResponse {
+  list: FeaturedArticleItem[];
+}
+
+/**
+ * 获取文章详情请求参数
+ */
+export interface GetArticleDetailRequest {
+  id: string;
+}
+
+/**
+ * 文章详情内容块（与后端 ArticleDetailDto 完全对应）
+ */
+export interface ArticleContentBlock {
+  type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list';
+  level?: number;
+  text?: string;
+  imageUrl?: string;
+  items?: string[];
+}
+
+/**
+ * 作者信息（与后端 ArticleDetailDto 完全对应）
+ */
+export interface ArticleAuthorInfo {
+  name: string;
+  avatar: string;
+}
+
+/**
+ * 获取文章详情响应（与后端 ArticleDetailDto 完全对应）
+ */
+export interface ArticleDetailResponse {
+  id: string;
+  title: string;
+  summary?: string;
+  coverUrl?: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  author: ArticleAuthorInfo;
+  authorId: string;
+  authorName?: string;
+  authorAvatar?: string;
+  tags: string[];
+  views: number;
+  likes: number;
+  commentsCount: number;
+  publishedAt: string;
+  publishAt: string;
+  isTop?: boolean;
+  readTime?: number;
+  content: ArticleContentBlock[];
+  isLiked?: boolean;
+  isCollected?: boolean;
+  contentHtml?: string;
+  markdownContent?: string;
+  updatedAt?: string;
+  seoKeywords?: string[];
+  seoDescription?: string;
+}
+
+/**
  * 文章 / 分类 API 模块
  */
 export const articleApi = {
@@ -53,5 +144,21 @@ export const articleApi = {
     params: ArticleListParams,
   ): Promise<ArticleListResponse> => {
     return await api.get('/api/v1/article/list', { params });
+  },
+
+  /**
+   * 获取特色文章轮播列表（置顶文章）
+   */
+  getFeaturedArticles: async (): Promise<FeaturedArticleListResponse> => {
+    return await api.get('/api/v1/article/featured');
+  },
+
+  /**
+   * 获取文章详情
+   */
+  getArticleDetail: async (
+    params: GetArticleDetailRequest,
+  ): Promise<ArticleDetailResponse> => {
+    return await api.get('/api/v1/article/detail', { params });
   },
 };

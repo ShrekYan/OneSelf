@@ -6,56 +6,75 @@
 import { runInAction } from 'mobx';
 import { useLocalObservable } from 'mobx-react';
 
-import { MOCK_ARTICLES } from './constant';
-import type { ArticleItem } from './components/article-list-item/index';
+import api from '@/api';
+import type { ArticleItem as ApiArticleItem } from '@/types/article';
+import type { FeaturedArticleItem as ApiFeaturedArticleItem } from '@/api/article';
+import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
+import type { FeaturedArticleItem } from './constant';
+
+// 文章列表项类型 = API 返回类型 + 本地点赞状态
+export type ArticleItem = ApiArticleItem & {
+  isLiked?: boolean;
+};
 
 export type HomeStoreType = {
   /** 当前选中的分类ID */
   activeCategoryId: string;
   /** 文章列表 */
   articles: ArticleItem[];
+  /** 特色文章轮播列表 */
+  featuredArticles: FeaturedArticleItem[];
+  /** 热门分类标签列表（从 API 获取） */
+  categories: HotSearchItem[];
   /** 加载状态 */
   loading: boolean;
-  /** 是否还有更多数据 */
-  hasMore: boolean;
-  /** 当前页码 */
-  currentPage: number;
-  /** 每页数量 */
-  pageSize: number;
+  /** 分类加载状态 */
+  categoriesLoading: boolean;
 
   /** 设置当前选中分类 */
   setActiveCategory: (categoryId: string) => void;
   /** 设置文章列表 */
   setArticles: (articles: ArticleItem[]) => void;
-  /** 追加文章到列表（加载更多） */
-  appendArticles: (articles: ArticleItem[]) => void;
+  /** 设置分类列表 */
+  setCategories: (categories: HotSearchItem[]) => void;
   /** 设置加载状态 */
   setLoading: (loading: boolean) => void;
-  /** 设置是否还有更多 */
-  setHasMore: (hasMore: boolean) => void;
-  /** 重置分页 */
-  resetPagination: () => void;
+  /** 设置分类加载状态 */
+  setCategoriesLoading: (loading: boolean) => void;
   /** 切换文章点赞状态 */
   toggleLike: (articleId: string) => void;
   /** 加载文章列表数据 */
   fetchArticles: () => Promise<void>;
-  /** 加载更多文章 */
-  loadMoreArticles: () => Promise<void>;
+  /** 加载特色文章数据 */
+  fetchFeaturedArticles: () => Promise<void>;
+  /** 加载热门分类数据 */
+  fetchCategories: () => Promise<void>;
 };
 
 export function useHomeStore(): HomeStoreType {
   const store = useLocalObservable<HomeStoreType>(() => ({
-    activeCategoryId: 'all',
-    articles: MOCK_ARTICLES,
+    activeCategoryId: '',
+    articles: [],
+    featuredArticles: [],
+    categories: [],
     loading: false,
-    hasMore: true,
-    currentPage: 1,
-    pageSize: 10,
+    categoriesLoading: false,
 
     setActiveCategory(categoryId: string) {
       runInAction(() => {
         this.activeCategoryId = categoryId;
-        this.resetPagination();
+      });
+    },
+
+    setCategories(categories: HotSearchItem[]) {
+      runInAction(() => {
+        this.categories = categories;
+      });
+    },
+
+    setCategoriesLoading(loading: boolean) {
+      runInAction(() => {
+        this.categoriesLoading = loading;
       });
     },
 
@@ -65,29 +84,9 @@ export function useHomeStore(): HomeStoreType {
       });
     },
 
-    appendArticles(articles: ArticleItem[]) {
-      runInAction(() => {
-        this.articles.push(...articles);
-        this.currentPage += 1;
-      });
-    },
-
     setLoading(loading: boolean) {
       runInAction(() => {
         this.loading = loading;
-      });
-    },
-
-    setHasMore(hasMore: boolean) {
-      runInAction(() => {
-        this.hasMore = hasMore;
-      });
-    },
-
-    resetPagination() {
-      runInAction(() => {
-        this.currentPage = 1;
-        this.hasMore = true;
       });
     },
 
@@ -104,15 +103,17 @@ export function useHomeStore(): HomeStoreType {
     async fetchArticles(): Promise<void> {
       this.setLoading(true);
       try {
-        // TODO: 调用 API 获取文章列表
-        // const response = await articleApi.getList({
-        //   page: this.currentPage,
-        //   pageSize: this.pageSize,
-        //   categoryId: this.activeCategoryId,
-        // });
-        // this.setArticles(response.list);
-        // this.setHasMore(response.hasMore);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await api.article.listArticles({
+          page: 1,
+          pageSize: 10,
+          categoryId: this.activeCategoryId || undefined,
+        });
+        // 为 API 返回的文章添加本地 isLiked 状态
+        const articlesWithLocalState = response.list.map(article => ({
+          ...article,
+          isLiked: false,
+        }));
+        this.setArticles(articlesWithLocalState);
       } catch (error) {
         console.error('加载文章列表失败:', error);
       } finally {
@@ -120,21 +121,38 @@ export function useHomeStore(): HomeStoreType {
       }
     },
 
-    async loadMoreArticles(): Promise<void> {
-      if (this.loading || !this.hasMore) return;
-
+    async fetchFeaturedArticles(): Promise<void> {
       try {
-        // TODO: 调用 API 加载更多文章
-        // const response = await articleApi.getList({
-        //   page: this.currentPage + 1,
-        //   pageSize: this.pageSize,
-        //   categoryId: this.activeCategoryId,
-        // });
-        // this.appendArticles(response.list);
-        // this.setHasMore(response.hasMore);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await api.article.getFeaturedArticles();
+        runInAction(() => {
+          // 直接映射，只提取组件需要的字段
+          this.featuredArticles = response.list.map(
+            (item: ApiFeaturedArticleItem) => ({
+              id: item.id,
+              category: item.category.name,
+              title: item.title,
+              authorName: item.authorName || 'Unknown',
+              authorAvatar: item.authorAvatar || '',
+              publishedAt: item.publishedAt,
+              readTime: item.readTime,
+              coverUrl: item.coverUrl || '',
+            }),
+          );
+        });
       } catch (error) {
-        console.error('加载更多文章失败:', error);
+        console.error('加载特色文章失败:', error);
+      }
+    },
+
+    async fetchCategories(): Promise<void> {
+      this.setCategoriesLoading(true);
+      try {
+        const data = await api.category.getHotKeywords();
+        this.setCategories(data);
+      } catch (error) {
+        console.error('加载热门分类失败:', error);
+      } finally {
+        this.setCategoriesLoading(false);
       }
     },
   }));

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
-import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
+import type { CategoryItem } from '../../constant';
 
 interface CategoryTabsProps {
-  tabs?: HotSearchItem[];
+  tabs?: CategoryItem[];
   defaultSelectedId?: string;
   onTabChange?: (tabId: string) => void;
 }
@@ -86,5 +86,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
     </div>
   );
 };
+
+CategoryTabs.displayName = 'ArticleListCategoryTabs';
 
 export default CategoryTabs;

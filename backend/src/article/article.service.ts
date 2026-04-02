@@ -4,111 +4,19 @@ import {
   ArticleListResponseDto,
   ArticleListItemDto,
   ArticleSortBy,
+  FeaturedArticleItemDto,
+  FeaturedArticleListResponseDto,
+  ToggleLikeRequestDto,
+  ToggleLikeResponseDto,
+  GetArticleDetailRequestDto,
+  ArticleDetailDto,
 } from './dto';
-
-// Mock 文章数据 - 生成 30 条示例文章
-const generateMockArticles = (): ArticleListItemDto[] => {
-  const categories = [
-    { id: 'frontend', name: 'Frontend' },
-    { id: 'backend', name: 'Backend' },
-    { id: 'ui-ux-design', name: 'UI/UX Design' },
-    { id: 'engineering', name: 'Engineering' },
-    { id: 'mobile', name: 'Mobile Dev' },
-    { id: 'devops', name: 'DevOps' },
-    { id: 'productivity', name: 'Productivity' },
-    { id: 'life-culture', name: 'Life & Culture' },
-  ];
-
-  const titles = [
-    'React 19 新特性详解',
-    'TypeScript 高级技巧汇总',
-    '如何设计一个可扩展的组件库',
-    '微前端架构实践总结',
-    'CSS Grid 布局完全指南',
-    '性能优化：从 10s 到 1s 的优化历程',
-    'Node.js 内存泄漏排查实战',
-    'Docker 容器化最佳实践',
-    'React Hooks 使用误区总结',
-    '设计系统：从规范到落地',
-    'MobX 状态管理最佳实践',
-    'GraphQL vs REST 选型分析',
-    '持续集成与自动化部署',
-    '程序员如何保持学习效率',
-    '我的技术栈进化之路',
-    '前端工程化：从手动到自动化',
-    '移动端 H5 开发踩坑指南',
-    'PWA 渐进式 Web 应用实践',
-    'Webpack 5 打包优化攻略',
-    'Vite 原理与插件开发',
-    'Git 工作流规范指南',
-    '单元测试：为什么要写，怎么写',
-    '函数式编程思想在前端的应用',
-    '响应式设计：从弹性到自适应',
-    '无障碍开发实践总结',
-    '安全：前端常见安全问题防范',
-    'SSR 服务端渲染原理与实践',
-    '静态站点生成 Next.js 对比',
-    'CI/CD 流水线设计心得',
-    '开发者工具调试技巧分享',
-  ];
-
-  const summaries = [
-    'React 19 带来了哪些令人期待的新特性？让我们一起来看看...',
-    '整理了一些日常开发中常用的 TypeScript 高级技巧，提升代码质量...',
-    '分享一下我在开发大型项目中设计可扩展组件库的经验...',
-    '微前端不是银弹，但在特定场景下确实能解决大团队协作问题...',
-    'Grid 布局比 Flex 更强大？一文搞懂 Grid 的各种用法...',
-    '分享一次真实项目的性能优化经历，从 10 秒加载到 1 秒秒开...',
-    'Node.js 项目遇到内存泄漏如何排查？分享几种实用的排查方法...',
-    'Docker 不是 DevOps 必须的，但用好它确实能提升效率...',
-    'React Hooks 用了这么久，总结一些容易踩的坑...',
-    '设计系统不仅仅是样式规范，更是一套协作方法...',
-  ];
-
-  const tags = [
-    ['React', '前端'],
-    ['TypeScript', '类型系统'],
-    ['组件库', '架构设计'],
-    ['微前端', '架构'],
-    ['CSS', '布局'],
-    ['性能优化', '实践'],
-    ['Node.js', '调试'],
-    ['Docker', 'DevOps'],
-    ['React', 'Hooks'],
-    ['设计系统', '架构'],
-  ];
-
-  const result: ArticleListItemDto[] = [];
-
-  for (let i = 0; i < 30; i++) {
-    const category = categories[Math.floor(Math.random() * categories.length)];
-    const title = titles[i % titles.length];
-    const summary = summaries[i % summaries.length];
-    const tagsList = tags[i % tags.length];
-    const views = Math.floor(Math.random() * 5000) + 100;
-    const likes = Math.floor(Math.random() * 200) + 10;
-    const commentsCount = Math.floor(Math.random() * 50);
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-
-    result.push({
-      id: String(i + 1),
-      title,
-      summary,
-      coverUrl: `https://picsum.photos/400/300?random=${i + 1}`,
-      category,
-      tags: tagsList,
-      views,
-      likes,
-      commentsCount,
-      publishedAt: date.toISOString(),
-    });
-  }
-
-  return result;
-};
-
-const MOCK_ARTICLES = generateMockArticles();
+import {
+  MOCK_ARTICLES,
+  USER_LIKE_MAP,
+  DEFAULT_USER_ID,
+  generateMockContent,
+} from './mock';
 
 @Injectable()
 export class ArticleService {
@@ -152,6 +60,111 @@ export class ArticleService {
       pageSize,
       hasMore: endIndex < total,
     });
+  }
+
+  getFeaturedArticles(): Promise<FeaturedArticleListResponseDto> {
+    // 筛选出置顶文章 = 特色文章，数据来自统一数据源
+    const featuredArticles: FeaturedArticleItemDto[] = MOCK_ARTICLES.filter(
+      (article) => article.isTop === true,
+    ).map(
+      (article) =>
+        ({
+          ...article,
+          // 确保 readTime 存在（兼容旧数据）
+          readTime: article.readTime ?? Math.floor(Math.random() * 10) + 1,
+        }) as FeaturedArticleItemDto,
+    );
+
+    return Promise.resolve({
+      list: featuredArticles,
+    });
+  }
+
+  toggleLike(body: ToggleLikeRequestDto): Promise<ToggleLikeResponseDto> {
+    const { articleId } = body;
+    const userLikeSet = USER_LIKE_MAP.get(DEFAULT_USER_ID) ?? new Set<string>();
+
+    // 查找文章
+    const articleIndex = MOCK_ARTICLES.findIndex((a) => a.id === articleId);
+    if (articleIndex === -1) {
+      return Promise.resolve({
+        articleId,
+        likes: 0,
+        isLiked: false,
+      });
+    }
+
+    const article = MOCK_ARTICLES[articleIndex];
+    const isLiked = userLikeSet.has(articleId);
+
+    // 切换点赞状态
+    if (isLiked) {
+      // 取消点赞
+      userLikeSet.delete(articleId);
+      article.likes = article.likes - 1;
+    } else {
+      // 添加点赞
+      userLikeSet.add(articleId);
+      article.likes = article.likes + 1;
+    }
+
+    // 更新内存中的数据（所有接口共享此数据源，保证一致性）
+    USER_LIKE_MAP.set(DEFAULT_USER_ID, userLikeSet);
+    MOCK_ARTICLES[articleIndex] = { ...article };
+
+    return Promise.resolve({
+      articleId,
+      likes: article.likes,
+      isLiked: !isLiked,
+    });
+  }
+
+  getArticleDetail(
+    query: GetArticleDetailRequestDto,
+  ): Promise<ArticleDetailDto> {
+    const { id } = query;
+
+    // 查找文章
+    const articleIndex = MOCK_ARTICLES.findIndex((a) => a.id === id);
+    if (articleIndex === -1) {
+      // 用户要求：找不到返回空对象
+      return Promise.resolve({} as ArticleDetailDto);
+    }
+
+    const article = MOCK_ARTICLES[articleIndex];
+
+    // 增加阅读量计数（内存修改，保持统计）
+    article.views += 1;
+    MOCK_ARTICLES[articleIndex] = { ...article };
+
+    // 获取当前用户点赞状态
+    const userLikeSet = USER_LIKE_MAP.get(DEFAULT_USER_ID);
+    const isLiked = userLikeSet?.has(id) ?? false;
+
+    // 生成结构化的 mock 内容
+    const content = generateMockContent(article.title, article.tags || []);
+
+    // 组装完整详情，匹配前端期望的数据结构
+    const detail: ArticleDetailDto = {
+      ...article,
+      // author 嵌套对象（提供默认值满足类型检查）
+      author: {
+        name: article.authorName ?? '未知作者',
+        avatar: article.authorAvatar ?? 'https://picsum.photos/100/100?default',
+      },
+      // publishAt 字段名匹配前端
+      publishAt: article.publishedAt,
+      // 结构化内容数组
+      content,
+      // 点赞状态
+      isLiked,
+      // 默认未收藏
+      isCollected: false,
+      // SEO 关键词从 tags 生成
+      seoKeywords: article.tags,
+    };
+
+    return Promise.resolve(detail);
   }
 
   private sortArticles(
