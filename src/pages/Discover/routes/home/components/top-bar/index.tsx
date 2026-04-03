@@ -23,7 +23,7 @@ const TopBar: React.FC<TopBarProps> = ({ title = 'Discover' }) => {
   };
 
   return (
-    <header className={styles.header}>
+    <header className={styles.topBarContainer}>
       <div className={styles.leftSection}>
         <div
           className={styles.avatar}

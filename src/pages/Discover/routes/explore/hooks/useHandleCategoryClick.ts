@@ -15,7 +15,7 @@ export function useHandleCategoryClick() {
 
   return (categoryId: string): void => {
     console.log('Navigate to category articles:', categoryId);
-    navigate(`/explore/category/${categoryId}`);
+    navigate(`/articles/${categoryId}`);
   };
 }
 

@@ -1,17 +1,11 @@
-import {
-  useState,
-  useRef,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
 import type { CategoryItem } from '../../constant';
 
 interface CategoryTabsProps {
   tabs?: CategoryItem[];
-  defaultSelectedId?: string;
+  selectedId: string;
   onTabChange?: (tabId: string) => void;
 }
 
@@ -20,8 +14,7 @@ export interface CategoryTabsRef {
 }
 
 const CategoryTabs = forwardRef<CategoryTabsRef, CategoryTabsProps>(
-  ({ tabs = [], defaultSelectedId = '', onTabChange }, ref) => {
-    const [selectedId, setSelectedId] = useState(defaultSelectedId);
+  ({ tabs = [], selectedId, onTabChange }, ref) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
@@ -54,7 +47,6 @@ const CategoryTabs = forwardRef<CategoryTabsRef, CategoryTabsProps>(
     }, []);
 
     const handleTabClick = (tabId: string) => {
-      setSelectedId(tabId);
       if (onTabChange) {
         onTabChange(tabId);
       }

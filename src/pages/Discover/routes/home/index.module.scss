@@ -1,6 +1,6 @@
 
 
-.homeRoot {
+.homeContainer {
   min-height: 100vh;
   background-color: $background-color;
   display: flex;
@@ -8,6 +8,7 @@
   overflow-x: visible;
   max-width: 750px;
   margin: 0 auto;
+  padding-top: calc(115px + env(safe-area-inset-top));
   padding-bottom: env(safe-area-inset-bottom);
 }
 

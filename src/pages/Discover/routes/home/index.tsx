@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
   }, [store]);
 
   return useObserver(() => (
-    <div className={styles.homeRoot}>
+    <div className={styles.homeContainer}>
       {/* 顶部导航栏 */}
       <TopBar />
 

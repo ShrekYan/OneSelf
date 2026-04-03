@@ -1,4 +1,4 @@
-.exploreRoot {
+.exploreContainer {
   min-height: 100vh;
   background-color: $background-color;
   display: flex;
@@ -6,12 +6,16 @@
   overflow-x: visible;
   max-width: 750px;
   margin: 0 auto;
+  padding-top: calc(115px + env(safe-area-inset-top));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 顶部导航栏 */
-.header {
-  position: sticky;
+.exploreHeader {
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   background-color: $background-white;
   padding: calc(25px + env(safe-area-inset-top)) 40px 25px;
@@ -19,6 +23,8 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgb(224 223 223 / 40%);
+  max-width: 750px;
+  margin: 0 auto;
 }
 
 .leftSection {

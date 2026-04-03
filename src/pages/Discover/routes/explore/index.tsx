@@ -32,9 +32,9 @@ const ExplorePage: React.FC = () => {
   };
 
   return useObserver(() => (
-    <div className={styles.exploreRoot}>
+    <div className={styles.exploreContainer}>
       {/* 顶部导航栏 */}
-      <header className={styles.header}>
+      <header className={styles.exploreHeader}>
         <div className={styles.leftSection}>
           <div className={styles.logoB}>B</div>
         </div>

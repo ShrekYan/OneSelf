@@ -1,3 +1,4 @@
+//import type { NavigateFunction } from 'react-router-dom';
 import type { ArticleListStore } from './useStore';
 
 /**
@@ -6,8 +7,15 @@ import type { ArticleListStore } from './useStore';
 export const handleTabChange = (
   store: ArticleListStore,
   tabId: string,
+  // navigate: NavigateFunction,
 ): void => {
   store.setSelectedCategoryId(tabId);
+  // // 同步更新 URL
+  // if (tabId === 'all') {
+  //   navigate('/articles');
+  // } else {
+  //   navigate(`/articles/${tabId}`);
+  // }
 };
 
 /**

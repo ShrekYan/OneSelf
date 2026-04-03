@@ -19,6 +19,8 @@ const ArticleListPage: React.FC = () => {
   );
 
   const handleBack = () => {
+    console.log('handleback');
+    // window.history.back();
     navigate(-1);
   };
 
@@ -33,43 +35,61 @@ const ArticleListPage: React.FC = () => {
     store.fetchCategories();
   }, [store]);
 
-  // 从路由参数初始化选中分类（分类列表加载完成后才能检查是否存在）
-  useEffect(() => {
-    if (categoryId && store.categories.length > 0) {
-      // 检查分类是否存在
-      const categoryExists = store.categories.some(
-        cat => cat.id === categoryId,
-      );
-      if (categoryExists) {
-        handle.handleTabChange(store, categoryId);
-        // 延迟一帧让 DOM 更新后再滚动
-        requestAnimationFrame(() => {
-          categoryTabsRef.current?.scrollToTab(categoryId);
-        });
-      }
-    }
-  }, [categoryId, store.categories, store]);
-
-  // 使用 reaction 监听 selectedCategoryId 和 categories 变化，只要变化就重新获取文章
-  // 这是 MobX 推荐的响应式做法，可靠监听 observable 值变化
+  // 使用 reaction 监听 categories 长度变化，分类加载完成后：
+  // 第一步：从 URL 初始化选中分类
+  // 第二步：直接请求文章，保证顺序可靠
   useEffect(() => {
     const dispose = reaction(
-      () => [store.selectedCategoryId, store.categories.length],
+      () => store.categories.length,
       () => {
-        // 只有当分类列表已经加载完成才请求
+        // 只有当分类列表已经加载完成才处理
         if (store.categories.length > 0) {
-          // console.log('store.categories.length');
+          if (categoryId) {
+            // 检查分类是否存在
+            const categoryExists = store.categories.some(
+              cat => cat.id === categoryId,
+            );
+            if (categoryExists) {
+              handle.handleTabChange(store, categoryId);
+              // 延迟一帧让 DOM 更新后再滚动
+              requestAnimationFrame(() => {
+                categoryTabsRef.current?.scrollToTab(categoryId);
+              });
+            } else {
+              // 分类不存在，默认选中全部
+              handle.handleTabChange(store, 'all');
+            }
+          } else {
+            // 没有 categoryId 参数，默认选中全部
+            handle.handleTabChange(store, 'all');
+          }
+          // 分类设置完成后，直接请求文章（顺序保证：先设置再请求）
           store.fetchArticles();
         }
       },
-      { fireImmediately: true }, // 初始化时立即触发一次，获取第一批数据
+      { fireImmediately: true }, // 初始化时立即检查
+    );
+
+    return dispose; // 组件卸载时清理 reaction
+  }, [categoryId, store]);
+
+  // 仅监听用户手动切换分类，分类变化后重新获取文章
+  // 初始化已经由上面的 reaction 保证，不需要 fireImmediately
+  useEffect(() => {
+    const dispose = reaction(
+      () => store.selectedCategoryId,
+      () => {
+        // 只有当分类列表已经加载完成才请求
+        if (store.categories.length > 0) {
+          store.fetchArticles();
+        }
+      },
     );
 
     return dispose; // 组件卸载时清理 reaction，防止内存泄漏
   }, [store]);
 
   return useObserver(() => {
-    console.log(store.hasMore);
     return (
       <div className={styles.articleListContainer}>
         {/* 顶部导航栏 - 毛玻璃效果，和详情页保持一致 */}
@@ -102,7 +122,7 @@ const ArticleListPage: React.FC = () => {
           <CategoryTabs
             ref={categoryTabsRef}
             tabs={store.categories}
-            defaultSelectedId={store.selectedCategoryId}
+            selectedId={store.selectedCategoryId}
             onTabChange={tabId => handle.handleTabChange(store, tabId)}
           />
 
