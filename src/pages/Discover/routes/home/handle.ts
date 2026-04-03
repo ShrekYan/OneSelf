@@ -38,13 +38,23 @@ export const handleCommentClick = (articleId: string): void => {
   // TODO: 打开评论弹窗或跳转到评论页面
 };
 
+import type { NavigateFunction } from 'react-router-dom';
+
 /**
  * 处理查看全部点击事件
- * 跳转到全部文章列表页面
+ * 跳转到全部文章列表页面，带入当前选中的分类ID
  */
-export const handleSeeAllClick = (): void => {
-  console.log('Navigate to see all articles');
-  // TODO: 跳转到全部文章列表
+export const handleSeeAllClick = (
+  navigate: NavigateFunction,
+  categoryId: string,
+): void => {
+  console.log('Navigate to article list with category:', categoryId);
+  // 如果没有选中分类，跳转到全部文章列表
+  if (!categoryId) {
+    navigate('/articles');
+  } else {
+    navigate(`/articles/${categoryId}`);
+  }
 };
 
 /**
@@ -75,9 +85,12 @@ export const handleFeaturedBookmark = (articleId: string): void => {
 
 /**
  * 处理特色文章点击
- * 跳转到特色文章详情页
+ * 跳转到特色文章详情页，带入文章ID
  */
-export const handleFeaturedClick = (articleId: string): void => {
+export const handleFeaturedClick = (
+  navigate: NavigateFunction,
+  articleId: string,
+): void => {
   console.log('Navigate to featured article detail:', articleId);
-  // TODO: 跳转到特色文章详情
+  navigate(`/article/${articleId}`);
 };

@@ -70,11 +70,11 @@ const articleRoutes: RouteConfig[] = [
     },
   },
   {
-    path: '/articles',
+    path: '/articles/:categoryId?',
     element: (
       <RouteInterceptor
         routeConfig={{
-          path: '/articles',
+          path: '/articles/:categoryId?',
           pageName: '文章列表',
           keepAlive: false,
         }}

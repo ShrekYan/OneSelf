@@ -193,10 +193,10 @@ api.interceptors.request.use(
 
     // 开发环境日志
     if (isDev()) {
-      console.log(
-        `[API Request] ${requestConfig.method?.toUpperCase()} ${requestConfig.url}`,
-        requestConfig,
-      );
+      // console.log(
+      //   `[API Request] ${requestConfig.method?.toUpperCase()} ${requestConfig.url}`,
+      //   requestConfig,
+      // );
     }
 
     // 处理缓存
@@ -247,7 +247,7 @@ api.interceptors.response.use((response: AxiosResponse<ApiResponse>) => {
 
   // 开发环境日志
   if (isDev()) {
-    console.log(`[API Response] ${config.url}`, data);
+    // console.log(`[API Response] ${config.url}`, data);
   }
 
   // 业务成功

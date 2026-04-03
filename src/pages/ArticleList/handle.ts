@@ -19,3 +19,14 @@ export const handleLikeClick = (
 ): void => {
   store.toggleLike(articleId);
 };
+
+/**
+ * 处理无限滚动加载更多
+ */
+export const useHandleLoadMore = (store: ArticleListStore) => {
+  const handleLoadMore = async () => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await store.fetchMoreArticles();
+  };
+  return handleLoadMore;
+};

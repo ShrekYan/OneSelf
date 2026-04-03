@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useObserver } from 'mobx-react';
 import { DotLoading } from 'antd-mobile';
 import styles from './index.module.scss';
@@ -13,6 +14,7 @@ import * as handle from './handle';
 
 const HomePage: React.FC = () => {
   const store = useHomeStore();
+  const navigate = useNavigate();
   const onArticleClick = useHandleArticleClick();
 
   //  useActivate(() => {
@@ -45,7 +47,9 @@ const HomePage: React.FC = () => {
       <FeaturedArticle
         articles={store.featuredArticles}
         onBookmarkClick={handle.handleFeaturedBookmark}
-        onArticleClick={handle.handleFeaturedClick}
+        onArticleClick={articleId =>
+          handle.handleFeaturedClick(navigate, articleId)
+        }
       />
 
       {/* Latest Articles 标题区域 */}
@@ -54,7 +58,9 @@ const HomePage: React.FC = () => {
           <h2 className={styles.sectionTitle}>Latest Articles</h2>
           <button
             className={styles.seeAllLink}
-            onClick={handle.handleSeeAllClick}
+            onClick={() =>
+              handle.handleSeeAllClick(navigate, store.activeCategoryId)
+            }
             type="button"
           >
             See all
