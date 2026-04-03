@@ -26,24 +26,24 @@ export function useArticleListStore() {
     loadingMore: false,
 
     // Actions
-    setSelectedCategoryId: (categoryId: string): void => {
-      store.selectedCategoryId = categoryId;
+    setSelectedCategoryId(categoryId: string): void {
+      this.selectedCategoryId = categoryId;
     },
 
-    setLoading: (state: boolean): void => {
-      store.loading = state;
+    setLoading(state: boolean): void {
+      this.loading = state;
     },
 
-    setCategories: (categories: CategoryItem[]): void => {
-      store.categories = categories;
+    setCategories(categories: CategoryItem[]): void {
+      this.categories = categories;
     },
 
-    setArticles: (articles: ArticleItem[]): void => {
-      store.allArticles = articles;
+    setArticles(articles: ArticleItem[]): void {
+      this.allArticles = articles;
     },
 
-    toggleLike: (articleId: string): void => {
-      const article = store.allArticles.find(item => item.id === articleId);
+    toggleLike(articleId: string): void {
+      const article = this.allArticles.find(item => item.id === articleId);
       if (article) {
         article.isLiked = !article.isLiked;
         article.likes += article.isLiked ? 1 : -1;
@@ -51,36 +51,36 @@ export function useArticleListStore() {
     },
 
     /** 重置分页状态（切换分类时调用） */
-    resetPagination: (): void => {
-      store.currentPage = 1;
-      store.allArticles = [];
-      store.hasMore = false;
+    resetPagination(): void {
+      this.currentPage = 1;
+      this.allArticles = [];
+      this.hasMore = false;
     },
 
     /** 设置加载更多状态 */
-    setLoadingMore: (loading: boolean): void => {
-      store.loadingMore = loading;
+    setLoadingMore(loading: boolean): void {
+      this.loadingMore = loading;
     },
 
     /** 设置是否还有更多数据 */
-    setHasMore: (hasMore: boolean): void => {
-      store.hasMore = hasMore;
+    setHasMore(hasMore: boolean): void {
+      this.hasMore = hasMore;
     },
 
     /** 加载下一页文章 */
-    fetchMoreArticles: async (): Promise<void> => {
-      if (!store.hasMore || store.loadingMore) return;
+    async fetchMoreArticles(): Promise<void> {
+      if (!this.hasMore || this.loadingMore) return;
       console.log('加载更多文章');
       try {
-        store.setLoadingMore(true);
-        const nextPage = store.currentPage + 1;
+        this.setLoadingMore(true);
+        const nextPage = this.currentPage + 1;
         const params: { page: number; pageSize: number; categoryId?: string } =
           {
             page: nextPage,
-            pageSize: store.pageSize,
+            pageSize: this.pageSize,
           };
-        if (store.selectedCategoryId !== 'all') {
-          params.categoryId = store.selectedCategoryId;
+        if (this.selectedCategoryId !== 'all') {
+          params.categoryId = this.selectedCategoryId;
         }
         const res = await articleApi.listArticles(params);
 
@@ -94,7 +94,7 @@ export function useArticleListStore() {
             categoryId: apiArticle.category.id,
             authorName: apiArticle.authorName || 'Unknown',
             authorAvatar: apiArticle.authorAvatar,
-            readTime: apiArticle.readTime,
+            readTime: apiArticle.readTime ?? undefined,
             likes: apiArticle.likes || 0,
             commentsCount: apiArticle.commentsCount || 0,
             isLiked: false,
@@ -102,20 +102,25 @@ export function useArticleListStore() {
         );
 
         // 追加到已有列表后
-        store.allArticles = [...store.allArticles, ...adaptedArticles];
-        store.currentPage = nextPage;
-        store.setHasMore(res.hasMore);
+        this.allArticles = [...this.allArticles, ...adaptedArticles];
+        this.currentPage = nextPage;
+        this.setHasMore(res.hasMore);
       } catch (error) {
-        console.error('加载更多文章失败:', error);
+        console.error('加载更多文章失败:');
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else if (typeof error === 'string') {
+          console.error(error);
+        }
       } finally {
-        store.setLoadingMore(false);
+        this.setLoadingMore(false);
       }
     },
 
     /** 获取分类列表 */
-    fetchCategories: async (): Promise<void> => {
+    async fetchCategories(): Promise<void> {
       try {
-        store.setLoading(true);
+        this.setLoading(true);
         const res = await articleApi.listCategories();
         // 在接口返回的分类列表前面添加"全部"选项
         const categoriesWithAll: CategoryItem[] = [
@@ -125,30 +130,35 @@ export function useArticleListStore() {
             name: item.name,
           })),
         ];
-        store.setCategories(categoriesWithAll);
+        this.setCategories(categoriesWithAll);
       } catch (error) {
         // 错误由 API 拦截器全局处理，这里什么都不做
-        console.error('获取分类列表失败:', error);
+        console.error('获取分类列表失败:');
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else if (typeof error === 'string') {
+          console.error(error);
+        }
       } finally {
-        store.setLoading(false);
+        this.setLoading(false);
       }
     },
 
     /** 获取文章列表（根据当前选中分类筛选） */
-    fetchArticles: async (): Promise<void> => {
+    async fetchArticles(): Promise<void> {
       console.log('获取文章列表');
       try {
-        store.setLoading(true);
+        this.setLoading(true);
         // 切换分类，重置分页
-        store.resetPagination();
+        this.resetPagination();
         const params: { page: number; pageSize: number; categoryId?: string } =
           {
             page: 1,
-            pageSize: store.pageSize,
+            pageSize: this.pageSize,
           };
         // 只有当选中分类不是"all"时才传递 categoryId 参数（由后端筛选）
-        if (store.selectedCategoryId !== 'all') {
-          params.categoryId = store.selectedCategoryId;
+        if (this.selectedCategoryId !== 'all') {
+          params.categoryId = this.selectedCategoryId;
         }
         const res = await articleApi.listArticles(params);
 
@@ -163,33 +173,38 @@ export function useArticleListStore() {
             categoryId: apiArticle.category.id,
             authorName: apiArticle.authorName || 'Unknown',
             authorAvatar: apiArticle.authorAvatar,
-            readTime: apiArticle.readTime,
+            readTime: apiArticle.readTime ?? undefined,
             likes: apiArticle.likes || 0,
             commentsCount: apiArticle.commentsCount || 0,
             isLiked: false, // 接口不返回点赞状态，初始化为 false
           }),
         );
-        store.setArticles(adaptedArticles);
+        this.setArticles(adaptedArticles);
         console.log(res.hasMore);
-        store.setHasMore(res.hasMore);
+        this.setHasMore(res.hasMore);
       } catch (error) {
         // 错误由 API 拦截器全局处理，这里什么都不做
-        console.error('获取文章列表失败:', error);
+        console.error('获取文章列表失败:');
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else if (typeof error === 'string') {
+          console.error(error);
+        }
       } finally {
-        store.setLoading(false);
+        this.setLoading(false);
       }
     },
 
     // /** 根据当前选中分类过滤后的文章列表 */
     // get filteredArticles(): ArticleItem[] {
-    //   console.log(store.selectedCategoryId);
+    //   console.log(this.selectedCategoryId);
     //   // 后端已经按 categoryId 筛选过了，直接返回即可
     //   // 保留过滤逻辑作为兼容，万一前端需要过滤也可以正常工作
-    //   if (store.selectedCategoryId === 'all') {
-    //     return store.allArticles;
+    //   if (this.selectedCategoryId === 'all') {
+    //     return this.allArticles;
     //   }
-    //   return store.allArticles.filter(
-    //     article => article.categoryId === store.selectedCategoryId,
+    //   return this.allArticles.filter(
+    //     article => article.categoryId === this.selectedCategoryId,
     //   );
     // },
   }));
