@@ -43,6 +43,8 @@ export type HomeStoreType = {
   setCategoriesLoading: (loading: boolean) => void;
   /** 切换文章点赞状态 */
   toggleLike: (articleId: string) => void;
+  /** 加载首页所有初始化数据（并发请求，使用 Promise.allSettled 容错） */
+  fetchInitialData: () => Promise<void>;
   /** 加载文章列表数据 */
   fetchArticles: () => Promise<void>;
   /** 加载特色文章数据 */
@@ -154,6 +156,17 @@ export function useHomeStore(): HomeStoreType {
       } finally {
         this.setCategoriesLoading(false);
       }
+    },
+
+    async fetchInitialData(): Promise<void> {
+      // 使用 Promise.allSettled 并发启动三个请求
+      // 即使某个请求失败，其他请求仍然能正常返回数据
+      // 每个方法内部已独立处理 try/catch 和 loading 状态更新
+      await Promise.allSettled([
+        this.fetchArticles(),
+        this.fetchFeaturedArticles(),
+        this.fetchCategories(),
+      ]);
     },
   }));
 

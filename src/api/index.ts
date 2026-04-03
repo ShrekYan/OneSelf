@@ -7,6 +7,7 @@ import { productApi } from './product';
 import { userApi } from './user';
 import { articleApi } from './article';
 import { categoryApi } from './category';
+import { bankApi } from './bank';
 import type { AxiosInstance } from 'axios';
 
 // 导出核心类型定义
@@ -23,7 +24,7 @@ export { apiUtils } from './core/api-utils';
 import api from './core/axios-instance';
 
 // 导出各业务模块 API
-export { productApi, userApi, articleApi, categoryApi };
+export { productApi, userApi, articleApi, categoryApi, bankApi };
 
 /**
  * 默认导出对象聚合 axios 实例 和 所有业务模块 API
@@ -36,6 +37,7 @@ interface DefaultApi extends AxiosInstance {
   user: typeof userApi;
   article: typeof articleApi;
   category: typeof categoryApi;
+  bank: typeof bankApi;
 }
 
 const defaultApi = api as DefaultApi;
@@ -43,5 +45,6 @@ defaultApi.product = productApi;
 defaultApi.user = userApi;
 defaultApi.article = articleApi;
 defaultApi.category = categoryApi;
+defaultApi.bank = bankApi;
 
 export default defaultApi;

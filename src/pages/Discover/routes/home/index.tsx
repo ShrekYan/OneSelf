@@ -26,9 +26,7 @@ const HomePage: React.FC = () => {
   //   });
 
   useEffect(() => {
-    store.fetchArticles();
-    store.fetchFeaturedArticles();
-    store.fetchCategories();
+    store.fetchInitialData();
   }, [store]);
 
   return useObserver(() => (
