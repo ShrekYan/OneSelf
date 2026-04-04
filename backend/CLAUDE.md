@@ -71,6 +71,7 @@ backend/
 |------|------|------|
 | **NestJS** | 11.0.1 | 后端框架 |
 | **TypeScript** | 5.7.3 | 开发语言 |
+| **Prisma ORM** | 6.4.1 | 数据库 ORM 框架 |
 | **@nestjs/config** | 4.0.3 | 环境配置管理 |
 | **@nestjs/platform-express** | 11.0.1 | Express 适配器 |
 | **@nestjs/swagger** | 11.2.6 | API 文档生成 |

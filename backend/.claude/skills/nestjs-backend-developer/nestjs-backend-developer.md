@@ -16,6 +16,7 @@ include: 05-typescript-spec.md
 include: 06-api-documentation.md
 include: 07-error-handling.md
 include: 08-checklist.md
+include: 09-prisma-orm.md
 
 <!-- 引用基础规范 -->
 include: ../../rules/typescript.md

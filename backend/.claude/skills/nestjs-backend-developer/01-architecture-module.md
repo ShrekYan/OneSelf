@@ -2,6 +2,7 @@
 
 ## 核心技术栈
 - **NestJS 11** + **TypeScript 5.7**
+- **Prisma ORM** - 数据库访问
 - **@nestjs/swagger** - API 文档自动生成
 - **class-validator** - 数据验证
 - **class-transformer** - 类型转换

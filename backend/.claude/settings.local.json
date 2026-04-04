@@ -1,0 +1,9 @@
+{
+  "disabledMcpjsonServers": [
+    "figma",
+    "playwright",
+    "context7",
+    "pixso",
+    "apifox"
+  ]
+}
