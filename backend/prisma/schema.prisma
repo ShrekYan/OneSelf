@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  /// 分类ID（字符串ID，如 "frontend"）
+  id            String  @id @db.VarChar(36)
+  /// 分类名称
+  name          String  @db.VarChar(50)
+  /// 分类描述（可选）
+  description   String? @db.VarChar(500)
+  image_url     String? @db.VarChar(500)
+  article_count Int     @default(0)
+  sort_order    Int?    @default(0)
+  is_active     Boolean @default(true)
+  created_at    BigInt
+  updated_at    BigInt
+
+  @@map("categories")
+}

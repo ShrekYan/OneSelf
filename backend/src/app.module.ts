@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ArticleModule } from './article/article.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 // @Module() 是 NestJS 提供的装饰器，用于声明一个模块（Module）。
 // 模块是 NestJS 应用的基本组织单位，每个应用至少有一个根模块（AppModule）。
@@ -21,6 +22,8 @@ import { ArticleModule } from './article/article.module';
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'],
     }),
+    // PrismaModule - Prisma ORM 全局模块，提供数据库连接
+    PrismaModule,
     // AuthModule 是负责处理用户认证相关功能的模块，如登录、刷新令牌、登出等。
     AuthModule,
     // CategoryModule 负责文章分类相关接口

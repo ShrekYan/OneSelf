@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Category } from '@prisma/client';
 import {
   CategoryListResponseDto,
   CategoryItemDto,
@@ -6,84 +8,53 @@ import {
   HotKeywordDto,
 } from './dto';
 
-// Mock 分类数据，与前端保持一致
-const MOCK_CATEGORIES: CategoryItemDto[] = [
-  {
-    id: 'ui-ux-design',
-    name: 'UI/UX Design',
-    articleCount: 142,
-    imageUrl: 'https://picsum.photos/400/300?random=1',
-  },
-  {
-    id: 'engineering',
-    name: 'Engineering',
-    articleCount: 284,
-    imageUrl: 'https://picsum.photos/400/300?random=2',
-  },
-  {
-    id: 'productivity',
-    name: 'Productivity',
-    articleCount: 95,
-    imageUrl: 'https://picsum.photos/400/300?random=3',
-  },
-  {
-    id: 'life-culture',
-    name: 'Life & Culture',
-    articleCount: 213,
-    imageUrl: 'https://picsum.photos/400/300?random=4',
-  },
-  {
-    id: 'web3-crypto',
-    name: 'Web3 & Crypto',
-    articleCount: 87,
-    imageUrl: 'https://picsum.photos/400/300?random=5',
-  },
-  {
-    id: 'startups',
-    name: 'Startups',
-    articleCount: 164,
-    imageUrl: 'https://picsum.photos/400/300?random=6',
-  },
-  {
-    id: 'frontend',
-    name: 'Frontend',
-    articleCount: 326,
-    imageUrl: 'https://picsum.photos/400/300?random=7',
-  },
-  {
-    id: 'backend',
-    name: 'Backend',
-    articleCount: 198,
-    imageUrl: 'https://picsum.photos/400/300?random=8',
-  },
-  {
-    id: 'mobile',
-    name: 'Mobile Dev',
-    articleCount: 127,
-    imageUrl: 'https://picsum.photos/400/300?random=9',
-  },
-  {
-    id: 'devops',
-    name: 'DevOps',
-    articleCount: 89,
-    imageUrl: 'https://picsum.photos/400/300?random=10',
-  },
-];
-
 @Injectable()
 export class CategoryService {
-  getList(): Promise<CategoryListResponseDto> {
-    return Promise.resolve({
-      list: MOCK_CATEGORIES,
-      total: MOCK_CATEGORIES.length,
-    });
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  getHotKeywords(): Promise<HotKeywordsResponseDto> {
-    const keywords: HotKeywordDto[] = MOCK_CATEGORIES.map((category) => ({
+  async getList(): Promise<CategoryListResponseDto> {
+    const categories = await this.prisma.category.findMany({
+      where: { is_active: true },
+      orderBy: { sort_order: 'desc' },
+    });
+
+    // 数据库下划线命名 → DTO 驼峰命名转换
+    const list: CategoryItemDto[] = categories.map((category: Category) => ({
       id: category.id,
       name: category.name,
+      articleCount: category.article_count,
+      imageUrl: category.image_url ?? undefined,
+      description: category.description ?? undefined,
+      sortOrder: category.sort_order ?? undefined,
     }));
-    return Promise.resolve({ keywords });
+
+    return {
+      list,
+      total: list.length,
+    };
+  }
+
+  async getHotKeywords(): Promise<HotKeywordsResponseDto> {
+    // 只查询 id 和 name 两个字段，优化查询性能
+
+    const categories = await this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      where: { is_active: true },
+      orderBy: {
+        article_count: 'desc',
+      },
+    });
+
+    const keywords: HotKeywordDto[] = categories.map(
+      (category: Pick<Category, 'id' | 'name'>) => ({
+        id: category.id,
+        name: category.name,
+      }),
+    );
+
+    return { keywords };
   }
 }
