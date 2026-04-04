@@ -60,10 +60,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT ?? 8888;
-  await app.listen(port);
+  const host = '0.0.0.0';
+  await app.listen(port, host);
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/docs`);
+  console.log(`🚀 Application is running on: http://127.0.0.1:${port}`);
+  console.log(`🚀 Alternative: http://localhost:${port}`);
+  console.log(`📚 API Documentation: http://127.0.0.1:${port}/docs`);
 }
 
 bootstrap();
