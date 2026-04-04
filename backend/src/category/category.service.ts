@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Category } from '@prisma/client';
+import type { Categories, HotSearchKeywords } from '@prisma/client';
 import {
   CategoryListResponseDto,
   CategoryItemDto,
@@ -13,13 +13,13 @@ export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getList(): Promise<CategoryListResponseDto> {
-    const categories = await this.prisma.category.findMany({
+    const categories = await this.prisma.categories.findMany({
       where: { is_active: true },
       orderBy: { sort_order: 'desc' },
     });
 
     // 数据库下划线命名 → DTO 驼峰命名转换
-    const list: CategoryItemDto[] = categories.map((category: Category) => ({
+    const list: CategoryItemDto[] = categories.map((category: Categories) => ({
       id: category.id,
       name: category.name,
       articleCount: category.article_count,
@@ -37,24 +37,18 @@ export class CategoryService {
   async getHotKeywords(): Promise<HotKeywordsResponseDto> {
     // 只查询 id 和 name 两个字段，优化查询性能
 
-    const categories = await this.prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      where: { is_active: true },
+    const keywords = await this.prisma.hotSearchKeywords.findMany({
+      where: { is_active: true }, // ← 加上这句，只查询激活的关键词
       orderBy: {
-        article_count: 'desc',
+        sort_order: 'desc',
       },
     });
 
-    const keywords: HotKeywordDto[] = categories.map(
-      (category: Pick<Category, 'id' | 'name'>) => ({
-        id: category.id,
-        name: category.name,
-      }),
-    );
+    const result: HotKeywordDto[] = keywords.map((item: HotSearchKeywords) => ({
+      id: item.id,
+      name: item.keyword,
+    }));
 
-    return { keywords };
+    return { keywords: result };
   }
 }

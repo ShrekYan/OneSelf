@@ -8,7 +8,7 @@ datasource db {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model categories {
+model Categories {
   id            String  @id @db.VarChar(36)
   name          String  @db.VarChar(50)
   description   String? @db.VarChar(500)
@@ -18,4 +18,20 @@ model categories {
   is_active     Boolean @default(true)
   created_at    BigInt
   updated_at    BigInt
+  @@map("categories")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model HotSearchKeywords {
+  id         String  @id @db.VarChar(36)
+  keyword    String  @db.VarChar(50)
+  hot_score  Int     @default(0)
+  is_active  Boolean @default(true)
+  sort_order Int?    @default(0)
+  created_at BigInt
+
+  @@index([hot_score], map: "idx_hot_score")
+  @@index([is_active], map: "idx_is_active")
+  @@index([sort_order], map: "idx_sort_order")
+  @@map("hot_search_keywords")
 }
