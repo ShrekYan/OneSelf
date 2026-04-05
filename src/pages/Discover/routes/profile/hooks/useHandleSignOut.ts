@@ -20,8 +20,10 @@ export const useHandleSignOut = () => {
     if (confirmed) {
       try {
         await userApi.signOut();
-        // 清除本地存储的 token
-        localStorage.removeItem('token');
+        // 清除本地存储的所有认证信息
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userInfo');
         // 跳转到登录页面
         navigate('/login');
       } catch (error) {

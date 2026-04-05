@@ -124,7 +124,7 @@ export const userApi = {
    * 退出登录
    */
   signOut: async (): Promise<{ success: boolean }> => {
-    return await api.post('/api/v1/auth/sign-out');
+    return await api.post('/api/v1/auth/logout');
   },
 
   /**
