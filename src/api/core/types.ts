@@ -23,6 +23,7 @@ export type RequestConfig = AxiosRequestConfig & {
   cache?: boolean; // 是否缓存
   cacheTime?: number; // 缓存时间(ms)
   __retryCount?: number; // 内部重试计数
+  __isRetry?: boolean; // 标记是否是刷新后的重试
 };
 
 /**

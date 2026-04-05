@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Ip } from '@nestjs/common';
+import { Controller, Post, Body, Ip, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -8,6 +8,7 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../common/guards';
 
 /**
  * 认证控制器
@@ -78,6 +79,7 @@ export class AuthController {
     status: 200,
     description: '登出成功',
   })
+  @UseGuards(JwtAuthGuard)
   async logout(@CurrentUserId() userId: string) {
     await this.authService.logout(userId);
     return { message: '登出成功' };

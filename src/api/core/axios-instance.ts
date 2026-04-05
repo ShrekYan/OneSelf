@@ -9,10 +9,30 @@ import type { ApiResponse, RequestConfig } from './types';
 import { ApiError, ErrorType } from './types';
 import { RequestCache } from './request-cache';
 import { CancelManager } from './cancel-manager';
+import defaultApi from '../index';
 
 // 创建缓存和取消管理器实例
 const cache = new RequestCache();
 const cancelManager = new CancelManager();
+
+// 令牌刷新相关状态
+let isRefreshing = false; // 是否正在刷新中
+const pendingRequests: Array<(token: string | null) => void> = []; // 等待刷新的请求队列
+
+/**
+ * 将等待的请求加入队列，刷新完成后逐个重试
+ */
+function addPendingRequest(callback: (token: string | null) => void): void {
+  pendingRequests.push(callback);
+}
+
+/**
+ * 刷新完成后，通知所有等待的请求使用新的 token 重试
+ */
+function resolvePendingRequests(token: string | null): void {
+  pendingRequests.forEach(callback => callback(token));
+  pendingRequests.length = 0;
+}
 
 // 从环境变量获取基础 URL
 const getBaseURL = () => {
@@ -56,10 +76,11 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
   }
 
   // 特殊错误码处理
-  if (data.code === 401 || data.code === 1001) {
-    // 未授权，清除 token 并跳转登录
-    localStorage.removeItem('token');
-    // TODO: 跳转登录页
+  if (data.code === 410 || data.code === 1001) {
+    // 未授权，清除所有 token 并跳转登录
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
   }
 
   return Promise.reject(apiError);
@@ -131,25 +152,110 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
 
   if (status) {
     switch (status) {
-      case 401:
+      case 401: {
+        errorType = ErrorType.UNAUTHORIZED;
+        errorMessage = '访问令牌已过期';
+
+        // 已标记为重试，不重复刷新，直接返回错误
+        if (config.__isRetry) {
+          errorMessage = '刷新后请求仍然失败';
+          break;
+        }
+
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        // 没有刷新令牌，直接清除所有令牌跳转登录
+        if (!refreshToken) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+          break;
+        }
+
+        // 如果正在刷新中，将请求加入队列等待
+        if (isRefreshing) {
+          return new Promise(resolve => {
+            addPendingRequest((newToken: string | null) => {
+              if (newToken && config.headers) {
+                config.headers.Authorization = `Bearer ${newToken}`;
+              }
+              resolve(api(config));
+            });
+          });
+        }
+
+        // 开始刷新
+        isRefreshing = true;
+        defaultApi.auth
+          .refreshToken(refreshToken)
+          .then(response => {
+            // 刷新成功，保存新 token
+            localStorage.setItem('accessToken', response.accessToken);
+            isRefreshing = false;
+            resolvePendingRequests(response.accessToken);
+            return Promise.resolve(response.accessToken);
+          })
+          .catch(() => {
+            // 刷新失败（refreshToken 也失效了），清除所有 token 跳转登录
+            isRefreshing = false;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            resolvePendingRequests(null);
+            if (!config.skipErrorToast) {
+              Toast.show({
+                icon: 'fail',
+                content: '会话已过期，请重新登录',
+              });
+            }
+            window.location.href = '/login';
+            return Promise.resolve(null);
+          });
+
+        // 将当前请求加入队列，等待刷新完成后重试
+        return new Promise(resolve => {
+          addPendingRequest((newToken: string | null) => {
+            if (newToken && config.headers) {
+              config.headers.Authorization = `Bearer ${newToken}`;
+              config.__isRetry = true; // 标记为重试，避免无限循环
+              resolve(api(config));
+            } else {
+              // 刷新失败，直接返回错误
+              resolve(
+                Promise.reject(
+                  new ApiError('刷新令牌失败', errorType, status, error),
+                ),
+              );
+            }
+          });
+        });
+
+        break;
+      }
+
+      case 410:
         errorType = ErrorType.UNAUTHORIZED;
         errorMessage = '未授权，请重新登录';
-        localStorage.removeItem('token');
-        // TODO: 跳转登录页
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
         break;
+
       case 403:
         errorType = ErrorType.FORBIDDEN;
         errorMessage = '无权访问';
         break;
+
       case 404:
         errorType = ErrorType.NOT_FOUND;
         errorMessage = '请求的资源不存在';
         break;
+
       case 408:
       case 504:
         errorType = ErrorType.TIMEOUT;
         errorMessage = '请求超时';
         break;
+
       case 500:
       case 502:
       case 503:
@@ -216,7 +322,7 @@ api.interceptors.request.use(
 
     // 添加认证 token
     if (!requestConfig.skipAuth) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       if (token && requestConfig.headers) {
         requestConfig.headers.Authorization = `Bearer ${token}`;
       }
