@@ -14,6 +14,34 @@ export interface HotKeywordsResponse {
 }
 
 /**
+ * 分类项
+ */
+export interface CategoryItem {
+  /** 分类ID */
+  id: string;
+  /** 分类名称 */
+  name: string;
+  /** 该分类下已发布文章数量 */
+  articleCount: number;
+  /** 封面图片URL */
+  imageUrl?: string;
+  /** 分类描述 */
+  description?: string;
+  /** 排序权重 */
+  sortOrder?: number;
+}
+
+/**
+ * 获取分类列表响应
+ */
+export interface CategoryListResponse {
+  /** 分类列表数组 */
+  list: CategoryItem[];
+  /** 分类总数 */
+  total: number;
+}
+
+/**
  * 分类 API 模块
  */
 export const categoryApi = {
@@ -32,5 +60,22 @@ export const categoryApi = {
     )) as unknown as HotKeywordsResponse;
     // 响应拦截器已解包，直接返回 keywords
     return response.keywords;
+  },
+
+  /**
+   * 获取分类列表
+   * @description 获取所有激活的文章分类列表，分类数据不常变动，启用缓存（5分钟）
+   */
+  getList: async (): Promise<CategoryListResponse> => {
+    // 注意：拦截器会自动解包，返回的是 data.data 而不是整个 response
+    const response = (await api.get<CategoryListResponse>(
+      '/api/v1/category/list',
+      {
+        cache: true,
+        cacheTime: 5 * 60 * 1000, // 缓存5分钟
+      } as RequestConfig,
+    )) as unknown as CategoryListResponse;
+    // 响应拦截器已解包，直接返回整个响应数据
+    return response;
   },
 };

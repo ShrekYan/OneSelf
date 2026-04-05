@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import type { Articles, Prisma } from '@prisma/client';
 import {
   QueryArticleListDto,
   ArticleListResponseDto,
@@ -20,46 +22,96 @@ import {
 
 @Injectable()
 export class ArticleService {
-  queryArticleList(
+  constructor(private readonly prisma: PrismaService) {}
+
+  async queryArticleList(
     query: QueryArticleListDto,
   ): Promise<ArticleListResponseDto> {
-    let filteredData = [...MOCK_ARTICLES];
+    // 构建 where 查询条件
+    const where: Prisma.ArticlesWhereInput = {
+      is_published: true,
+    };
 
     // 按分类筛选
     if (query.categoryId) {
-      filteredData = filteredData.filter(
-        (article) => article.category.id === query.categoryId,
-      );
+      where.category_id = query.categoryId;
     }
 
-    // 关键词搜索
+    // 关键词搜索（标题或摘要包含关键词）
     if (query.keyword) {
-      const keyword = query.keyword.toLowerCase();
-      filteredData = filteredData.filter(
-        (article) =>
-          article.title.toLowerCase().includes(keyword) ||
-          article.summary?.toLowerCase().includes(keyword),
-      );
+      where.OR = [
+        { title: { contains: query.keyword } },
+        { summary: { contains: query.keyword } },
+      ];
     }
 
-    // 排序
-    this.sortArticles(filteredData, query.sortBy);
+    // 构建排序
+    const orderBy: Prisma.ArticlesOrderByWithRelationInput = {};
+    switch (query.sortBy) {
+      case ArticleSortBy.VIEWS:
+        orderBy.views = 'desc';
+        break;
+      case ArticleSortBy.LIKES:
+        orderBy.likes = 'desc';
+        break;
+      case ArticleSortBy.PUBLISHED_AT:
+      default:
+        orderBy.published_at = 'desc';
+        break;
+    }
 
-    // 分页
+    // 分页参数
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 10;
-    const total = filteredData.length;
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedData = filteredData.slice(startIndex, endIndex);
+    const skip = (page - 1) * pageSize;
 
-    return Promise.resolve({
-      list: paginatedData,
+    // 并行查询：数据列表 + 总数
+    const [articlesWithCategories, total] = await Promise.all([
+      this.prisma.articles.findMany({
+        where,
+        orderBy,
+        skip,
+        take: pageSize,
+        include: {
+          categories: true,
+        },
+      }),
+      this.prisma.articles.count({ where }),
+    ]);
+
+    // 转换数据库结果为 DTO 格式
+    const list: ArticleListItemDto[] = articlesWithCategories.map(
+      (article: Articles & { categories: { id: string; name: string } }) => ({
+        id: article.id,
+        title: article.title,
+        summary: article.summary ?? undefined,
+        coverUrl: article.cover_url ?? undefined,
+        category: {
+          id: article.categories.id,
+          name: article.categories.name,
+        },
+        authorId: article.author_id,
+        authorName: article.author_name ?? undefined,
+        authorAvatar: article.author_avatar ?? undefined,
+        tags: article.tags
+          ? article.tags.split(',').map((t: string) => t.trim())
+          : [],
+        views: article.views,
+        likes: article.likes,
+        commentsCount: article.comments_count,
+        publishedAt: new Date(Number(article.published_at)).toISOString(),
+        isTop: article.is_top,
+        readTime: article.read_time ?? undefined,
+      }),
+    );
+
+    return {
+      list,
       total,
       page,
       pageSize,
-      hasMore: endIndex < total,
-    });
+      hasMore: skip + list.length < total,
+    };
   }
 
   getFeaturedArticles(): Promise<FeaturedArticleListResponseDto> {

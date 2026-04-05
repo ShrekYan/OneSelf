@@ -11,6 +11,7 @@ import type { ArticleItem as ApiArticleItem } from '@/types/article';
 import type { FeaturedArticleItem as ApiFeaturedArticleItem } from '@/api/article';
 import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
 import type { FeaturedArticleItem } from './constant';
+import type { CategoryItem } from '@/api/category';
 
 // 文章列表项类型 = API 返回类型 + 本地点赞状态
 export type ArticleItem = ApiArticleItem & {
@@ -36,7 +37,7 @@ export type HomeStoreType = {
   /** 设置文章列表 */
   setArticles: (articles: ArticleItem[]) => void;
   /** 设置分类列表 */
-  setCategories: (categories: HotSearchItem[]) => void;
+  setCategories: (categories: CategoryItem[]) => void;
   /** 设置加载状态 */
   setLoading: (loading: boolean) => void;
   /** 设置分类加载状态 */
@@ -149,8 +150,8 @@ export function useHomeStore(): HomeStoreType {
     async fetchCategories(): Promise<void> {
       this.setCategoriesLoading(true);
       try {
-        const data = await api.category.getHotKeywords();
-        this.setCategories(data);
+        const data = await api.category.getList();
+        this.setCategories(data.list);
       } catch (error) {
         console.error('加载热门分类失败:', error);
       } finally {

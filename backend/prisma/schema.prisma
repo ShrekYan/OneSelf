@@ -9,15 +9,17 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Categories {
-  id            String  @id @db.VarChar(36)
-  name          String  @db.VarChar(50)
-  description   String? @db.VarChar(500)
-  image_url     String? @db.VarChar(500)
-  article_count Int     @default(0)
-  sort_order    Int?    @default(0)
-  is_active     Boolean @default(true)
+  id            String     @id @db.VarChar(36)
+  name          String     @db.VarChar(50)
+  description   String?    @db.VarChar(500)
+  image_url     String?    @db.VarChar(500)
+  article_count Int        @default(0)
+  sort_order    Int?       @default(0)
+  is_active     Boolean    @default(true)
   created_at    BigInt
   updated_at    BigInt
+  articles      Articles[]
+
   @@map("categories")
 }
 
@@ -34,4 +36,67 @@ model HotSearchKeywords {
   @@index([is_active], map: "idx_is_active")
   @@index([sort_order], map: "idx_sort_order")
   @@map("hot_search_keywords")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Articles {
+  id             String     @id @db.VarChar(36)
+  title          String     @db.VarChar(200)
+  summary        String?    @db.VarChar(500)
+  cover_url      String?    @db.VarChar(500)
+  category_id    String     @db.VarChar(36)
+  author_id      String     @db.VarChar(36)
+  author_name    String?    @db.VarChar(50)
+  author_avatar  String?    @db.VarChar(500)
+  tags           String?    @db.VarChar(200)
+  views          Int        @default(0)
+  likes          Int        @default(0)
+  comments_count Int        @default(0)
+  is_top         Boolean    @default(false)
+  read_time      Int?
+  published_at   BigInt
+  is_published   Boolean    @default(true)
+  created_at     BigInt
+  updated_at     BigInt
+  categories     Categories @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "articles_ibfk_1")
+  users          users      @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "articles_ibfk_2")
+
+  @@index([author_id], map: "idx_author_id")
+  @@index([category_id], map: "idx_category_id")
+  @@index([is_published], map: "idx_is_published")
+  @@index([is_top], map: "idx_is_top")
+  @@index([published_at], map: "idx_published_at")
+  @@map("articles")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model refresh_tokens {
+  id            String  @id @db.VarChar(36)
+  user_id       String  @db.VarChar(36)
+  refresh_token String  @unique(map: "uk_refresh_token") @db.VarChar(500)
+  client_ip     String  @db.VarChar(50)
+  expires_at    BigInt
+  revoked       Boolean @default(false)
+  created_at    BigInt
+  users         users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+
+  @@index([expires_at], map: "idx_expires_at")
+  @@index([user_id], map: "idx_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id             String           @id @db.VarChar(36)
+  username       String           @unique(map: "uk_username") @db.VarChar(50)
+  password_hash  String           @db.VarChar(255)
+  email          String?          @db.VarChar(100)
+  nickname       String?          @db.VarChar(50)
+  avatar         String?          @db.VarChar(500)
+  is_active      Boolean          @default(true)
+  created_at     BigInt
+  updated_at     BigInt
+  articles       Articles[]
+  refresh_tokens refresh_tokens[]
+  @@map("users")
+  @@index([is_active], map: "idx_is_active")
 }

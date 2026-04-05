@@ -17,7 +17,6 @@ export class CategoryService {
       where: { is_active: true },
       orderBy: { sort_order: 'desc' },
     });
-
     // 数据库下划线命名 → DTO 驼峰命名转换
     const list: CategoryItemDto[] = categories.map((category: Categories) => ({
       id: category.id,
