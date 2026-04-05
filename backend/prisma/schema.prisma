@@ -59,7 +59,7 @@ model Articles {
   created_at     BigInt
   updated_at     BigInt
   categories     Categories @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "articles_ibfk_1")
-  users          users      @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "articles_ibfk_2")
+  users          Users      @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "articles_ibfk_2")
 
   @@index([author_id], map: "idx_author_id")
   @@index([category_id], map: "idx_category_id")
@@ -70,7 +70,7 @@ model Articles {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model refresh_tokens {
+model RefreshTokens {
   id            String  @id @db.VarChar(36)
   user_id       String  @db.VarChar(36)
   refresh_token String  @unique(map: "uk_refresh_token") @db.VarChar(500)
@@ -78,14 +78,15 @@ model refresh_tokens {
   expires_at    BigInt
   revoked       Boolean @default(false)
   created_at    BigInt
-  users         users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+  users         Users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
 
   @@index([expires_at], map: "idx_expires_at")
   @@index([user_id], map: "idx_user_id")
+  @@map("refresh_tokens")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model users {
+model Users {
   id             String           @id @db.VarChar(36)
   username       String           @unique(map: "uk_username") @db.VarChar(50)
   password_hash  String           @db.VarChar(255)
@@ -96,7 +97,7 @@ model users {
   created_at     BigInt
   updated_at     BigInt
   articles       Articles[]
-  refresh_tokens refresh_tokens[]
+  refresh_tokens RefreshTokens[]
   @@map("users")
   @@index([is_active], map: "idx_is_active")
 }

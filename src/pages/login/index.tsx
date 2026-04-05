@@ -34,7 +34,7 @@ const Login: React.FC = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      account: '',
+      username: '',
       password: '',
       agreeTerms: false,
     },
@@ -107,8 +107,8 @@ const Login: React.FC = () => {
           <form className={styles.form} onSubmit={onSubmit}>
             {/* 账号输入框 */}
             <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="account">
-                Phone/Username
+              <label className={styles.label} htmlFor="username">
+                Username/Phone
               </label>
               <div className={styles.inputWrapper}>
                 <span className={styles.inputIcon}>
@@ -122,16 +122,18 @@ const Login: React.FC = () => {
                   </svg>
                 </span>
                 <input
-                  id="account"
+                  id="username"
                   type="text"
-                  placeholder="Enter phone or username"
+                  placeholder="Enter username or phone"
                   className={styles.input}
-                  {...register('account')}
+                  {...register('username')}
                   disabled={store.isLoading || isSubmitting}
                 />
               </div>
-              {errors.account && (
-                <div className={styles.errorText}>{errors.account.message}</div>
+              {errors.username && (
+                <div className={styles.errorText}>
+                  {errors.username.message}
+                </div>
               )}
             </div>
 

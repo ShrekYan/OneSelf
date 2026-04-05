@@ -3,11 +3,13 @@ import {
   UnauthorizedException,
   ForbiddenException,
   ConflictException,
+  HttpException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 interface User {
   id: string;
@@ -242,10 +244,13 @@ export class AuthService {
       // 检查刷新令牌是否有效
       const isValid = await this.validateRefreshToken(refreshToken);
       if (!isValid) {
-        throw new UnauthorizedException({
-          code: 'INVALID_REFRESH_TOKEN',
-          message: '刷新令牌无效或已过期',
-        });
+        throw new HttpException(
+          {
+            code: 'INVALID_REFRESH_TOKEN',
+            message: '刷新令牌无效或已过期',
+          },
+          410,
+        );
       }
 
       // 生成新的访问令牌
@@ -259,10 +264,13 @@ export class AuthService {
         expiresIn: this.tokenExpiresIn,
       };
     } catch {
-      throw new UnauthorizedException({
-        code: 'INVALID_REFRESH_TOKEN',
-        message: '刷新令牌无效或已过期',
-      });
+      throw new HttpException(
+        {
+          code: 'INVALID_REFRESH_TOKEN',
+          message: '刷新令牌无效或已过期',
+        },
+        410,
+      );
     }
   }
 
@@ -379,41 +387,58 @@ export class AuthService {
   }
 
   /**
-   * 保存刷新令牌（模拟实现）
+   * 保存刷新令牌
    * @param userId - 用户 ID
    * @param token - 刷新令牌
-   * @param deviceId - 设备 ID
+   * @param clientIp - 客户端 IP
    */
   private async saveRefreshToken(
     userId: string,
     token: string,
-    deviceId: string,
+    clientIp: string,
   ) {
-    // TODO: 保存到数据库
-    console.log(
-      `保存刷新令牌: userId=${userId}, token=${token.slice(0, 20)}..., deviceId=${deviceId}`,
-    );
-    return Promise.resolve();
+    const id = uuidv4();
+    const now = Date.now();
+    const expiresAt = BigInt(now + this.refreshExpiresIn * 1000);
+
+    await this.prismaService.refreshTokens.create({
+      data: {
+        id,
+        user_id: userId,
+        refresh_token: token,
+        client_ip: clientIp,
+        expires_at: expiresAt,
+        created_at: BigInt(now),
+      },
+    });
   }
 
   /**
-   * 验证刷新令牌（模拟实现）
+   * 验证刷新令牌
    * @param token - 刷新令牌
    * @returns 是否有效
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async validateRefreshToken(token: string): Promise<boolean> {
-    // TODO: 从数据库验证
-    return Promise.resolve(true);
+    const record = await this.prismaService.refreshTokens.findUnique({
+      where: { refresh_token: token },
+    });
+
+    if (!record) return false;
+    if (record.revoked) return false;
+
+    const now = BigInt(Date.now());
+    if (record.expires_at < now) return false;
+
+    return true;
   }
 
   /**
-   * 删除所有刷新令牌（模拟实现）
+   * 删除所有刷新令牌
    * @param userId - 用户 ID
    */
   private async deleteAllRefreshTokens(userId: string) {
-    // TODO: 从数据库删除
-    console.log(`删除用户 ${userId} 的所有刷新令牌`);
-    return Promise.resolve();
+    await this.prismaService.refreshTokens.deleteMany({
+      where: { user_id: userId },
+    });
   }
 }

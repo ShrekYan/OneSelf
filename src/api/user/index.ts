@@ -88,6 +88,19 @@ export interface RegisterResponse {
 }
 
 /**
+ * 登录请求参数（与后端 LoginDto 保持一致）
+ */
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+/**
+ * 登录响应（与后端 LoginResponseDto 保持一致，结构同注册响应）
+ */
+export type LoginResponse = RegisterResponse;
+
+/**
  * 用户 API 模块
  */
 export const userApi = {
@@ -134,5 +147,13 @@ export const userApi = {
       password: params.password,
     };
     return await api.post('/api/v1/auth/register', requestBody);
+  },
+
+  /**
+   * 用户登录
+   * 与后端 LoginDto 保持一致，发送 username + password
+   */
+  login: async (data: LoginRequest): Promise<LoginResponse> => {
+    return await api.post('/api/v1/auth/login', data);
   },
 };

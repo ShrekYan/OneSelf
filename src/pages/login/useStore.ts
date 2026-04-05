@@ -1,12 +1,13 @@
 import { useLocalObservable } from 'mobx-react';
+import { userApi } from '@/api';
 import type { LoginFormData } from './schema';
+import type { LoginResponse } from '@/api/user';
 
 /**
  * 登录 API 响应类型
  */
 export interface LoginApiResponse {
   success: boolean;
-  token?: string;
   message?: string;
 }
 
@@ -25,28 +26,6 @@ export interface LoginStoreType {
   // 业务方法
   login: (formData: LoginFormData) => Promise<LoginApiResponse>;
 }
-
-/**
- * 模拟登录 API 请求
- * @param formData - 登录表单数据
- * @returns Promise<LoginApiResponse>
- */
-const mockLoginApi = async (
-  formData: LoginFormData,
-): Promise<LoginApiResponse> => {
-  // 模拟网络请求
-  await new Promise(resolve => setTimeout(resolve, 800));
-
-  // 这里可以添加模拟验证逻辑
-  console.log('Mock login API called with:', formData);
-
-  // 默认返回成功
-  return {
-    success: true,
-    token: 'mock-jwt-token-' + Date.now(),
-    message: 'Login successful',
-  };
-};
 
 /**
  * 移动端登录模块状态管理 Hook
@@ -82,13 +61,28 @@ export const useLoginStore = () => {
       this.isLoading = true;
 
       try {
-        const result = await mockLoginApi(formData);
+        const result: LoginResponse = await userApi.login({
+          username: formData.username,
+          password: formData.password,
+        });
+
+        // 保存 token 和用户信息到 localStorage（与注册页保持一致）
+        localStorage.setItem('accessToken', result.accessToken);
+        localStorage.setItem('refreshToken', result.refreshToken);
+        localStorage.setItem('userInfo', JSON.stringify(result.user));
+
         this.isLoading = false;
-        return result;
+        return {
+          success: true,
+        };
       } catch (error) {
         console.error('Login failed:', error);
         this.isLoading = false;
-        throw error;
+        // API 拦截器已经处理了错误提示，这里只需要返回失败
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : 'Login failed',
+        };
       }
     },
   }));

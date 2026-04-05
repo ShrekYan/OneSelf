@@ -5,11 +5,11 @@ import { z } from 'zod';
  * 使用 zod 进行表单验证
  */
 export const loginSchema = z.object({
-  account: z.string().min(1, 'Phone/Username is required').trim(),
+  username: z.string().min(1, 'Username/Phone is required').trim(),
   password: z
     .string()
     .min(6, 'Password must be at least 6 characters')
-    .max(32, 'Password cannot exceed 32 characters')
+    .max(20, 'Password cannot exceed 20 characters')
     .trim(),
   agreeTerms: z.literal<boolean>(true, {
     errorMap: () => ({

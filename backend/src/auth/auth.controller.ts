@@ -62,7 +62,7 @@ export class AuthController {
     type: RefreshResponseDto,
   })
   @ApiResponse({
-    status: 401,
+    status: 410,
     description: '刷新令牌无效或已过期',
   })
   async refreshToken(
