@@ -21,11 +21,6 @@ export const registerSchema = z
       .string()
       .min(6, 'Password must be at least 6 characters')
       .trim(),
-    nickname: z
-      .string()
-      .min(1, 'Nickname is required')
-      .max(20, 'Nickname cannot exceed 20 characters')
-      .trim(),
     agreeTerms: z.literal<boolean>(true, {
       errorMap: () => ({
         message: 'Please agree to the User Agreement and Privacy Policy',

@@ -5,6 +5,8 @@ import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
+import { RegisterDto } from './dto/register.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
 
 /**
@@ -76,8 +78,38 @@ export class AuthController {
     status: 200,
     description: '登出成功',
   })
-  async logout(@CurrentUserId() userId: number) {
+  async logout(@CurrentUserId() userId: string) {
     await this.authService.logout(userId);
     return { message: '登出成功' };
+  }
+
+  @Post('register')
+  @ApiOperation({ summary: '用户注册' })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: '注册成功',
+    type: RegisterResponseDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: '手机号已注册',
+    schema: {
+      example: {
+        statusCode: 409,
+        code: 'MOBILE_ALREADY_REGISTERED',
+        message: '手机号已注册',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '参数校验失败',
+  })
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Ip() clientIp: string,
+  ): Promise<RegisterResponseDto> {
+    return this.authService.register(registerDto, clientIp);
   }
 }

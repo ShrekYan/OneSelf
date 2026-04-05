@@ -58,22 +58,33 @@ export interface SendCodeParams {
 }
 
 /**
- * 注册请求参数
+ * 注册请求参数（API 层只接收这三个字段，confirmPassword 在前端表单完成校验后不需要传入 API）
  */
 export interface RegisterParams {
   mobile: string;
   code: string;
   password: string;
-  nickname: string;
 }
 
 /**
- * 注册响应
+ * 用户信息 DTO（注册响应返回，与后端保持一致）
+ */
+export interface UserDto {
+  id: string;
+  username: string;
+  email?: string;
+  avatar?: string;
+  nickname?: string;
+}
+
+/**
+ * 注册响应（与后端 RegisterResponseDto 保持一致）
  */
 export interface RegisterResponse {
-  success: boolean;
-  token?: string;
-  message?: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  user: UserDto;
 }
 
 /**
@@ -114,8 +125,14 @@ export const userApi = {
 
   /**
    * 用户注册
+   * 前端表单完成验证码和密码确认校验后，仅发送 mobile + password 给后端（与后端接口对齐）
    */
   register: async (params: RegisterParams): Promise<RegisterResponse> => {
-    return await api.post('/api/v1/auth/register', params);
+    // 只提取后端需要的字段，code 留在前端做校验
+    const requestBody = {
+      mobile: params.mobile,
+      password: params.password,
+    };
+    return await api.post('/api/v1/auth/register', requestBody);
   },
 };

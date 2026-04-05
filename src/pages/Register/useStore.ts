@@ -1,14 +1,6 @@
 import { useLocalObservable } from 'mobx-react';
+import api from '@/api';
 import type { RegisterFormData } from './schema';
-
-/**
- * 注册 API 响应类型
- */
-export interface RegisterApiResponse {
-  success: boolean;
-  token?: string;
-  message?: string;
-}
 
 /**
  * 注册页面状态管理接口
@@ -28,31 +20,11 @@ export interface RegisterStoreType {
   startCountdown: () => void;
 
   // 业务方法
-  register: (formData: RegisterFormData) => Promise<RegisterApiResponse>;
+  register: (
+    formData: RegisterFormData,
+  ) => Promise<{ success: boolean; message?: string }>;
   sendCode: (mobile: string) => Promise<boolean>;
 }
-
-/**
- * 模拟注册 API 请求
- * @param formData - 注册表单数据
- * @returns Promise<RegisterApiResponse>
- */
-const mockRegisterApi = async (
-  formData: RegisterFormData,
-): Promise<RegisterApiResponse> => {
-  // 模拟网络请求
-  await new Promise(resolve => setTimeout(resolve, 800));
-
-  // 这里可以添加模拟验证逻辑
-  console.log('Mock register API called with:', formData);
-
-  // 默认返回成功
-  return {
-    success: true,
-    token: 'mock-jwt-token-' + Date.now(),
-    message: 'Registration successful',
-  };
-};
 
 /**
  * 模拟发送验证码 API 请求
@@ -125,7 +97,7 @@ export const useRegisterStore = () => {
     },
 
     /**
-     * 注册处理
+     * 注册处理 - 改用真实 API
      * @param formData - 表单数据（已通过验证）
      * @returns Promise
      */
@@ -133,13 +105,35 @@ export const useRegisterStore = () => {
       this.isLoading = true;
 
       try {
-        const result = await mockRegisterApi(formData);
+        // 提取 API 需要的字段，confirmPassword 丢弃（已在前端完成校验）
+        const params = {
+          mobile: formData.mobile,
+          code: formData.code,
+          password: formData.password,
+        };
+
+        // 调用真实 API
+        const result = await api.user.register(params);
+
+        // 保存 token 和用户信息到 localStorage
+        localStorage.setItem('accessToken', result.accessToken);
+        localStorage.setItem('refreshToken', result.refreshToken);
+        localStorage.setItem('userInfo', JSON.stringify(result.user));
+
         this.isLoading = false;
-        return result;
+
+        return {
+          success: true,
+          message: 'Registration successful',
+        };
       } catch (error) {
         console.error('Registration failed:', error);
         this.isLoading = false;
-        throw error;
+        return {
+          success: false,
+          message:
+            error instanceof Error ? error.message : 'Registration failed',
+        };
       }
     },
 

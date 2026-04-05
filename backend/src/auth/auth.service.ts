@@ -2,29 +2,31 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 interface User {
-  id: number;
+  id: string;
   username: string;
-  passwordHash: string;
+  password_hash: string;
   email: string | null;
-  avatar: string | null;
   nickname: string | null;
-  status: number;
-  loginAttempts: number;
-  lockedUntil: Date | null;
-  lastLoginAt: Date | null;
-  lastLoginIp: string | null;
+  avatar: string | null;
+  is_active: boolean;
+  created_at: bigint;
+  updated_at: bigint;
 }
 
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { UserDto } from './dto/user.dto';
+import { RegisterDto } from './dto/register.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 /**
  * 认证错误码
@@ -49,7 +51,10 @@ export class AuthService {
   private readonly maxLoginAttempts: number;
   private readonly lockDuration: number;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
+  ) {
     // 从环境变量读取 JWT 配置和其他配置
     this.jwtSecret =
       this.configService.get<string>('JWT_SECRET') || 'default-secret';
@@ -75,6 +80,87 @@ export class AuthService {
   }
 
   /**
+   * 用户注册
+   * @param registerDto - 注册请求数据
+   * @param clientIp - 客户端 IP
+   * @returns 注册响应数据（包含登录令牌）
+   */
+  async register(
+    registerDto: RegisterDto,
+    clientIp: string,
+  ): Promise<RegisterResponseDto> {
+    const { mobile, password } = registerDto;
+
+    // 检查手机号是否已注册（手机号存在 username 字段）
+    const existingUser = await this.prismaService.users.findUnique({
+      where: { username: mobile },
+    });
+
+    if (existingUser) {
+      throw new ConflictException({
+        code: 'MOBILE_ALREADY_REGISTERED',
+        message: '手机号已注册',
+      });
+    }
+
+    // 查找最后一个用户获取最大 ID 并递增
+    const lastUser = await this.prismaService.users.findFirst({
+      orderBy: { id: 'desc' },
+      select: { id: true },
+    });
+
+    // 解析生成新 ID
+    let nextNumber = 1;
+    if (lastUser?.id) {
+      const match = lastUser.id.match(/^author-(\d+)$/);
+      if (match) {
+        nextNumber = parseInt(match[1], 10) + 1;
+      }
+    }
+    const newId = `author-${nextNumber}`;
+
+    // 加密密码
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // 创建用户
+    const now = BigInt(Date.now());
+    const user = await this.prismaService.users.create({
+      data: {
+        id: newId,
+        username: mobile,
+        password_hash: passwordHash,
+        email: null,
+        nickname: null,
+        avatar: null,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+      },
+    });
+
+    // 生成 Token
+    const accessToken = this.generateAccessToken(user.id, clientIp);
+    const refreshToken = this.generateRefreshToken(user.id, clientIp);
+    await this.saveRefreshToken(user.id, refreshToken, clientIp);
+
+    // 组装响应
+    const userDto: UserDto = {
+      id: user.id,
+      username: user.username,
+      email: user.email ?? undefined,
+      avatar: user.avatar ?? undefined,
+      nickname: user.nickname ?? undefined,
+    };
+
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.tokenExpiresIn,
+      user: userDto,
+    };
+  }
+
+  /**
    * 用户登录
    * @param loginDto - 登录请求数据
    * @param clientIp - 客户端 IP
@@ -83,7 +169,7 @@ export class AuthService {
   async login(loginDto: LoginDto, clientIp: string): Promise<LoginResponseDto> {
     const { username, password } = loginDto;
 
-    // TODO: 从数据库查找用户
+    // 从数据库查找用户
     const user = await this.findUserByUsername(username);
     console.log(user);
 
@@ -95,26 +181,15 @@ export class AuthService {
     }
 
     // 检查用户状态
-    if (user.status === 0) {
+    if (!user.is_active) {
       throw new ForbiddenException({
         code: AuthErrorCode.USER_DISABLED,
         message: '用户已被禁用',
       });
     }
 
-    // 检查锁定状态
-    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-      const remainingMinutes = Math.ceil(
-        (new Date(user.lockedUntil).getTime() - Date.now()) / 60000,
-      );
-      throw new ForbiddenException({
-        code: AuthErrorCode.USER_LOCKED,
-        message: `账号已被锁定，请 ${remainingMinutes} 分钟后重试`,
-      });
-    }
-
     // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordValid) {
       // 增加登录失败次数
@@ -160,7 +235,7 @@ export class AuthService {
     try {
       // 验证刷新令牌
       const payload = jwt.verify(refreshToken, this.jwtRefreshSecret) as {
-        userId: number;
+        userId: string;
         deviceId: string;
       };
 
@@ -195,7 +270,7 @@ export class AuthService {
    * 用户登出
    * @param userId - 用户 ID
    */
-  async logout(userId: number) {
+  async logout(userId: string) {
     // 删除所有刷新令牌
     await this.deleteAllRefreshTokens(userId);
   }
@@ -206,7 +281,7 @@ export class AuthService {
    * @param deviceId - 设备 ID
    * @returns JWT 访问令牌
    */
-  private generateAccessToken(userId: number, deviceId: string): string {
+  private generateAccessToken(userId: string, deviceId: string): string {
     return jwt.sign(
       {
         userId,
@@ -226,7 +301,7 @@ export class AuthService {
    * @param deviceId - 设备 ID
    * @returns JWT 刷新令牌
    */
-  private generateRefreshToken(userId: number, deviceId: string): string {
+  private generateRefreshToken(userId: string, deviceId: string): string {
     return jwt.sign(
       {
         userId,
@@ -245,13 +320,9 @@ export class AuthService {
    * @param user - 用户对象
    * @param clientIp - 客户端 IP
    */
-  private async handleLoginSuccess(user: User, clientIp: string) {
-    // TODO: 更新用户登录信息
-    user.loginAttempts = 0;
-    user.lockedUntil = null;
-    user.lastLoginAt = new Date();
-    user.lastLoginIp = clientIp;
-    // await user.save();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleLoginSuccess(_user: User, _clientIp: string) {
+    // 登录锁定功能未在数据库表中设计，暂不实现
     return Promise.resolve();
   }
 
@@ -259,43 +330,51 @@ export class AuthService {
    * 处理登录失败
    * @param user - 用户对象
    */
-  private async handleLoginFailure(user: User) {
-    user.loginAttempts = (user.loginAttempts || 0) + 1;
-
-    // 检查是否需要锁定
-    if (user.loginAttempts >= this.maxLoginAttempts) {
-      user.lockedUntil = new Date(Date.now() + this.lockDuration);
-      user.status = 2; // 锁定状态
-    }
-
-    // TODO: 保存用户状态
-    // await user.save();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async handleLoginFailure(_user: User) {
+    // 登录锁定功能未在数据库表中设计，暂不实现
     return Promise.resolve();
   }
 
   /**
-   * 查找用户（模拟实现）
-   * @param username - 用户名
+   * 从数据库查找用户
+   * @param username - 用户名（手机号）
    * @returns 用户对象
    */
   private async findUserByUsername(username: string): Promise<User | null> {
-    // TODO: 实际应该从数据库查询
-    // 这里是模拟实现
-    if (username === 'admin') {
+    const user = await this.prismaService.users.findUnique({
+      where: { username },
+    });
+
+    if (user) {
       return {
-        id: 1,
-        username: 'admin',
-        passwordHash: await bcrypt.hash('admin123', 12),
-        email: 'admin@example.com',
-        avatar: null,
-        nickname: '管理员',
-        status: 1,
-        loginAttempts: 0,
-        lockedUntil: null,
-        lastLoginAt: null,
-        lastLoginIp: null,
+        id: user.id,
+        username: user.username,
+        password_hash: user.password_hash,
+        email: user.email,
+        nickname: user.nickname,
+        avatar: user.avatar,
+        is_active: user.is_active,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
       };
     }
+
+    // 保留默认 admin 用户用于测试
+    if (username === 'admin') {
+      return {
+        id: 'author-1',
+        username: 'admin',
+        password_hash: await bcrypt.hash('admin123', 12),
+        email: 'admin@example.com',
+        nickname: '管理员',
+        avatar: null,
+        is_active: true,
+        created_at: BigInt(Date.now()),
+        updated_at: BigInt(Date.now()),
+      };
+    }
+
     return null;
   }
 
@@ -306,7 +385,7 @@ export class AuthService {
    * @param deviceId - 设备 ID
    */
   private async saveRefreshToken(
-    userId: number,
+    userId: string,
     token: string,
     deviceId: string,
   ) {
@@ -332,7 +411,7 @@ export class AuthService {
    * 删除所有刷新令牌（模拟实现）
    * @param userId - 用户 ID
    */
-  private async deleteAllRefreshTokens(userId: number) {
+  private async deleteAllRefreshTokens(userId: string) {
     // TODO: 从数据库删除
     console.log(`删除用户 ${userId} 的所有刷新令牌`);
     return Promise.resolve();

@@ -40,7 +40,6 @@ const Register: React.FC = () => {
       code: '',
       password: '',
       confirmPassword: '',
-      nickname: '',
       agreeTerms: false,
     },
   });
@@ -92,9 +91,9 @@ const Register: React.FC = () => {
           icon: 'success',
           content: 'Registration successful!',
         });
-        // 注册成功后跳转到首页或登录页
+        // 注册成功后跳转到首页
         setTimeout(() => {
-          navigate('/login');
+          navigate('/');
         }, 1000);
       } else {
         Toast.show({
@@ -333,40 +332,6 @@ const Register: React.FC = () => {
               {errors.confirmPassword && (
                 <div className={styles.errorText}>
                   {errors.confirmPassword.message}
-                </div>
-              )}
-            </div>
-
-            {/* 昵称输入框 */}
-            <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="nickname">
-                Nickname
-              </label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                </span>
-                <input
-                  id="nickname"
-                  type="text"
-                  placeholder="Enter your nickname"
-                  maxLength={20}
-                  className={styles.input}
-                  {...register('nickname')}
-                  disabled={store.isLoading || isSubmitting}
-                />
-              </div>
-              {errors.nickname && (
-                <div className={styles.errorText}>
-                  {errors.nickname.message}
                 </div>
               )}
             </div>

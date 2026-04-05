@@ -3,6 +3,7 @@
  * @description 移动端用户登录页面，包含手机号/用户名、密码输入、协议勾选等功能
  */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useObserver } from 'mobx-react';
@@ -11,7 +12,6 @@ import { useLoginStore } from './useStore';
 import { loginSchema, type LoginFormData } from './schema';
 import {
   handleForgotPassword,
-  handleRegister,
   handleUserAgreement,
   handlePrivacyPolicy,
 } from './handle';
@@ -22,6 +22,7 @@ import styles from './index.module.scss';
  */
 const Login: React.FC = () => {
   const store = useLoginStore();
+  const navigate = useNavigate();
 
   // 使用 react-hook-form 管理表单状态和验证
   const {
@@ -41,6 +42,13 @@ const Login: React.FC = () => {
 
   // 监听协议勾选状态
   const agreeTerms = watch('agreeTerms');
+
+  /**
+   * 跳转到注册页面
+   */
+  const goToRegister = () => {
+    navigate('/register');
+  };
 
   /**
    * 处理登录提交
@@ -250,10 +258,20 @@ const Login: React.FC = () => {
             >
               {store.isLoading || isSubmitting ? 'Logging in...' : 'Login'}
             </button>
+
+            {/* 注册按钮 */}
+            <button
+              type="button"
+              className={styles.registerButton}
+              disabled={store.isLoading || isSubmitting}
+              onClick={goToRegister}
+            >
+              Sign Up
+            </button>
           </form>
         </div>
 
-        {/* 底部注册链接 */}
+        {/* 底部注册提示 */}
         <div className={styles.footerSection}>
           <span className={styles.registerText}>
             Don't have an account?
@@ -262,7 +280,7 @@ const Login: React.FC = () => {
               className={styles.registerLink}
               onClick={e => {
                 e.preventDefault();
-                handleRegister();
+                goToRegister();
               }}
             >
               Sign Up
