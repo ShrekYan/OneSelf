@@ -4,10 +4,6 @@ import { Toast } from 'antd-mobile';
  * 处理忘记密码点击
  */
 export const handleForgotPassword = (): void => {
-  Toast.show({
-    content: 'Navigate to forgot password page',
-    position: 'bottom',
-  });
   console.log('Navigate to forgot password page');
 };
 

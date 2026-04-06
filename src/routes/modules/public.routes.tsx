@@ -10,6 +10,7 @@ import { RouteInterceptor } from '@/routes/components/RouteInterceptor';
 
 const Login = React.lazy(() => import('@/pages/Login'));
 const Register = React.lazy(() => import('@/pages/Register'));
+const ForgotPassword = React.lazy(() => import('@/pages/ForgotPassword'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
 const About = React.lazy(() => import('@/pages/About'));
 const Help = React.lazy(() => import('@/pages/Help'));
@@ -86,6 +87,26 @@ const publicRoutes: RouteConfig[] = [
     ),
     handle: {
       pageName: '注册',
+      keepAlive: false,
+    },
+  },
+  {
+    path: '/forgot-password',
+    element: (
+      <RouteInterceptor
+        routeConfig={{
+          path: '/forgot-password',
+          pageName: '忘记密码',
+          keepAlive: false,
+        }}
+      >
+        <KeepAliveLayout keepAlive={false} cacheKey="/forgot-password">
+          <ForgotPassword />
+        </KeepAliveLayout>
+      </RouteInterceptor>
+    ),
+    handle: {
+      pageName: '忘记密码',
       keepAlive: false,
     },
   },

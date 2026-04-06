@@ -51,6 +51,13 @@ const Login: React.FC = () => {
   };
 
   /**
+   * 跳转到忘记密码页面
+   */
+  const goToForgotPassword = () => {
+    navigate('/forgot-password');
+  };
+
+  /**
    * 处理登录提交
    * 表单验证通过后调用登录 API
    */
@@ -208,6 +215,7 @@ const Login: React.FC = () => {
                 onClick={e => {
                   e.preventDefault();
                   handleForgotPassword();
+                  goToForgotPassword();
                 }}
               >
                 Forgot Password

@@ -1,32 +1,26 @@
 import { useLocalObservable } from 'mobx-react';
-import type { Step2FormData, Step3FormData } from './schema';
+import type { ForgotPasswordFormData } from './schema';
 
 /**
  * 忘记密码页面状态管理接口
  */
 export interface ForgotPasswordStoreType {
   // 状态数据
-  currentStep: 1 | 2 | 3;
   isLoading: boolean;
   showPassword: boolean;
   showConfirmPassword: boolean;
   countdown: number;
-  mobile: string;
 
   // Setter 方法
-  setCurrentStep: (step: 1 | 2 | 3) => void;
   setLoading: (loading: boolean) => void;
   togglePasswordVisibility: () => void;
   toggleConfirmPasswordVisibility: () => void;
   setCountdown: (seconds: number) => void;
-  setMobile: (mobile: string) => void;
   startCountdown: () => void;
-  goToPrevStep: () => void;
 
   // 业务方法
   sendCode: (mobile: string) => Promise<boolean>;
-  verifyCode: (data: Step2FormData) => Promise<boolean>;
-  resetPassword: (data: Step3FormData) => Promise<boolean>;
+  submitResetPassword: (data: ForgotPasswordFormData) => Promise<boolean>;
 }
 
 /**
@@ -48,30 +42,27 @@ const mockSendCodeApi = async (mobile: string): Promise<boolean> => {
 };
 
 /**
- * 模拟验证验证码 API 请求
- * @param code - 验证码
+ * 模拟验证验证码 + 重置密码 API 请求
+ * @param data - 完整表单数据
  * @returns Promise<boolean>
  */
-const mockVerifyCodeApi = async (code: string): Promise<boolean> => {
-  // 模拟网络请求
-  await new Promise(resolve => setTimeout(resolve, 800));
-
-  console.log('Mock verify code API called with code:', code);
-  const savedCode = localStorage.getItem('forgotPasswordCode');
-
-  return code === savedCode;
-};
-
-/**
- * 模拟重置密码 API 请求
- * @param password - 新密码
- * @returns Promise<boolean>
- */
-const mockResetPasswordApi = async (password: string): Promise<boolean> => {
+const mockResetPasswordApi = async (
+  data: ForgotPasswordFormData,
+): Promise<boolean> => {
   // 模拟网络请求
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  console.log('Mock reset password API called with password:', password);
+  console.log('Mock reset password API called with data:', {
+    mobile: data.mobile,
+    code: data.code,
+    passwordLength: data.password.length,
+  });
+
+  // 验证验证码（mock 验证码为 123456）
+  const savedCode = localStorage.getItem('forgotPasswordCode');
+  if (data.code !== savedCode) {
+    return false;
+  }
 
   // 清理 mock 数据
   localStorage.removeItem('forgotPasswordCode');
@@ -83,25 +74,15 @@ const mockResetPasswordApi = async (password: string): Promise<boolean> => {
 
 /**
  * 忘记密码模块状态管理 Hook
- * 使用 MobX 进行状态管理，分三步流程
+ * 使用 MobX 进行状态管理，单页表单
  * 表单验证由 react-hook-form 处理
  */
 export const useForgotPasswordStore = () => {
   const store = useLocalObservable<ForgotPasswordStoreType>(() => ({
-    currentStep: 1,
     isLoading: false,
     showPassword: false,
     showConfirmPassword: false,
     countdown: 0,
-    mobile: '',
-
-    /**
-     * 设置当前步骤
-     * @param step - 步骤号
-     */
-    setCurrentStep(step: 1 | 2 | 3) {
-      this.currentStep = step;
-    },
 
     /**
      * 设置加载状态
@@ -134,14 +115,6 @@ export const useForgotPasswordStore = () => {
     },
 
     /**
-     * 设置手机号
-     * @param mobile - 手机号
-     */
-    setMobile(mobile: string) {
-      this.mobile = mobile;
-    },
-
-    /**
      * 开始倒计时
      */
     startCountdown() {
@@ -152,17 +125,6 @@ export const useForgotPasswordStore = () => {
           clearInterval(timer);
         }
       }, 1000);
-    },
-
-    /**
-     * 返回到上一步
-     */
-    goToPrevStep() {
-      if (this.currentStep === 2) {
-        this.currentStep = 1;
-      } else if (this.currentStep === 3) {
-        this.currentStep = 2;
-      }
     },
 
     /**
@@ -177,7 +139,6 @@ export const useForgotPasswordStore = () => {
         const result = await mockSendCodeApi(mobile);
         this.isLoading = false;
         if (result) {
-          this.setMobile(mobile);
           this.startCountdown();
         }
         return result;
@@ -189,37 +150,15 @@ export const useForgotPasswordStore = () => {
     },
 
     /**
-     * 验证验证码，通过后进入下一步
-     * @param data - 表单数据（已通过验证）
+     * 提交重置密码请求（验证验证码 + 重置密码）
+     * @param data - 完整表单数据（已通过验证）
      * @returns Promise<boolean>
      */
-    async verifyCode(data: Step2FormData) {
+    async submitResetPassword(data: ForgotPasswordFormData) {
       this.isLoading = true;
 
       try {
-        const result = await mockVerifyCodeApi(data.code);
-        this.isLoading = false;
-        if (result) {
-          this.setCurrentStep(3);
-        }
-        return result;
-      } catch (error) {
-        console.error('Verify code failed:', error);
-        this.isLoading = false;
-        throw error;
-      }
-    },
-
-    /**
-     * 重置密码
-     * @param data - 表单数据（已通过验证）
-     * @returns Promise<boolean>
-     */
-    async resetPassword(data: Step3FormData) {
-      this.isLoading = true;
-
-      try {
-        const result = await mockResetPasswordApi(data.password);
+        const result = await mockResetPasswordApi(data);
         this.isLoading = false;
         return result;
       } catch (error) {
