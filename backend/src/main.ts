@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
@@ -29,6 +30,9 @@ async function bootstrap() {
   );
 
   // 全局异常过滤器
+  // 业务异常过滤器（优先处理 BusinessException）
+  app.useGlobalFilters(new BusinessExceptionFilter());
+  // 兜底所有其他异常
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // 全局响应拦截器

@@ -9,7 +9,6 @@ import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards';
-import { ApiResult } from '../common/result/api-result';
 
 /**
  * 认证控制器
@@ -51,7 +50,7 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Ip() clientIp: string,
-  ): Promise<ApiResult<LoginResponseDto>> {
+  ): Promise<LoginResponseDto> {
     return this.authService.login(loginDto, clientIp);
   }
 
@@ -112,7 +111,7 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDto,
     @Ip() clientIp: string,
-  ): Promise<ApiResult<RegisterResponseDto>> {
+  ): Promise<RegisterResponseDto> {
     return this.authService.register(registerDto, clientIp);
   }
 }

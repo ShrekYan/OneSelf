@@ -1,10 +1,10 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import { ApiResult } from '../common/result/api-result';
+import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
 
 interface User {
@@ -86,7 +86,7 @@ export class AuthService {
   async register(
     registerDto: RegisterDto,
     clientIp: string,
-  ): Promise<ApiResult<RegisterResponseDto>> {
+  ): Promise<RegisterResponseDto> {
     const { mobile, password } = registerDto;
 
     // 检查手机号是否已注册（手机号存在 username 字段）
@@ -95,7 +95,9 @@ export class AuthService {
     });
 
     if (existingUser) {
-      return ApiResult.error(BusinessErrorCode.AUTH_MOBILE_ALREADY_REGISTERED);
+      throw new BusinessException(
+        BusinessErrorCode.AUTH_MOBILE_ALREADY_REGISTERED,
+      );
     }
 
     // 查找最后一个用户获取最大 ID 并递增
@@ -147,12 +149,13 @@ export class AuthService {
       nickname: user.nickname ?? undefined,
     };
 
-    return ApiResult.success({
+    // 直接返回数据，TransformInterceptor 会自动包装成 ApiResult.success
+    return {
       accessToken,
       refreshToken,
       expiresIn: this.tokenExpiresIn,
       user: userDto,
-    });
+    };
   }
 
   /**
@@ -161,22 +164,19 @@ export class AuthService {
    * @param clientIp - 客户端 IP
    * @returns 登录响应数据
    */
-  async login(
-    loginDto: LoginDto,
-    clientIp: string,
-  ): Promise<ApiResult<LoginResponseDto>> {
+  async login(loginDto: LoginDto, clientIp: string): Promise<LoginResponseDto> {
     const { username, password } = loginDto;
 
     // 从数据库查找用户
     const user = await this.findUserByUsername(username);
 
     if (!user) {
-      return ApiResult.error(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
+      throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
     // 检查用户状态
     if (!user.is_active) {
-      return ApiResult.error(BusinessErrorCode.AUTH_USER_DISABLED);
+      throw new BusinessException(BusinessErrorCode.AUTH_USER_DISABLED);
     }
 
     // 验证密码
@@ -185,7 +185,7 @@ export class AuthService {
     if (!isPasswordValid) {
       // 增加登录失败次数
       await this.handleLoginFailure(user);
-      return ApiResult.error(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
+      throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
     // 重置登录失败次数
@@ -206,12 +206,13 @@ export class AuthService {
       nickname: user.nickname ?? undefined,
     };
 
-    return ApiResult.success({
+    // 直接返回数据，TransformInterceptor 会自动包装成 ApiResult.success
+    return {
       accessToken,
       refreshToken,
       expiresIn: this.tokenExpiresIn,
       user: userDto,
-    });
+    };
   }
 
   /**
@@ -230,12 +231,10 @@ export class AuthService {
       // 检查刷新令牌是否有效
       const isValid = await this.validateRefreshToken(refreshToken);
       if (!isValid) {
-        throw new HttpException(
-          {
-            code: 'INVALID_REFRESH_TOKEN',
-            message: '刷新令牌无效或已过期',
-          },
-          410,
+        throw new BusinessException(
+          BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN,
+          undefined,
+          HttpStatus.GONE, // 保持原来的 410 状态码
         );
       }
 
@@ -250,12 +249,10 @@ export class AuthService {
         expiresIn: this.tokenExpiresIn,
       };
     } catch {
-      throw new HttpException(
-        {
-          code: 'INVALID_REFRESH_TOKEN',
-          message: '刷新令牌无效或已过期',
-        },
-        410,
+      throw new BusinessException(
+        BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN,
+        undefined,
+        HttpStatus.GONE, // 保持原来的 410 状态码
       );
     }
   }
