@@ -66,6 +66,8 @@ model Articles {
   @@index([is_published], map: "idx_is_published")
   @@index([is_top], map: "idx_is_top")
   @@index([published_at], map: "idx_published_at")
+  articleContentBlocks ArticleContentBlocks[]
+
   @@map("articles")
 }
 
@@ -100,4 +102,20 @@ model Users {
   refresh_tokens RefreshTokens[]
   @@map("users")
   @@index([is_active], map: "idx_is_active")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ArticleContentBlocks {
+  id          String   @id @db.VarChar(36)
+  articleId   String   @db.VarChar(36)
+  blockType   String   @db.VarChar(20)
+  content     String   @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   BigInt
+  updatedAt   BigInt
+  articles    Articles @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@index([articleId], map: "idx_article_id")
+  @@index([articleId, sortOrder], map: "idx_sort_order")
+  @@map("article_content_blocks")
 }

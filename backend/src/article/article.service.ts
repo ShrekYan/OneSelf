@@ -13,12 +13,8 @@ import {
   GetArticleDetailRequestDto,
   ArticleDetailDto,
 } from './dto';
-import {
-  MOCK_ARTICLES,
-  USER_LIKE_MAP,
-  DEFAULT_USER_ID,
-  generateMockContent,
-} from './mock';
+import { MOCK_ARTICLES, USER_LIKE_MAP, DEFAULT_USER_ID } from './mock';
+import { convertArticleContentBlocks } from './utils/article-content.converter';
 
 @Injectable()
 export class ArticleService {
@@ -171,52 +167,110 @@ export class ArticleService {
     });
   }
 
-  getArticleDetail(
+  async getArticleDetail(
     query: GetArticleDetailRequestDto,
   ): Promise<ArticleDetailDto> {
     const { id } = query;
 
-    // 查找文章
-    const articleIndex = MOCK_ARTICLES.findIndex((a) => a.id === id);
-    if (articleIndex === -1) {
-      // 用户要求：找不到返回空对象
+    // 联合查询文章 + 分类 + 内容块
+    const article = await this.prisma.articles.findUnique({
+      where: { id },
+      include: {
+        categories: true,
+        articleContentBlocks: true,
+      },
+    });
+
+    // 找不到文章返回空对象（保持现有行为）
+    if (!article) {
       return Promise.resolve({} as ArticleDetailDto);
     }
 
-    const article = MOCK_ARTICLES[articleIndex];
+    // 异步递增阅读量（原子操作），不等待返回提升响应速度
+    this.prisma.articles
+      .update({
+        where: { id },
+        data: { views: { increment: 1 } },
+      })
+      .catch((err) => {
+        console.error('递增阅读量失败:', err);
+      });
 
-    // 增加阅读量计数（内存修改，保持统计）
-    article.views += 1;
-    MOCK_ARTICLES[articleIndex] = { ...article };
+    // tags 转换：逗号分隔字符串 -> string[]
+    const tags: string[] = article.tags
+      ? article.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
 
-    // 获取当前用户点赞状态
-    const userLikeSet = USER_LIKE_MAP.get(DEFAULT_USER_ID);
-    const isLiked = userLikeSet?.has(id) ?? false;
+    // 时间戳转换：BigInt -> ISO 字符串
+    const publishedAtStr = new Date(Number(article.published_at)).toISOString();
+    const updatedAtStr = article.updated_at
+      ? new Date(Number(article.updated_at)).toISOString()
+      : undefined;
 
-    // 生成结构化的 mock 内容
-    const content = generateMockContent(article.title, article.tags || []);
+    // 转换内容块为 DTO 格式
+    const content = convertArticleContentBlocks(article.articleContentBlocks);
 
-    // 组装完整详情，匹配前端期望的数据结构
+    // 组装完整 DTO
     const detail: ArticleDetailDto = {
-      ...article,
-      // author 嵌套对象（提供默认值满足类型检查）
-      author: {
-        name: article.authorName ?? '未知作者',
-        avatar: article.authorAvatar ?? 'https://picsum.photos/100/100?default',
+      // 基础字段
+      id: article.id,
+      title: article.title,
+      summary: article.summary ?? undefined,
+      coverUrl: article.cover_url ?? undefined,
+
+      // 分类信息（来自关联表）
+      category: {
+        id: article.categories.id,
+        name: article.categories.name,
       },
-      // publishAt 字段名匹配前端
-      publishAt: article.publishedAt,
-      // 结构化内容数组
+
+      // 作者信息
+      authorId: article.author_id,
+      authorName: article.author_name ?? undefined,
+      authorAvatar: article.author_avatar ?? undefined,
+
+      // 作者嵌套对象（DTO 需要）
+      author: {
+        name: article.author_name || '未知作者',
+        avatar:
+          article.author_avatar || 'https://picsum.photos/100/100?default',
+      },
+
+      // tags 转换后
+      tags,
+
+      // 统计数据（views + 1 因为已经递增，返回最新值给前端
+      views: article.views + 1,
+      likes: article.likes,
+      commentsCount: article.comments_count,
+
+      // 布尔字段
+      isTop: article.is_top,
+      readTime: article.read_time ?? undefined,
+
+      // 时间字段：两个字段都需要（publishedAt 继承自基类，publishAt 在 DTO 新增）
+      publishedAt: publishedAtStr,
+      publishAt: publishedAtStr,
+
+      // 更新时间
+      updatedAt: updatedAtStr,
+
+      // 转换后的内容块
       content,
-      // 点赞状态
-      isLiked,
-      // 默认未收藏
+
+      // 用户交互状态（默认值）
+      isLiked: false,
       isCollected: false,
-      // SEO 关键词从 tags 生成
-      seoKeywords: article.tags,
+
+      // SEO 字段
+      seoKeywords: tags,
+      seoDescription: article.summary ?? undefined,
     };
 
-    return Promise.resolve(detail);
+    return detail;
   }
 
   private sortArticles(
