@@ -5,8 +5,9 @@
 ## 严格模式
 
 - 开启 `strict: true`，必须遵守严格模式
-- 禁止使用 `@ts-ignore`，禁止 `// @ts-expect-error`
-- 禁止使用 `any`，优先使用 `unknown` 或具体类型
+- 禁止使用 `@ts-ignore`，禁止 `// @ts-expect-error` 除非真的必要
+- **ESLint 配置**: 当前项目 `no-explicit-any` 设为 warning（而非 error），允许必要时使用 any
+- **推荐实践**: 仍然尽量避免使用 `any`，优先使用 `unknown` 或具体类型。只有在和 Prisma 类型系统冲突等特殊场景才使用 any。
 
 ## 类型声明
 

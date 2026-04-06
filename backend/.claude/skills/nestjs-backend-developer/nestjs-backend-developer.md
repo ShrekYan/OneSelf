@@ -17,6 +17,7 @@ include: 06-api-documentation.md
 include: 07-error-handling.md
 include: 08-checklist.md
 include: 09-prisma-orm.md
+include: 10-code-format.md
 
 <!-- 引用基础规范 -->
 include: ../../rules/typescript.md

@@ -45,9 +45,11 @@ export class ArticleController {
 - 所有方法必须显式声明返回类型 `Promise<ResponseDto>`
 - Controller 方法不需要 `async`/`await`，直接返回 Service Promise
 - 不需要捕获异常，让全局异常过滤器处理
+- **自动包装**: `TransformInterceptor` 会自动将返回的 DTO 包装为标准 `ApiResult` 格式
+- 如果需要返回业务错误，手动返回 `ApiResult.error()`
 
 ```typescript
-// ✅ 正确
+// ✅ 正确 - 直接返回数据，拦截器自动包装
 @Get('list')
 @ApiOperation({ summary: '分页查询文章列表' })
 queryArticleList(
@@ -59,6 +61,26 @@ queryArticleList(
 // ❌ 不必要的 async/await
 async queryArticleList(...) {
   return await this.articleService.queryArticleList(query);
+}
+```
+
+### 依赖注入 PrismaService
+
+`PrismaModule` 是全局模块，所有模块可以直接注入：
+
+```typescript
+@Injectable()
+export class ArticleService {
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
+
+  async queryList(params: QueryArticleListDto): Promise<ArticleListResponseDto> {
+    // 直接使用 this.prisma 进行数据库操作
+    const articles = await this.prisma.articles.findMany({
+      where: { ... },
+    });
+  }
 }
 ```
 

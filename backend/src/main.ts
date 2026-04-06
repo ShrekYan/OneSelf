@@ -30,10 +30,9 @@ async function bootstrap() {
   );
 
   // 全局异常过滤器
-  // 业务异常过滤器（优先处理 BusinessException）
-  app.useGlobalFilters(new BusinessExceptionFilter());
-  // 兜底所有其他异常
+  // 先注册兜底异常，再注册具体异常（NestJS 倒序匹配，后注册优先级更高）
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new BusinessExceptionFilter());
 
   // 全局响应拦截器
   app.useGlobalInterceptors(new TransformInterceptor());

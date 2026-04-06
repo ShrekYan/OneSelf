@@ -62,8 +62,8 @@ getArticleDetail() { ... }
 
 ## 文档访问
 
-- 开发环境文档: `http://localhost:3000/api`
-- Swagger JSON: `http://localhost:3000/api-json`
+- 开发环境文档: `http://localhost:8888/docs`
+- Swagger JSON: `http://localhost:8888/docs-json`
 
 ## 检查点
 

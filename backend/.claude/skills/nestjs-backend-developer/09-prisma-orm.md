@@ -13,10 +13,44 @@
 - 数据库文档: `prisma/` 目录下可存放 `README.md` 说明文档
 
 ### 模型命名
-- **模型名**: PascalCase 单数形式 (`Category`, `Article`, `User`)
-- **表名**: 使用 `@@map()` 指定下划线复数命名 (`@@map("categories")`)
+遵循标准 Prisma 命名约定：
+
+- **模型名**: PascalCase（首字母大写），单数形式表示实体，如 `Article`, `Category`, `User`, `ArticleContentBlock`
+- **表名**: 使用 `@@map("table_name")` 指定下划线复数表名
 - **字段名**: 数据库字段使用下划线命名 (`article_count`, `created_at`)
 - **TypeScript 生成类型**: Prisma 保持 schema 中定义的字段名，需要手动转换到 DTO 驼峰命名
+
+示例：
+```prisma
+/// 文章内容块
+model ArticleContentBlock {
+  /// 块ID
+  id          String          @id @db.VarChar(36)
+  /// 文章ID
+  article_id  String          @db.VarChar(36)
+  /// 块类型
+  block_type  String          @db.VarChar(20)
+  /// 块内容
+  content     String          @db.Text
+  /// 排序
+  sort_order  Int             @default(0)
+  /// 创建时间戳
+  created_at  BigInt
+  /// 更新时间戳
+  updated_at  BigInt
+  /// 关联文章
+  articles    ArticleContent @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@index([article_id], map: "idx_article_id")
+  @@index([article_id, sort_order], map: "idx_sort_order")
+  @@map("article_content_blocks")
+}
+```
+
+这种方式：
+- ✅ TypeScript 可以正确识别 `prisma.articleContentBlock` 属性
+- ✅ 不需要 `as any` 绕过类型检查
+- ✅ 符合 Prisma 社区标准约定
 
 ### 字段规范
 - **主键**: 优先使用字符串 `String @id @db.VarChar(36)` (支持 UUID 或语义ID)
@@ -29,30 +63,30 @@
 - 每个模型必须添加 `///` 文档注释说明用途
 - 每个字段必须添加 `///` 文档注释说明含义
 
-示例：
+示例（参考项目现有 `RefreshTokens` 案例）：
 ```prisma
-/// 文章分类
-model Category {
-  /// 分类ID（字符串ID，如 "frontend"）
+/// 刷新令牌
+model RefreshTokens {
+  /// 令牌ID
   id            String  @id @db.VarChar(36)
-  /// 分类名称
-  name          String  @db.VarChar(50)
-  /// 分类描述（可选）
-  description   String? @db.VarChar(500)
-  /// 分类图标图片URL
-  image_url     String? @db.VarChar(500)
-  /// 文章数量统计
-  article_count Int     @default(0)
-  /// 排序权重
-  sort_order    Int?    @default(0)
-  /// 是否启用
-  is_active     Boolean @default(true)
-  /// 创建时间戳（毫秒）
+  /// 用户ID
+  user_id       String  @db.VarChar(36)
+  /// 刷新令牌值
+  refresh_token String  @unique(map: "uk_refresh_token") @db.VarChar(500)
+  /// 客户端IP
+  client_ip     String  @db.VarChar(50)
+  /// 过期时间戳
+  expires_at    BigInt
+  /// 是否已撤销
+  revoked       Boolean @default(false)
+  /// 创建时间戳
   created_at    BigInt
-  /// 更新时间戳（毫秒）
-  updated_at    BigInt
+  /// 关联用户
+  users         Users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
 
-  @@map("categories")
+  @@index([expires_at], map: "idx_expires_at")
+  @@index([user_id], map: "idx_user_id")
+  @@map("refresh_tokens")
 }
 ```
 
@@ -60,7 +94,13 @@ model Category {
 - 双向关系必须在两端都定义关系字段
 - 外键端使用 `@relation` 指定引用
 - 一对多：一方用 `[]`，多方用单数
-- 级联删除：明确声明 `onDelete: Cascade` 或 `onDelete: SetNull`
+- 级联删除：明确声明 `onDelete: Cascade` 或 `onDelete: Restrict`
+- **外键约束名**: `@relation` 末尾必须添加 `map: "table_name_ibfk_n"`，格式：`{table_name}_{ibfk}_{sequence_number}`
+
+```prisma
+// ✅ 正确
+users Users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+```
 
 ---
 
@@ -301,7 +341,9 @@ const articles = await this.prisma.article.findMany({
 
 ## 检查清单
 - [ ] Schema 中每个模型和字段都有 `///` 文档注释吗？
+- [ ] 模型名 PascalCase，表名使用 `@@map` 指定下划线复数？
 - [ ] 表名和字段名是否遵循下划线命名规范？
+- [ ] 外键关系 `@relation` 是否添加了 `map` 指定外键约束名？
 - [ ] 是否只查询需要的字段（使用 `select`）？
 - [ ] 多个写操作是否使用事务保证原子性？
 - [ ] 是否处理了记录不存在的情况（404）？

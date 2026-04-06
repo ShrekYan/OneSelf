@@ -11,9 +11,11 @@
 | 服务 | `{module-name}.service.ts` | `article.service.ts` |
 | DTO | `{dto-name}.dto.ts` | `query-article-list.dto.ts` |
 | 守卫 | `{guard-name}.guard.ts` | `jwt-auth.guard.ts` |
-| 拦截器 | `{interceptor-name}.interceptor.ts` | `logging.interceptor.ts` |
-| 过滤器 | `{filter-name}.filter.ts` | `http-exception.filter.ts` |
-| 装饰器 | `{decorator-name}.decorator.ts` | `public.decorator.ts` |
+| 拦截器 | `{interceptor-name}.interceptor.ts` | `transform.interceptor.ts` |
+| 过滤器 | `{filter-name}.filter.ts` | `all-exceptions.filter.ts` |
+| 装饰器 | `{decorator-name}.decorator.ts` | `current-user.decorator.ts` |
+| 自定义异常 | `{exception-name}.exception.ts` | `business.exception.ts` |
+| 常量/错误码 | `{name}.ts` | `business-error-codes.ts` |
 | 单元测试 | `{module-name}.controller.spec.ts` | `article.controller.spec.ts` |
 
 ## DTO 命名规范
