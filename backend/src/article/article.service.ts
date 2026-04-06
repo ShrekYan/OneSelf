@@ -171,13 +171,12 @@ export class ArticleService {
     query: GetArticleDetailRequestDto,
   ): Promise<ArticleDetailDto> {
     const { id } = query;
-
     // 联合查询文章 + 分类 + 内容块
     const article = await this.prisma.articles.findUnique({
       where: { id },
       include: {
         categories: true,
-        articleContentBlocks: true,
+        article_content_blocks: true,
       },
     });
 
@@ -211,7 +210,7 @@ export class ArticleService {
       : undefined;
 
     // 转换内容块为 DTO 格式
-    const content = convertArticleContentBlocks(article.articleContentBlocks);
+    const content = convertArticleContentBlocks(article.article_content_blocks);
 
     // 组装完整 DTO
     const detail: ArticleDetailDto = {
@@ -220,12 +219,16 @@ export class ArticleService {
       title: article.title,
       summary: article.summary ?? undefined,
       coverUrl: article.cover_url ?? undefined,
-
-      // 分类信息（来自关联表）
-      category: {
-        id: article.categories.id,
-        name: article.categories.name,
-      },
+      // 分类信息（来自关联表），兼容分类不存在的情况
+      category: article.categories
+        ? {
+            id: article.categories.id,
+            name: article.categories.name,
+          }
+        : {
+            id: '',
+            name: '未分类',
+          },
 
       // 作者信息
       authorId: article.author_id,

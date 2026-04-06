@@ -66,7 +66,7 @@ model Articles {
   @@index([is_published], map: "idx_is_published")
   @@index([is_top], map: "idx_is_top")
   @@index([published_at], map: "idx_published_at")
-  articleContentBlocks ArticleContentBlocks[]
+  article_content_blocks ArticleContentBlocks[]
 
   @@map("articles")
 }
@@ -107,15 +107,15 @@ model Users {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model ArticleContentBlocks {
   id          String   @id @db.VarChar(36)
-  articleId   String   @db.VarChar(36)
-  blockType   String   @db.VarChar(20)
+  article_id  String   @db.VarChar(36)
+  block_type  String   @db.VarChar(20)
   content     String   @db.Text
-  sortOrder   Int      @default(0)
-  createdAt   BigInt
-  updatedAt   BigInt
-  articles    Articles @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  sort_order  Int      @default(0)
+  created_at  BigInt
+  updated_at  BigInt
+  articles    Articles @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
-  @@index([articleId], map: "idx_article_id")
-  @@index([articleId, sortOrder], map: "idx_sort_order")
+  @@index([article_id], map: "idx_article_id")
+  @@index([article_id, sort_order], map: "idx_sort_order")
   @@map("article_content_blocks")
 }

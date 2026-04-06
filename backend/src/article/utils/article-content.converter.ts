@@ -6,14 +6,14 @@ import type { ContentBlock } from '../dto';
  * 处理：按 sortOrder 排序，类型映射，heading 格式解析
  */
 export function convertArticleContentBlocks(
-  blocks: ArticleContentBlocks[],
+  blocks: ArticleContentBlocks[] | undefined,
 ): ContentBlock[] {
-  return blocks
-    .sort((a, b) => a.sortOrder - b.sortOrder)
+  return (blocks ?? [])
+    .sort((a, b) => a.sort_order - b.sort_order)
     .map((block): ContentBlock => {
-      const { blockType, content } = block;
+      const { block_type, content } = block;
 
-      switch (blockType) {
+      switch (block_type) {
         case 'heading': {
           // 预期格式: "2:这是二级标题"
           const parts = content.split(':', 2);
