@@ -3,6 +3,7 @@
  * @description 用户信息、个人中心相关接口
  */
 import { api } from '@/api';
+import type { RequestConfig } from '@/api/core/types';
 
 /**
  * 用户统计数据接口
@@ -140,20 +141,26 @@ export const userApi = {
    * 用户注册
    * 前端表单完成验证码和密码确认校验后，仅发送 mobile + password 给后端（与后端接口对齐）
    */
-  register: async (params: RegisterParams): Promise<RegisterResponse> => {
+  register: async (
+    params: RegisterParams,
+    config?: RequestConfig,
+  ): Promise<RegisterResponse> => {
     // 只提取后端需要的字段，code 留在前端做校验
     const requestBody = {
       mobile: params.mobile,
       password: params.password,
     };
-    return await api.post('/api/v1/auth/register', requestBody);
+    return await api.post('/api/v1/auth/register', requestBody, config);
   },
 
   /**
    * 用户登录
    * 与后端 LoginDto 保持一致，发送 username + password
    */
-  login: async (data: LoginRequest): Promise<LoginResponse> => {
-    return await api.post('/api/v1/auth/login', data);
+  login: async (
+    data: LoginRequest,
+    config?: RequestConfig,
+  ): Promise<LoginResponse> => {
+    return await api.post('/api/v1/auth/login', data, config);
   },
 };

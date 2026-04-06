@@ -57,7 +57,7 @@ const Login: React.FC = () => {
   const onSubmit = handleSubmit(async (formData: LoginFormData) => {
     try {
       const apiResult = await store.login(formData);
-
+      console.log(apiResult);
       if (apiResult.success) {
         Toast.show({
           icon: 'success',
@@ -65,7 +65,7 @@ const Login: React.FC = () => {
         });
         // 这里可以保存 token 并跳转到首页
         setTimeout(() => {
-          window.location.href = '/';
+          navigate('/');
         }, 1000);
       } else {
         Toast.show({

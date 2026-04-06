@@ -61,11 +61,18 @@ export const useLoginStore = () => {
       this.isLoading = true;
 
       try {
-        const result: LoginResponse = await userApi.login({
-          username: formData.username,
-          password: formData.password,
-        });
+        const result: LoginResponse = await userApi.login(
+          {
+            username: formData.username,
+            password: formData.password,
+          },
+          {
+            skipAuth: true, // 登录接口不需要认证
+            skipErrorToast: true, // 不使用拦截器自动提示，我们自己处理
+          },
+        );
 
+        // 拦截器已经过滤，能走到这里说明 code === 200
         // 保存 token 和用户信息到 localStorage（与注册页保持一致）
         localStorage.setItem('accessToken', result.accessToken);
         localStorage.setItem('refreshToken', result.refreshToken);
@@ -78,7 +85,7 @@ export const useLoginStore = () => {
       } catch (error) {
         console.error('Login failed:', error);
         this.isLoading = false;
-        // API 拦截器已经处理了错误提示，这里只需要返回失败
+        // code !== 200 会被拦截器 reject，进入这里
         return {
           success: false,
           message: error instanceof Error ? error.message : 'Login failed',

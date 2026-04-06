@@ -1,15 +1,11 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ForbiddenException,
-  ConflictException,
-  HttpException,
-} from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiResult } from '../common/result/api-result';
+import { BusinessErrorCode } from '../common/constants/business-error-codes';
 
 interface User {
   id: string;
@@ -90,7 +86,7 @@ export class AuthService {
   async register(
     registerDto: RegisterDto,
     clientIp: string,
-  ): Promise<RegisterResponseDto> {
+  ): Promise<ApiResult<RegisterResponseDto>> {
     const { mobile, password } = registerDto;
 
     // 检查手机号是否已注册（手机号存在 username 字段）
@@ -99,10 +95,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException({
-        code: 'MOBILE_ALREADY_REGISTERED',
-        message: '手机号已注册',
-      });
+      return ApiResult.error(BusinessErrorCode.AUTH_MOBILE_ALREADY_REGISTERED);
     }
 
     // 查找最后一个用户获取最大 ID 并递增
@@ -154,12 +147,12 @@ export class AuthService {
       nickname: user.nickname ?? undefined,
     };
 
-    return {
+    return ApiResult.success({
       accessToken,
       refreshToken,
       expiresIn: this.tokenExpiresIn,
       user: userDto,
-    };
+    });
   }
 
   /**
@@ -168,26 +161,22 @@ export class AuthService {
    * @param clientIp - 客户端 IP
    * @returns 登录响应数据
    */
-  async login(loginDto: LoginDto, clientIp: string): Promise<LoginResponseDto> {
+  async login(
+    loginDto: LoginDto,
+    clientIp: string,
+  ): Promise<ApiResult<LoginResponseDto>> {
     const { username, password } = loginDto;
 
     // 从数据库查找用户
     const user = await this.findUserByUsername(username);
-    console.log(user);
 
     if (!user) {
-      throw new UnauthorizedException({
-        code: AuthErrorCode.INVALID_CREDENTIALS,
-        message: '用户名或密码错误',
-      });
+      return ApiResult.error(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
     // 检查用户状态
     if (!user.is_active) {
-      throw new ForbiddenException({
-        code: AuthErrorCode.USER_DISABLED,
-        message: '用户已被禁用',
-      });
+      return ApiResult.error(BusinessErrorCode.AUTH_USER_DISABLED);
     }
 
     // 验证密码
@@ -196,10 +185,7 @@ export class AuthService {
     if (!isPasswordValid) {
       // 增加登录失败次数
       await this.handleLoginFailure(user);
-      throw new UnauthorizedException({
-        code: AuthErrorCode.INVALID_CREDENTIALS,
-        message: '用户名或密码错误',
-      });
+      return ApiResult.error(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
     // 重置登录失败次数
@@ -220,12 +206,12 @@ export class AuthService {
       nickname: user.nickname ?? undefined,
     };
 
-    return {
+    return ApiResult.success({
       accessToken,
       refreshToken,
       expiresIn: this.tokenExpiresIn,
       user: userDto,
-    };
+    });
   }
 
   /**

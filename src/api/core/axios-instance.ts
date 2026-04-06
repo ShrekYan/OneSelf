@@ -76,7 +76,9 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
   }
 
   // 特殊错误码处理
-  if (data.code === 410 || data.code === 1001) {
+  // 只有 410 = token 失效 才需要清除 token 跳转登录
+  // 1001 等业务错误码，即使 code !== 200 也只是业务错误，不需要跳转
+  if (!config.skipAuth && data.code === 410) {
     // 未授权，清除所有 token 并跳转登录
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -235,9 +237,12 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
       case 410:
         errorType = ErrorType.UNAUTHORIZED;
         errorMessage = '未授权，请重新登录';
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        // 只有不需要skipAuth=false 不对，应该是：只有非 skipAuth 才跳转
+        if (!config.skipAuth) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+        }
         break;
 
       case 403:
