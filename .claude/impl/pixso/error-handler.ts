@@ -6,16 +6,16 @@
  * 错误类型枚举
  */
 export type PixsoErrorType =
-  | 'none'              // 无错误
-  | 'unauthorized'      // 未授权 / Token 无效
-  | 'nodeNotFound'      // 节点不存在 / 文件不存在
-  | 'networkError'      // 网络错误 / 超时
-  | 'tokenExceeded'     // Token 超限 - 结果已保存到本地文件
-  | 'rateLimit'         // 频率限制
-  | 'serverError'       // 服务端错误
-  | 'dslWriteError'     // DSL 写入临时文件失败（引号转义问题）
-  | 'dslParseError'     // DSL JSON 解析失败（文件损坏）
-  | 'unknown';          // 未知错误
+  | 'none' // 无错误
+  | 'unauthorized' // 未授权 / Token 无效
+  | 'nodeNotFound' // 节点不存在 / 文件不存在
+  | 'networkError' // 网络错误 / 超时
+  | 'tokenExceeded' // Token 超限 - 结果已保存到本地文件
+  | 'rateLimit' // 频率限制
+  | 'serverError' // 服务端错误
+  | 'dslWriteError' // DSL 写入临时文件失败（引号转义问题）
+  | 'dslParseError' // DSL JSON 解析失败（文件损坏）
+  | 'unknown'; // 未知错误
 
 /**
  * Token 超限错误上下文
@@ -51,6 +51,9 @@ export function shouldRetry(error: ClassifiedError): boolean {
       return retryCount < 1;
     case 'dslWriteError':
       return retryCount < 1;
+    case 'tokenExceeded':
+      // Token 超限但本地文件丢失，允许有限次重试
+      return retryCount < getConfig().tokenExceededMaxRetries;
     default:
       return false;
   }
@@ -205,7 +208,8 @@ export function extractFilePath(errorMessage: string): string | null {
   // - Windows: C:\ 或 D:\ 等盘符开头
   // 文件名格式: mcp-pixso-get_node_dsl-*.txt
   const unixPathRegex = /(\/[^\s]*mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
-  const windowsPathRegex = /([A-Za-z]:\\[^]*mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
+  const windowsPathRegex =
+    /([A-Za-z]:\\[^]*mcp-pixso-get_node_dsl-[0-9]+\.txt)/;
 
   let match = errorMessage.match(unixPathRegex);
   if (match) {
@@ -277,7 +281,21 @@ export function formatUserMessage(error: ClassifiedError): string {
 3. 如果问题持续，请检查 MCP 配置`;
 
     case 'tokenExceeded':
-      return `⚠️ 结果过大超出 Token 限制，正在从本地文件读取: ${error.context?.localFilePath}`;
+      if (shouldRetry(error)) {
+        return `⚠️ Token 超限且本地文件不存在，正在重试获取...`;
+      }
+      return `## ❌ Pixso 调用失败: Token 超限且本地文件不存在
+
+经过 ${error.retryCount + 1} 次尝试，仍然无法获取完整设计文件。
+
+**可能原因**:
+- tmp 目录被系统自动清理
+- MCP 服务端生成文件失败
+- 文件权限问题无法读取
+
+**建议解决方案**:
+1. 等待片刻后手动重新执行 \`/pixso <fileKey> [nodeId]\`
+2. 检查 /tmp 目录读写权限`;
 
     case 'rateLimit':
       if (shouldRetry(error)) {

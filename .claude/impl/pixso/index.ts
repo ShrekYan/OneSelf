@@ -2,7 +2,13 @@
  * Pixso MCP 调用入口 - 整合错误处理、大文件读取、DSL 解析
  */
 
-import { classifyError, ClassifiedError, shouldRetry, getRetryDelay, formatUserMessage } from './error-handler';
+import {
+  classifyError,
+  ClassifiedError,
+  shouldRetry,
+  getRetryDelay,
+  formatUserMessage,
+} from './error-handler';
 import { readLargeFile, checkFileExists } from './large-file-reader';
 import { scaleDimensions, validateDsl, calculateScale } from './dsl-parser';
 import { writeDslSafely, validateDslFile, WriteResult } from './dsl-writer';
@@ -28,7 +34,7 @@ export interface PixsoResult {
  */
 export async function processPixsoResult(
   mcpResult: unknown,
-  errorMessage?: string
+  errorMessage?: string,
 ): Promise<PixsoResult> {
   // 如果 MCP 直接返回成功结果
   if (!errorMessage && mcpResult) {
@@ -47,14 +53,13 @@ export async function processPixsoResult(
     const filePath = error.context.localFilePath;
 
     if (!(await checkFileExists(filePath))) {
-      logger.error(`Local file not found: ${filePath}`);
+      logger.warn(`Local file not found: ${filePath}, will retry`);
+      // 返回失败，由上层 callWithRetry 判断是否重试
+      // shouldRetry 已配置 tokenExceeded 允许有限次重试
       return {
         success: false,
         error,
-        userMessage: formatUserMessage({
-          ...error,
-          message: `文件不存在: ${filePath}`,
-        }),
+        userMessage: formatUserMessage(error),
       };
     }
 
@@ -82,7 +87,10 @@ export async function processPixsoResult(
       };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Failed to read local file`, err instanceof Error ? err : msg);
+      logger.error(
+        `Failed to read local file`,
+        err instanceof Error ? err : msg,
+      );
       return {
         success: false,
         error,
@@ -105,11 +113,9 @@ import { logger } from './logger';
 /**
  * 归一化 DSL 尺寸到项目设计稿标准
  */
-export function normalizeDslDimensions<T extends { width: number; height: number }>(
-  dsl: T,
-  originalDesignWidth: number,
-  targetWidth?: number
-): T {
+export function normalizeDslDimensions<
+  T extends { width: number; height: number },
+>(dsl: T, originalDesignWidth: number, targetWidth?: number): T {
   const config = getConfig();
   const finalTargetWidth = targetWidth ?? config.defaultTargetWidth;
   const scale = calculateScale(originalDesignWidth, finalTargetWidth);
@@ -132,7 +138,9 @@ export function normalizeDslDimensions<T extends { width: number; height: number
     (result as { y: number }).y = scaled.y;
   }
 
-  logger.debug(`Normalized dimensions: ${(dsl as { width: number }).width}x${(dsl as { height: number }).height} -> ${scaled.width}x${scaled.height}`);
+  logger.debug(
+    `Normalized dimensions: ${(dsl as { width: number }).width}x${(dsl as { height: number }).height} -> ${scaled.width}x${scaled.height}`,
+  );
 
   return result;
 }
@@ -149,7 +157,7 @@ export function delay(ms: number): Promise<void> {
  */
 export async function callWithRetry<T>(
   callFn: () => Promise<T>,
-  maxRetries?: number
+  maxRetries?: number,
 ): Promise<{ success: true; data: T } | { success: false; lastError: string }> {
   const config = getConfig();
   const finalMaxRetries = maxRetries ?? config.maxRetries;

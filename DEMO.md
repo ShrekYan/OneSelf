@@ -1,4 +1,49 @@
 # Claude code 自动化流程
+## 自动化生成前端页面
+* 环境和数据准备：
+    * 确保已安装Claude code插件。
+    * 接入pixso的MCP服务
+* 触发方式：
+    * 手动触发方式-/pixso C6uHsX_s0nCfPlWqo6ANRw 2:485 按照设计稿生成前端代码： 
+    * 自动触发方式-使用pixso的MCP服务，根据设计稿生成前端页面代码： https://pixso.cn/app/design/HxbGTl-K7eLdXMJQUV3YCg?item-id=1:137。
+* 相关提示词操作：
+    * 操作一（手动执行）
+        * 动作：手动触发方式-/pixso C6uHsX_s0nCfPlWqo6ANRw 2:485 按照设计稿生成前端代码： 
+            * 功能需求：
+                * 根据设计稿生成前端页面代码，按照750设计稿宽度进行生成代码。
+            * 资源存放
+                * 一定要放在/Users/yanjinqiang/WebstormProjects/claude下
+                * ./src/routes/modules/public.routes.tsx 中定义的路由，路由名称为template77。
+                * 文件存放在./src/pages/template77.tsx
+            * 完成标准：
+                * 字体、颜色、间距等与设计稿一致。
+                * 所有设计稿上的元素都必须存在
+            * 强制工作流程：
+                * 1. 打印完完整树结构，每个节点显示尺寸/位置/颜色/文字
+                * 2. 对照树结构，列出所有需要实现的元素，确认没有遗漏       
+            * 约束条件：
+                * 仅新增前端页面，其他不动。
+                * 不需要添加功能、特效。
+                * 不要参考其他页面的实现。
+    * 操作二（自动执行）
+        * 动作：使用pixso的MCP服务，根据设计稿生成前端页面代码： https://pixso.cn/app/design/HxbGTl-K7eLdXMJQUV3YCg?item-id=1:137。
+            * 功能需求：
+                * 根据设计稿生成前端页面代码，按照750设计稿宽度进行生成代码。
+            * 资源存放
+                 * 一定要放在/Users/yanjinqiang/WebstormProjects/claude下
+                * ./src/routes/modules/public.routes.tsx 中定义的路由，路由名称为Template99。
+                * 文件存放在./src/pages/template99.tsx
+            * 完成标准：
+                * 字体、颜色、间距等与设计稿一致。
+                * 所有设计稿上的元素都必须存在
+            * 强制工作流程：
+                * 1. 打印完完整树结构，每个节点显示尺寸/位置/颜色/文字
+                * 2. 对照树结构，列出所有需要实现的元素，确认没有遗漏  
+                * 3. 写完后，再次对照树结构逐一检查每个节点
+            * 约束条件：
+                * 仅新增前端页面，其他不动。
+                * 不需要添加功能、特效。
+                * 不要参考其他页面的实现。
 
 ## 自动化对接API接口流程
 
@@ -9,7 +54,7 @@
     * 导出postman、yapi、swagger等接口数据，存放在当前项目中。
 * 触发方式：
     * 手动触发方式-@api-parser 帮我解析 @yapi.json 接口文档，输出接口列表
-    * 自动触发方式-帮我解析 @yapi.json 接口文档，输出接口列表
+    * 自动触发方式-帮我解析 yapi.json 接口文档，输出接口列表
 * 相关提示词操作：
     * 操作一（体验版本）：
         * 动作：获取接口分类列表->选择分类接口->查看具体接口的详情->生成前后端API接口以及相关类型

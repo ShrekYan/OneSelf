@@ -15,6 +15,8 @@ export interface PixsoConfig {
   maxRetries: number;
   /** 基础重试延迟（毫秒），默认 1000ms */
   baseRetryDelayMs: number;
+  /** Token 超限场景最大重试次数（文件丢失自动重试），默认 1 */
+  tokenExceededMaxRetries: number;
 }
 
 /**
@@ -25,6 +27,7 @@ const defaultConfig: PixsoConfig = {
   defaultTargetWidth: 750,
   maxRetries: 3,
   baseRetryDelayMs: 1000,
+  tokenExceededMaxRetries: 1,
 };
 
 /**
