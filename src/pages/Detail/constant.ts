@@ -39,7 +39,6 @@ export interface ArticleDetail {
   content: ArticleContentBlock[];
   isLiked?: boolean;
   isCollected?: boolean;
-  isFollowing?: boolean;
   contentHtml?: string;
   markdownContent?: string;
   updatedAt?: string;
@@ -104,5 +103,4 @@ export const mockArticleDetail: ArticleDetail = {
   ],
   isLiked: false,
   isCollected: false,
-  isFollowing: false,
 };

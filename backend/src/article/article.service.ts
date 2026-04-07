@@ -110,22 +110,56 @@ export class ArticleService {
     };
   }
 
-  getFeaturedArticles(): Promise<FeaturedArticleListResponseDto> {
-    // 筛选出置顶文章 = 特色文章，数据来自统一数据源
-    const featuredArticles: FeaturedArticleItemDto[] = MOCK_ARTICLES.filter(
-      (article) => article.isTop === true,
-    ).map(
-      (article) =>
-        ({
-          ...article,
-          // 确保 readTime 存在（兼容旧数据）
-          readTime: article.readTime ?? Math.floor(Math.random() * 10) + 1,
-        }) as FeaturedArticleItemDto,
+  async getFeaturedArticles(): Promise<FeaturedArticleListResponseDto> {
+    // 查询置顶且已发布的文章，按发布时间倒序，限制返回数量
+    const articlesWithCategories =
+      (await // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      (this.prisma as any).articles.findMany({
+        where: {
+          is_top: true,
+          is_published: true,
+        },
+        include: {
+          categories: true,
+        },
+        orderBy: {
+          published_at: 'desc',
+        },
+        take: 5,
+      })) as (Articles & { categories: { id: string; name: string } })[];
+
+    // 转换数据库结果为 DTO 格式（复用与列表查询相同的转换逻辑）
+    const list: FeaturedArticleItemDto[] = articlesWithCategories.map(
+      (article: Articles & { categories: { id: string; name: string } }) => ({
+        id: article.id,
+        title: article.title,
+        summary: article.summary ?? undefined,
+        coverUrl: article.cover_url ?? undefined,
+        category: {
+          id: article.categories.id,
+          name: article.categories.name,
+        },
+        authorId: article.author_id,
+        authorName: article.author_name ?? undefined,
+        authorAvatar: article.author_avatar ?? undefined,
+        tags: article.tags
+          ? article.tags
+              .split(',')
+              .map((t: string) => t.trim())
+              .filter(Boolean)
+          : [],
+        views: article.views,
+        likes: article.likes,
+        commentsCount: article.comments_count,
+        publishedAt: new Date(Number(article.published_at)).toISOString(),
+        isTop: article.is_top,
+        readTime: article.read_time ?? 1,
+      }),
     );
 
-    return Promise.resolve({
-      list: featuredArticles,
-    });
+    return {
+      list,
+    };
   }
 
   toggleLike(body: ToggleLikeRequestDto): Promise<ToggleLikeResponseDto> {

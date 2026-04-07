@@ -109,11 +109,9 @@ const Detail2Page: React.FC = () => {
                   alt={store.article.author.name}
                 />
               </div>
-              {store.article.isFollowing !== false && (
-                <button className={styles.followButton} onClick={handleFollow}>
-                  Follow
-                </button>
-              )}
+              <button className={styles.followButton} onClick={handleFollow}>
+                Follow
+              </button>
             </div>
 
             <hr className={styles.divider} />

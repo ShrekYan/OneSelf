@@ -134,11 +134,11 @@ export function useHomeStore(): HomeStoreType {
               id: item.id,
               category: item.category.name,
               title: item.title,
-              authorName: item.authorName || 'Unknown',
-              authorAvatar: item.authorAvatar || '',
+              authorName: item.authorName ?? 'Unknown',
+              authorAvatar: item.authorAvatar ?? '',
               publishedAt: item.publishedAt,
               readTime: item.readTime,
-              coverUrl: item.coverUrl || '',
+              coverUrl: item.coverUrl ?? '',
             }),
           );
         });
