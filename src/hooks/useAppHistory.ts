@@ -67,11 +67,8 @@ export function appGoBack(
     return false;
   }
 
-  const prev = historyStackStore.pop();
-  if (prev) {
-    navigate(`${prev.pathname}${prev.search}`);
-  } else {
-    navigate(-1);
-  }
+  // 应用层索引已经减一，让浏览器真正后退一步，保持两边同步
+  historyStackStore.pop();
+  navigate(-1);
   return true;
 }

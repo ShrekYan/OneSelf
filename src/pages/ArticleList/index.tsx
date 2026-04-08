@@ -7,7 +7,9 @@ import InfiniteScroll from 'react-infinite-scroller';
 import styles from './index.module.scss';
 import CategoryTabs from './components/category-tabs';
 import ArticleListItem from './components/article-list-item';
+import { useAppGoBack } from '@/hooks/useAppGoBack';
 import { useArticleListStore } from './useStore';
+
 import * as handle from './handle';
 
 const ArticleListPage: React.FC = () => {
@@ -17,11 +19,16 @@ const ArticleListPage: React.FC = () => {
   const categoryTabsRef = useRef<{ scrollToTab: (tabId: string) => void }>(
     null,
   );
+  // 只需要这一行！
+  // onLastPage 是可选的，当已经是最后一页时会调用
+  const handleGoBackMethod = useAppGoBack({
+    onLastPage: () => {
+      navigate('/');
+    },
+  });
 
   const handleBack = () => {
-    console.log('handleback');
-    // window.history.back();
-    navigate(-1);
+    handleGoBackMethod();
   };
 
   const handleArticleClick = (articleId: string) => {
