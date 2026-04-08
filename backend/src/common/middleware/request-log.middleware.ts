@@ -38,8 +38,8 @@ export class RequestLogMiddleware implements NestMiddleware {
     const responseTime = Date.now() - startTime;
 
     // 构建日志数据
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const logData: Record<string, any> = {
+
+    const logData: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       level: request.error ? 'error' : 'access',
       method: request.method,

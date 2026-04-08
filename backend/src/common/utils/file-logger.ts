@@ -67,14 +67,11 @@ export function appendErrorLog(info: ErrorLogInfo): void {
  * 追加 JSON 格式日志到文件（按 level 分文件存储）
  * @param data JSON 日志数据对象
  */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function appendJsonLog(data: Record<string, any>): void {
+export function appendJsonLog(data: Record<string, unknown>): void {
   try {
     const today = new Date().toISOString().split('T')[0];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const level = data.level || 'access';
+    const level = (data.level as string) || 'access';
     const fileName = `${level}-${today}.log`;
     const filePath = path.join(process.cwd(), 'logs', fileName);
 

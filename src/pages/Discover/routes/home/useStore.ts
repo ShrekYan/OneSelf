@@ -7,6 +7,7 @@ import { runInAction } from 'mobx';
 import { useLocalObservable } from 'mobx-react';
 
 import api from '@/api';
+import { useGlobalStore } from '@/store';
 import type { ArticleItem as ApiArticleItem } from '@/types/article';
 import type { FeaturedArticleItem as ApiFeaturedArticleItem } from '@/api/article';
 import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
@@ -31,6 +32,8 @@ export type HomeStoreType = {
   loading: boolean;
   /** 分类加载状态 */
   categoriesLoading: boolean;
+  /** 当前用户点赞过的文章ID集合 */
+  likedArticleIds: Set<string>;
 
   /** 设置当前选中分类 */
   setActiveCategory: (categoryId: string) => void;
@@ -44,6 +47,10 @@ export type HomeStoreType = {
   setCategoriesLoading: (loading: boolean) => void;
   /** 切换文章点赞状态 */
   toggleLike: (articleId: string) => void;
+  /** 获取当前用户点赞列表 */
+  fetchUserLikeList: () => Promise<void>;
+  /** 文章列表获取后，应用点赞状态 */
+  applyLikeStatusToArticles: () => void;
   /** 加载首页所有初始化数据（并发请求，使用 Promise.allSettled 容错） */
   fetchInitialData: () => Promise<void>;
   /** 加载文章列表数据 */
@@ -55,6 +62,8 @@ export type HomeStoreType = {
 };
 
 export function useHomeStore(): HomeStoreType {
+  const rootStore = useGlobalStore();
+
   const store = useLocalObservable<HomeStoreType>(() => ({
     activeCategoryId: '',
     articles: [],
@@ -62,6 +71,7 @@ export function useHomeStore(): HomeStoreType {
     categories: [],
     loading: false,
     categoriesLoading: false,
+    likedArticleIds: new Set(),
 
     setActiveCategory(categoryId: string) {
       runInAction(() => {
@@ -99,6 +109,12 @@ export function useHomeStore(): HomeStoreType {
         if (article) {
           article.isLiked = !article.isLiked;
           article.likes += article.isLiked ? 1 : -1;
+          // 同步更新 likedArticleIds 集合
+          if (article.isLiked) {
+            this.likedArticleIds.add(articleId);
+          } else {
+            this.likedArticleIds.delete(articleId);
+          }
         }
       });
     },
@@ -111,12 +127,21 @@ export function useHomeStore(): HomeStoreType {
           pageSize: 10,
           categoryId: this.activeCategoryId || undefined,
         });
-        // 为 API 返回的文章添加本地 isLiked 状态
-        const articlesWithLocalState = response.list.map(article => ({
-          ...article,
-          isLiked: article.isLiked ?? false,
-        }));
-        this.setArticles(articlesWithLocalState);
+        // 先设置文章列表
+        this.setArticles(response.list);
+
+        // 获取完文章列表后，自动应用点赞状态
+        const userId = rootStore.app.userInfo?.id;
+        if (userId) {
+          // 如果已经有点赞列表，直接应用
+          if (this.likedArticleIds.size > 0) {
+            this.applyLikeStatusToArticles();
+          } else {
+            // 如果没有点赞列表，先获取再应用
+            await this.fetchUserLikeList();
+            this.applyLikeStatusToArticles();
+          }
+        }
       } catch (error) {
         console.error('加载文章列表失败:', error);
       } finally {
@@ -159,10 +184,33 @@ export function useHomeStore(): HomeStoreType {
       }
     },
 
+    async fetchUserLikeList(): Promise<void> {
+      const userId = rootStore.app.userInfo?.id;
+      if (!userId) return;
+
+      try {
+        const response = await api.article.getUserLikeList({ userId });
+        runInAction(() => {
+          this.likedArticleIds = new Set(response.articleIds);
+        });
+      } catch (error) {
+        console.error('获取用户点赞列表失败:', error);
+      }
+    },
+
+    applyLikeStatusToArticles(): void {
+      runInAction(() => {
+        this.articles = this.articles.map(article => ({
+          ...article,
+          isLiked:
+            this.likedArticleIds.has(article.id) ?? article.isLiked ?? false,
+        }));
+      });
+    },
+
     async fetchInitialData(): Promise<void> {
-      // 使用 Promise.allSettled 并发启动三个请求
-      // 即使某个请求失败，其他请求仍然能正常返回数据
-      // 每个方法内部已独立处理 try/catch 和 loading 状态更新
+      // 并发获取基础数据
+      // fetchArticles 内部会自动处理点赞状态
       await Promise.allSettled([
         this.fetchArticles(),
         this.fetchFeaturedArticles(),

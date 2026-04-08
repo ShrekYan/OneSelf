@@ -143,6 +143,20 @@ export interface ToggleLikeResponse {
 }
 
 /**
+ * 获取用户点赞文章列表请求参数
+ */
+export interface UserLikeListByUserIdRequest {
+  userId: string;
+}
+
+/**
+ * 获取用户点赞文章列表响应
+ */
+export interface UserLikeListByUserIdResponse {
+  articleIds: string[];
+}
+
+/**
  * 文章 / 分类 API 模块
  */
 export const articleApi = {
@@ -183,5 +197,14 @@ export const articleApi = {
    */
   toggleLike: async (data: ToggleLikeRequest): Promise<ToggleLikeResponse> => {
     return await api.post('/api/v1/article/toggle-like', data);
+  },
+
+  /**
+   * 获取指定用户点赞的所有文章ID列表
+   */
+  getUserLikeList: async (
+    data: UserLikeListByUserIdRequest,
+  ): Promise<UserLikeListByUserIdResponse> => {
+    return await api.post('/api/v1/article/user-likes', data);
   },
 };

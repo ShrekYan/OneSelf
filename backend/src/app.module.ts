@@ -1,16 +1,12 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ArticleModule } from './article/article.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
-import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { CommonModule } from './common/common.module';
 import { CorsMiddleware } from './common/middleware/cors.middleware';
 import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 import { RequestLogMiddleware } from './common/middleware/request-log.middleware';
@@ -32,6 +28,8 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
     }),
     // PrismaModule - Prisma ORM 全局模块，提供数据库连接
     PrismaModule,
+    // CommonModule - 公共基础设施模块，统一管理全局过滤器、拦截器、守卫
+    CommonModule,
     // AuthModule 是负责处理用户认证相关功能的模块，如登录、刷新令牌、登出等。
     AuthModule,
     // CategoryModule 负责文章分类相关接口
@@ -44,14 +42,8 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
   controllers: [AppController],
   // AppService 是应用的根服务，负责处理应用的业务逻辑。
   // 这里将 AppService 导入到 AppModule 中，使得应用中的所有模块都可以使用 AppService 提供的方法。
-  // 全局过滤器和拦截器通过 APP_FILTER / APP_INTERCEPTOR 令牌注册，享受完整依赖注入
-  providers: [
-    AppService,
-    { provide: APP_FILTER, useClass: AllExceptionsFilter },
-    { provide: APP_FILTER, useClass: BusinessExceptionFilter },
-    { provide: APP_FILTER, useClass: PrismaExceptionFilter },
-    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
-  ],
+  // 全局过滤器和拦截器已经移动到 CommonModule 中统一注册
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

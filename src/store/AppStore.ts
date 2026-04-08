@@ -5,7 +5,8 @@ import { useLocalObservable } from 'mobx-react';
  * 用户信息接口
  */
 export interface UserInfo {
-  uid: string;
+  id: string;
+  username?: string;
   nickname?: string;
   avatar?: string;
   email?: string;
@@ -25,10 +26,29 @@ export interface MobxStoreType {
 type UseMobxStoreType = () => MobxStoreType;
 
 const useMobxStore: UseMobxStoreType = () => {
+  // 初始化时从 localStorage 恢复已保存的用户信息
+  const initialUserInfo = ((): UserInfo | null => {
+    try {
+      const stored = localStorage.getItem('userInfo');
+      if (!stored) return null;
+      return JSON.parse(stored) as UserInfo;
+    } catch {
+      return null;
+    }
+  })();
+
+  const initialToken = ((): string => {
+    try {
+      return localStorage.getItem('accessToken') || '';
+    } catch {
+      return '';
+    }
+  })();
+
   const store = useLocalObservable<MobxStoreType>(() => ({
     isLoading: false,
-    userInfo: null,
-    token: '',
+    userInfo: initialUserInfo,
+    token: initialToken,
 
     setLoading(value: boolean) {
       runInAction(() => {

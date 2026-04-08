@@ -19,6 +19,8 @@ import {
   UserLikeListResponseDto,
   CheckLikeStatusRequestDto,
   CheckLikeStatusResponseDto,
+  UserLikeListByUserIdRequestDto,
+  UserLikeListByUserIdResponseDto,
 } from './dto';
 import { convertArticleContentBlocks } from './utils/article-content.converter';
 
@@ -493,5 +495,23 @@ export class ArticleService {
         );
         break;
     }
+  }
+
+  async getUserLikeListByUserId(
+    params: UserLikeListByUserIdRequestDto,
+  ): Promise<UserLikeListByUserIdResponseDto> {
+    const { userId } = params;
+
+    // 查询该用户所有点赞记录，只选择 article_id 字段，不关联文章完整信息
+    const likes = await this.prisma.articleLikes.findMany({
+      where: { user_id: userId },
+      select: { article_id: true },
+      orderBy: { created_at: 'desc' },
+    });
+
+    // 提取 article_id 到数组
+    const articleIds = likes.map((like) => like.article_id);
+
+    return { articleIds };
   }
 }

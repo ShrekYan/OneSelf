@@ -18,3 +18,5 @@ export { UserLikeListRequestDto } from './user-like-list-request.dto';
 export { UserLikeListResponseDto } from './user-like-list-response.dto';
 export { CheckLikeStatusRequestDto } from './check-like-status-request.dto';
 export { CheckLikeStatusResponseDto } from './check-like-status-response.dto';
+export { UserLikeListByUserIdRequestDto } from './user-like-list-by-user-id-request.dto';
+export { UserLikeListByUserIdResponseDto } from './user-like-list-by-user-id-response.dto';

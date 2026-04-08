@@ -130,6 +130,17 @@
   &:hover {
     color: #8848f9;
   }
+
+  &.active {
+    svg path {
+      fill: #ff4d4f;
+      stroke: #ff4d4f;
+    }
+
+    span {
+      color: #ff4d4f;
+    }
+  }
 }
 
 .coverContainer {

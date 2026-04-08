@@ -15,6 +15,8 @@ import {
   UserLikeListResponseDto,
   CheckLikeStatusRequestDto,
   CheckLikeStatusResponseDto,
+  UserLikeListByUserIdRequestDto,
+  UserLikeListByUserIdResponseDto,
 } from './dto';
 
 @ApiTags('article')
@@ -73,5 +75,14 @@ export class ArticleController {
     @CurrentUserId() userId?: string,
   ): Promise<ArticleDetailDto> {
     return this.articleService.getArticleDetail(query, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('user-likes')
+  @ApiOperation({ summary: '根据用户ID查询指定用户点赞的所有文章ID列表' })
+  getUserLikeListByUserId(
+    @Body() body: UserLikeListByUserIdRequestDto,
+  ): Promise<UserLikeListByUserIdResponseDto> {
+    return this.articleService.getUserLikeListByUserId(body);
   }
 }

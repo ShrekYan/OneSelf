@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { LazyImage } from '@/components';
 import styles from './index.module.scss';
 import type { ArticleItem as ApiArticleItem } from '@/types/article';
@@ -87,7 +88,10 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
               </div>
               <div className={styles.stats}>
                 <div
-                  className={styles.statBtn}
+                  className={classNames(
+                    styles.statBtn,
+                    article.isLiked && styles.active,
+                  )}
                   onClick={handleLike}
                   role="button"
                   tabIndex={0}
@@ -153,7 +157,10 @@ const ArticleListItem: React.FC<ArticleListItemProps> = ({
             </div>
             <div className={styles.stats}>
               <div
-                className={styles.statBtn}
+                className={classNames(
+                  styles.statBtn,
+                  article.isLiked && styles.active,
+                )}
                 onClick={handleLike}
                 role="button"
                 tabIndex={0}

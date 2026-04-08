@@ -4,28 +4,92 @@
  */
 
 import { Toast } from 'antd-mobile';
+import { runInAction } from 'mobx';
 
-import type { HomeStoreType } from '../home/useStore';
+import api from '@/api';
+import type { HomeStoreType } from './useStore';
 
 /**
  * 处理文章点赞/取消点赞
  * @param store - Home store 实例
  * @param articleId - 文章ID
  */
-export const handleLikeClick = (
+export const handleLikeClick = async (
   store: HomeStoreType,
   articleId: string,
-): void => {
-  store.toggleLike(articleId);
+): Promise<void> => {
+  // 1. 保存原始状态，用于失败回滚
   const article = store.articles.find(item => item.id === articleId);
-  if (article) {
-    const message = article.isLiked ? '点赞成功' : '取消点赞';
+  const originalIsLiked = article?.isLiked;
+  const originalLikes = article?.likes;
+
+  // 2. 乐观更新：先更新本地状态，给用户即时反馈
+  store.toggleLike(articleId);
+
+  try {
+    // 3. 调用后端API
+    const response = await api.article.toggleLike({ articleId });
+
+    // 4. 用服务端返回的数据校正本地状态（防止乐观更新和实际不一致）
+    runInAction(() => {
+      // 重新创建整个 articles 数组，确保 MobX 能正确追踪变更
+      store.articles = store.articles.map(article => {
+        if (article.id === articleId) {
+          return {
+            ...article,
+            isLiked: response.isLiked,
+            likes: response.likes,
+          };
+        }
+        return article;
+      });
+
+      // 同步更新 likedArticleIds
+      if (response.isLiked) {
+        store.likedArticleIds.add(articleId);
+      } else {
+        store.likedArticleIds.delete(articleId);
+      }
+    });
+
+    // 5. 显示成功提示
+    const message = response.isLiked ? '点赞成功' : '取消点赞';
     Toast.show({
       icon: 'success',
       content: message,
     });
+  } catch (error) {
+    // 6. 请求失败：回滚到原始状态
+    console.error('点赞操作失败:', error);
+    runInAction(() => {
+      // 重新创建整个 articles 数组，确保 MobX 能正确追踪变更
+      store.articles = store.articles.map(article => {
+        if (
+          article.id === articleId &&
+          originalIsLiked !== undefined &&
+          originalLikes !== undefined
+        ) {
+          return {
+            ...article,
+            isLiked: originalIsLiked,
+            likes: originalLikes,
+          };
+        }
+        return article;
+      });
+
+      // 回滚 likedArticleIds
+      if (originalIsLiked) {
+        store.likedArticleIds.add(articleId);
+      } else {
+        store.likedArticleIds.delete(articleId);
+      }
+    });
+    Toast.show({
+      icon: 'error',
+      content: '操作失败，请重试',
+    });
   }
-  console.log('Like article:', articleId);
 };
 
 /**

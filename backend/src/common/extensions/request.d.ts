@@ -15,8 +15,8 @@ declare global {
       /** JWT 解析后的用户信息，由 JwtParseMiddleware 添加 */
       user?: {
         id: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
+
+        [key: string]: unknown;
       };
     }
   }
