@@ -381,8 +381,6 @@ export class ArticleService {
     let isLiked = false;
     console.log(userId);
     if (userId) {
-      console.log(userId);
-      console.log(id);
       const like = await this.prisma.articleLikes.findUnique({
         where: {
           article_id_user_id: {

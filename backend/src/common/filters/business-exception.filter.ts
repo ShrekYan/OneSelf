@@ -2,11 +2,12 @@ import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BusinessException } from '../exceptions/business.exception';
 import { ApiResult } from '../result/api-result';
-import { appendErrorLog } from '../utils/file-logger';
 
 /**
  * 业务异常过滤器
  * 捕获 BusinessException，转换成统一的 ApiResult 格式响应
+ *
+ * 日志记录统一交由 RequestLogMiddleware 在 finish 事件处理
  */
 @Catch(BusinessException)
 export class BusinessExceptionFilter implements ExceptionFilter {
@@ -18,15 +19,8 @@ export class BusinessExceptionFilter implements ExceptionFilter {
     const businessCode = exception.getBusinessCode();
     const responseBody = exception.getResponse() as { message: string };
 
-    // Write business error log to file
-    appendErrorLog({
-      message: `${responseBody.message} (code: ${businessCode})`,
-      stack: exception.stack,
-      name: exception.name,
-      method: request.method,
-      url: request.originalUrl,
-      ip: request.ip,
-    });
+    // 将异常挂载到 request 对象，供 RequestLogMiddleware 统一记录
+    request.error = exception;
 
     // 使用 ApiResult 包装，保持与现有格式完全一致
     const apiResult = ApiResult.error(businessCode, responseBody.message);

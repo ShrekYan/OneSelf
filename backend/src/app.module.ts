@@ -11,6 +11,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
+import { RequestLogMiddleware } from './common/middleware/request-log.middleware';
 
 // @Module() 是 NestJS 提供的装饰器，用于声明一个模块（Module）。
 // 模块是 NestJS 应用的基本组织单位，每个应用至少有一个根模块（AppModule）。
@@ -51,6 +52,8 @@ import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
+    // 注册请求日志中间件到所有路由（必须在 JwtParse 之前，才能准确计时）
+    consumer.apply(RequestLogMiddleware).forRoutes('*');
     // 注册 JWT 解析中间件到所有路由
     consumer.apply(JwtParseMiddleware).forRoutes('*');
   }
