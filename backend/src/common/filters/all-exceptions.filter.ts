@@ -5,8 +5,9 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiResult } from '../result/api-result';
+import { appendErrorLog } from '../utils/file-logger';
 
 interface ErrorResponse {
   message?: string;
@@ -17,6 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     const status =
       exception instanceof HttpException
@@ -32,6 +34,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
       typeof message === 'string'
         ? message
         : ((message as ErrorResponse).message ?? 'Internal server error');
+
+    // Write error log to file
+    appendErrorLog({
+      message: errorMessage,
+      stack: exception instanceof Error ? exception.stack : undefined,
+      name: exception instanceof Error ? exception.name : undefined,
+      method: request.method,
+      url: request.originalUrl,
+      ip: request.ip,
+    });
 
     // Use uniform ApiResult format
     const errorResponse = new ApiResult(status, errorMessage, null);

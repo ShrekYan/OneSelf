@@ -169,7 +169,7 @@ export class AuthService {
 
     // 从数据库查找用户
     const user = await this.findUserByUsername(username);
-
+    console.log(user);
     if (!user) {
       throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
