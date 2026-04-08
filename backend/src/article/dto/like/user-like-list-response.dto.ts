@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArticleListItemDto } from './article-list-item.dto';
+import { ArticleListItemDto } from '../article/article-list-item.dto';
 
 export class UserLikeListResponseDto {
   @ApiProperty({ type: [ArticleListItemDto], description: '点赞文章列表' })
