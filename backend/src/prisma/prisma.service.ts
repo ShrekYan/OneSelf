@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { appendJsonLog } from '@/common/utils/file-logger';
 
 @Injectable()
 export class PrismaService
@@ -34,9 +35,27 @@ export class PrismaService
   async onModuleDestroy() {
     try {
       await this.$disconnect();
-      this.logger.log('Database disconnected successfully');
+      const msg = 'Database disconnected successfully';
+      this.logger.log(msg);
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'info',
+        context: PrismaService.name,
+        message: msg,
+        env: process.env.NODE_ENV || 'development',
+      });
     } catch (error) {
-      this.logger.error('Error disconnecting from database', error);
+      const msg = 'Error disconnecting from database';
+      this.logger.error(msg, error);
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'error',
+        context: PrismaService.name,
+        message: msg,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        env: process.env.NODE_ENV || 'development',
+      });
     }
   }
 
@@ -48,27 +67,56 @@ export class PrismaService
     try {
       await this.$connect();
       if (retryCount > 0) {
-        this.logger.log(
-          `Database connected successfully after ${retryCount} retries`,
-        );
+        const msg = `Database connected successfully after ${retryCount} retries`;
+        this.logger.log(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'info',
+          context: PrismaService.name,
+          message: msg,
+          env: process.env.NODE_ENV || 'development',
+        });
       } else {
-        this.logger.log('Database connected successfully');
+        const msg = 'Database connected successfully';
+        this.logger.log(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'info',
+          context: PrismaService.name,
+          message: msg,
+          env: process.env.NODE_ENV || 'development',
+        });
       }
     } catch (error) {
       if (retryCount < this.maxRetries) {
         const delay = this.initialRetryDelay * Math.pow(2, retryCount);
-        this.logger.warn(
-          `Database connection failed, retrying in ${delay}ms... (attempt ${
-            retryCount + 1
-          }/${this.maxRetries})`,
-        );
+        const msg = `Database connection failed, retrying in ${delay}ms... (attempt ${
+          retryCount + 1
+        }/${this.maxRetries})`;
+        this.logger.warn(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'warn',
+          context: PrismaService.name,
+          message: msg,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          env: process.env.NODE_ENV || 'development',
+        });
         await new Promise((resolve) => setTimeout(resolve, delay));
         await this.connectWithRetry(retryCount + 1);
       } else {
-        this.logger.error(
-          `Database connection failed after ${this.maxRetries} retries. Giving up.`,
-          error,
-        );
+        const msg = `Database connection failed after ${this.maxRetries} retries. Giving up.`;
+        this.logger.error(msg, error);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'error',
+          context: PrismaService.name,
+          message: msg,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          env: process.env.NODE_ENV || 'development',
+        });
         throw error;
       }
     }
@@ -84,20 +132,46 @@ export class PrismaService
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
     (this.$on as any)('query', (e: { duration: number; query: string }) => {
       if (e.duration > this.slowQueryThreshold) {
-        this.logger.warn(
-          `Slow query detected: duration=${e.duration}ms, query=${e.query}`,
-        );
+        const msg = `Slow query detected: duration=${e.duration}ms, query=${e.query}`;
+        this.logger.warn(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'warn',
+          context: PrismaService.name,
+          message: msg,
+          query: e.query,
+          duration: e.duration,
+          env: process.env.NODE_ENV || 'development',
+        });
       }
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
     (this.$on as any)('error', (e: { message: string; target: string }) => {
-      this.logger.error(`Database error: ${e.message}`, e.target);
+      const msg = `Database error: ${e.message}`;
+      this.logger.error(msg, e.target);
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'error',
+        context: PrismaService.name,
+        message: msg,
+        target: e.target,
+        env: process.env.NODE_ENV || 'development',
+      });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
     (this.$on as any)('warn', (e: { message: string; target: string }) => {
-      this.logger.warn(`Database warning: ${e.message}`, e.target);
+      const msg = `Database warning: ${e.message}`;
+      this.logger.warn(msg, e.target);
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'warn',
+        context: PrismaService.name,
+        message: msg,
+        target: e.target,
+        env: process.env.NODE_ENV || 'development',
+      });
     });
   }
 
@@ -110,7 +184,17 @@ export class PrismaService
       await this.$queryRaw`SELECT 1`;
       return true;
     } catch (error) {
-      this.logger.error('Health check failed', error);
+      const msg = 'Health check failed';
+      this.logger.error(msg, error);
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'error',
+        context: PrismaService.name,
+        message: msg,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        env: process.env.NODE_ENV || 'development',
+      });
       return false;
     }
   }

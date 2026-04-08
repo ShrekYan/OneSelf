@@ -34,6 +34,81 @@
 - **全局拦截**: 拦截器自动处理 Token、401 跳转及通用错误 Toast
 - **缓存**: 静态配置类数据建议开启 `cache: true`
 
+## 多接口并发请求初始化
+
+### 核心原则
+- **全并发优先**: 页面初始化需要多个独立接口时，优先全部并发同时请求，避免串行等待，提升首屏速度
+- **职责分离**: `fetchXxx` 函数只负责发起请求返回数据，错误处理和状态更新放到外层统一处理
+- **统一结果处理**: 使用 `Promise.allSettled` 等待所有请求完成，然后逐个处理每个请求的结果
+- **容错隔离**: 单个请求失败不影响其他请求，保证能展示的部分都展示给用户，不白屏
+
+### 推荐模式
+
+```typescript
+async fetchInitialData(): Promise<void> {
+  const userId = rootStore.app.userInfo?.id;
+
+  // 并发发起所有独立请求（可选请求动态加入）
+  const results = await Promise.allSettled([
+    this.fetchArticles(),
+    this.fetchCategories(),
+    this.fetchFeaturedArticles(),
+    ...(userId ? [this.fetchUserLikeList()] : []),
+  ]);
+
+  // 逐个类型断言处理结果
+  const articlesResult = results[0] as PromiseSettledResult<ArticleItem[]>;
+  if (articlesResult.status === 'fulfilled') {
+    this.setArticles(articlesResult.value);
+  } else {
+    console.error('加载文章列表失败:', articlesResult.reason);
+  }
+
+  const categoriesResult = results[1] as PromiseSettledResult<CategoryItem[]>;
+  if (categoriesResult.status === 'fulfilled') {
+    this.setCategories(categoriesResult.value);
+  } else {
+    console.error('加载分类失败:', categoriesResult.reason);
+  }
+
+  // ... 其他请求同理逐个处理
+
+  // 所有数据就绪后，统一处理依赖逻辑（如应用点赞状态）
+  if (this.likedArticleIds.size > 0) {
+    this.applyLikeStatusToArticles();
+  }
+
+  // 统一关闭 loading
+  this.setLoading(false);
+  this.setCategoriesLoading(false);
+}
+
+// 每个 fetchXxx 只负责：开启 loading + 发起请求 + 返回数据
+private async fetchArticles(): Promise<ArticleItem[]> {
+  this.setLoading(true);
+  const response = await api.article.listArticles({
+    page: 1,
+    pageSize: 10,
+    categoryId: this.activeCategoryId || undefined,
+  });
+  return response.list;
+}
+```
+
+### 方式对比
+
+| 方式 | 特点 | 推荐 |
+|------|------|------|
+| 每个 `fetchXxx` 内部 `try/catch` 自己处理错误和更新 | 逻辑分散，不便于整体流程把控 | ❌ 不推荐 |
+| `Promise.allSettled` 后统一逐个处理 | 职责清晰，集中处理，易于调试 | ✅ 推荐 |
+
+### 关键要点
+- ❗ **每个 `fetchXxx` 只返回数据**: 不处理错误，不更新状态，职责单一
+- ❗ **类型断言**: `results[0] as PromiseSettledResult<ReturnType>` 解决 TypeScript 类型推断问题
+- ❗ **loading 管理**: 需要的请求在 `fetchXxx` 内部**开启**，全部处理完后**统一关闭**
+- ❗ **条件并发**: 可选请求（如需要登录的点赞列表）通过展开运算符动态加入
+- ❗ **失败不阻塞**: 一个请求失败只打日志，不影响其他成功请求更新状态，页面部分可用比全错更好
+
 ## 路由规范
 - **编程式导航**: 统一使用 `useNavigate` Hook，**禁止使用 `<a>` 标签跳转**
 - **参数获取**: 使用 `useParams` (路径参数) 和 `useSearchParams` (查询参数)

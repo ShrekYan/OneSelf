@@ -12,7 +12,6 @@ import type { ArticleItem as ApiArticleItem } from '@/types/article';
 import type { FeaturedArticleItem as ApiFeaturedArticleItem } from '@/api/article';
 import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
 import type { FeaturedArticleItem } from './constant';
-import type { CategoryItem } from '@/api/category';
 
 // 文章列表项类型 = API 返回类型 + 本地点赞状态
 export type ArticleItem = ApiArticleItem & {
@@ -40,25 +39,25 @@ export type HomeStoreType = {
   /** 设置文章列表 */
   setArticles: (articles: ArticleItem[]) => void;
   /** 设置分类列表 */
-  setCategories: (categories: CategoryItem[]) => void;
+  setCategories: (categories: HotSearchItem[]) => void;
   /** 设置加载状态 */
   setLoading: (loading: boolean) => void;
   /** 设置分类加载状态 */
   setCategoriesLoading: (loading: boolean) => void;
   /** 切换文章点赞状态 */
   toggleLike: (articleId: string) => void;
-  /** 获取当前用户点赞列表 */
-  fetchUserLikeList: () => Promise<void>;
+  /** 获取当前用户点赞列表，返回数据不更新状态 */
+  fetchUserLikeList: () => Promise<string[] | null>;
   /** 文章列表获取后，应用点赞状态 */
   applyLikeStatusToArticles: () => void;
-  /** 加载首页所有初始化数据（并发请求，使用 Promise.allSettled 容错） */
+  /** 加载首页所有初始化数据（并发请求，统一结果处理，使用 Promise.allSettled 容错） */
   fetchInitialData: () => Promise<void>;
-  /** 加载文章列表数据 */
-  fetchArticles: () => Promise<void>;
-  /** 加载特色文章数据 */
-  fetchFeaturedArticles: () => Promise<void>;
-  /** 加载热门分类数据 */
-  fetchCategories: () => Promise<void>;
+  /** 加载文章列表数据，返回数据不更新状态 */
+  fetchArticles: () => Promise<ArticleItem[]>;
+  /** 加载特色文章数据，返回数据不更新状态 */
+  fetchFeaturedArticles: () => Promise<FeaturedArticleItem[]>;
+  /** 加载热门分类数据，返回数据不更新状态 */
+  fetchCategories: () => Promise<HotSearchItem[]>;
 };
 
 export function useHomeStore(): HomeStoreType {
@@ -119,83 +118,43 @@ export function useHomeStore(): HomeStoreType {
       });
     },
 
-    async fetchArticles(): Promise<void> {
+    async fetchArticles(): Promise<ArticleItem[]> {
       this.setLoading(true);
-      try {
-        const response = await api.article.listArticles({
-          page: 1,
-          pageSize: 10,
-          categoryId: this.activeCategoryId || undefined,
-        });
-        // 先设置文章列表
-        this.setArticles(response.list);
-
-        // 获取完文章列表后，自动应用点赞状态
-        const userId = rootStore.app.userInfo?.id;
-        if (userId) {
-          // 如果已经有点赞列表，直接应用
-          if (this.likedArticleIds.size > 0) {
-            this.applyLikeStatusToArticles();
-          } else {
-            // 如果没有点赞列表，先获取再应用
-            await this.fetchUserLikeList();
-            this.applyLikeStatusToArticles();
-          }
-        }
-      } catch (error) {
-        console.error('加载文章列表失败:', error);
-      } finally {
-        this.setLoading(false);
-      }
+      const response = await api.article.listArticles({
+        page: 1,
+        pageSize: 10,
+        categoryId: this.activeCategoryId || undefined,
+      });
+      return response.list;
     },
 
-    async fetchFeaturedArticles(): Promise<void> {
-      try {
-        const response = await api.article.getFeaturedArticles();
-        runInAction(() => {
-          // 直接映射，只提取组件需要的字段
-          this.featuredArticles = response.list.map(
-            (item: ApiFeaturedArticleItem) => ({
-              id: item.id,
-              category: item.category.name,
-              title: item.title,
-              authorName: item.authorName ?? 'Unknown',
-              authorAvatar: item.authorAvatar ?? '',
-              publishedAt: item.publishedAt,
-              readTime: item.readTime,
-              coverUrl: item.coverUrl ?? '',
-            }),
-          );
-        });
-      } catch (error) {
-        console.error('加载特色文章失败:', error);
-      }
+    async fetchFeaturedArticles(): Promise<FeaturedArticleItem[]> {
+      const response = await api.article.getFeaturedArticles();
+      // 直接映射，只提取组件需要的字段
+      return response.list.map((item: ApiFeaturedArticleItem) => ({
+        id: item.id,
+        category: item.category.name,
+        title: item.title,
+        authorName: item.authorName ?? 'Unknown',
+        authorAvatar: item.authorAvatar ?? '',
+        publishedAt: item.publishedAt,
+        readTime: item.readTime,
+        coverUrl: item.coverUrl ?? '',
+      }));
     },
 
-    async fetchCategories(): Promise<void> {
+    async fetchCategories(): Promise<HotSearchItem[]> {
       this.setCategoriesLoading(true);
-      try {
-        const data = await api.category.getList();
-        this.setCategories(data.list);
-      } catch (error) {
-        console.error('加载热门分类失败:', error);
-      } finally {
-        this.setCategoriesLoading(false);
-      }
+      const data = await api.category.getList();
+      return data.list;
     },
 
-    async fetchUserLikeList(): Promise<void> {
+    async fetchUserLikeList(): Promise<string[] | null> {
       const userId = rootStore.app.userInfo?.id;
-      if (!userId) return;
+      if (!userId) return null;
 
-      try {
-        const response = await api.article.getUserLikeList({ userId });
-        runInAction(() => {
-          this.likedArticleIds = new Set(response.articleIds);
-        });
-      } catch (error) {
-        console.error('获取用户点赞列表失败:', error);
-      }
+      const response = await api.article.getUserLikeList({ userId });
+      return response.articleIds;
     },
 
     applyLikeStatusToArticles(): void {
@@ -209,13 +168,65 @@ export function useHomeStore(): HomeStoreType {
     },
 
     async fetchInitialData(): Promise<void> {
-      // 并发获取基础数据
-      // fetchArticles 内部会自动处理点赞状态
-      await Promise.allSettled([
+      const userId = rootStore.app.userInfo?.id;
+
+      // 并发发起所有请求（包括用户点赞列表）
+      const results = await Promise.allSettled([
         this.fetchArticles(),
         this.fetchFeaturedArticles(),
         this.fetchCategories(),
+        ...(userId ? [this.fetchUserLikeList()] : []),
       ]);
+
+      // 1. 处理文章列表
+      const articlesResult = results[0];
+      if (articlesResult.status === 'fulfilled') {
+        this.setArticles(articlesResult.value);
+      } else {
+        console.error('加载文章列表失败:', articlesResult.reason);
+      }
+
+      // 2. 处理特色文章
+      const featuredResult = results[1];
+      if (featuredResult.status === 'fulfilled') {
+        runInAction(() => {
+          this.featuredArticles = featuredResult.value;
+        });
+      } else {
+        console.error('加载特色文章失败:', featuredResult.reason);
+      }
+
+      // 3. 处理分类列表
+      const categoriesResult = results[2];
+      if (categoriesResult.status === 'fulfilled') {
+        this.setCategories(categoriesResult.value);
+      } else {
+        console.error('加载热门分类失败:', categoriesResult.reason);
+      }
+
+      // 4. 处理用户点赞列表（如果有）
+      if (userId && results.length >= 4) {
+        const likeListResult = results[3];
+        if (
+          likeListResult.status === 'fulfilled' &&
+          likeListResult.value !== null
+        ) {
+          runInAction(() => {
+            this.likedArticleIds = new Set(likeListResult.value);
+          });
+        } else if (likeListResult.status === 'rejected') {
+          console.error('获取用户点赞列表失败:', likeListResult.reason);
+        }
+      }
+
+      // 所有数据获取完成后，统一应用点赞状态到文章列表
+      if (this.likedArticleIds.size > 0) {
+        this.applyLikeStatusToArticles();
+      }
+
+      // 统一关闭 loading
+      this.setLoading(false);
+      this.setCategoriesLoading(false);
     },
   }));
 
