@@ -20,12 +20,14 @@ import {
 const ArticleDetail: React.FC = () => {
   const store = useArticleDetailStore();
 
-  const handleToggleLike = (): void => {
-    store.toggleLike();
-    Toast.show({
-      content: store.article.isLiked ? 'Liked' : 'Unliked',
-      duration: 1500,
-    });
+  const handleToggleLike = async (): Promise<void> => {
+    await store.toggleLike();
+    if (!store.likeLoading) {
+      Toast.show({
+        content: store.article.isLiked ? '已点赞' : '已取消点赞',
+        duration: 1500,
+      });
+    }
   };
 
   const handleToggleCollect = (): void => {
@@ -70,6 +72,7 @@ const ArticleDetail: React.FC = () => {
         onToggleCollect={handleToggleCollect}
         onCommentClick={handleCommentClick}
         onShareClick={handleShareClick}
+        disabled={store.likeLoading}
       />
     </div>
   ));

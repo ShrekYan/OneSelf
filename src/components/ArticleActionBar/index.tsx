@@ -18,6 +18,8 @@ export interface ArticleActionBarProps {
   onShareClick?: () => void;
   /** 收藏点击回调 */
   onCollectClick?: () => void;
+  /** 点赞按钮禁用状态（请求中防重复点击） */
+  disabled?: boolean;
 }
 
 /**
@@ -33,6 +35,7 @@ export const ArticleActionBar: React.FC<ArticleActionBarProps> = ({
   onCommentClick,
   onShareClick,
   onCollectClick,
+  disabled = false,
 }) => {
   // 格式化数字显示，超过 1000 显示 k
   const formatCount = (count: number): string => {
@@ -41,14 +44,14 @@ export const ArticleActionBar: React.FC<ArticleActionBarProps> = ({
     }
     return String(count);
   };
-
   return (
     <div className={styles.articleActionBarContainer}>
       <div className={styles.leftGroup}>
         <button
-          className={`${styles.actionBtn} ${isLiked ? styles.active : ''}`}
+          className={`${styles.actionBtn} ${isLiked ? styles.active : ''} ${disabled ? styles.disabled : ''}`}
           onClick={onLikeClick}
           aria-label={isLiked ? '取消点赞' : '点赞'}
+          disabled={disabled}
         >
           <svg
             className={styles.icon}

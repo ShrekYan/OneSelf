@@ -196,7 +196,6 @@ export class ArticleService {
         },
       },
     });
-
     const isLiked = !!existingLike;
 
     // 使用事务处理：保证点赞记录和计数同时更新
@@ -380,7 +379,10 @@ export class ArticleService {
 
     // 如果有用户ID，检查是否已点赞
     let isLiked = false;
+    console.log(userId);
     if (userId) {
+      console.log(userId);
+      console.log(id);
       const like = await this.prisma.articleLikes.findUnique({
         where: {
           article_id_user_id: {
@@ -392,7 +394,6 @@ export class ArticleService {
       });
       isLiked = !!like;
     }
-
     // tags 转换：逗号分隔字符串 -> string[]
     const tags: string[] = article.tags
       ? article.tags

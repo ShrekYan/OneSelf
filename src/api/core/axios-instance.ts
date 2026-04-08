@@ -82,7 +82,9 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
     // 未授权，清除所有 token 并跳转登录
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    window.location.href = '/login';
+    const currentUrl =
+      window.location.pathname + window.location.search + window.location.hash;
+    window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
   }
 
   return Promise.reject(apiError);
@@ -170,7 +172,11 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         if (!refreshToken) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          const currentUrl =
+            window.location.pathname +
+            window.location.search +
+            window.location.hash;
+          window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
           break;
         }
 
@@ -209,7 +215,11 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
                 content: '会话已过期，请重新登录',
               });
             }
-            window.location.href = '/login';
+            const currentUrl =
+              window.location.pathname +
+              window.location.search +
+              window.location.hash;
+            window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
             return Promise.resolve(null);
           });
 
@@ -241,7 +251,11 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         if (!config.skipAuth) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          const currentUrl =
+            window.location.pathname +
+            window.location.search +
+            window.location.hash;
+          window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
         }
         break;
 

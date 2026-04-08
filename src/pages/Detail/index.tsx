@@ -23,8 +23,8 @@ const Detail2Page: React.FC = () => {
     Toast.show({ content: '关注成功' });
   };
 
-  const handleToggleLike = () => {
-    store.toggleLike();
+  const handleToggleLike = async (): Promise<void> => {
+    await store.toggleLike();
   };
 
   const handleToggleCollect = () => {
@@ -182,14 +182,17 @@ const Detail2Page: React.FC = () => {
       {/* 底部互动栏 - 严格匹配设计稿结构：[点赞+收藏] 左，分隔线，[更多+分享] 右 */}
       {store.article && (
         <footer className={styles.actionBar}>
-          <ArticleActionBar
-            likeCount={store.article.likes || 0}
-            commentCount={store.article.commentsCount || 0}
-            isLiked={store.isLiked}
-            onLikeClick={handleToggleLike}
-            isCollected={store.isCollected}
-            onCollectClick={handleToggleCollect}
-          />
+          <div className={styles.actionBarContent}>
+            <ArticleActionBar
+              likeCount={store.article.likes || 0}
+              commentCount={store.article.commentsCount || 0}
+              isLiked={store.isLiked}
+              onLikeClick={handleToggleLike}
+              isCollected={store.isCollected}
+              onCollectClick={handleToggleCollect}
+              disabled={store.loading || store.likeLoading}
+            />
+          </div>
         </footer>
       )}
     </div>

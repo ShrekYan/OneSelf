@@ -68,7 +68,6 @@ export class ArticleController {
 
   @Get('detail')
   @ApiOperation({ summary: '获取文章详情' })
-  @UseGuards(JwtAuthGuard)
   getArticleDetail(
     @Query() query: GetArticleDetailRequestDto,
     @CurrentUserId() userId?: string,

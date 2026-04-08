@@ -12,6 +12,7 @@ interface ArticleActionsProps {
   onToggleCollect: () => void;
   onCommentClick: () => void;
   onShareClick: () => void;
+  disabled?: boolean;
 }
 
 const ArticleActions: React.FC<ArticleActionsProps> = ({
@@ -23,6 +24,7 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
   onToggleCollect,
   onCommentClick,
   onShareClick,
+  disabled = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -88,8 +90,9 @@ const ArticleActions: React.FC<ArticleActionsProps> = ({
       <div className={styles.actions}>
         <button
           type="button"
-          className={`${styles.actionItem} ${isLiked ? styles.active : ''}`}
+          className={`${styles.actionItem} ${isLiked ? styles.active : ''} ${disabled ? styles.disabled : ''}`}
           onClick={onToggleLike}
+          disabled={disabled}
         >
           {isLiked ? (
             <svg

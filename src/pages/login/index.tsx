@@ -40,6 +40,18 @@ const Login: React.FC = () => {
     },
   });
 
+  /**
+   * 从 URL query 获取重定向地址
+   */
+  const getRedirectUrl = (): string => {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    if (redirect) {
+      return redirect;
+    }
+    return '/';
+  };
+
   // 监听协议勾选状态
   const agreeTerms = watch('agreeTerms');
 
@@ -70,9 +82,10 @@ const Login: React.FC = () => {
           icon: 'success',
           content: 'Login successful!',
         });
-        // 这里可以保存 token 并跳转到首页
+        // 登录成功，跳转到重定向地址或首页
         setTimeout(() => {
-          navigate('/');
+          const redirectTo = getRedirectUrl();
+          navigate(redirectTo);
         }, 1000);
       } else {
         Toast.show({

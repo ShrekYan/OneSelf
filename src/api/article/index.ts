@@ -127,6 +127,22 @@ export interface ArticleDetailResponse {
 }
 
 /**
+ * 切换点赞/取消点赞请求参数
+ */
+export interface ToggleLikeRequest {
+  articleId: string;
+}
+
+/**
+ * 切换点赞/取消点赞响应
+ */
+export interface ToggleLikeResponse {
+  articleId: string;
+  likes: number;
+  isLiked: boolean;
+}
+
+/**
  * 文章 / 分类 API 模块
  */
 export const articleApi = {
@@ -160,5 +176,12 @@ export const articleApi = {
     params: GetArticleDetailRequest,
   ): Promise<ArticleDetailResponse> => {
     return await api.get('/api/v1/article/detail', { params });
+  },
+
+  /**
+   * 切换文章点赞状态（点赞 / 取消点赞）
+   */
+  toggleLike: async (data: ToggleLikeRequest): Promise<ToggleLikeResponse> => {
+    return await api.post('/api/v1/article/toggle-like', data);
   },
 };
