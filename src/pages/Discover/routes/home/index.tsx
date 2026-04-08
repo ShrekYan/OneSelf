@@ -9,7 +9,7 @@ import FeaturedArticle from './components/featured-article';
 import ArticleListItem from './components/article-list-item';
 import { useHomeStore } from './useStore';
 import { useHandleArticleClick } from './hooks/useHandleArticleClick';
-//import { useActivate, useUnactivate } from "react-activation";
+import { useActivate, useUnactivate } from 'react-activation';
 import * as handle from './handle';
 
 const HomePage: React.FC = () => {
@@ -17,13 +17,14 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const onArticleClick = useHandleArticleClick();
 
-  //  useActivate(() => {
-  //       console.log("HomePage: didActivate");
-  //   });
+  useActivate(() => {
+    console.log('HomePage: didActivate - 刷新文章列表');
+    store.fetchArticles();
+  });
 
-  //   useUnactivate(() => {
-  //       console.log("HomePage: willUnactivate");
-  //   });
+  useUnactivate(() => {
+    console.log('HomePage: willUnactivate');
+  });
 
   useEffect(() => {
     store.fetchInitialData();

@@ -114,7 +114,7 @@ export function useHomeStore(): HomeStoreType {
         // 为 API 返回的文章添加本地 isLiked 状态
         const articlesWithLocalState = response.list.map(article => ({
           ...article,
-          isLiked: false,
+          isLiked: article.isLiked ?? false,
         }));
         this.setArticles(articlesWithLocalState);
       } catch (error) {

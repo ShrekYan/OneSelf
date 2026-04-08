@@ -35,4 +35,6 @@ export interface ArticleItem {
   isTop?: boolean;
   /** 阅读时间（分钟） */
   readTime?: number;
+  /** 当前用户是否已点赞（仅登录用户接口返回） */
+  isLiked?: boolean;
 }

@@ -7,6 +7,7 @@
  * - 2xxx - 用户模块 (user)
  * - 3xxx - 文章模块 (article)
  * - 4xxx - 分类模块 (category)
+ * - 5xxx - 数据库错误 (database)
  */
 export enum BusinessErrorCode {
   // ========== 1xxx - 认证授权模块 (auth) ==========
@@ -31,6 +32,23 @@ export enum BusinessErrorCode {
   /** 文章不存在 */
   ARTICLE_NOT_FOUND = 3001,
 
+  // ========== 5xxx - 数据库错误 (database) ==========
+
+  /** 数据库唯一约束冲突 */
+  DATABASE_UNIQUE_CONSTRAINT = 5001,
+
+  /** 数据库记录不存在 */
+  DATABASE_RECORD_NOT_FOUND = 5002,
+
+  /** 外键约束冲突，无法删除 */
+  DATABASE_FOREIGN_KEY_CONSTRAINT = 5003,
+
+  /** 数据库事务冲突，请重试 */
+  DATABASE_TRANSACTION_CONFLICT = 5004,
+
+  /** 数据库连接异常 */
+  DATABASE_CONNECTION_ERROR = 5005,
+
   // ========== 可继续扩展其他模块... ==========
 }
 
@@ -44,6 +62,11 @@ export const BusinessErrorMessage: Record<BusinessErrorCode, string> = {
   [BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN]: '刷新令牌无效或已过期',
   [BusinessErrorCode.AUTH_USER_LOCKED]: '账户已被锁定，请稍后再试',
   [BusinessErrorCode.ARTICLE_NOT_FOUND]: '文章不存在',
+  [BusinessErrorCode.DATABASE_UNIQUE_CONSTRAINT]: '数据已存在，违反唯一约束',
+  [BusinessErrorCode.DATABASE_RECORD_NOT_FOUND]: '记录不存在',
+  [BusinessErrorCode.DATABASE_FOREIGN_KEY_CONSTRAINT]: '存在关联数据，无法删除',
+  [BusinessErrorCode.DATABASE_TRANSACTION_CONFLICT]: '事务冲突，请重试',
+  [BusinessErrorCode.DATABASE_CONNECTION_ERROR]: '数据库连接异常',
 };
 
 /**

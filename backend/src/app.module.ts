@@ -9,6 +9,7 @@ import { ArticleModule } from './article/article.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { CorsMiddleware } from './common/middleware/cors.middleware';
 import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
@@ -48,6 +49,7 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
     AppService,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_FILTER, useClass: BusinessExceptionFilter },
+    { provide: APP_FILTER, useClass: PrismaExceptionFilter },
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
 })
