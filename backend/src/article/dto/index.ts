@@ -14,3 +14,7 @@ export {
   AuthorInfo,
 } from './article-detail.dto';
 export { GetArticleDetailRequestDto } from './get-article-detail-request.dto';
+export { UserLikeListRequestDto } from './user-like-list-request.dto';
+export { UserLikeListResponseDto } from './user-like-list-response.dto';
+export { CheckLikeStatusRequestDto } from './check-like-status-request.dto';
+export { CheckLikeStatusResponseDto } from './check-like-status-response.dto';

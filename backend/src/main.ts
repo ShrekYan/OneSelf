@@ -2,9 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   //AppModule 是 NestJS 应用的根模块，负责启动应用并配置全局依赖。
@@ -28,14 +25,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // 全局异常过滤器
-  // 先注册兜底异常，再注册具体异常（NestJS 倒序匹配，后注册优先级更高）
-  app.useGlobalFilters(new AllExceptionsFilter());
-  app.useGlobalFilters(new BusinessExceptionFilter());
-
-  // 全局响应拦截器
-  app.useGlobalInterceptors(new TransformInterceptor());
 
   // 启用 API 版本控制，作用：让同一个接口支持多个版本（如 /v1/users 与 /v2/users），
   // 区分方式：在控制器或路由上通过 @Version('1')/@Version('2') 指定版本，

@@ -1,5 +1,8 @@
+import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessErrorCode } from '../common/constants/business-error-codes';
 import type { Articles, Prisma } from '@prisma/client';
 import {
   QueryArticleListDto,
@@ -12,8 +15,11 @@ import {
   ToggleLikeResponseDto,
   GetArticleDetailRequestDto,
   ArticleDetailDto,
+  UserLikeListRequestDto,
+  UserLikeListResponseDto,
+  CheckLikeStatusRequestDto,
+  CheckLikeStatusResponseDto,
 } from './dto';
-import { MOCK_ARTICLES, USER_LIKE_MAP, DEFAULT_USER_ID } from './mock';
 import { convertArticleContentBlocks } from './utils/article-content.converter';
 
 @Injectable()
@@ -162,47 +168,190 @@ export class ArticleService {
     };
   }
 
-  toggleLike(body: ToggleLikeRequestDto): Promise<ToggleLikeResponseDto> {
+  async toggleLike(
+    userId: string,
+    body: ToggleLikeRequestDto,
+  ): Promise<ToggleLikeResponseDto> {
     const { articleId } = body;
-    const userLikeSet = USER_LIKE_MAP.get(DEFAULT_USER_ID) ?? new Set<string>();
 
-    // 查找文章
-    const articleIndex = MOCK_ARTICLES.findIndex((a) => a.id === articleId);
-    if (articleIndex === -1) {
-      return Promise.resolve({
-        articleId,
-        likes: 0,
-        isLiked: false,
-      });
-    }
-
-    const article = MOCK_ARTICLES[articleIndex];
-    const isLiked = userLikeSet.has(articleId);
-
-    // 切换点赞状态
-    if (isLiked) {
-      // 取消点赞
-      userLikeSet.delete(articleId);
-      article.likes = article.likes - 1;
-    } else {
-      // 添加点赞
-      userLikeSet.add(articleId);
-      article.likes = article.likes + 1;
-    }
-
-    // 更新内存中的数据（所有接口共享此数据源，保证一致性）
-    USER_LIKE_MAP.set(DEFAULT_USER_ID, userLikeSet);
-    MOCK_ARTICLES[articleIndex] = { ...article };
-
-    return Promise.resolve({
-      articleId,
-      likes: article.likes,
-      isLiked: !isLiked,
+    // 检查文章是否存在
+    const article = await this.prisma.articles.findUnique({
+      where: { id: articleId },
+      select: { id: true, likes: true },
     });
+
+    if (!article) {
+      throw new BusinessException(
+        BusinessErrorCode.ARTICLE_NOT_FOUND,
+        '文章不存在',
+      );
+    }
+
+    // 检查当前点赞记录是否存在
+    const existingLike = await this.prisma.articleLikes.findUnique({
+      where: {
+        article_id_user_id: {
+          article_id: articleId,
+          user_id: userId,
+        },
+      },
+    });
+
+    const isLiked = !!existingLike;
+
+    // 使用事务处理：保证点赞记录和计数同时更新
+    const result = await this.prisma.$transaction(async (tx) => {
+      if (isLiked) {
+        // 取消点赞：删除记录，计数减 1
+        await tx.articleLikes.delete({
+          where: {
+            article_id_user_id: {
+              article_id: articleId,
+              user_id: userId,
+            },
+          },
+        });
+        await tx.articles.update({
+          where: { id: articleId },
+          data: { likes: { decrement: 1 } },
+        });
+        return { likes: article.likes - 1, isLiked: false };
+      } else {
+        // 添加点赞：创建记录，计数加 1
+        await tx.articleLikes.create({
+          data: {
+            id: crypto.randomUUID(),
+            article_id: articleId,
+            user_id: userId,
+            created_at: BigInt(Date.now()),
+          },
+        });
+        await tx.articles.update({
+          where: { id: articleId },
+          data: { likes: { increment: 1 } },
+        });
+        return { likes: article.likes + 1, isLiked: true };
+      }
+    });
+
+    return {
+      articleId,
+      likes: result.likes,
+      isLiked: result.isLiked,
+    };
+  }
+
+  async checkLikeStatus(
+    userId: string,
+    query: CheckLikeStatusRequestDto,
+  ): Promise<CheckLikeStatusResponseDto> {
+    const { articleId } = query;
+
+    const like = await this.prisma.articleLikes.findUnique({
+      where: {
+        article_id_user_id: {
+          article_id: articleId,
+          user_id: userId,
+        },
+      },
+      select: { id: true },
+    });
+
+    return {
+      articleId,
+      isLiked: !!like,
+    };
+  }
+
+  async getUserLikeList(
+    userId: string,
+    query: UserLikeListRequestDto,
+  ): Promise<UserLikeListResponseDto> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    // 查询该用户点赞总数
+    const total = await this.prisma.articleLikes.count({
+      where: { user_id: userId },
+    });
+
+    if (total === 0) {
+      return {
+        list: [],
+        total: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+
+    // 分页查询点赞记录，关联文章和分类信息
+    const likesWithArticles = await this.prisma.articleLikes.findMany({
+      where: { user_id: userId },
+      skip,
+      take: pageSize,
+      orderBy: { created_at: 'desc' },
+      include: {
+        articles: {
+          include: {
+            categories: true,
+          },
+        },
+      },
+    });
+
+    // 转换为 ArticleListItemDto 格式
+    const list: ArticleListItemDto[] = likesWithArticles
+      .map((like) => {
+        const article = like.articles as Articles & {
+          categories: { id: string; name: string };
+        };
+
+        if (!article || !article.is_published) {
+          return null; // 文章已删除或未发布，过滤掉
+        }
+
+        return {
+          id: article.id,
+          title: article.title,
+          summary: article.summary ?? undefined,
+          coverUrl: article.cover_url ?? undefined,
+          category: {
+            id: article.categories.id,
+            name: article.categories.name,
+          },
+          authorId: article.author_id,
+          authorName: article.author_name ?? undefined,
+          authorAvatar: article.author_avatar ?? undefined,
+          tags: article.tags
+            ? article.tags
+                .split(',')
+                .map((t: string) => t.trim())
+                .filter(Boolean)
+            : [],
+          views: article.views,
+          likes: article.likes,
+          commentsCount: article.comments_count,
+          publishedAt: new Date(Number(article.published_at)).toISOString(),
+          isTop: article.is_top,
+          readTime: article.read_time ?? undefined,
+        } as ArticleListItemDto;
+      })
+      .filter((item) => item !== null);
+
+    return {
+      list,
+      total,
+      page,
+      pageSize,
+      hasMore: skip + list.length < total,
+    };
   }
 
   async getArticleDetail(
     query: GetArticleDetailRequestDto,
+    userId?: string,
   ): Promise<ArticleDetailDto> {
     const { id } = query;
     // 联合查询文章 + 分类 + 内容块
@@ -228,6 +377,21 @@ export class ArticleService {
       .catch((err) => {
         console.error('递增阅读量失败:', err);
       });
+
+    // 如果有用户ID，检查是否已点赞
+    let isLiked = false;
+    if (userId) {
+      const like = await this.prisma.articleLikes.findUnique({
+        where: {
+          article_id_user_id: {
+            article_id: id,
+            user_id: userId,
+          },
+        },
+        select: { id: true },
+      });
+      isLiked = !!like;
+    }
 
     // tags 转换：逗号分隔字符串 -> string[]
     const tags: string[] = article.tags
@@ -298,8 +462,8 @@ export class ArticleService {
       // 转换后的内容块
       content,
 
-      // 用户交互状态（默认值）
-      isLiked: false,
+      // 用户交互状态
+      isLiked,
       isCollected: false,
 
       // SEO 字段

@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ArticleModule } from './article/article.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 // @Module() 是 NestJS 提供的装饰器，用于声明一个模块（Module）。
 // 模块是 NestJS 应用的基本组织单位，每个应用至少有一个根模块（AppModule）。
@@ -36,6 +40,12 @@ import { PrismaModule } from './prisma/prisma.module';
   controllers: [AppController],
   // AppService 是应用的根服务，负责处理应用的业务逻辑。
   // 这里将 AppService 导入到 AppModule 中，使得应用中的所有模块都可以使用 AppService 提供的方法。
-  providers: [AppService],
+  // 全局过滤器和拦截器通过 APP_FILTER / APP_INTERCEPTOR 令牌注册，享受完整依赖注入
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_FILTER, useClass: BusinessExceptionFilter },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+  ],
 })
 export class AppModule {}
