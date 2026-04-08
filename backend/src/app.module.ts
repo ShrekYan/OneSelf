@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { BusinessExceptionFilter } from './common/filters/business-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { CorsMiddleware } from './common/middleware/cors.middleware';
 import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 import { RequestLogMiddleware } from './common/middleware/request-log.middleware';
 
@@ -52,6 +53,8 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
+    // CORS 中间件必须放在最前面，优先处理 OPTIONS 预检请求
+    consumer.apply(CorsMiddleware).forRoutes('*');
     // 注册请求日志中间件到所有路由（必须在 JwtParse 之前，才能准确计时）
     consumer.apply(RequestLogMiddleware).forRoutes('*');
     // 注册 JWT 解析中间件到所有路由

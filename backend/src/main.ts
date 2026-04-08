@@ -7,13 +7,6 @@ async function bootstrap() {
   //AppModule 是 NestJS 应用的根模块，负责启动应用并配置全局依赖。
   const app = await NestFactory.create(AppModule);
 
-  // 启用 CORS
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
-
   // 全局验证管道：自动校验所有进入控制器的请求体/DTO
   // whitelist=true          → 只保留 DTO（Data Transfer Object，数据传输对象）中声明的属性，多余字段被过滤
   // forbidNonWhitelisted=true → 若出现多余字段直接抛 400，拒绝请求
