@@ -5,14 +5,22 @@ import { Toast } from 'antd-mobile';
 import { useDetailStore } from './useStore';
 import { ArticleActionBar } from '@/components/ArticleActionBar';
 import { LazyImage } from '@/components/LazyImage';
+import { useAppGoBack } from '@/hooks/useAppGoBack';
 import styles from './index.module.scss';
 
 const Detail2Page: React.FC = () => {
   const navigate = useNavigate();
   const store = useDetailStore();
+  // 只需要这一行！
+  // onLastPage 是可选的，当已经是最后一页时会调用
+  const handleGoBackMethod = useAppGoBack({
+    onLastPage: () => {
+      navigate('/');
+    },
+  });
 
   const handleGoBack = () => {
-    navigate(-1);
+    handleGoBackMethod();
   };
 
   const handleMore = () => {
