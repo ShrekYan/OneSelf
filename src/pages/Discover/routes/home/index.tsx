@@ -19,7 +19,7 @@ const HomePage: React.FC = () => {
 
   useActivate(() => {
     console.log('HomePage: didActivate - 刷新文章列表');
-    store.fetchArticles();
+      store.fetchInitialData();
   });
 
   useUnactivate(() => {

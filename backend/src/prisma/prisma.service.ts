@@ -4,6 +4,7 @@ import {
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { appendJsonLog } from '@/common/utils/file-logger';
 
@@ -17,7 +18,7 @@ export class PrismaService
   private readonly initialRetryDelay = 1000;
   private readonly slowQueryThreshold = 1000; // 慢查询阈值（毫秒）
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     super({
       log: [
         { emit: 'event', level: 'query' },
@@ -85,6 +86,43 @@ export class PrismaService
           context: PrismaService.name,
           message: msg,
           env: process.env.NODE_ENV || 'development',
+        });
+      }
+
+      // 解析并记录连接池配置
+      const databaseUrl = this.configService.get<string>('DATABASE_URL');
+      const connectionLimitMatch = databaseUrl?.match(/connection_limit=(\d+)/);
+      const poolTimeoutMatch = databaseUrl?.match(/pool_timeout=(\d+)/);
+      const connectTimeoutMatch = databaseUrl?.match(/connect_timeout=(\d+)/);
+
+      if (connectionLimitMatch?.[1]) {
+        const msg = `Connection pool configuration: connection_limit=${connectionLimitMatch[1]}`;
+        this.logger.log(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'info',
+          context: PrismaService.name,
+          message: msg,
+          env: process.env.NODE_ENV || 'development',
+          connectionLimit: parseInt(connectionLimitMatch[1], 10),
+          poolTimeout: poolTimeoutMatch?.[1]
+            ? parseInt(poolTimeoutMatch[1], 10)
+            : undefined,
+          connectTimeout: connectTimeoutMatch?.[1]
+            ? parseInt(connectTimeoutMatch[1], 10)
+            : undefined,
+        });
+      } else {
+        const msg =
+          'Connection pool configuration: using default connection_limit=10';
+        this.logger.log(msg);
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'info',
+          context: PrismaService.name,
+          message: msg,
+          env: process.env.NODE_ENV || 'development',
+          connectionLimit: 10,
         });
       }
     } catch (error) {

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum, IsInt, Min } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsInt, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum ArticleSortBy {
@@ -22,6 +22,7 @@ export class QueryArticleListDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   pageSize?: number = 10;
 
   @ApiProperty({ required: false, description: '按分类ID筛选' })

@@ -75,6 +75,32 @@ export class AuthService {
       this.configService.get<string>('LOCK_DURATION') || '900000',
       10,
     ); // 15分钟
+
+    // JWT 密钥强度校验
+    const nodeEnv = this.configService.get<string>('NODE_ENV') || 'development';
+    const isProduction = nodeEnv === 'production';
+
+    // 校验密钥强度的辅助函数
+    const validateSecret = (secret: string, name: string): void => {
+      if (
+        !secret ||
+        secret === `default-${name.toLowerCase()}` ||
+        secret.length < 32
+      ) {
+        const message = `${name} must be configured with a strong key (length ≥ 32 characters)`;
+        if (isProduction) {
+          throw new Error(
+            `❌ ${message} in production. Please check your environment configuration.`,
+          );
+        } else {
+          console.warn(
+            `⚠️  ${message}. This is insfecure for production deployment.`,
+          );
+        }
+      }
+    };
+    validateSecret(this.jwtSecret, 'JWT_SECRET');
+    validateSecret(this.jwtRefreshSecret, 'JWT_REFRESH_SECRET');
   }
 
   /**

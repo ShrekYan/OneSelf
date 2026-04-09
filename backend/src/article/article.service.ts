@@ -120,21 +120,19 @@ export class ArticleService {
 
   async getFeaturedArticles(): Promise<FeaturedArticleListResponseDto> {
     // 查询置顶且已发布的文章，按发布时间倒序，限制返回数量
-    const articlesWithCategories =
-      (await // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      (this.prisma as any).articles.findMany({
-        where: {
-          is_top: true,
-          is_published: true,
-        },
-        include: {
-          categories: true,
-        },
-        orderBy: {
-          published_at: 'desc',
-        },
-        take: 5,
-      })) as (Articles & { categories: { id: string; name: string } })[];
+    const articlesWithCategories = (await this.prisma.articles.findMany({
+      where: {
+        is_top: true,
+        is_published: true,
+      },
+      include: {
+        categories: true,
+      },
+      orderBy: {
+        published_at: 'desc',
+      },
+      take: 5,
+    })) as (Articles & { categories: { id: string; name: string } })[];
 
     // 转换数据库结果为 DTO 格式（复用与列表查询相同的转换逻辑）
     const list: FeaturedArticleItemDto[] = articlesWithCategories.map(
@@ -276,7 +274,6 @@ export class ArticleService {
     const total = await this.prisma.articleLikes.count({
       where: { user_id: userId },
     });
-
     if (total === 0) {
       return {
         list: [],
