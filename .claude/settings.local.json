@@ -13,6 +13,6 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "figma"
+ 
   ]
 }
