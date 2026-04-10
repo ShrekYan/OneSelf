@@ -201,22 +201,20 @@ const [list, total] = await Promise.all([
 
 ## 4. 命名转换规范
 
-Prisma schema 中定义的字段名就是 TypeScript 中使用的名称。因此遵循：
-
-- **schema.prisma 中**: 数据库字段使用下划线命名（与数据库一致）
-- **转换到 DTO**: 在 Service 中手动转换为驼峰命名返回
+✅ **schema.prisma 中**: 数据库字段使用下划线命名（与数据库一致）
+✅ **转换到 DTO**: 在 Service 中手动转换为驼峰命名返回
 
 ```typescript
-// 数据库查询结果（字段名与 schema 定义一致，即下划线）
-const category: Category = await this.prisma.category.findUnique(...);
-
-// 转换为 DTO 驼峰命名
+// ✅ 正确 - 下划线 → 驼峰转换
 return {
   id: category.id,
   name: category.name,
-  articleCount: category.article_count,  // 下划线 → 驼峰
-  imageUrl: category.image_url,          // 下划线 → 驼峰
+  articleCount: category.article_count,
+  imageUrl: category.image_url,
 };
+
+// ❌ 错误 - 直接返回，字段名还是下划线
+return category;
 ```
 
 **说明**: 本项目选择手动转换，简单直接，不需要额外依赖。
