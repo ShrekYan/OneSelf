@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'antd-mobile';
-import { userApi } from '@/api';
+import { authApi } from '@/api';
 
 /**
  * 处理退出登录
@@ -19,7 +19,7 @@ export const useHandleSignOut = () => {
 
     if (confirmed) {
       try {
-        await userApi.signOut();
+        await authApi.logout();
         // 清除本地存储的所有认证信息
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

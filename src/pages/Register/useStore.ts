@@ -1,5 +1,5 @@
 import { useLocalObservable } from 'mobx-react';
-import { userApi } from '@/api';
+import { authApi } from '@/api';
 import type { RegisterFormData } from './schema';
 
 /**
@@ -113,7 +113,7 @@ export const useRegisterStore = () => {
         };
 
         // 调用真实 API
-        const result = await userApi.register(params, {
+        const result = await authApi.register(params, {
           skipAuth: true, // 注册接口不需要认证
           skipErrorToast: true, // 不使用拦截器自动提示，我们自己处理
         });

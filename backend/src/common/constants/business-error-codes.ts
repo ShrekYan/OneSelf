@@ -27,6 +27,11 @@ export enum BusinessErrorCode {
   /** 用户已被锁定（登录失败次数过多）*/
   AUTH_USER_LOCKED = 1005,
 
+  // ========== 2xxx - 用户模块 (user) ==========
+
+  /** 用户不存在 */
+  USER_NOT_FOUND = 2001,
+
   // ========== 3xxx - 文章模块 (article) ==========
 
   /** 文章不存在 */
@@ -61,6 +66,7 @@ export const BusinessErrorMessage: Record<BusinessErrorCode, string> = {
   [BusinessErrorCode.AUTH_MOBILE_ALREADY_REGISTERED]: '手机号已注册',
   [BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN]: '刷新令牌无效或已过期',
   [BusinessErrorCode.AUTH_USER_LOCKED]: '账户已被锁定，请稍后再试',
+  [BusinessErrorCode.USER_NOT_FOUND]: '用户不存在',
   [BusinessErrorCode.ARTICLE_NOT_FOUND]: '文章不存在',
   [BusinessErrorCode.DATABASE_UNIQUE_CONSTRAINT]: '数据已存在，违反唯一约束',
   [BusinessErrorCode.DATABASE_RECORD_NOT_FOUND]: '记录不存在',

@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ArticleModule } from './article/article.module';
+import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
 import { CorsMiddleware } from './common/middleware/cors.middleware';
@@ -36,6 +37,8 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
     CategoryModule,
     // ArticleModule 负责文章相关接口
     ArticleModule,
+    // UsersModule 负责用户信息查询和更新
+    UsersModule,
   ],
   // AppController 是应用的根控制器，负责处理应用的 HTTP 请求。
   // 这里将 AppController 导入到 AppModule 中，使得应用中的所有模块都可以使用 AppController 提供的路由处理方法。

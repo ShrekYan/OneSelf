@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
- * 用户信息 DTO
- * 登录/注册成功后返回的简化用户信息
+ * 用户信息响应 DTO
+ * 返回当前登录用户的详细信息
  */
-export class UserDto {
+export class UserInfoDto {
   @ApiProperty({
     description: '用户 ID',
     example: 'author-1',
@@ -37,4 +37,11 @@ export class UserDto {
     required: false,
   })
   avatar?: string;
+
+  @ApiProperty({
+    description: '个人简介',
+    example: '热爱写作的程序员',
+    required: false,
+  })
+  bio?: string;
 }

@@ -1,7 +1,7 @@
 import { useLocalObservable } from 'mobx-react';
-import { userApi } from '@/api';
+import { authApi } from '@/api';
 import type { LoginFormData } from './schema';
-import type { LoginResponse } from '@/api/user';
+import type { LoginResponse } from '@/api/auth';
 
 /**
  * 登录 API 响应类型
@@ -61,7 +61,7 @@ export const useLoginStore = () => {
       this.isLoading = true;
 
       try {
-        const result: LoginResponse = await userApi.login(
+        const result: LoginResponse = await authApi.login(
           {
             username: formData.username,
             password: formData.password,
