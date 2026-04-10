@@ -125,6 +125,8 @@ export function useHomeStore(): HomeStoreType {
         pageSize: 10,
         categoryId: this.activeCategoryId || undefined,
       });
+      this.setArticles(response.list);
+      this.setLoading(false);
       return response.list;
     },
 

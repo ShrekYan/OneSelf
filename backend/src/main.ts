@@ -37,7 +37,7 @@ async function bootstrap() {
     .setDescription('API Documentation')
     .setVersion('1.0')
     .addTag('health', '健康检查')
-    .addTag('product', '商品接口')
+    .addTag('product', '博客接口')
     .addBearerAuth()
     .build();
 
