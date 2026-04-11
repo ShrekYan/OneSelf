@@ -165,4 +165,110 @@ export class RedisService
       return false;
     }
   }
+
+  /**
+   * 记录 Redis 操作日志到自定义日志系统
+   * @param operation - 操作类型
+   * @param key - Redis 键
+   * @param success - 是否成功
+   * @param error - 错误对象（失败时）
+   */
+  private logRedisOperation(
+    operation: 'get' | 'set' | 'del',
+    key: string,
+    success: boolean,
+    error?: Error,
+  ): void {
+    appendJsonLog({
+      timestamp: new Date().toISOString(),
+      level: success ? 'debug' : 'error',
+      context: RedisService.name,
+      message: `Redis ${operation} operation ${success ? 'succeeded' : 'failed'}`,
+      operation,
+      key,
+      error: error
+        ? error instanceof Error
+          ? error.message
+          : String(error)
+        : undefined,
+      env: process.env.NODE_ENV || 'development',
+    });
+  }
+
+  /**
+   * 重写 get 方法，添加操作日志
+   * @param key - Redis 键
+   * @returns 值或者 null
+   */
+  override async get(key: string): Promise<string | null> {
+    try {
+      const result = await super.get(key);
+      this.logRedisOperation('get', key, true);
+      return result;
+    } catch (error) {
+      this.logRedisOperation('get', key, false, error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * 重写 set 方法，添加操作日志
+   * 支持 ioredis set 的可变参数形式
+   * @param key - Redis 键
+   * @param value - 值
+   * @param args - 额外参数（如 EX, EX 10 等）
+   * @returns 'OK'
+   */
+  override async set(
+    key: string,
+    value: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
+  ): Promise<'OK'> {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const result = await super.set(key, value, ...args);
+      this.logRedisOperation('set', key, true);
+      return result;
+    } catch (error) {
+      this.logRedisOperation('set', key, false, error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * 重写 del 方法，添加操作日志
+   * 支持 ioredis del 的所有重载形式（删除单个/多个键，带/不带回调）
+   * @returns 删除的键数量
+   */
+  override del(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
+  ): Promise<number> {
+    try {
+      // 提取键列表（排除回调函数）
+      const keys = args.filter(
+        (arg) => typeof arg === 'string' || Buffer.isBuffer(arg),
+      ) as string[];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const result = super.del(...args);
+
+      // 对每个删除的键都记录日志（只记录 string 类型的键）
+      keys.forEach((key) => {
+        if (typeof key === 'string') {
+          this.logRedisOperation('del', key, true);
+        }
+      });
+
+      return result;
+    } catch (error) {
+      // 第一个键用于日志
+      const keys = args.filter(
+        (arg) => typeof arg === 'string' || Buffer.isBuffer(arg),
+      ) as string[];
+      const firstKey = keys.length > 0 ? keys[0] : 'unknown';
+      this.logRedisOperation('del', String(firstKey), false, error as Error);
+      throw error;
+    }
+  }
 }

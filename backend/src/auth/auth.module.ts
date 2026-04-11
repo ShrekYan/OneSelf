@@ -5,6 +5,7 @@ import { CommonModule } from '../common/common.module';
 import { RedisModule } from '../redis/redis.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { PasswordCacheService } from './password-cache.service';
 
 /**
  * 认证模块
@@ -13,7 +14,7 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [ConfigModule, PrismaModule, CommonModule, RedisModule],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, PasswordCacheService],
   exports: [AuthService],
 })
 export class AuthModule {}

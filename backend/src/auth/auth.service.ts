@@ -2,6 +2,7 @@ import { Injectable, HttpStatus, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { PasswordCacheService } from './password-cache.service';
 import bcrypt from 'bcrypt';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -52,13 +53,13 @@ export class AuthService {
   private readonly refreshExpiresIn: number;
   private readonly maxLoginAttempts: number;
   private readonly lockDuration: number;
-  private readonly passwordCacheTtl = 600; // 密码缓存过期时间（秒）= 10分钟
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
+    private readonly passwordCacheService: PasswordCacheService,
   ) {
     // 从环境变量读取 JWT 配置和其他配置
     this.jwtSecret =
@@ -203,28 +204,11 @@ export class AuthService {
     const startTime = Date.now();
 
     // 先尝试从 Redis 获取缓存的密码哈希
-    const cacheKey = `login:password:${username}`;
-    let cachedPasswordHash: string | null = null;
-    let userFromDb = false;
-
-    try {
-      cachedPasswordHash = await this.redisService.get(cacheKey);
-    } catch (error) {
-      // Redis 出错不阻塞，降级到数据库查询
-      this.logger.warn(
-        `Redis get password cache failed, fallback to database: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      appendJsonLog({
-        timestamp: new Date().toISOString(),
-        level: 'warn',
-        context: AuthService.name,
-        message: 'Redis get password cache failed, fallback to database',
-        error: error instanceof Error ? error.message : String(error),
-        env: process.env.NODE_ENV || 'development',
-      });
-    }
+    const cachedPasswordHash =
+      await this.passwordCacheService.getCachedPasswordHash(username);
 
     let user: User | null;
+    let userFromDb = false;
 
     if (cachedPasswordHash) {
       // 缓存命中：只查询必要的用户信息（不包含密码哈希，已经从缓存获取）
@@ -254,18 +238,12 @@ export class AuthService {
       } else {
         user = null;
         // 用户不存在，清除缓存
-        try {
-          await this.redisService.del(cacheKey);
-        } catch {
-          /* ignore */
-        }
+        await this.passwordCacheService.deletePasswordCache(username);
       }
     } else {
       // 缓存未命中：从数据库查询完整信息
       user = await this.findUserByUsername(username);
       userFromDb = true;
-
-      // 如果找到用户且登录成功，写入缓存（后续验证成功后再缓存）
     }
 
     if (!user) {
@@ -292,30 +270,10 @@ export class AuthService {
 
     // 验证成功，如果是从数据库加载的，写入 Redis 缓存
     if (userFromDb) {
-      try {
-        await this.redisService.set(
-          cacheKey,
-          user.password_hash,
-          'EX',
-          this.passwordCacheTtl,
-        );
-        this.logger.debug(
-          `Password cached for username=${username}, ttl=${this.passwordCacheTtl}s`,
-        );
-      } catch (error) {
-        // 缓存写入失败不影响登录流程
-        this.logger.warn(
-          `Failed to cache password for username=${username}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-        appendJsonLog({
-          timestamp: new Date().toISOString(),
-          level: 'warn',
-          context: AuthService.name,
-          message: `Failed to cache password for username=${username}`,
-          error: error instanceof Error ? error.message : String(error),
-          env: process.env.NODE_ENV || 'development',
-        });
-      }
+      await this.passwordCacheService.setPasswordCache(
+        username,
+        user.password_hash,
+      );
     }
 
     // 重置登录失败次数
@@ -513,23 +471,11 @@ export class AuthService {
       },
     });
 
-    // 更新 Redis 缓存
-    const cacheKey = `login:password:${username}`;
-    try {
-      // 更新缓存
-      // 缓存过期时间 1 小时
-      await this.redisService.set(
-        cacheKey,
-        newHash,
-        'EX',
-        this.passwordCacheTtl,
-      );
-    } catch (error) {
-      // 更新缓存失败不影响，下次从数据库加载
-      this.logger.warn(
-        `Failed to update cache after migration for user ${username}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
+    // 更新 Redis 缓存 - 委托给 PasswordCacheService
+    await this.passwordCacheService.updatePasswordCacheAfterMigration(
+      username,
+      newHash,
+    );
 
     appendJsonLog({
       timestamp: new Date().toISOString(),

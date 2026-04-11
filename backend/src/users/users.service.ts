@@ -20,7 +20,7 @@ export class UsersService {
    * @returns 用户信息 DTO
    */
   async getUserInfo(userId: string): Promise<UserInfoDto> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
     const user = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -43,7 +43,7 @@ export class UsersService {
     updateDto: UpdateProfileDto,
   ): Promise<UserInfoDto> {
     // 检查用户是否存在
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
     const existing = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -69,7 +69,7 @@ export class UsersService {
       updateData.bio = updateDto.bio;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
     const updated = await (this.prismaService as any).users.update({
       where: { id: userId },
       data: updateData,
