@@ -219,10 +219,10 @@ export class RedisService
    * @param args - 额外参数（如 EX, EX 10 等）
    * @returns 'OK'
    */
+
   override async set(
     key: string,
     value: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...args: any[]
   ): Promise<'OK'> {
     try {
@@ -241,10 +241,8 @@ export class RedisService
    * 支持 ioredis del 的所有重载形式（删除单个/多个键，带/不带回调）
    * @returns 删除的键数量
    */
-  override del(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...args: any[]
-  ): Promise<number> {
+
+  override del(...args: any[]): Promise<number> {
     try {
       // 提取键列表（排除回调函数）
       const keys = args.filter(

@@ -53,6 +53,7 @@ export class AuthService {
   private readonly refreshExpiresIn: number;
   private readonly maxLoginAttempts: number;
   private readonly lockDuration: number;
+  private readonly argon2Options: argon2.Options;
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
@@ -109,6 +110,20 @@ export class AuthService {
     };
     validateSecret(this.jwtSecret, 'JWT_SECRET');
     validateSecret(this.jwtRefreshSecret, 'JWT_REFRESH_SECRET');
+
+    // 从环境变量读取 argon2 参数，平衡安全性与性能
+    this.argon2Options = {
+      type: argon2.argon2id,
+      memoryCost: parseInt(
+        this.configService.get<string>('ARGON2_MEMORY_COST') || '4096',
+        10,
+      ),
+      timeCost: parseInt(
+        this.configService.get<string>('ARGON2_TIME_COST') || '2',
+        10,
+      ),
+      parallelism: 1,
+    } as unknown as argon2.Options;
   }
 
   /**
@@ -151,7 +166,7 @@ export class AuthService {
     const newId = `author-${nextNumber}`;
 
     // 加密密码 - 新用户默认使用 argon2id
-    const passwordHash = await argon2.hash(password);
+    const passwordHash = await argon2.hash(password, this.argon2Options);
 
     // 创建用户
     const now = BigInt(Date.now());
@@ -457,8 +472,35 @@ export class AuthService {
     username: string,
     plainPassword: string,
   ): Promise<void> {
+    // 检查环境变量开关：是否启用自动迁移
+    const enabled = this.configService.get<boolean>(
+      'PASSWORD_AUTO_MIGRATION_ENABLED',
+      true,
+    );
+    if (!enabled) {
+      this.logger.debug(
+        `Password auto migration disabled, skipped for user ${username}`,
+      );
+      return;
+    }
+
+    // 迁移前先查询当前算法，确认还是 bcrypt 才执行
+    // 防止已经迁移过了重复执行，浪费 CPU 和 IO
+    const currentUser = await this.prismaService.users.findUnique({
+      where: { id: userId },
+      select: { password_algorithm: true },
+    });
+
+    if (!currentUser || currentUser.password_algorithm !== 'bcrypt') {
+      // 已经迁移过了，跳过
+      this.logger.debug(
+        `Password already migrated to argon2id, skipped migration for user ${username}`,
+      );
+      return;
+    }
+
     // 使用 argon2id 重新哈希
-    const newHash = await argon2.hash(plainPassword);
+    const newHash = await argon2.hash(plainPassword, this.argon2Options);
     const now = BigInt(Date.now());
 
     // 更新数据库
@@ -585,6 +627,20 @@ export class AuthService {
    * @returns 是否有效
    */
   private async validateRefreshToken(token: string): Promise<boolean> {
+    // 先尝试从 Redis 缓存获取
+    const cacheKey = `refresh:token:${token}`;
+
+    try {
+      const cached = await this.redisService.get(cacheKey);
+      if (cached === 'valid') {
+        // 缓存命中，直接返回有效
+        return true;
+      }
+    } catch {
+      // Redis 出错不阻塞，降级查询数据库
+    }
+
+    // 缓存未命中或 Redis 出错，查询数据库
     const record = await this.prismaService.refreshTokens.findUnique({
       where: { refresh_token: token },
     });
@@ -595,6 +651,18 @@ export class AuthService {
     const now = BigInt(Date.now());
     if (record.expires_at < now) return false;
 
+    // 验证成功，写入 Redis 缓存
+    try {
+      const ttlSeconds = Number(
+        (record.expires_at - BigInt(Date.now())) / 1000n,
+      );
+      if (ttlSeconds > 0) {
+        await this.redisService.set(cacheKey, 'valid', 'EX', ttlSeconds);
+      }
+    } catch {
+      // 缓存写入失败不影响验证结果
+    }
+
     return true;
   }
 
@@ -603,6 +671,23 @@ export class AuthService {
    * @param userId - 用户 ID
    */
   private async deleteAllRefreshTokens(userId: string) {
+    // 先查询所有 token，清除 Redis 缓存
+    const tokens = await this.prismaService.refreshTokens.findMany({
+      where: { user_id: userId },
+      select: { refresh_token: true },
+    });
+
+    // 逐个清除 Redis 缓存
+    for (const { refresh_token } of tokens) {
+      const cacheKey = `refresh:token:${refresh_token}`;
+      try {
+        await this.redisService.del(cacheKey);
+      } catch {
+        // 删除缓存失败不影响主流程
+      }
+    }
+
+    // 删除数据库记录
     await this.prismaService.refreshTokens.deleteMany({
       where: { user_id: userId },
     });
