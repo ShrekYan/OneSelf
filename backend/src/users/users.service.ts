@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
+import { UserCacheService } from './user-cache.service';
 import { UserInfoDto } from './dto';
 import { UpdateProfileDto } from './dto';
 import type { Users } from '@prisma/client';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * 用户信息服务
@@ -15,7 +18,10 @@ import type { Users } from '@prisma/client';
  */
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly userCacheService: UserCacheService,
+  ) {}
 
   /**
    * 获取当前用户信息
@@ -74,6 +80,13 @@ export class UsersService {
       where: { id: userId },
       data: updateData,
     });
+
+    // 更新用户信息后，删除缓存保证一致性
+    // existing 是查询得到的，肯定有 username
+    const username = (existing as Users).username;
+    if (username) {
+      await this.userCacheService.deleteUserInfoCache(username);
+    }
 
     return this.mapToDto(updated as Users);
   }

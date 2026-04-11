@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { PasswordCacheService } from './password-cache.service';
+import { UserCacheService } from '../users/user-cache.service';
 import bcrypt from 'bcrypt';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -61,6 +62,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
     private readonly passwordCacheService: PasswordCacheService,
+    private readonly userCacheService: UserCacheService,
   ) {
     // 从环境变量读取 JWT 配置和其他配置
     this.jwtSecret =
@@ -218,50 +220,56 @@ export class AuthService {
     const { username, password } = loginDto;
     const startTime = Date.now();
 
-    // 先尝试从 Redis 获取缓存的密码哈希
-    const cachedPasswordHash =
-      await this.passwordCacheService.getCachedPasswordHash(username);
+    // 先尝试从 Redis 获取缓存的用户全信息
+    const cachedUserInfo =
+      await this.userCacheService.getCachedUserInfo(username);
 
     let user: User | null;
     let userFromDb = false;
 
-    if (cachedPasswordHash) {
-      // 缓存命中：只查询必要的用户信息（不包含密码哈希，已经从缓存获取）
-      const dbUser = await this.prismaService.users.findUnique({
-        where: { username },
-        select: {
-          id: true,
-          username: true,
-          password_algorithm: true,
-          email: true,
-          nickname: true,
-          avatar: true,
-          is_active: true,
-          created_at: true,
-          updated_at: true,
-        },
-      });
-
-      if (dbUser) {
-        user = {
-          ...dbUser,
-          password_hash: cachedPasswordHash,
-        };
-        this.logger.debug(
-          `Password cache hit for username=${username}, elapsed=${Date.now() - startTime}ms`,
-        );
-      } else {
-        user = null;
-        // 用户不存在，清除缓存
-        await this.passwordCacheService.deletePasswordCache(username);
-      }
+    if (cachedUserInfo) {
+      // 用户信息缓存命中：直接使用缓存数据，完全跳过 DB 查询
+      user = {
+        id: cachedUserInfo.id,
+        username: cachedUserInfo.username,
+        password_hash: cachedUserInfo.password_hash,
+        password_algorithm: cachedUserInfo.password_algorithm,
+        email: cachedUserInfo.email,
+        nickname: cachedUserInfo.nickname,
+        avatar: cachedUserInfo.avatar,
+        is_active: cachedUserInfo.is_active,
+        created_at: cachedUserInfo.created_at,
+        updated_at: cachedUserInfo.updated_at,
+      };
+      this.logger.debug(
+        `User info cache hit for username=${username}, elapsed=${Date.now() - startTime}ms`,
+      );
     } else {
       // 缓存未命中：从数据库查询完整信息
       user = await this.findUserByUsername(username);
       userFromDb = true;
+
+      // 查询成功，写入用户信息缓存
+      if (user) {
+        await this.userCacheService.setUserInfoCache(username, {
+          id: user.id,
+          username: user.username,
+          password_hash: user.password_hash,
+          password_algorithm: user.password_algorithm,
+          email: user.email,
+          nickname: user.nickname,
+          avatar: user.avatar,
+          is_active: user.is_active,
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+        });
+      }
     }
 
     if (!user) {
+      // 用户不存在，清除缓存
+      await this.userCacheService.deleteUserInfoCache(username);
+      await this.passwordCacheService.deletePasswordCache(username);
       throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
@@ -518,6 +526,9 @@ export class AuthService {
       username,
       newHash,
     );
+
+    // 删除用户信息缓存，让下次登录重新缓存最新数据
+    await this.userCacheService.deleteUserInfoCache(username);
 
     appendJsonLog({
       timestamp: new Date().toISOString(),
