@@ -89,7 +89,14 @@ export class UserCacheService {
     const cacheKey = this.getCacheKey(username);
 
     try {
-      const json = JSON.stringify(userInfo);
+      // 序列化前将 bigint 转换为 number（JSON.stringify 不支持 bigint）
+      // created_at / updated_at 是时间戳，数值在 Number.MAX_SAFE_INTEGER 范围内，转换安全
+      const serialized = {
+        ...userInfo,
+        created_at: Number(userInfo.created_at),
+        updated_at: Number(userInfo.updated_at),
+      };
+      const json = JSON.stringify(serialized);
       await this.redisService.set(cacheKey, json, 'EX', this.userInfoCacheTtl);
       this.logger.debug(
         `User info cached for username=${username}, ttl=${this.userInfoCacheTtl}s`,

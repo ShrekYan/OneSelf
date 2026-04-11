@@ -226,7 +226,6 @@ export class AuthService {
 
     let user: User | null;
     let userFromDb = false;
-
     if (cachedUserInfo) {
       // 用户信息缓存命中：直接使用缓存数据，完全跳过 DB 查询
       user = {
