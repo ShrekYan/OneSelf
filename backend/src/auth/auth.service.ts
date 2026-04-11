@@ -1,16 +1,20 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
+import { appendJsonLog } from '@/common/utils/file-logger';
 
 interface User {
   id: string;
   username: string;
   password_hash: string;
+  password_algorithm: string | null;
   email: string | null;
   nickname: string | null;
   avatar: string | null;
@@ -48,10 +52,13 @@ export class AuthService {
   private readonly refreshExpiresIn: number;
   private readonly maxLoginAttempts: number;
   private readonly lockDuration: number;
+  private readonly passwordCacheTtl = 600; // 密码缓存过期时间（秒）= 10分钟
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
+    private readonly redisService: RedisService,
   ) {
     // 从环境变量读取 JWT 配置和其他配置
     this.jwtSecret =
@@ -142,8 +149,8 @@ export class AuthService {
     }
     const newId = `author-${nextNumber}`;
 
-    // 加密密码
-    const passwordHash = await bcrypt.hash(password, 12);
+    // 加密密码 - 新用户默认使用 argon2id
+    const passwordHash = await argon2.hash(password);
 
     // 创建用户
     const now = BigInt(Date.now());
@@ -152,6 +159,7 @@ export class AuthService {
         id: newId,
         username: mobile,
         password_hash: passwordHash,
+        password_algorithm: 'argon2id',
         email: null,
         nickname: null,
         avatar: null,
@@ -192,10 +200,74 @@ export class AuthService {
    */
   async login(loginDto: LoginDto, clientIp: string): Promise<LoginResponseDto> {
     const { username, password } = loginDto;
+    const startTime = Date.now();
 
-    // 从数据库查找用户
-    const user = await this.findUserByUsername(username);
-    console.log(user);
+    // 先尝试从 Redis 获取缓存的密码哈希
+    const cacheKey = `login:password:${username}`;
+    let cachedPasswordHash: string | null = null;
+    let userFromDb = false;
+
+    try {
+      cachedPasswordHash = await this.redisService.get(cacheKey);
+    } catch (error) {
+      // Redis 出错不阻塞，降级到数据库查询
+      this.logger.warn(
+        `Redis get password cache failed, fallback to database: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      appendJsonLog({
+        timestamp: new Date().toISOString(),
+        level: 'warn',
+        context: AuthService.name,
+        message: 'Redis get password cache failed, fallback to database',
+        error: error instanceof Error ? error.message : String(error),
+        env: process.env.NODE_ENV || 'development',
+      });
+    }
+
+    let user: User | null;
+
+    if (cachedPasswordHash) {
+      // 缓存命中：只查询必要的用户信息（不包含密码哈希，已经从缓存获取）
+      const dbUser = await this.prismaService.users.findUnique({
+        where: { username },
+        select: {
+          id: true,
+          username: true,
+          password_algorithm: true,
+          email: true,
+          nickname: true,
+          avatar: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
+        },
+      });
+
+      if (dbUser) {
+        user = {
+          ...dbUser,
+          password_hash: cachedPasswordHash,
+        };
+        this.logger.debug(
+          `Password cache hit for username=${username}, elapsed=${Date.now() - startTime}ms`,
+        );
+      } else {
+        user = null;
+        // 用户不存在，清除缓存
+        try {
+          await this.redisService.del(cacheKey);
+        } catch {
+          /* ignore */
+        }
+      }
+    } else {
+      // 缓存未命中：从数据库查询完整信息
+      user = await this.findUserByUsername(username);
+      userFromDb = true;
+
+      // 如果找到用户且登录成功，写入缓存（后续验证成功后再缓存）
+    }
+
     if (!user) {
       throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
@@ -205,8 +277,12 @@ export class AuthService {
       throw new BusinessException(BusinessErrorCode.AUTH_USER_DISABLED);
     }
 
-    // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    // 根据算法选择验证方法验证密码
+    const isPasswordValid = await this.verifyPassword(
+      password,
+      user.password_hash,
+      user.password_algorithm,
+    );
 
     if (!isPasswordValid) {
       // 增加登录失败次数
@@ -214,8 +290,64 @@ export class AuthService {
       throw new BusinessException(BusinessErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
+    // 验证成功，如果是从数据库加载的，写入 Redis 缓存
+    if (userFromDb) {
+      try {
+        await this.redisService.set(
+          cacheKey,
+          user.password_hash,
+          'EX',
+          this.passwordCacheTtl,
+        );
+        this.logger.debug(
+          `Password cached for username=${username}, ttl=${this.passwordCacheTtl}s`,
+        );
+      } catch (error) {
+        // 缓存写入失败不影响登录流程
+        this.logger.warn(
+          `Failed to cache password for username=${username}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        appendJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'warn',
+          context: AuthService.name,
+          message: `Failed to cache password for username=${username}`,
+          error: error instanceof Error ? error.message : String(error),
+          env: process.env.NODE_ENV || 'development',
+        });
+      }
+    }
+
     // 重置登录失败次数
     await this.handleLoginSuccess(user, clientIp);
+
+    // 静默迁移：如果当前用户还是 bcrypt 算法，异步升级为 argon2id
+    if (!user.password_algorithm || user.password_algorithm === 'bcrypt') {
+      // 不阻塞登录响应，异步执行升级
+      setImmediate(() => {
+        void (async () => {
+          try {
+            await this.silentMigrateToArgon2id(user.id, username, password);
+            this.logger.log(
+              `Silent password migration completed for user ${username} (bcrypt → argon2id)`,
+            );
+          } catch (error) {
+            // 迁移失败不影响当前登录，下次登录再试
+            this.logger.warn(
+              `Silent password migration failed for user ${username}: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            appendJsonLog({
+              timestamp: new Date().toISOString(),
+              level: 'warn',
+              context: AuthService.name,
+              message: `Silent password migration failed for user ${username}`,
+              error: error instanceof Error ? error.message : String(error),
+              env: process.env.NODE_ENV || 'development',
+            });
+          }
+        })();
+      });
+    }
 
     // 生成 Token
     const accessToken = this.generateAccessToken(user.id, clientIp);
@@ -231,6 +363,10 @@ export class AuthService {
       avatar: user.avatar ?? undefined,
       nickname: user.nickname ?? undefined,
     };
+
+    this.logger.debug(
+      `Login completed for username=${username}, elapsed=${Date.now() - startTime}ms`,
+    );
 
     // 直接返回数据，TransformInterceptor 会自动包装成 ApiResult.success
     return {
@@ -333,6 +469,78 @@ export class AuthService {
   }
 
   /**
+   * 验证密码（支持多种算法）
+   * @param plainPassword - 明文密码
+   * @param hashedPassword - 哈希密码
+   * @param algorithm - 算法名称（null 表示 bcrypt）
+   * @returns 是否验证通过
+   */
+  private async verifyPassword(
+    plainPassword: string,
+    hashedPassword: string,
+    algorithm: string | null,
+  ): Promise<boolean> {
+    if (algorithm === 'argon2id') {
+      return argon2.verify(hashedPassword, plainPassword);
+    }
+    // 默认兼容 bcrypt
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  /**
+   * 静默迁移密码算法 bcrypt → argon2id
+   * 用户登录成功后异步执行，重新哈希密码并更新数据库，同时更新缓存
+   * @param userId - 用户 ID
+   * @param username - 用户名（用于缓存）
+   * @param plainPassword - 明文密码（登录成功后仍然在内存中，可以直接使用）
+   */
+  private async silentMigrateToArgon2id(
+    userId: string,
+    username: string,
+    plainPassword: string,
+  ): Promise<void> {
+    // 使用 argon2id 重新哈希
+    const newHash = await argon2.hash(plainPassword);
+    const now = BigInt(Date.now());
+
+    // 更新数据库
+    await this.prismaService.users.update({
+      where: { id: userId },
+      data: {
+        password_hash: newHash,
+        password_algorithm: 'argon2id',
+        updated_at: now,
+      },
+    });
+
+    // 更新 Redis 缓存
+    const cacheKey = `login:password:${username}`;
+    try {
+      // 更新缓存
+      // 缓存过期时间 1 小时
+      await this.redisService.set(
+        cacheKey,
+        newHash,
+        'EX',
+        this.passwordCacheTtl,
+      );
+    } catch (error) {
+      // 更新缓存失败不影响，下次从数据库加载
+      this.logger.warn(
+        `Failed to update cache after migration for user ${username}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+
+    appendJsonLog({
+      timestamp: new Date().toISOString(),
+      level: 'info',
+      context: AuthService.name,
+      message: `Silent password migration completed: userId=${userId}, username=${username}, algorithm=bcrypt→argon2id`,
+      env: process.env.NODE_ENV || 'development',
+    });
+  }
+
+  /**
    * 处理登录成功
    * @param user - 用户对象
    * @param clientIp - 客户端 IP
@@ -368,6 +576,7 @@ export class AuthService {
         id: user.id,
         username: user.username,
         password_hash: user.password_hash,
+        password_algorithm: user.password_algorithm ?? null,
         email: user.email,
         nickname: user.nickname,
         avatar: user.avatar,
@@ -379,10 +588,12 @@ export class AuthService {
 
     // 保留默认 admin 用户用于测试
     if (username === 'admin') {
+      // 默认 admin 用户使用 bcrypt
       return {
         id: 'author-1',
         username: 'admin',
         password_hash: await bcrypt.hash('admin123', 12),
+        password_algorithm: 'bcrypt',
         email: 'admin@example.com',
         nickname: '管理员',
         avatar: null,

@@ -8,6 +8,7 @@ import { ArticleModule } from './article/article.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
+import { RedisModule } from './redis/redis.module';
 import { CorsMiddleware } from './common/middleware/cors.middleware';
 import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 import { RequestLogMiddleware } from './common/middleware/request-log.middleware';
@@ -31,6 +32,8 @@ import { RequestLogMiddleware } from './common/middleware/request-log.middleware
     PrismaModule,
     // CommonModule - 公共基础设施模块，统一管理全局过滤器、拦截器、守卫
     CommonModule,
+    // RedisModule - Redis 缓存模块，提供缓存服务
+    RedisModule,
     // AuthModule 是负责处理用户认证相关功能的模块，如登录、刷新令牌、登出等。
     AuthModule,
     // CategoryModule 负责文章分类相关接口

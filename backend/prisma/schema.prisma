@@ -93,6 +93,7 @@ model Users {
   id             String           @id @db.VarChar(36)
   username       String           @unique(map: "uk_username") @db.VarChar(50)
   password_hash  String           @db.VarChar(255)
+  password_algorithm String?     @db.VarChar(20)
   email          String?          @db.VarChar(100)
   nickname       String?          @db.VarChar(50)
   avatar         String?          @db.VarChar(500)
