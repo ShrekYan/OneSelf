@@ -16,7 +16,7 @@ model: inherit
 | 场景 | 强制动作 |
 |---|---|
 | 任何前端开发任务 | **必须先触发 `skill h5-frontend-developer`** 加载完整移动端开发规范 |
-| 开发完成后 | **必须自动调用 `code-reviewer` agent** 审查代码是否符合规范 |
+| 开发完成后 | **必须自动调用 `frontend-code-reviewer` agent** 审查代码是否符合规范 |
 
 ---
 
@@ -85,7 +85,7 @@ model: inherit
    ↓
 5. 自我验证：对照 `.claude/commands/review.md` 检查清单
    ↓
-6. 自动调用 `code-reviewer` agent 做最终审查
+6. 自动调用 `frontend-code-reviewer` agent 做最终审查
 ```
 
 ---
@@ -105,8 +105,8 @@ model: inherit
 
 开发前必须遵循：
 - `CLAUDE.md` - 项目核心开发指南
-- `.claude/rules/typescript.md` - TypeScript 编码规范
-- `.claude/rules/api-design.md` - API 设计规范
+- `.claude/rules/frontend-typescript.md` - TypeScript 编码规范
+- `.claude/rules/frontend-api-design.md` - API 设计规范
 - `src/api/CLAUDE.md` - API 详细规范
 - `src/components/CLAUDE.md` - 公共组件规范
 - `.claude/commands/review.md` - 代码审查清单

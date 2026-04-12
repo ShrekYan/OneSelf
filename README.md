@@ -185,7 +185,7 @@ npm run test:coverage
 - 基于 750px 设计稿，直接写 `px`，插件自动转换为 `vw`
 - 点击区域 ≥ 44px × 44px，适配移动端触摸操作
 
-详细规范：[.claude/rules/css-scss.md](./.claude/rules/css-scss.md)
+详细规范：[.claude/rules/frontend-css-scss.md](./.claude/rules/frontend-css-scss.md)
 
 ### API 设计规范
 
@@ -194,7 +194,7 @@ npm run test:coverage
 - 支持请求缓存、自动取消重复请求、错误自动重试
 - 默认全局 Toast 错误提示，可通过 `skipErrorToast: true` 关闭
 
-详细规范：[.claude/rules/api-design.md](./.claude/rules/api-design.md)
+详细规范：[.claude/rules/frontend-api-design.md](./.claude/rules/frontend-api-design.md)
 
 ### TypeScript 规范
 
@@ -203,7 +203,7 @@ npm run test:coverage
 - 必须为所有函数参数和返回值添加显式类型
 - 使用 `export type` 导出类型，便于 tree-shaking
 
-详细规范：[.claude/rules/typescript.md](./.claude/rules/typescript.md)
+详细规范：[.claude/rules/frontend-typescript.md](./.claude/rules/frontend-typescript.md)
 
 ### 逻辑拆分规范 (`handle.ts` vs `useStore.ts` vs `hooks/`)
 
@@ -215,7 +215,7 @@ npm run test:coverage
 | `hooks/useXxx.ts` | 需要依赖 Hook 的业务逻辑 | ✅ | ✅ |
 | `constant.ts` | 静态常量配置 | ❌ | ❌ |
 
-详细规范：[.claude/rules/handle-ts.md](./.claude/rules/handle-ts.md)
+详细规范：[.claude/rules/frontend-handle-ts.md](./.claude/rules/frontend-handle-ts.md)
 
 ## 📝 提交规范
 

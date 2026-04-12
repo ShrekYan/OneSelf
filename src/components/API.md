@@ -297,5 +297,5 @@ export default ArticleDetailPage;
 ### 项目规范链接
 
 - [公共组件开发规范](./CLAUDE.md) - 查看组件开发规范
-- [CSS/SCSS 规范](../../../.claude/rules/css-scss.md) - 样式开发规范
-- [TypeScript 规范](../../../.claude/rules/typescript.md) - 类型开发规范
+- [CSS/SCSS 规范](../../../.claude/rules/frontend-css-scss.md) - 样式开发规范
+- [TypeScript 规范](../../../.claude/rules/frontend-typescript.md) - 类型开发规范

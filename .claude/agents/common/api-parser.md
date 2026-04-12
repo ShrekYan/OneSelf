@@ -157,7 +157,7 @@ model: inherit
    ↓
 4. 对照验证清单自我检查（前端 + 后端）
    ↓
-5. 输出结果摘要，提示用户运行验证命令，建议调用 code-reviewer 审查
+5. 输出结果摘要，提示用户运行验证命令，建议调用 frontend-code-reviewer 审查
 ```
 
 ---
@@ -169,8 +169,8 @@ model: inherit
 ### 前端规范
 
 **所有规范严格遵循项目现有文档，直接引用：**
-- API 设计规范 → [.claude/rules/api-design.md](.claude/rules/api-design.md)
-- TypeScript 规范 → [.claude/rules/typescript.md](.claude/rules/typescript.md)
+- API 设计规范 → [.claude/rules/frontend-api-design.md](.claude/rules/frontend-api-design.md)
+- TypeScript 规范 → [.claude/rules/frontend-typescript.md](.claude/rules/frontend-typescript.md)
 - 项目整体规范 → [CLAUDE.md](CLAUDE.md)
 
 #### 目录与命名规范（前端）

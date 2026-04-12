@@ -15,11 +15,11 @@ include: logic-data-flow.md
 include: troubleshooting.md
 
 <!-- 引用基础规范 -->
-include: ../../rules/api-design.md
-include: ../../rules/typescript.md
-include: ../../rules/css-scss.md
-include: ../../rules/hooks-error-handling.md
-include: ../../rules/handle-ts.md
-include: ../../rules/assets-resources.md
-include: ../../rules/third-party-libraries.md
+include: ../../rules/frontend-api-design.md
+include: ../../rules/frontend-typescript.md
+include: ../../rules/frontend-css-scss.md
+include: ../../rules/frontend-hooks-error-handling.md
+include: ../../rules/frontend-handle-ts.md
+include: ../../rules/frontend-assets-resources.md
+include: ../../rules/frontend-third-party-libraries.md
 include: ../../../CLAUDE.md

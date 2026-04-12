@@ -27,7 +27,7 @@
 ├── .claude/                 # Claude Code 配置与开发规则
 │   ├── agents/              # 自定义 Agent 定义
 │   ├── skills/              # Skill 规则
-│   └── rules/               # 开发规范文档
+│   └── rules/               # 前端开发规范文档（文件名都以 frontend- 开头）
 ├── .husky/                  # Git Hooks 配置
 ├── src/                     # 主源码目录
 │   ├── api/                 # API 接口层

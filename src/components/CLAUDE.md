@@ -44,10 +44,10 @@ src/components/
 
 | 项 | 规则 |
 |----|------|
-| **样式方案** | SCSS + CSS Modules，必须遵循 [css-scss.md](../../../.claude/rules/css-scss.md) |
-| **类型系统** | TypeScript 显式类型，必须遵循 [typescript.md](../../../.claude/rules/typescript.md) |
+| **样式方案** | SCSS + CSS Modules，必须遵循 [frontend-css-scss.md](../../../.claude/rules/frontend-css-scss.md) |
+| **类型系统** | TypeScript 显式类型，必须遵循 [frontend-typescript.md](../../../.claude/rules/frontend-typescript.md) |
 | **状态管理** | 纯组件，仅依赖 Props，不使用 MobX |
-| **第三方依赖** | 必须遵循 [third-party-libraries.md](../../../.claude/rules/third-party-libraries.md) |
+| **第三方依赖** | 必须遵循 [frontend-third-party-libraries.md](../../../.claude/rules/frontend-third-party-libraries.md) |
 
 ---
 
@@ -96,7 +96,7 @@ export default LazyImage;
 
 ## 样式规范
 
-公共组件样式必须遵循 [CSS/SCSS 规范](../../../.claude/rules/css-scss.md)，额外要求：
+公共组件样式必须遵循 [CSS/SCSS 规范](../../../.claude/rules/frontend-css-scss.md)，额外要求：
 
 ### 根容器命名强制要求
 ```scss
