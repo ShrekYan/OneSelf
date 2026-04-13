@@ -8,7 +8,7 @@ import globals from 'globals';
 export default tseslint.config(
   // 1. Global ignores
   {
-    ignores: ['dist', 'eslint.config.js', '.history/**', '.claude/**'],
+    ignores: ['**/dist', 'eslint.config.js', '.history/**', '.claude/**'],
   },
 
   // 2. Node globals for config files

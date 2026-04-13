@@ -1,0 +1,101 @@
+name: 后端代码审查
+description: NestJS 后端代码完整审查，按顺序执行：代码规范 → 安全漏洞 → 性能检查
+
+inputs:
+  - name: scope
+    description: 审查范围 (changed: 仅变更文件 / all: 全项目)
+    default: "changed"
+    options: ["changed", "all"]
+
+  - name: targetPath
+    description: 目标路径（可选，例如 src/article），指定后只审查该模块
+    default: ""
+
+steps:
+  - name: 准备阶段
+    description: 初始化审查环境，确定审查范围
+    run: |
+      echo "🔍 开始 NestJS 后端代码审查..."
+      echo "📋 审查范围：{{scope}}"
+      {{#if targetPath}}
+      echo "🎯 目标路径：{{targetPath}}"
+      {{/if}}
+      echo ""
+
+  - name: 代码规范检查
+    description: 检查架构分层、命名规范、DTO 验证、TypeScript 类型安全
+    agent: nestjs-code-review-agent
+    prompt: |
+      根据项目规范进行 NestJS 后端代码审查：
+
+      审查范围：{{#if (eq scope "all")}}全项目后端代码{{else}}变更的后端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      请检查：
+      1. 是否遵循 NestJS 架构分层（Controller / Service / Module 分层是否清晰）
+      2. DTO 是否正确使用 class-validator 验证注解
+      3. Prisma ORM 使用是否符合最佳实践
+      4. TypeScript 类型是否正确，是否避免了滥用 any
+      5. 命名规范是否符合项目要求
+      6. 异常处理是否完善
+
+      请列出发现的问题，按严重程度排序，并给出具体改进建议。
+
+  - name: 安全漏洞扫描
+    description: 按照 OWASP Top 10 检查认证授权、输入验证、敏感信息泄露
+    agent: nestjs-security-audit-agent
+    prompt: |
+      对 NestJS 后端代码进行安全漏洞扫描：
+
+      检查范围：{{#if (eq scope "all")}}全项目后端代码{{else}}变更的后端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      按照 OWASP Top 10 重点检查：
+      1. 认证授权：路由保护是否正确，越权访问风险
+      2. 输入验证：用户输入是否正确验证，是否存在 SQL 注入风险
+      3. 敏感信息：是否存在敏感信息泄露（数据库凭证、API Key 等）
+      4. 安全配置：HTTP 头等安全配置是否正确
+      5. XSS：接口输出是否正确处理用户输入
+
+      按风险等级（高/中/低）列出发现的问题，并给出修复建议。
+
+  - name: 性能检测
+    description: 检测数据库 N+1、缺少索引、异步处理等性能问题
+    agent: nestjs-performance-audit-agent
+    prompt: |
+      对 NestJS 后端进行性能检测：
+
+      检查范围：{{#if (eq scope "all")}}全项目后端代码{{else}}变更的后端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      重点检查：
+      1. Prisma 查询是否存在 N+1 问题
+      2. 数据库查询是否缺少索引
+      3. 异步处理是否正确，是否存在阻塞
+      4. 缓存（Redis）使用是否合理
+      5. 是否存在不必要的数据查询
+      6. 内存使用是否存在泄漏风险
+
+      按 T0/T1/T2 优先级列出问题，并给出优化建议。
+
+  - name: 生成审查报告
+    description: 汇总检查结果，生成最终报告
+    run: |
+      echo ""
+      echo "========================================"
+      echo "📊 NestJS 后端代码审查完成"
+      echo "========================================"
+      echo ""
+      echo "以上报告整合了三个维度的检查结果："
+      echo "  1️⃣  代码规范 - 架构分层、命名规范、DTO 验证"
+      echo "  2️⃣  安全漏洞 - OWASP Top 10、认证授权、输入验证"
+      echo "  3️⃣  性能检测 - N+1 查询、索引、异步处理"
+      echo ""
+      echo "请根据上述建议按优先级修复问题。修复完成后可以重新运行审查。"
+      echo ""

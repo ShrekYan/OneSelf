@@ -1,0 +1,98 @@
+name: 前端代码审查
+description: 自动化完整前端代码审查，按顺序执行：代码质量 → 安全漏洞 → 性能优化，输出综合报告
+
+inputs:
+  - name: scope
+    description: 审查范围 (changed: 仅变更文件 / all: 全项目)
+    default: "changed"
+    options: ["changed", "all"]
+
+  - name: targetPath
+    description: 目标路径（可选，例如 src/pages/Article），指定后只审查该目录
+    default: ""
+
+steps:
+  - name: 准备阶段
+    description: 初始化审查环境，确定审查范围
+    run: |
+      echo "🧐 开始前端代码审查..."
+      echo "📋 审查范围：{{scope}}"
+      {{#if targetPath}}
+      echo "🎯 目标路径：{{targetPath}}"
+      {{/if}}
+      echo ""
+
+  - name: 代码质量审查
+    description: 检查 TypeScript 类型安全、React 最佳实践和项目规范符合度
+    agent: frontend-code-reviewer-agent
+    prompt: |
+      根据项目规范进行前端代码审查：
+
+      审查范围：{{#if (eq scope "all")}}全项目前端代码{{else}}变更的前端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      请检查：
+      1. TypeScript 类型使用是否合理，是否存在不必要的 any
+      2. React 19 最佳实践是否遵循（hooks 使用、性能优化等）
+      3. 是否符合项目 MobX 写法规范（页面级 useStore 必须 useLocalObservable + 对象字面量）
+      4. 命名规范是否符合项目要求
+      5. 是否有重复代码可以提取复用
+
+      请列出发现的问题，按严重程度排序，并给出具体的改进建议。
+
+  - name: 安全漏洞检查
+    description: 扫描 XSS、注入、敏感信息泄露等安全问题
+    agent: frontend-security-auditor
+    prompt: |
+      对前端代码进行安全漏洞扫描：
+
+      检查范围：{{#if (eq scope "all")}}全项目前端代码{{else}}变更的前端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      请检查：
+      1. 是否存在 XSS 漏洞风险（dangerouslySetInnerHTML、未转义用户输入等）
+      2. 是否存在敏感信息泄露（API Key、Token 硬编码等）
+      3. 路由权限控制是否正确
+      4. 是否存在其他常见前端安全问题
+
+      按风险等级（高/中/低）列出发现的问题，并给出修复建议。
+
+  - name: 性能优化分析
+    description: 分析潜在性能问题，给出优化建议
+    agent: frontend-performance-expert-agent
+    prompt: |
+      对前端代码进行性能分析：
+
+      分析范围：{{#if (eq scope "all")}}全项目前端代码{{else}}变更的前端文件{{/if}}
+      {{#if targetPath}}
+      限定路径：{{targetPath}}
+      {{/if}}
+
+      项目是移动端 H5，请重点关注：
+      1. 包体积是否过大，是否有不必要的依赖导入
+      2. React 组件渲染性能问题（不必要的重渲染）
+      3. MobX 状态管理是否合理
+      4. 图片资源优化
+      5. 其他移动端性能优化点
+
+      请列出发现的性能问题，按影响程度排序，并给出具体优化建议。
+
+  - name: 生成审查报告
+    description: 汇总三个维度的检查结果，生成最终报告
+    run: |
+      echo ""
+      echo "========================================"
+      echo "📊 前端代码审查完成"
+      echo "========================================"
+      echo ""
+      echo "以上报告整合了三个维度的检查结果："
+      echo "  1️⃣  代码质量 - 类型安全、项目规范、最佳实践"
+      echo "  2️⃣  安全漏洞 - XSS、注入、敏感信息泄露"
+      echo "  3️⃣  性能优化 - 包体积、渲染性能、移动端优化"
+      echo ""
+      echo "请根据上述建议逐步修复问题。修复完成后可以重新运行审查。"
+      echo ""
