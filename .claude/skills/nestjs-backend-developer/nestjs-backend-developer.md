@@ -20,4 +20,4 @@ include: 09-prisma-orm.md
 include: 10-code-format.md
 
 <!-- 引用基础规范 -->
-include: ../rules/nestjs-typescript.md
+include: ./rules/nestjs-typescript.md

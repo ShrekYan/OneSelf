@@ -15,10 +15,10 @@ include: h5-frontend-developer/logic-data-flow.md
 include: h5-frontend-developer/troubleshooting.md
 
 <!-- 引用基础规范 -->
-include: ../../rules/frontend-api-design.md
-include: ../../rules/frontend-typescript.md
-include: ../../rules/frontend-css-scss.md
-include: ../../rules/frontend-hooks-error-handling.md
-include: ../../rules/frontend-handle-ts.md
-include: ../../rules/frontend-assets-resources.md
-include: ../../rules/frontend-third-party-libraries.md
+include: rules/frontend-api-design.md
+include: rules/frontend-typescript.md
+include: rules/frontend-css-scss.md
+include: rules/frontend-hooks-error-handling.md
+include: rules/frontend-handle-ts.md
+include: rules/frontend-assets-resources.md
+include: rules/frontend-third-party-libraries.md
