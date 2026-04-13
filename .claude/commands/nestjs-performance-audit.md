@@ -1,5 +1,5 @@
 ---
-name: nestjs-performance-audit-command
+name: nestjs-performance-audit
 description: NestJS 后端性能审计，检测数据库 N+1、缺少索引、内存泄漏、异步处理等性能问题
 ---
 

@@ -165,10 +165,11 @@ graph TD
 ## 文件位置
 
 ```
-backend/.claude/agents/
-├── nestjs-code-review-agent.md    # 代码审查专家
-├── nestjs-security-audit-agent.md # 安全漏洞扫描专家
-└── nestjs-test-writer-agent.md    # 测试编写专家
+.claude/agents/
+├── nestjs-code-review.md    # 代码审查专家
+├── nestjs-performance-audit.md # 性能审计专家
+├── nestjs-security-audit.md # 安全漏洞扫描专家
+└── nestjs-test-writer.md    # 测试编写专家
 ```
 
 ## 使用示例

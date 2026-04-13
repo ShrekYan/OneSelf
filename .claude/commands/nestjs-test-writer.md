@@ -1,5 +1,5 @@
 ---
-name: nestjs-test-writer-command
+name: nestjs-test-writer
 description: NestJS 后端单元测试生成，按照项目规范为 Controller/Service 生成完整 Jest 测试用例
 ---
 

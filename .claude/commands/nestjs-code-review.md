@@ -1,5 +1,5 @@
 ---
-name: nestjs-code-review-command
+name: nestjs-code-review
 description: NestJS 后端代码审查，对照项目规范检查架构分层、命名规范、DTO 验证、TypeScript 类型安全等
 ---
 

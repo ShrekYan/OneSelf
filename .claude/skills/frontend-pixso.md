@@ -2,7 +2,6 @@
 name: pixso
 description: Pixso 设计稿获取与代码生成，内置完善错误处理和大结果支持
 trigger: /pixso <fileKey> [nodeId]
-tools: Read, Write, Bash, mcp__pixso_get_node_dsl, mcp__pixso_get_export_image, frontend-developer
 model: inherit
 ---
 

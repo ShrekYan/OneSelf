@@ -1,5 +1,5 @@
 ---
-name: nestjs-security-audit-command
+name: nestjs-security-audit
 description: NestJS 后端安全漏洞扫描，按照 OWASP Top 10 检查认证授权、输入验证、敏感信息泄露等安全问题
 ---
 

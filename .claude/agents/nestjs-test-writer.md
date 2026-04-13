@@ -1,5 +1,5 @@
 ---
-name: nestjs-test-writer-agent
+name: nestjs-test-writer
 description: NestJS 后端测试编写专家，为 Controller / Service 生成完整 Jest 单元测试，遵循项目测试规范。
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
