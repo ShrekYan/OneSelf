@@ -76,6 +76,7 @@ src/
 - **公共组件规范**: [src/components/CLAUDE.md](src/components/CLAUDE.md)
 - **代码审查清单**: [.claude/commands/review.md](.claude/commands/review.md)
 - **提交规范**: [commitlint.config.js](commitlint.config.js)
+- **后端 NestJS 规范**: [backend/CLAUDE.md](backend/CLAUDE.md)
 
 ## 行为标准
 
