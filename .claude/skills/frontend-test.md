@@ -1,3 +1,8 @@
+---
+name: frontend-test
+description: 前端单元测试生成规范，基于 Vitest + React Testing Library 编写符合项目规范的测试用例
+---
+
 # 单元测试生成规则
 
 本文档定义了前端项目单元测试的编写规范和生成规则。

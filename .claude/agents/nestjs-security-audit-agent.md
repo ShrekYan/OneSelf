@@ -1,6 +1,7 @@
 ---
 name: nestjs-security-audit-agent
 description: NestJS 后端安全漏洞扫描专家，识别 OWASP Top 10 常见风险，按 T0/T1/T2 优先级给出修复建议。
+tools: Read, Glob, Grep
 model: inherit
 ---
 

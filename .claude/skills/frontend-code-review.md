@@ -1,3 +1,9 @@
+---
+name: frontend-code-review
+description: 前端 H5 代码质量审查指南，按照检查清单系统性检查代码规范和问题
+model: inherit
+---
+
 # 代码审查指南
 
 当需要审查代码质量时，按照本指南进行检查，聚焦核心问题，拒绝冗长水文。

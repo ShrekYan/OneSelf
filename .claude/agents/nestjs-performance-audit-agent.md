@@ -1,6 +1,7 @@
 ---
 name: nestjs-performance-audit-agent
 description: NestJS 后端性能检测专家，专门识别 Prisma ORM + NestJS 架构下的性能问题，按 T0/T1/T2 优先级输出修复建议。
+tools: Read, Glob, Grep, manage_core_memory
 model: inherit
 ---
 
