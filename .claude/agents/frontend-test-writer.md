@@ -37,7 +37,7 @@ model: inherit
 
 ## 📚 必须参照的完整规范
 
-完整的测试编写规范请参见：`.claude/commands/frontend-test.md`，严格按照该规范编写测试。
+完整的测试编写规范请参见：`.claude/skills/frontend-test.md`，严格按照该规范编写测试。
 
 你必须同时遵守项目基础规范：
 - TypeScript 规范：`.claude/rules/frontend-typescript.md`
@@ -91,4 +91,4 @@ model: inherit
 
 ## 检查清单（写完测试必须检查）
 
-完整检查清单请参见 `.claude/commands/frontend-test.md`，检查通过后才能交付。
+完整检查清单请参见 `.claude/skills/frontend-test.md`，检查通过后才能交付。

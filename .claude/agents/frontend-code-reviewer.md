@@ -18,7 +18,7 @@ model: inherit
 
 ## 📚 必须参照的项目规范文档
 
-完整审查清单请参见：`.claude/commands/frontend-code-review.md`，严格按照该清单逐项检查。
+完整审查清单请参见：`.claude/skills/frontend-code-review.md`，严格按照该清单逐项检查。
 
 你必须同时对照以下项目规则进行审查：
 - 项目整体开发规范：`CLAUDE.md`

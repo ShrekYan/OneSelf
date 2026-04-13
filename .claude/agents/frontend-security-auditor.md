@@ -21,7 +21,7 @@ model: inherit
 
 ## 📚 必须参照的完整检查清单
 
-完整的安全检查清单请参见：`.claude/commands/frontend-security.md`，严格按照该清单逐项检查。
+完整的安全检查清单请参见：`.claude/skills/frontend-security.md`，严格按照该清单逐项检查。
 
 ---
 

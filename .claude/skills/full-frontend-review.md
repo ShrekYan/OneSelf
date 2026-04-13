@@ -1,7 +1,6 @@
 ---
 name: full-frontend-review
 description: 一键触发完整前端代码审查，自动顺序执行代码质量 → 安全 → 性能三个维度检查
-parameters: [检查范围]
 ---
 
 # full-frontend-review
@@ -15,9 +14,9 @@ parameters: [检查范围]
 **用户只需要触发一次**，编排器自动跑完整个流程，最后输出整合后的综合审查报告。
 
 三个专项检查**复用各自现有的检查清单**，不需要重复整合：
-- 代码质量 → `.claude/commands/frontend-code-review.md`
-- 安全扫描 → `.claude/commands/frontend-security.md`
-- 性能优化 → `.claude/commands/frontend-perf.md`
+- 代码质量 → `.claude/skills/frontend-code-review.md`
+- 安全扫描 → `.claude/skills/frontend-security.md`
+- 性能优化 → `.claude/skills/frontend-perf.md`
 
 ## 使用方法
 

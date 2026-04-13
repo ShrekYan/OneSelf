@@ -20,8 +20,8 @@
 ```
 .claude/
 ├── agents/          # 专家子代理 - 每个文件定义一个专业化的子 Claude 专家
-├── commands/        # 公共规则仓库 - 每个文件是一条具体的规则/检查清单
-├── skills/          # 斜杠命令入口 - 每个文件注册一个 /xxx 命令，定义执行流程
+├── commands/        # 斜杠命令入口 - 每个文件注册一个 /xxx 命令，定义执行流程 ✅  Claude 扫描这里 → 出现在补全
+├── skills/          # 技能文档分类 - 按分类存放技能源码/规范文档 ❌ Claude 不扫描这里 → 需要被引用
 ├── rules/           # 前端项目开发规范 - 编码规范说明书，文件名都以 frontend- 开头
 └── ...
 ```
@@ -56,51 +56,28 @@ model: inherit
 
 ---
 
-### 2️⃣ `commands/` - 公共规则仓库
+### 2️⃣ `commands/` - 斜杠命令入口登记
 
-**本质**：存放**斜杠命令的规则和检查清单**，是公共的，可以被 skill/agent 引用复用。
-
-**谁触发**：
-- ✅ 你**手动输入 `/xxx`** + `skills/xxx.md` 不存在 → Claude Code 自动 fallback 加载
-- ✅ 被 `skills/` 引用 → skill 入口加载后，引用这里的规则
-- ✅ 被 `agents/` 引用 → agent 工作时，对照这里的清单检查
-- ✅ **公共规则**，可以被多处复用
-
-**触发流程（fallback）**：
-```
-你输入: /code-review
-  ↓
-Claude Code 找 skills/code-review.md → 没找到
-  ↓
-自动 fallback → 找 commands/frontend-code-review.md → 找到了
-  ↓
-加载内容给我 → 我按照规则执行
-```
-
----
-
-### 3️⃣ `skills/` - 斜杠命令入口登记
-
-**本质**：**斜杠命令的注册入口**，告诉 Claude Code 系统"有这么一个 `/xxx` 命令，该怎么执行"。
+**本质**：**斜杠命令的注册入口**，告诉 Claude Code 系统"有这么一个 `/xxx` 命令，该怎么执行"。Claude Code 启动时**自动扫描这个目录**，所以放这里的文件会出现在补全列表中。
 
 **触发**：
-- ✅ 你输入 `/xxx` → Claude Code 找 `skills/xxx.md` → 加载执行
+- ✅ 你输入 `/xxx` → Claude Code 找 `commands/xxx.md` → 加载执行
+- ✅ 出现在自动补全提示中 → 用户输入前缀就能看到
 - ❌ 不输入 `/xxx` → 永远不会触发，躺着不动
 
-**什么时候需要 skill**：
+**什么时候放 commands**：
 
-| 场景 | 需要 skill？ |
+| 场景 | 需要放 commands？ |
 |------|-------------|
-| 只是一份静态规则/清单 | ❌ 不需要 → 直接放 `commands/`，fallback 够用 |
-| 需要定义执行流程（先做A，再做B，再做C） | ✅ 需要 |
-| 需要整合多个 command 文件 | ✅ 需要（打包成套餐） |
-| 需要定义参数、处理输入 | ✅ 需要 |
-| 需要前置处理（调用 API、执行命令） | ✅ 需要 |
-| 规则只给这个命令用，不需要复用 | ❓ 可放 skill 里，也可放 commands，都可以 |
+| 需要用户通过 `/xxx` 触发 | ✅ **必须放这里** → Claude 扫描补全 |
+| 需要定义执行流程（先做A，再做B，再做C） | ✅ 放这里 |
+| 需要整合多个技能/规则文档 | ✅ 放这里（打包成套餐） |
+| 需要定义参数、处理用户输入 | ✅ 放这里 |
+| 只是一份静态规则/清单，会被多处复用 | ❌ 不需要 → 放 `skills/` 或 `rules/`，commands 引用它 |
 
-**一个 skill 引用多个 command 例子**（做套餐）：
+**一个 command 引用多个 skill/规则文档 例子**（做套餐）：
 
-`.claude/skills/full-check.md`:
+`.claude/commands/full-check.md`:
 ```markdown
 ---
 name: full-check
@@ -109,14 +86,37 @@ description: 全方位检查（代码+性能+安全）
 
 请按照以下顺序依次执行：
 
-1. 首先，按照 .claude/commands/frontend-code-review.md 进行代码审查
-2. 然后，按照 .claude/commands/frontend-perf.md 进行性能检查
-3. 最后，按照 .claude/commands/frontend-security.md 进行安全检查
+1. 首先，按照 .claude/skills/code-review/checklist.md 进行代码审查
+2. 然后，按照 .claude/skills/performance/checklist.md 进行性能检查
+3. 最后，按照 .claude/skills/security/checklist.md 进行安全检查
 
 汇总所有问题，按严重程度排序输出。
 ```
 
-这个 skill 整合了三个 command 规则，你只需要输入一次 `/full-check` 就能完成三次检查。
+这个 command 整合了三个技能文档，你只需要输入一次 `/full-check` 就能完成三次检查。
+
+---
+
+### 3️⃣ `skills/` - 技能文档分类存储
+
+**本质**：按分类存放**技能源码、规则文档**，便于组织管理。**Claude Code 不会自动扫描这个目录**，所以放这里的文件不会出现在补全列表中，必须通过 `commands/` 中的入口引用才能触发。
+
+**谁触发**：
+- ✅ 被 `commands/` 引用 → command 入口加载后，读取这里的规则执行
+- ✅ 被 `agents/` 引用 → agent 工作时，对照这里的清单检查
+- ✅ **公共规则**，可以被多处复用
+- ❌ 不会出现在 `/xxx` 补全列表中 → 不能直接触发
+
+**触发流程（引用）**：
+```
+你输入: /full-check
+  ↓
+Claude Code 找 commands/full-check.md → 找到了，加载
+  ↓
+full-check 指令说：请读取 .claude/skills/code-review/checklist.md → 加载规则
+  ↓
+我按照规则执行 → 输出结果
+```
 
 ---
 
@@ -134,55 +134,58 @@ description: 全方位检查（代码+性能+安全）
 
 ## 触发方式汇总
 
-| 模块 | 触发者 | 触发方式 | 是否自动运行 |
-|------|--------|----------|-------------|
-| `agents/` | 主 Claude（我） | 调用 `Agent(subagent_type="xxx")` | 你说自然语言需求，我自动发起 |
-| `commands/` | 你（用户） / skill / agent | 输入 `/xxx` (fallback) 或 被引用 | 不引用就不加载 |
-| `skills/` | 你（用户） | 输入 `/xxx` | 你不输入，不运行 |
-| `rules/` | 我（Claude） | 我写代码/审查代码时读 | 我需要时就读，不需要不读 |
+| 模块 | 触发者 | 触发方式 | 是否出现在 `/xxx` 补全 |
+|------|--------|----------|-------------------------|
+| `agents/` | 主 Claude（我） | 调用 `Agent(subagent_type="xxx")` | ❌ 不会出现在补全，只被调用 |
+| `commands/` | 你（用户） | 输入 `/xxx` → Claude 加载对应文件 | ✅ **一定会出现在补全** |
+| `skills/` | commands / agents | 被引用后，Claude 读取文档内容执行 | ❌ **不会出现在补全**，必须被引用 |
+| `rules/` | 我（Claude） | 我写代码/审查代码时读 | ❌ 不会出现在补全，需要时自动读 |
 
 ---
 
 ## 常见问题深度解答
 
-### Q1: 如果 skill 不存在，但 command 存在，`/xxx` 能触发吗？
+### Q1: Claude Code 从哪里扫描 `/xxx` 命令补全？
 
-**A**: ✅ **能正常触发**。Claude Code 有 fallback 机制：
-- 找不到 `skills/xxx.md` → 自动去找 `commands/xxx.md` → 找到了就执行。
+**A**: ✅ **只扫描 `.claude/commands/` 目录**：
+- `.claude/commands/xxx.md` → 文件名 = 命令名 → `/xxx` 出现在补全列表
+- `.claude/skills/xxx.md` → Claude **不扫描** → `/xxx` **不会**出现在补全列表
+- frontmatter `name` 必须等于文件名：`xxx.md` → `name: xxx`，否则补全不正常
 
-这就是为什么我们项目 `/code-review`/`/perf`/`/security`/`/test` 都能正常用，虽然 `skills/` 下没有这些文件。这是**最佳实践**，纯规则命令不需要 skill。
-
----
-
-### Q2: skill 可以引用多个 command 吗？
-
-**A**: ✅ **完全可以**。这正是 skill 的一个重要用法：**把多个命令打包成一个套餐**，一键执行。
-
-对应饭店比喻：一个 skill 就是菜单上的一个套餐，包含好几道菜（多个 command），你点一次套餐就能吃到多道菜。
+这就是经典问题"为什么我定义了文件但 `/xxx` 没有补全"的原因：文件放错目录了。
 
 ---
 
-### Q3: 如果 skill 引用了 command，最终规则是谁定义的？
+### Q2: command 可以引用多个 skills 吗？
 
-**A**: 最终规则是 **`command` 定义的**。分工：
-- `skill` → 定义**执行流程**（先做什么后做什么，整合哪些规则）
-- `command` → 定义**具体规则内容**（检查哪几项，每一项检查什么）
+**A**: ✅ **完全可以**。这正是 command 的一个重要用法：**把多个技能打包成一个套餐**，一键执行。
+
+对应饭店比喻：一个 command 就是菜单上的一个套餐，包含好几道菜（多个 skills 文档），你点一次套餐就能吃到多道菜。
 
 ---
 
-### Q4: 如果 skill 不引用 command，skill 自己写规则，可以吗？
+### Q3: 如果 command 引用了 skill，最终规则是谁定义的？
+
+**A**: 最终规则是 **`skill` 文档定义的**。分工：
+- `command` → 定义**执行流程 + 入口**（先做什么后做什么，整合哪些技能规则，用户输入 `/xxx` 触发）
+- `skill` → 定义**具体规则内容**（检查哪几项，每一项检查什么，规范是什么）
+
+---
+
+### Q4: 如果 command 不引用 skill，command 自己写规则，可以吗？
 
 **A**: ✅ **完全可以**。两种用法：
-- 如果规则需要被多处复用（skill/agent 都会用）→ 放 `command`，skill 引用 → 最佳实践
-- 如果规则只给这个 skill 用，不需要复用 → 规则直接写在 skill 里 → "私有规则"，完全 OK
+- 如果规则需要被多处复用（commands/agents 都会用）→ 放 `skills/` 分类存储，command 引用 → 最佳实践
+- 如果规则只给这个 command 用，不需要复用 → 规则直接写在 command 里 → "私有规则"，完全 OK
 
 ---
 
-### Q5: command 一定是公用的吗？skill 可以有私有规则吗？
+### Q5: skills 一定是放公用规则吗？command 可以有私有规则吗？
 
-**A**: 是的，理解正确：
-- `commands/` 就是放**公用规则**的地方，大家都可以引用
-- 如果规则只在 skill 里用，不需要公用 → 直接写 skill 里，就是 skill 的私有规则 → 完全没问题，不会混乱
+**A**: 正确分工应该是：
+- `skills/` → 放**分类组织的公用规则**，按目录整理，便于多处引用
+- `commands/` → 放**可触发的斜杠命令入口**，规则可以自包含，也可以引用 skills
+- 如果规则只在这个 command 里用，不需要公用 → 直接写 command 里，完全没问题，不会混乱
 
 ---
 
@@ -200,8 +203,8 @@ description: 全方位检查（代码+性能+安全）
 
 **A**: **不会混乱**，分工清晰：
 - 如果这个规则只有这个 agent 用 → 放 agent 自己文件里 → 干净利落
-- 如果这个规则还会被 skill/其他 agent 用 → 放 `commands/` 共享 → 避免重复
-- 只要遵循"复用放 command，不复放 agent"，就不会混乱
+- 如果这个规则还会被 command/其他 agent 用 → 放 `skills/` 共享 → 避免重复
+- 只要遵循"复用放 skills，不复放 agent"，就不会混乱
 
 ---
 
@@ -209,7 +212,7 @@ description: 全方位检查（代码+性能+安全）
 
 **A**: ✅ **是的**。不输入 `/xxx`，永远不会触发。
 
-唯一例外：一个 skill 调用另一个 skill，这时候入口还是你输入的那个外层命令，还是需要你输入。
+唯一例外：一个 command 调用另一个 command，这时候入口还是你输入的那个外层命令，还是需要你输入。
 
 ---
 
@@ -231,14 +234,14 @@ description: 全方位检查（代码+性能+安全）
 
 **最佳实践**：什么时候需要专门配一个 agent？
 
-- ✅ 需要配：**复杂的专业领域任务**，且会被频繁使用（如 `test` → `test-writer`，`code-review` → `code-reviewer`）
+- ✅ 需要配：**复杂的专业领域任务**，且会被频繁使用（如 `test` → `frontend-test-writer`，`code-review` → `frontend-code-reviewer`）
 - ❌ 不需要配：一次性简单规则、小众场景，通用处理足够用
 
-**完整示例（以 `/test` 为例）**：
+**完整示例（以 `/frontend-test` 为例）**：
 ```
-你输入: /test → 生成整个页面的测试
+你输入: /frontend-test → 生成整个页面的测试
   ↓
-skills/test.md 不存在 → fallback → 加载 commands/frontend-test.md（规则）
+Claude Code：找到 commands/frontend-test.md → 加载规则
   ↓
 主 Claude：任务复杂（多个文件要生成测试），看有没有对应 agent
   ↓
@@ -259,21 +262,21 @@ skills/test.md 不存在 → fallback → 加载 commands/frontend-test.md（规
 
 ---
 
-### Q11: 什么是 agent 编排和 skills 编排？
+### Q11: 什么是 agent 编排和 commands 编排？
 
 **A：** "编排"就是**安排工作流程**，把多个任务/专家按顺序组合起来完成大任务。两种编排方式对比如下：
 
 | 编排方式 | 本质 | 适用场景 |
 |----------|------|---------|
-| **Skills 编排** | 在 `skills/xxx.md` 里定义执行顺序，组合多个 `commands/` 规则 | 需要把多个检查/步骤打包成一个命令给用户用 |
+| **Commands 编排** | 在 `commands/xxx.md` 里定义执行顺序，组合多个 `skills/` 规则 | 需要把多个检查/步骤打包成一个命令给用户用 |
 | **Agent 编排** | 主 Claude 主动调度多个专业化 `agents/` 专家依次干活 | 大而复杂的任务，每个环节都需要专业专家深度处理 |
 
 ---
 
-**Skills 编排示例**（打包套餐）：
+**Commands 编排示例**（打包套餐）：
 
 ```markdown
-# .claude/skills/full-check.md
+# .claude/commands/full-check.md
 ---
 name: full-check
 description: 全方位代码检查（代码+性能+安全）
@@ -281,9 +284,9 @@ description: 全方位代码检查（代码+性能+安全）
 
 请按照以下顺序依次执行：
 
-1. 首先，按照 .claude/commands/frontend-code-review.md 进行代码审查
-2. 然后，按照 .claude/commands/frontend-perf.md 进行性能检查
-3. 最后，按照 .claude/commands/frontend-security.md 进行安全检查
+1. 首先，按照 .claude/skills/code-review/checklist.md 进行代码审查
+2. 然后，按照 .claude/skills/performance/checklist.md 进行性能检查
+3. 最后，按照 .claude/skills/security/checklist.md 进行安全检查
 
 汇总所有问题，按严重程度排序输出。
 ```
@@ -326,25 +329,23 @@ code-reviewer 返回代码审查结果
 
 | 概念 | 饭店对应 |
 |------|----------|
-| Skills 编排 | 套餐菜单上印好了上菜顺序：冷菜 → 主菜 → 甜点 |
+| Commands 编排 | 套餐菜单上印好了上菜顺序：冷菜 → 主菜 → 甜点 |
 | Agent 编排 | 主厨（主 Claude）给各个专职大厨派活：老王烧菜，老李做甜点，张刀工摆盘 |
 
 **在我们项目中，两种方式混用，各取所长：**
-- 简单组合多个规则 → Skills 编排（套餐）
+- 简单组合多个规则 → Commands 编排（套餐）
 - 复杂专业任务 → Agent 编排（专家分工）
 
 ---
 
 ## 完整调用链举例
 
-### 例 1：你输入 `/code-review`（skill 不存在，command 存在）
+### 例 1：你输入 `/frontend-code-review`（直接放 commands，可触发）
 
 ```
-你：输入 /code-review
+你：输入 /frontend-code-review
   ↓
-Claude Code：找 skills/code-review.md → 没找到
-  ↓
-Claude Code：自动 fallback → 读 commands/frontend-code-review.md
+Claude Code：找 commands/frontend-code-review.md → 找到了，加载
   ↓
 我：拿到规则清单 → 按照规则检查你的代码 → 输出结果
   ↓
@@ -352,7 +353,7 @@ Claude Code：自动 fallback → 读 commands/frontend-code-review.md
   ↓
 我：启动 agents/frontend-code-reviewer.md 子专家
   ↓
-子专家：加载角色 → 读 rules（项目规范）→ 读 commands/frontend-code-review.md（检查清单）→ 分析代码 → 返回报告
+子专家：加载角色 → 读 rules（项目规范）→ 读 skills/xxx/checklist.md（检查清单）→ 分析代码 → 返回报告
   ↓
 我：把专家报告整理给你
 ```
@@ -366,27 +367,29 @@ Claude Code：自动 fallback → 读 commands/frontend-code-review.md
   ↓
 我：理解需求 → 需要性能专家 → 调用 Agent(subagent_type="frontend-performance-expert")
   ↓
-子专家：加载 agents/frontend-performance-expert.md → 读 rules → 读 commands/frontend-perf.md 检查清单 → 分析代码 → 输出优化方案
+子专家：加载 agents/frontend-performance-expert.md → 读 rules → 读 skills/performance/checklist.md 检查清单 → 分析代码 → 输出优化方案
   ↓
 我：拿到结果 → 给你
 ```
 
 ---
 
-### 例 3：你输入 `/full-check`（skill 整合多个 command）
+### 例 3：你输入 `/full-frontend-review`（command 整合多个 skills/规则）
 
 ```
-你：输入 /full-check
+你：输入 /full-frontend-review src/
   ↓
-Claude Code：找到 skills/full-check.md → 加载
+Claude Code：找到 commands/full-frontend-review.md → 加载
   ↓
-skill 说：依次执行 code-review + perf + security
+command 说：调用 full-frontend-review-orchestrator agent
   ↓
-第一步：按照 commands/frontend-code-review.md → 做代码审查
+orchestrator 说：依次执行 code-review + perf + security
   ↓
-第二步：按照 commands/frontend-perf.md → 做性能检查
+第一步：按照 skills/code-review/checklist.md → 做代码审查
   ↓
-第三步：按照 commands/frontend-security.md → 做安全检查
+第二步：按照 skills/performance/checklist.md → 做性能检查
+  ↓
+第三步：按照 skills/security/checklist.md → 做安全检查
   ↓
 汇总三个结果 → 输出给你
 ```
@@ -416,8 +419,8 @@ skill 说：依次执行 code-review + perf + security
 
 ```
 agents   = 请来帮忙的专家，我叫才来
-commands = 公共规则仓库，谁用谁拿
-skills   = 斜杠入口菜单，登记有什么菜，可打包套餐
+commands = 斜杠入口菜单，登记有什么菜，可打包套餐 → Claude 扫描这里，出现在补全
+skills   = 分类规则仓库，按目录整理，谁用谁拿 → Claude 不扫描，被引用才加载
 rules    = 做菜规范手册，我做菜时照着看
 ```
 
@@ -426,12 +429,13 @@ rules    = 做菜规范手册，我做菜时照着看
 | 场景 | 放哪里 |
 |------|--------|
 | 专业化专家，需要深度分析复杂任务 | `agents/` |
-| 一条规则/检查清单，可能被多处复用 | `commands/` |
-| 需要定义执行流程/整合多个规则/注册斜杠命令 | `skills/` |
+| 需要用户通过 `/xxx` 触发执行 | `commands/` ✅ |
+| 需要定义执行流程/整合多个规则 | `commands/` ✅（文件名 = 命令名）|
+| 一条规则/检查清单，可能被多处复用 → 按分类整理 | `skills/分类目录/` ✅ |
 | 项目整体编码规范，写代码时要遵循 | `rules/` |
-| 纯规则，不需要注册流程，你输入 `/xxx` 就能用（fallback） | `commands/` → 不需要 `skills/` |
-| 一个命令整合多个规则（套餐） | `skills/` 引用多个 `commands/` |
-| 规则只在一个地方用，不需要复用 | 放使用它的地方（agent 或 skill） |
+| 纯规则，不需要整合多个，直接触发 → 放 `commands/` 自己包含规则 | `commands/` ✅ |
+| 一个命令整合多个规则（套餐） | `commands/xxx.md` 引用多个 `skills/xxx.md` |
+| 规则只在一个地方用，不需要复用 | 放使用它的地方（agent 或 command） |
 
 ### 完整判断流程图
 
@@ -439,16 +443,11 @@ rules    = 做菜规范手册，我做菜时照着看
 你想要新增一个 /xxx 命令
   ↓
 ┌─────────────────────────────────┐
-│  需要整合多个 command 吗？       │
-│  ┌─ YES ─┐ → 新建 skills/xxx.md，里面引用多个 commands → 完成
-│  └──────┘
-│  ┌─ NO ─┘
-│     ↓
-│  规则会被 skill/agent 多处复用吗？
-│     ┌─ YES ─┐ → 新建 commands/xxx.md → 完成（fallback 就能用）
-│     └──────┘
-│     └─ NO ─┘ → 规则只给这个命令用
-│           → 新建 skills/xxx.md，规则写里面 → 完成
+│  用户需要通过 /xxx 触发吗？       │
+│  └─ YES ─┘ → 必须放 commands/xxx.md → 然后：
+│             需要整合多个规则吗？
+│             ┌─ YES ─┘ → 在 skills/ 分类存放各个规则 → command 引用它们
+│             └─ NO ─┘  → 规则直接写在 commands/xxx.md → 完成
 └─────────────────────────────────┘
 ```
 
@@ -459,13 +458,13 @@ rules    = 做菜规范手册，我做菜时照着看
 | 概念 | 饭店对应 |
 |------|----------|
 | `agents/` | 特聘的专职大厨，每个大厨专精一道菜 |
-| `commands/` | 菜谱仓库，每道菜一份菜谱 |
-| `skills/` | 给顾客看的菜单，一页一道菜/一个套餐 |
+| `commands/` | 给顾客看的菜单，一页一道菜/一个套餐 → 顾客能看到，能点菜 |
+| `skills/` | 后厨菜谱仓库，每道菜一份菜谱 → 分类存放，厨师按菜谱做 |
 | `rules/` | 饭店烹饪卫生安全规范 |
-| 一个 skill 多个 command | 套餐，一个套餐包含好几道菜 |
-| skill 不引用 command，自己写规则 | 菜单上直接印了做法 |
+| 一个 command 多个 skill | 套餐，一个套餐包含好几道菜 |
+| command 不引用 skill，自己写规则 | 菜单上直接印了做法 |
 | 你输入 `/xxx` | 你点菜 |
 
 ---
 
-*本文整理于 2026-04-12，基于 Claude Code 当前机制，完整梳理了所有深层问题*
+*本文整理于 2026-04-13，基于 Claude Code 当前实际机制，完整梳理了所有深层问题*

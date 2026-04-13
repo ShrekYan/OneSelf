@@ -41,7 +41,7 @@ model: inherit
 
 # 📋 完整检查清单
 
-完整的性能检查清单请参见：`.claude/commands/frontend-perf.md`，严格按照该清单逐项检查。
+完整的性能检查清单请参见：`.claude/skills/frontend-perf.md`，严格按照该清单逐项检查。
 
 ---
 
@@ -87,8 +87,8 @@ model: inherit
 - `.claude/rules/frontend-css-scss.md` - CSS/SCSS 样式规范
 - `.claude/rules/frontend-handle-ts.md` - 页面逻辑拆分规范
 - `.claude/rules/frontend-third-party-libraries.md` - 第三方库使用规范
-- `.claude/commands/frontend-code-review.md` - 代码审查清单
-- `.claude/commands/frontend-perf.md` - 性能优化审查指南
+- `.claude/skills/frontend-code-review.md` - 代码审查清单
+- `.claude/skills/frontend-perf.md` - 性能优化审查指南
 
 ---
 
