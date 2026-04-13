@@ -1,0 +1,82 @@
+name: 预提交检查
+description: 提交代码前自动运行 lint 和类型检查，验证代码质量，提前发现问题
+
+inputs:
+  - name: checkAll
+    description: 是否检查全项目（默认仅检查变更文件）
+    default: "false"
+
+steps:
+  - name: 欢迎信息
+    description: 开始预提交检查流程
+    run: |
+      echo "🚀 开始预提交代码检查..."
+      echo ""
+
+  - name: 前端 ESLint 检查
+    description: 运行 ESLint 检查代码风格
+    run: |
+      echo "📐 运行前端 ESLint 检查..."
+      npm run lint
+      if [ $? -eq 0 ]; then
+        echo "✅ 前端 ESLint 检查通过"
+      else
+        echo "❌ 前端 ESLint 检查失败，请修复问题后重试"
+        exit 1
+      fi
+      echo ""
+
+  - name: 前端 TypeScript 类型检查
+    description: 运行 TypeScript 类型检查
+    run: |
+      echo "🔍 运行前端 TypeScript 类型检查..."
+      npx tsc --noEmit
+      if [ $? -eq 0 ]; then
+        echo "✅ 前端 TypeScript 类型检查通过"
+      else
+        echo "❌ 前端 TypeScript 类型检查失败，请修复类型错误后重试"
+        exit 1
+      fi
+      echo ""
+
+  - name: 后端检查（条件执行）
+    description: 如果有后端文件变更，运行后端检查
+    if: changed_files matches "^backend/"
+    run: |
+      echo "🔙 检测到后端文件变更，运行后端检查..."
+      cd backend
+      echo ""
+
+      echo "📐 运行后端 ESLint 检查..."
+      npm run lint
+      if [ $? -eq 0 ]; then
+        echo "✅ 后端 ESLint 检查通过"
+      else
+        echo "❌ 后端 ESLint 检查失败，请修复问题后重试"
+        exit 1
+      fi
+      echo ""
+
+      echo "🏗️  运行后端构建检查..."
+      npm run build
+      if [ $? -eq 0 ]; then
+        echo "✅ 后端构建检查通过"
+      else
+        echo "❌ 后端构建检查失败，请修复问题后重试"
+        exit 1
+      fi
+      echo ""
+
+  - name: 输出总结
+    description: 检查完成，输出总结
+    run: |
+      echo "🎉 所有检查通过！可以提交代码了"
+      echo ""
+      echo "检查项："
+      echo "  ✅ 前端 ESLint 代码风格检查"
+      echo "  ✅ 前端 TypeScript 类型检查"
+      if [ -n "$(echo '{{changed_files}}' | grep "^backend/")" ]; then
+        echo "  ✅ 后端 ESLint 代码风格检查"
+        echo "  ✅ 后端 TypeScript 构建检查"
+      fi
+      echo ""
