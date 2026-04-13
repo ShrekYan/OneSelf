@@ -1,5 +1,5 @@
 ---
-name: frontend-code-reviewer
+name: frontend-code-reviewer-agent
 description: 审查代码质量，专注 TypeScript 类型安全、React 最佳实践和性能问题。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
