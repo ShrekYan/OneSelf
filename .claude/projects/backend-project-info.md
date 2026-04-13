@@ -136,5 +136,5 @@ nest --help
 
 ---
 
-<!-- 引入统一管理的 NestJS 开发规范 -->
-include: .claude/skills/nestjs-backend-developer/nestjs-backend-developer.md
+<!-- 引入完整 NestJS 开发技能规范 -->
+include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md

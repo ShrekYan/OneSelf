@@ -21,4 +21,3 @@ include: 10-code-format.md
 
 <!-- 引用基础规范 -->
 include: ../rules/nestjs-typescript.md
-include: ../../../../backend/CLAUDE.md

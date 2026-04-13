@@ -22,4 +22,3 @@ include: ../../rules/frontend-hooks-error-handling.md
 include: ../../rules/frontend-handle-ts.md
 include: ../../rules/frontend-assets-resources.md
 include: ../../rules/frontend-third-party-libraries.md
-include: ../../CLAUDE.md
