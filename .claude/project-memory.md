@@ -35,3 +35,30 @@
 
 **记录日期**: 2026-03-27
 **错误原因**: 沿袭了其他项目习惯，忘记本项目要求所有 class 都加前缀
+
+---
+
+## Claude Code 命令路径规则
+
+### 错误场景
+要创建一个可以通过 `/command-name` 执行的命令，错误地将文件放在 `skills/` 目录下：`.claude/skills/workflow.md`，执行时报错 `Unknown skill: workflow`。
+
+### 正确规则
+> **Claude Code 斜杠命令路径约定**：
+> - ✅ `commands/` 目录 → `.claude/commands/{command-name}.md` → 可以通过 `/{command-name}` 直接执行
+> - ❌ `skills/` 目录 → `.claude/skills/{skill-name}.md` → **不能**通过 `/{skill-name}` 直接执行
+
+### 原因
+Claude Code 的设计：
+- `commands/` - 存放可直接通过 `/` 调用的命令，每个文件对应一个命令名称
+- `skills/` - 存放技能规范和审查规则，供其他命令/代理调用，不直接作为斜杠命令入口
+
+### 正确示例
+要创建 `/workflow` 命令：
+- ✅ 正确路径：`.claude/commands/workflow.md`
+- ❌ 错误路径：`.claude/skills/workflow.md`
+
+---
+
+**记录日期**: 2026-04-14
+**错误原因**: 混淆了 commands 和 skills 目录的用途，两者职责不同

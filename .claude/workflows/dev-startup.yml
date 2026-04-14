@@ -1,0 +1,97 @@
+name: 一键启动开发环境
+description: 同时启动前端 H5 开发服务和后端 NestJS 开发服务，支持选择不同环境
+
+inputs:
+  - name: environment
+    description: 选择前端启动环境
+    default: "dev"
+    options: ["dev", "test-dev", "sit-dev", "prd-dev"]
+
+steps:
+  - name: 初始化
+    description: 输出配置信息
+    run: |
+      echo "🚀 一键启动全栈开发环境"
+      echo ""
+      echo "📋 配置信息："
+      echo "  • 前端环境: {{environment}}"
+      echo "  • 后端启动命令: cd backend && npm run start:dev"
+      echo ""
+
+  - name: 检查依赖是否安装
+    description: 检查前后端依赖是否已安装
+    run: |
+      echo "🔍 检查依赖安装情况..."
+
+      if [ ! -d "node_modules" ]; then
+        echo "⚠️  前端 node_modules 未找到，请先运行: npm install"
+        exit 1
+      fi
+
+      if [ ! -d "backend/node_modules" ]; then
+        echo "⚠️  后端 node_modules 未找到，请先运行: cd backend && npm install"
+        exit 1
+      fi
+
+      echo "✅ 依赖检查通过"
+      echo ""
+
+  - name: 启动后端服务
+    description: 在后台启动 NestJS 后端开发服务
+    run: |
+      echo "🔙 启动后端 NestJS 开发服务..."
+      cd backend
+      npm run start:dev &
+      echo $! > /tmp/nest-dev-backend.pid
+      cd ..
+      echo "✅ 后端服务已启动 (PID: $(cat /tmp/nest-dev-backend.pid))"
+      echo ""
+
+  - name: 等待后端启动完成
+    description: 等待几秒钟让后端完全启动
+    run: |
+      echo "⏳ 等待后端服务初始化..."
+      sleep 3
+      echo ""
+
+  - name: 启动前端服务
+    description: 启动前端 Vite 开发服务
+    run: |
+      echo "🌐 启动前端 H5 开发服务 (环境: {{environment}})..."
+      echo ""
+
+      # 定义清理函数，Ctrl+C 时杀死后台进程
+      cleanup() {
+        echo ""
+        echo "🧹 清理进程..."
+        if [ -f /tmp/nest-dev-backend.pid ]; then
+          kill $(cat /tmp/nest-dev-backend.pid) 2>/dev/null
+          rm -f /tmp/nest-dev-backend.pid
+        fi
+        echo "👋 开发服务已停止"
+        exit 0
+      }
+
+      # 捕获中断信号
+      trap cleanup SIGINT SIGTERM
+
+      # 启动前端
+      npm run {{environment}}
+
+      # 前端退出后清理
+      cleanup
+
+  - name: 输出访问信息
+    description: 输出服务访问地址信息
+    run: |
+      echo ""
+      echo "🎉 开发服务已全部启动！"
+      echo "========================================"
+      echo ""
+      echo "📍 访问地址："
+      echo "  • 前端 H5: http://localhost:5173 (Vite 默认端口)"
+      echo "  • 后端 API: http://localhost:3000 (NestJS 默认端口)"
+      echo "  • Swagger 文档: http://localhost:3000/api (如果启用)"
+      echo ""
+      echo "💡 提示：按 Ctrl+C 停止两个服务"
+      echo ""
