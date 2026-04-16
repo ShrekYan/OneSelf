@@ -5,6 +5,7 @@ import { CurrentUserId } from '../common/decorators/current-user.decorator';
 import { ArticleService } from './article.service';
 import {
   QueryArticleListDto,
+  QueryArticleListByUserIdDto,
   ArticleListResponseDto,
   FeaturedArticleListResponseDto,
   ToggleLikeRequestDto,
@@ -84,5 +85,13 @@ export class ArticleController {
     @Body() body: UserLikeListByUserIdRequestDto,
   ): Promise<UserLikeListByUserIdResponseDto> {
     return this.articleService.getUserLikeListByUserId(body);
+  }
+
+  @Post('list-by-user')
+  @ApiOperation({ summary: '根据用户ID分页查询该用户发布的文章列表' })
+  queryArticleListByUserId(
+    @Body() query: QueryArticleListByUserIdDto,
+  ): Promise<ArticleListResponseDto> {
+    return this.articleService.queryArticleListByUserId(query);
   }
 }

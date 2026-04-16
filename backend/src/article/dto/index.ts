@@ -3,6 +3,7 @@ export {
   ArticleSortBy,
   QueryArticleListDto,
 } from './article/query-article-list.dto';
+export { QueryArticleListByUserIdDto } from './article/query-article-list-by-user-id.dto';
 export { GetArticleDetailRequestDto } from './article/get-article-detail-request.dto';
 export {
   ArticleCategoryInfoDto,

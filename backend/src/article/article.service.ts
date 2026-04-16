@@ -6,6 +6,7 @@ import { BusinessErrorCode } from '../common/constants/business-error-codes';
 import type { Articles, Prisma } from '@prisma/client';
 import {
   QueryArticleListDto,
+  QueryArticleListByUserIdDto,
   ArticleListResponseDto,
   ArticleListItemDto,
   ArticleSortBy,
@@ -510,5 +511,74 @@ export class ArticleService {
     const articleIds = likes.map((like) => like.article_id);
 
     return { articleIds };
+  }
+
+  async queryArticleListByUserId(
+    query: QueryArticleListByUserIdDto,
+  ): Promise<ArticleListResponseDto> {
+    // 查询条件：指定用户ID + 只查已发布
+    const where: Prisma.ArticlesWhereInput = {
+      author_id: query.userId,
+      is_published: true,
+    };
+
+    // 排序：固定按发布时间倒序
+    const orderBy: Prisma.ArticlesOrderByWithRelationInput = {
+      published_at: 'desc',
+    };
+
+    // 分页计算
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    // 并行查询数据和总数（性能优化）
+    const [articlesWithCategories, total] = await Promise.all([
+      this.prisma.articles.findMany({
+        where,
+        orderBy,
+        skip,
+        take: pageSize,
+        include: {
+          categories: true,
+        },
+      }),
+      this.prisma.articles.count({ where }),
+    ]);
+
+    // 数据库结果转换为 DTO（复用与 queryArticleList 相同的转换逻辑）
+    const list: ArticleListItemDto[] = articlesWithCategories.map(
+      (article: Articles & { categories: { id: string; name: string } }) => ({
+        id: article.id,
+        title: article.title,
+        summary: article.summary ?? undefined,
+        coverUrl: article.cover_url ?? undefined,
+        category: {
+          id: article.categories.id,
+          name: article.categories.name,
+        },
+        authorId: article.author_id,
+        authorName: article.author_name ?? undefined,
+        authorAvatar: article.author_avatar ?? undefined,
+        tags: article.tags
+          ? article.tags.split(',').map((t: string) => t.trim())
+          : [],
+        views: article.views,
+        likes: article.likes,
+        commentsCount: article.comments_count,
+        publishedAt: new Date(Number(article.published_at)).toISOString(),
+        isTop: article.is_top,
+        readTime: article.read_time ?? undefined,
+      }),
+    );
+
+    // 返回标准响应格式
+    return {
+      list,
+      total,
+      page,
+      pageSize,
+      hasMore: skip + list.length < total,
+    };
   }
 }

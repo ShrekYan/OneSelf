@@ -62,3 +62,59 @@ Claude Code 的设计：
 
 **记录日期**: 2026-04-14
 **错误原因**: 混淆了 commands 和 skills 目录的用途，两者职责不同
+
+---
+
+## Prisma 模型访问不需要多余的 as any 转换
+
+### 错误场景
+当 Prisma schema 模型名为 `model Articles` 时，错误地认为需要使用 `(this.prisma as any).articles` 来绕过 TypeScript 类型检查。
+
+### 错误现象
+- 代码中多出不必要的 `as any` 类型断言
+- 降低了 TypeScript 类型安全性
+
+### 原因分析
+旧的错误记忆：误认为当模型名是大写复数时 (`Articles`)，映射到表名小写 (`articles`) 后，TypeScript 无法识别 `this.prisma.articles` 属性。
+
+实际正确情况：**Prisma 可以正确生成类型**，当模型名为 `model Articles` 时：
+- 生成的查询属性名就是 `prisma.articles` (小写复数)
+- TypeScript 可以正确识别，不需要 `as any`
+
+### 正确解决方法
+
+❌ 错误写法：
+```typescript
+const [articlesWithCategories, total] = await Promise.all([
+  (this.prisma as any).articles.findMany({
+    where,
+    orderBy,
+    skip,
+    take: pageSize,
+    include: { categories: true },
+  }),
+  (this.prisma as any).articles.count({ where }),
+]);
+```
+
+✅ 正确写法：
+```typescript
+const [articlesWithCategories, total] = await Promise.all([
+  this.prisma.articles.findMany({
+    where,
+    orderBy,
+    skip,
+    take: pageSize,
+    include: { categories: true },
+  }),
+  this.prisma.articles.count({ where }),
+]);
+```
+
+### 什么时候才需要 as any？
+只有当**模型名本身在 Prisma schema 中就是全小写**时（如 `model articles` 而不是 `model Articles`），才需要用 `as any` 绕过。但本项目所有模型名都使用首字母大写，所以永远不需要。
+
+---
+
+**记录日期**: 2026-04-16
+**错误原因**: 基于过时错误记忆添加了不必要的 `as any` 类型断言
