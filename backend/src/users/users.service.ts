@@ -24,8 +24,7 @@ export class UsersService {
    * @returns 用户信息 DTO
    */
   async getUserInfo(userId: string): Promise<UserInfoDto> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const user = await (this.prismaService as any).users.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: { id: userId },
     });
 
@@ -33,7 +32,7 @@ export class UsersService {
       throw new BusinessException(BusinessErrorCode.USER_NOT_FOUND);
     }
 
-    return this.mapToDto(user as Users);
+    return this.mapToDto(user);
   }
 
   /**
@@ -48,8 +47,7 @@ export class UsersService {
   ): Promise<UserInfoDto> {
     // 检查用户是否存在
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const existing = await (this.prismaService as any).users.findUnique({
+    const existing = await this.prismaService.users.findUnique({
       where: { id: userId },
     });
 
@@ -75,15 +73,14 @@ export class UsersService {
       (updateData as Record<string, string | undefined>).bio = updateDto.bio;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const updated = await (this.prismaService as any).users.update({
+    const updated = await this.prismaService.users.update({
       where: { id: userId },
       data: updateData,
     });
 
     // 更新用户信息后，删除缓存保证一致性
     // existing 是查询得到的，肯定有 username
-    const username = (existing as Users).username;
+    const username = (existing).username;
     if (username) {
       await this.userSyncService.deleteUserFromRedis(username);
       // 同步更新到预加载缓存（写穿透）
@@ -118,7 +115,7 @@ export class UsersService {
       }
     }
 
-    return this.mapToDto(updated as Users);
+    return this.mapToDto(updated);
   }
 
   /**
@@ -133,8 +130,8 @@ export class UsersService {
       email: user.email ?? undefined,
       nickname: user.nickname ?? undefined,
       avatar: user.avatar ?? undefined,
-       
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
       bio: (user as any).bio ?? undefined,
     };
   }

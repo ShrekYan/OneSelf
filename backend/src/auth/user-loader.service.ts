@@ -58,11 +58,13 @@ export class UserLoaderService {
 
     // 从预加载获取缓存 Key
     const cacheKey = await this.userSyncService.getUserKey(username);
+    console.log(cacheKey);
     if (cacheKey) {
       const cachedStr = await this.redisService.get(cacheKey);
       if (cachedStr) {
         try {
           preloadedUser = JSON.parse(cachedStr) as PreloadedUser;
+          console.log(cachedStr);
           this.logger.debug(
             `Preloaded user cache hit for username=${username}`,
           );

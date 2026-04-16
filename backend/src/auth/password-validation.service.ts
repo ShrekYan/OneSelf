@@ -148,7 +148,6 @@ export class PasswordValidationService {
     if (algorithm === 'argon2id') {
       return argon2.verify(hashedPassword, plainPassword);
     }
-    // 默认兼容 bcrypt
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
