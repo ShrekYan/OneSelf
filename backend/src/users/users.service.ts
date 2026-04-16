@@ -24,7 +24,7 @@ export class UsersService {
    * @returns 用户信息 DTO
    */
   async getUserInfo(userId: string): Promise<UserInfoDto> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const user = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -48,7 +48,7 @@ export class UsersService {
   ): Promise<UserInfoDto> {
     // 检查用户是否存在
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const existing = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -75,7 +75,7 @@ export class UsersService {
       (updateData as Record<string, string | undefined>).bio = updateDto.bio;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const updated = await (this.prismaService as any).users.update({
       where: { id: userId },
       data: updateData,
@@ -133,7 +133,8 @@ export class UsersService {
       email: user.email ?? undefined,
       nickname: user.nickname ?? undefined,
       avatar: user.avatar ?? undefined,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+       
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
       bio: (user as any).bio ?? undefined,
     };
   }
