@@ -19,7 +19,9 @@ export const useHandleSignOut = () => {
 
     if (confirmed) {
       try {
-        await authApi.logout();
+        // 从 localStorage 获取 refreshToken 并传递给后端
+        const refreshToken = localStorage.getItem('refreshToken');
+        await authApi.logout(refreshToken ?? undefined);
         // 清除本地存储的所有认证信息
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

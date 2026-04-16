@@ -2,15 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
-import { UserCacheService } from './user-cache.service';
+import { UserSyncService } from './user-sync.service';
 import { UserInfoDto } from './dto';
 import { UpdateProfileDto } from './dto';
 import type { Users } from '@prisma/client';
-
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * 用户信息服务
@@ -20,7 +15,7 @@ import type { Users } from '@prisma/client';
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly userCacheService: UserCacheService,
+    private readonly userSyncService: UserSyncService,
   ) {}
 
   /**
@@ -29,6 +24,7 @@ export class UsersService {
    * @returns 用户信息 DTO
    */
   async getUserInfo(userId: string): Promise<UserInfoDto> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const user = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -52,6 +48,7 @@ export class UsersService {
   ): Promise<UserInfoDto> {
     // 检查用户是否存在
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const existing = await (this.prismaService as any).users.findUnique({
       where: { id: userId },
     });
@@ -62,20 +59,23 @@ export class UsersService {
 
     // 更新用户信息
 
-    const updateData: Record<string, any> = {
+    const updateData: Record<string, unknown> = {
       updated_at: BigInt(Date.now()),
     };
 
     if (updateDto.nickname !== undefined) {
-      updateData.nickname = updateDto.nickname;
+      (updateData as Record<string, string | undefined>).nickname =
+        updateDto.nickname;
     }
     if (updateDto.avatar !== undefined) {
-      updateData.avatar = updateDto.avatar;
+      (updateData as Record<string, string | undefined>).avatar =
+        updateDto.avatar;
     }
     if (updateDto.bio !== undefined) {
-      updateData.bio = updateDto.bio;
+      (updateData as Record<string, string | undefined>).bio = updateDto.bio;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const updated = await (this.prismaService as any).users.update({
       where: { id: userId },
       data: updateData,
@@ -85,7 +85,37 @@ export class UsersService {
     // existing 是查询得到的，肯定有 username
     const username = (existing as Users).username;
     if (username) {
-      await this.userCacheService.deleteUserInfoCache(username);
+      await this.userSyncService.deleteUserFromRedis(username);
+      // 同步更新到预加载缓存（写穿透）
+      const updatedUserFull = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          username: true,
+          password_hash: true,
+          password_algorithm: true,
+          is_active: true,
+          email: true,
+          nickname: true,
+          avatar: true,
+          created_at: true,
+          updated_at: true,
+        },
+      });
+      if (updatedUserFull) {
+        await this.userSyncService.syncSingleUserToRedis(username, {
+          id: updatedUserFull.id,
+          username: updatedUserFull.username,
+          password_hash: updatedUserFull.password_hash,
+          password_algorithm: updatedUserFull.password_algorithm,
+          is_active: updatedUserFull.is_active,
+          email: updatedUserFull.email,
+          nickname: updatedUserFull.nickname,
+          avatar: updatedUserFull.avatar,
+          created_at: updatedUserFull.created_at,
+          updated_at: updatedUserFull.updated_at,
+        });
+      }
     }
 
     return this.mapToDto(updated as Users);
@@ -103,7 +133,7 @@ export class UsersService {
       email: user.email ?? undefined,
       nickname: user.nickname ?? undefined,
       avatar: user.avatar ?? undefined,
-
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       bio: (user as any).bio ?? undefined,
     };
   }

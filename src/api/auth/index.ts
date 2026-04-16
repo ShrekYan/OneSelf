@@ -83,10 +83,13 @@ export async function refreshToken(
 
 /**
  * 用户登出
+ * @param refreshToken - 刷新令牌（可选）
  * @returns 登出结果
  */
-export async function logout(): Promise<{ message: string }> {
-  return await api.post('/api/v1/auth/logout', {});
+export async function logout(
+  refreshToken?: string,
+): Promise<{ message: string }> {
+  return await api.post('/api/v1/auth/logout', { refreshToken });
 }
 
 /**

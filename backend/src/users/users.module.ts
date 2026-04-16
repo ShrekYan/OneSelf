@@ -4,7 +4,7 @@ import { RedisModule } from '../redis/redis.module';
 import { CommonModule } from '../common/common.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { UserCacheService } from './user-cache.service';
+import { UserSyncService } from './user-sync.service';
 
 /**
  * 用户信息模块
@@ -13,7 +13,7 @@ import { UserCacheService } from './user-cache.service';
 @Module({
   imports: [PrismaModule, RedisModule, CommonModule],
   controllers: [UsersController],
-  providers: [UsersService, UserCacheService],
-  exports: [UsersService, UserCacheService],
+  providers: [UsersService, UserSyncService],
+  exports: [UsersService, UserSyncService],
 })
 export class UsersModule {}

@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PasswordCacheService } from './password-cache.service';
+import { RefreshTokenRedisService } from './refresh-token-redis.service';
 
 /**
  * 认证模块
@@ -15,7 +16,7 @@ import { PasswordCacheService } from './password-cache.service';
 @Module({
   imports: [ConfigModule, PrismaModule, CommonModule, RedisModule, UsersModule],
   controllers: [AuthController],
-  providers: [AuthService, PasswordCacheService],
+  providers: [AuthService, PasswordCacheService, RefreshTokenRedisService],
   exports: [AuthService],
 })
 export class AuthModule {}

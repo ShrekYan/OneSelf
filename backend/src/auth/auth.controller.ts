@@ -80,8 +80,12 @@ export class AuthController {
     description: '登出成功',
   })
   @UseGuards(JwtAuthGuard)
-  async logout(@CurrentUserId() userId: string) {
-    await this.authService.logout(userId);
+  @ApiBody({ schema: { example: { refreshToken: 'string' } } })
+  async logout(
+    @CurrentUserId() userId: string,
+    @Body('refreshToken') refreshToken?: string,
+  ) {
+    await this.authService.logout(userId, refreshToken);
     return { message: '登出成功' };
   }
 
