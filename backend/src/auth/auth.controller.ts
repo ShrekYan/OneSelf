@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Ip, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Ip,
+  UseGuards,
+  Req,
+  HttpStatus,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +22,8 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
+import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessErrorCode } from '../common/constants/business-error-codes';
 
 /**
  * 认证控制器
@@ -125,10 +135,16 @@ export class AuthController {
     @Body('refreshToken') refreshToken?: string,
   ) {
     if (this.remoteAuthEnabled) {
+      console.log('Remote authentication enabled');
+      console.log('Logout request received for user:', userId);
+      console.log('Refresh token:', refreshToken);
+
+      // 提取原请求的 Authorization header，转发给 auth-service
       const authorization = req.headers.authorization;
       const headers = authorization
         ? { Authorization: authorization }
         : undefined;
+
       try {
         await this.authClient.forwardRequest(
           'auth/logout',
@@ -138,15 +154,49 @@ export class AuthController {
           },
           headers,
         );
-      } catch (error) {
+
+        return { message: '登出成功' };
+      } catch (error: unknown) {
         console.error('Logout request failed:', error);
-        throw error;
+
+        // 如果 auth-service 返回了 HTTP 错误响应（如 401）
+        // 使用项目标准 BusinessException 抛出，让全局过滤器处理
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        if ((error as any).response) {
+          // Type assertion for axios error response structure
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+          const errorResponse = (error as any).response as {
+            status?: number;
+            data?: { message?: string };
+          };
+          const statusCode =
+            errorResponse.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = errorResponse.data?.message || 'Logout failed';
+
+          // 使用 BusinessException 抛出，由 BusinessExceptionFilter 全局处理
+          // 业务码使用 AUTH_INVALID_REFRESH_TOKEN（已定义），httpStatus 保持原状态码
+          throw new BusinessException(
+            BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN,
+            message,
+            statusCode,
+          );
+        }
+
+        // 网络错误等其他异常，也用 BusinessException 抛出
+        const message = error instanceof Error ? error.message : String(error);
+        throw new BusinessException(
+          BusinessErrorCode.AUTH_INVALID_REFRESH_TOKEN,
+          message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
-      return { message: '登出成功' };
     }
-    // await this.authService.logout(userId, refreshToken);
-    // return { message: '登出成功' };
-    throw new Error('Local authentication is disabled');
+
+    throw new BusinessException(
+      BusinessErrorCode.AUTH_INVALID_CREDENTIALS,
+      'Local authentication is disabled',
+      HttpStatus.NOT_IMPLEMENTED,
+    );
   }
 
   @Post('register')
