@@ -15,6 +15,7 @@ export class RemoteJwtParseMiddleware implements NestMiddleware {
     }
 
     try {
+      // 验证 JWT 令牌
       const result = await this.authClient.introspect(token);
 
       if (result.valid) {

@@ -85,6 +85,8 @@ export class AuthController {
     @CurrentUserId() userId: string,
     @Body('refreshToken') refreshToken?: string,
   ) {
+    console.log('Logout request received for user:', userId);
+    console.log('Refresh token:', refreshToken);
     await this.authService.logout(userId, refreshToken);
     return { message: '登出成功' };
   }

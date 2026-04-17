@@ -125,10 +125,23 @@ export class AuthController {
     @Body('refreshToken') refreshToken?: string,
   ) {
     if (this.remoteAuthEnabled) {
-      await this.authClient.forwardRequest('auth/logout', {
-        userId,
-        refreshToken,
-      });
+      const authorization = req.headers.authorization;
+      const headers = authorization
+        ? { Authorization: authorization }
+        : undefined;
+      try {
+        await this.authClient.forwardRequest(
+          'auth/logout',
+          {
+            userId,
+            refreshToken,
+          },
+          headers,
+        );
+      } catch (error) {
+        console.error('Logout request failed:', error);
+        throw error;
+      }
       return { message: '登出成功' };
     }
     // await this.authService.logout(userId, refreshToken);
