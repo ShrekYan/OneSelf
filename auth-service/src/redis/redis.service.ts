@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
-import { appendJsonLog } from '@/common/utils/file-logger';
+import { LogServiceClientService } from '@/common/log-service';
 
 @Injectable()
 export class RedisService
@@ -17,7 +17,10 @@ export class RedisService
   private readonly maxRetries = 5;
   private readonly initialRetryDelay = 1000;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logServiceClient: LogServiceClientService,
+  ) {
     const host = configService.get<string>('REDIS_HOST') || 'localhost';
     const port = parseInt(
       configService.get<string>('REDIS_PORT') || '6379',
@@ -46,7 +49,7 @@ export class RedisService
     this.disconnect();
     const msg = 'Redis disconnected successfully';
     this.logger.log(msg);
-    appendJsonLog({
+    this.logServiceClient.logJsonLog({
       timestamp: new Date().toISOString(),
       level: 'info',
       context: RedisService.name,
@@ -69,7 +72,7 @@ export class RedisService
       if (retryCount > 0) {
         const msg = `Redis connected successfully after ${retryCount} retries, host=${host}, port=${port}, db=${db}`;
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: RedisService.name,
@@ -79,7 +82,7 @@ export class RedisService
       } else {
         const msg = `Redis connected successfully, host=${host}, port=${port}, db=${db}`;
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: RedisService.name,
@@ -92,7 +95,7 @@ export class RedisService
         const delay = this.initialRetryDelay * Math.pow(2, retryCount);
         const msg = `Redis connection failed, retrying in ${delay}ms... (attempt ${retryCount + 1}/${this.maxRetries})`;
         this.logger.warn(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'warn',
           context: RedisService.name,
@@ -106,7 +109,7 @@ export class RedisService
       } else {
         const msg = `Redis connection failed after ${this.maxRetries} retries. Giving up.`;
         this.logger.error(msg, error);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'error',
           context: RedisService.name,
@@ -133,7 +136,7 @@ export class RedisService
       const msg =
         '⚠️  Security warning: Redis password is not configured in production. This is insecure.';
       this.logger.warn(msg);
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'warn',
         context: RedisService.name,
@@ -153,7 +156,7 @@ export class RedisService
     } catch (error) {
       const msg = 'Redis health check failed';
       this.logger.error(msg, error);
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'error',
         context: RedisService.name,
@@ -179,7 +182,7 @@ export class RedisService
     success: boolean,
     error?: Error,
   ): void {
-    appendJsonLog({
+    this.logServiceClient.logJsonLog({
       timestamp: new Date().toISOString(),
       level: success ? 'debug' : 'error',
       context: RedisService.name,
@@ -223,10 +226,10 @@ export class RedisService
   override async set(
     key: string,
     value: string,
-    ...args: any[]
+    ...args: (string | number | Buffer)[]
   ): Promise<'OK'> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+       
       const result = await super.set(key, value, ...args);
       this.logRedisOperation('set', key, true);
       return result;
@@ -242,13 +245,20 @@ export class RedisService
    * @returns 删除的键数量
    */
 
-  override del(...args: any[]): Promise<number> {
+  override del(
+    ...args: (
+      | string
+      | number
+      | Buffer
+      | ((err: Error | null, result: unknown) => void)
+    )[]
+  ): Promise<number> {
     try {
       // 提取键列表（排除回调函数）
       const keys = args.filter(
         (arg) => typeof arg === 'string' || Buffer.isBuffer(arg),
       ) as string[];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+       
       const result = super.del(...args);
 
       // 对每个删除的键都记录日志（只记录 string 类型的键）

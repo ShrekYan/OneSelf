@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
-import { appendJsonLog } from '@/common/utils/file-logger';
+import { LogServiceClientService } from '@/common/log-service';
 
 /**
  * 清理服务
@@ -16,6 +16,7 @@ export class CleanupService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
+    private readonly logServiceClient: LogServiceClientService,
   ) {
     this.enabled = this.configService.get<boolean>('CLEANUP_ENABLED', true);
     if (this.enabled) {
@@ -58,7 +59,7 @@ export class CleanupService {
         `Cleanup completed: deleted ${deletedCount} expired revoked refresh tokens, elapsed ${elapsed}ms`,
       );
 
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'info',
         context: CleanupService.name,
@@ -74,7 +75,7 @@ export class CleanupService {
         error instanceof Error ? error.stack : undefined,
       );
 
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'error',
         context: CleanupService.name,

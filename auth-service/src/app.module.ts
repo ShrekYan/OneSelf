@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '@/common/common.module';
 import { PrismaModule } from '@/prisma/prisma.module';
@@ -7,6 +8,8 @@ import { AuthorizationModule } from '@/authorization/authorization.module';
 import { UsersModule } from '@/users/users.module';
 import { AuthModule } from '@/auth/auth.module';
 import { IntrospectModule } from '@/introspect/introspect.module';
+import { CorsMiddleware } from '@/common/middleware/cors.middleware';
+import { RequestLogMiddleware } from '@/common/middleware/request-log.middleware';
 
 @Module({
   imports: [
@@ -14,6 +17,7 @@ import { IntrospectModule } from '@/introspect/introspect.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
+    HttpModule,
     CommonModule,
     PrismaModule,
     RedisModule,
@@ -23,4 +27,9 @@ import { IntrospectModule } from '@/introspect/introspect.module';
     IntrospectModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(CorsMiddleware).forRoutes('*');
+    consumer.apply(RequestLogMiddleware).forRoutes('*');
+  }
+}

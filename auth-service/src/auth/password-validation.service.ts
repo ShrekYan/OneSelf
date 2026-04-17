@@ -7,7 +7,7 @@ import { UserSyncService } from '@/users/user-sync.service';
 import { LoadedUser } from './user-loader.service';
 import bcrypt from 'bcrypt';
 import argon2 from 'argon2';
-import { appendJsonLog } from '@/common/utils/file-logger';
+import { LogServiceClientService } from '@/common/log-service';
 
 /**
  * 密码验证服务
@@ -24,6 +24,7 @@ export class PasswordValidationService {
     private readonly redisService: RedisService,
     private readonly passwordCacheService: PasswordCacheService,
     private readonly userSyncService: UserSyncService,
+    private readonly logServiceClient: LogServiceClientService,
   ) {
     // 从环境变量读取 argon2 参数，平衡安全性与性能
     this.argon2Options = {
@@ -119,7 +120,7 @@ export class PasswordValidationService {
             this.logger.warn(
               `Silent password migration failed for user ${user.username}: ${error instanceof Error ? error.message : String(error)}`,
             );
-            appendJsonLog({
+            this.logServiceClient.logJsonLog({
               timestamp: new Date().toISOString(),
               level: 'warn',
               context: PasswordValidationService.name,
@@ -245,7 +246,7 @@ export class PasswordValidationService {
       });
     }
 
-    appendJsonLog({
+    this.logServiceClient.logJsonLog({
       timestamp: new Date().toISOString(),
       level: 'info',
       context: PasswordValidationService.name,

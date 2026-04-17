@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '@/redis/redis.service';
-import { appendJsonLog } from '@/common/utils/file-logger';
+import { LogServiceClientService } from '@/common/log-service';
 
 /**
  * 密码缓存服务
@@ -12,7 +12,10 @@ export class PasswordCacheService {
   private readonly logger = new Logger(PasswordCacheService.name);
   private readonly passwordCacheTtl = 3600; // 密码缓存过期时间（秒）= 1小时
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly logServiceClient: LogServiceClientService,
+  ) {}
 
   /**
    * 生成缓存键
@@ -39,7 +42,7 @@ export class PasswordCacheService {
       this.logger.warn(
         `Redis get password cache failed, fallback to database: ${error instanceof Error ? error.message : String(error)}`,
       );
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'warn',
         context: PasswordCacheService.name,
@@ -90,7 +93,7 @@ export class PasswordCacheService {
       this.logger.warn(
         `Failed to cache password for username=${username}: ${error instanceof Error ? error.message : String(error)}`,
       );
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'warn',
         context: PasswordCacheService.name,

@@ -62,29 +62,3 @@ export function appendErrorLog(info: ErrorLogInfo): void {
     console.error('[FILE-LOGGER] Failed to write error log:', err);
   }
 }
-
-/**
- * 追加 JSON 格式日志到文件（按 level 分文件存储）
- * @param data JSON 日志数据对象
- */
-export function appendJsonLog(data: Record<string, unknown>): void {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-
-    const level = (data.level as string) || 'access';
-    const fileName = `${level}-${today}.log`;
-    const filePath = path.join(process.cwd(), 'logs', fileName);
-
-    // 确保 logs 目录存在
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    const logLine = JSON.stringify(data) + '\n';
-    fs.appendFileSync(filePath, logLine, 'utf8');
-  } catch (err) {
-    // 日志写入失败不影响主流程，只在控制台输出
-    console.error('[FILE-LOGGER] Failed to write JSON log:', err);
-  }
-}

@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
-import { appendJsonLog } from '@/common/utils/file-logger';
+import { LogServiceClientService } from '@/common/log-service';
 
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+ 
 
 @Injectable()
 export class PrismaService
@@ -20,7 +20,10 @@ export class PrismaService
   private readonly initialRetryDelay = 1000;
   private readonly slowQueryThreshold = 1000; // 慢查询阈值（毫秒）
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logServiceClient: LogServiceClientService,
+  ) {
     super({
       log: [
         { emit: 'event', level: 'query' },
@@ -40,7 +43,7 @@ export class PrismaService
       await this.$disconnect();
       const msg = 'Database disconnected successfully';
       this.logger.log(msg);
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'info',
         context: PrismaService.name,
@@ -50,7 +53,7 @@ export class PrismaService
     } catch (error) {
       const msg = 'Error disconnecting from database';
       this.logger.error(msg, error);
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'error',
         context: PrismaService.name,
@@ -72,7 +75,7 @@ export class PrismaService
       if (retryCount > 0) {
         const msg = `Database connected successfully after ${retryCount} retries`;
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: PrismaService.name,
@@ -82,7 +85,7 @@ export class PrismaService
       } else {
         const msg = 'Database connected successfully';
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: PrismaService.name,
@@ -100,7 +103,7 @@ export class PrismaService
       if (connectionLimitMatch?.[1]) {
         const msg = `Connection pool configuration: connection_limit=${connectionLimitMatch[1]}`;
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: PrismaService.name,
@@ -118,7 +121,7 @@ export class PrismaService
         const msg =
           'Connection pool configuration: using default connection_limit=10';
         this.logger.log(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'info',
           context: PrismaService.name,
@@ -134,7 +137,7 @@ export class PrismaService
           retryCount + 1
         }/${this.maxRetries})`;
         this.logger.warn(msg);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'warn',
           context: PrismaService.name,
@@ -148,7 +151,7 @@ export class PrismaService
       } else {
         const msg = `Database connection failed after ${this.maxRetries} retries. Giving up.`;
         this.logger.error(msg, error);
-        appendJsonLog({
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'error',
           context: PrismaService.name,
@@ -167,50 +170,62 @@ export class PrismaService
    * 包括慢查询警告和错误日志
    */
   private setupEventLogging(): void {
-    // 由于 Prisma 类型系统的限制，需要使用 any 绕过类型检查
+    // 由于 Prisma 类型系统的限制，需要使用未知类型绕过类型检查
     // 但运行时这些事件确实存在且能正常工作
 
-    (this.$on as any)('query', (e: { duration: number; query: string }) => {
-      if (e.duration > this.slowQueryThreshold) {
-        const msg = `Slow query detected: duration=${e.duration}ms, query=${e.query}`;
-        this.logger.warn(msg);
-        appendJsonLog({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.$on as unknown as (...args: any[]) => void)(
+      'query',
+      (e: { duration: number; query: string }) => {
+        if (e.duration > this.slowQueryThreshold) {
+          const msg = `Slow query detected: duration=${e.duration}ms, query=${e.query}`;
+          this.logger.warn(msg);
+          this.logServiceClient.logJsonLog({
+            timestamp: new Date().toISOString(),
+            level: 'warn',
+            context: PrismaService.name,
+            message: msg,
+            query: e.query,
+            duration: e.duration,
+            env: process.env.NODE_ENV || 'development',
+          });
+        }
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.$on as unknown as (...args: any[]) => void)(
+      'error',
+      (e: { message: string; target: string }) => {
+        const msg = `Database error: ${e.message}`;
+        this.logger.error(msg, e.target);
+        this.logServiceClient.logJsonLog({
+          timestamp: new Date().toISOString(),
+          level: 'error',
+          context: PrismaService.name,
+          message: msg,
+          target: e.target,
+          env: process.env.NODE_ENV || 'development',
+        });
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.$on as unknown as (...args: any[]) => void)(
+      'warn',
+      (e: { message: string; target: string }) => {
+        const msg = `Database warning: ${e.message}`;
+        this.logger.warn(msg, e.target);
+        this.logServiceClient.logJsonLog({
           timestamp: new Date().toISOString(),
           level: 'warn',
           context: PrismaService.name,
           message: msg,
-          query: e.query,
-          duration: e.duration,
+          target: e.target,
           env: process.env.NODE_ENV || 'development',
         });
-      }
-    });
-
-    (this.$on as any)('error', (e: { message: string; target: string }) => {
-      const msg = `Database error: ${e.message}`;
-      this.logger.error(msg, e.target);
-      appendJsonLog({
-        timestamp: new Date().toISOString(),
-        level: 'error',
-        context: PrismaService.name,
-        message: msg,
-        target: e.target,
-        env: process.env.NODE_ENV || 'development',
-      });
-    });
-
-    (this.$on as any)('warn', (e: { message: string; target: string }) => {
-      const msg = `Database warning: ${e.message}`;
-      this.logger.warn(msg, e.target);
-      appendJsonLog({
-        timestamp: new Date().toISOString(),
-        level: 'warn',
-        context: PrismaService.name,
-        message: msg,
-        target: e.target,
-        env: process.env.NODE_ENV || 'development',
-      });
-    });
+      },
+    );
   }
 
   /**
@@ -224,7 +239,7 @@ export class PrismaService
     } catch (error) {
       const msg = 'Health check failed';
       this.logger.error(msg, error);
-      appendJsonLog({
+      this.logServiceClient.logJsonLog({
         timestamp: new Date().toISOString(),
         level: 'error',
         context: PrismaService.name,

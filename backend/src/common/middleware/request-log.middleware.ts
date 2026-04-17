@@ -1,29 +1,25 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { appendJsonLog } from '../utils/file-logger';
+import { LogServiceClientService } from '../log-service';
 
 /**
  * 统一请求日志中间件
  *
  * 职责：
  * - 对所有请求（包括成功和失败）在响应完成后统一记录日志
- * - 采用 JSON 格式每一行，方便 Graylog/ELK 采集解析
- * - 按天分片存储，便于管理和清理
- * - 错误信息由 Exception Filter 挂载到 request.error，在这里统一记录
+ * - 发送到独立 log-service 服务集中收集
+ * - 错误发送失败不影响主流程，自动降级
  */
 @Injectable()
 export class RequestLogMiddleware implements NestMiddleware {
+  constructor(private readonly logServiceClient: LogServiceClientService) {}
+
   use(request: Request, response: Response, next: NextFunction): void {
     // 记录请求开始时间，用于计算响应时间
     request.startTime = Date.now();
 
     // 响应完成后统一记录日志（无论成功失败都会触发）
     response.on('finish', () => {
-      this.logRequest(request, response);
-    });
-
-    // 可选：连接提前关闭也记录
-    response.on('close', () => {
       this.logRequest(request, response);
     });
 
@@ -59,8 +55,8 @@ export class RequestLogMiddleware implements NestMiddleware {
       logData.stack = request.error.stack;
     }
 
-    // 写入 JSON 日志
-    appendJsonLog(logData);
+    // 发送日志到 log-service
+    this.logServiceClient.logJsonLog(logData);
   }
 
   /**

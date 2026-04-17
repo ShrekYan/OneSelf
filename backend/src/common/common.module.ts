@@ -4,6 +4,7 @@ import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { BusinessExceptionFilter } from './filters/business-exception.filter';
 import { PrismaExceptionFilter } from './filters/prisma-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { LogServiceModule } from './log-service';
 // JwtAuthGuard has been migrated to auth-service, use RemoteJwtAuthGuard from shared module
 // import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -12,6 +13,7 @@ import { TransformInterceptor } from './interceptors/transform.interceptor';
  * 统一管理全局异常过滤器、拦截器、守卫等公共组件
  */
 @Module({
+  imports: [LogServiceModule],
   providers: [
     // 全局异常过滤器
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
@@ -23,6 +25,7 @@ import { TransformInterceptor } from './interceptors/transform.interceptor';
     // JwtAuthGuard,
   ],
   // 导出可注入提供者，让需要使用的业务模块可以注入
+  exports: [LogServiceModule],
   // exports: [JwtAuthGuard],
 })
 export class CommonModule {}
