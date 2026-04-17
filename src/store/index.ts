@@ -20,3 +20,20 @@ export function useGlobalStore(): RootStore {
   }
   return store;
 }
+
+// 保存全局 RootStore 单例，供非 React 环境访问
+let rootStoreInstance: RootStore | null = null;
+
+/**
+ * 设置 RootStore 实例（由 GlobalStoreProvider 在初始化时调用）
+ */
+export function setRootStore(store: RootStore) {
+  rootStoreInstance = store;
+}
+
+/**
+ * 获取全局 RootStore 实例
+ */
+export function getRootStore(): RootStore | null {
+  return rootStoreInstance;
+}

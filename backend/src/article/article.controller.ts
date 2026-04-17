@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Post, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RemoteJwtAuthGuard } from '../shared/remote-jwt-auth.guard';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
 import { ArticleService } from './article.service';
 import {
@@ -41,7 +41,7 @@ export class ArticleController {
 
   @Post('toggle-like')
   @ApiOperation({ summary: '切换文章点赞状态（点赞/取消点赞）' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RemoteJwtAuthGuard)
   toggleLike(
     @CurrentUserId() userId: string,
     @Body() body: ToggleLikeRequestDto,
@@ -49,7 +49,7 @@ export class ArticleController {
     return this.articleService.toggleLike(userId, body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RemoteJwtAuthGuard)
   @Get('my-likes')
   @ApiOperation({ summary: '获取当前用户点赞列表' })
   getUserLikeList(
@@ -59,7 +59,7 @@ export class ArticleController {
     return this.articleService.getUserLikeList(userId, query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RemoteJwtAuthGuard)
   @Get('check-like')
   @ApiOperation({ summary: '检查当前用户是否已点赞某篇文章' })
   checkLikeStatus(
@@ -78,7 +78,7 @@ export class ArticleController {
     return this.articleService.getArticleDetail(query, userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RemoteJwtAuthGuard)
   @Post('user-likes')
   @ApiOperation({ summary: '根据用户ID查询指定用户点赞的所有文章ID列表' })
   getUserLikeListByUserId(

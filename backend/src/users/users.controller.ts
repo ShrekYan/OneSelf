@@ -5,7 +5,7 @@ import {
   ApiBearerAuth,
   ApiResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../common/guards';
+import { RemoteJwtAuthGuard } from '../shared/remote-jwt-auth.guard';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
 import { UsersService } from './users.service';
 import { UserInfoDto, UpdateProfileDto } from './dto';
@@ -17,7 +17,7 @@ import { UserInfoDto, UpdateProfileDto } from './dto';
 @ApiTags('用户信息')
 @ApiBearerAuth()
 @Controller('user')
-@UseGuards(JwtAuthGuard)
+@UseGuards(RemoteJwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

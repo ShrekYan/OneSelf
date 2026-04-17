@@ -28,10 +28,9 @@ export class IntrospectService {
 
     try {
       const decoded = verify(accessToken, jwtSecret) as {
-        sub: string;
+        userId: string;
         exp: number;
       };
-
       const now = Math.floor(Date.now() / 1000);
       const expiresIn = decoded.exp - now;
 
@@ -44,7 +43,7 @@ export class IntrospectService {
 
       return {
         valid: true,
-        userId: decoded.sub,
+        userId: decoded.userId,
         expiresIn,
       };
     } catch {

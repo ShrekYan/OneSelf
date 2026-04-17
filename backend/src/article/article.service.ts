@@ -379,7 +379,6 @@ export class ArticleService {
 
     // 如果有用户ID，检查是否已点赞
     let isLiked = false;
-    console.log(userId);
     if (userId) {
       const like = await this.prisma.articleLikes.findUnique({
         where: {

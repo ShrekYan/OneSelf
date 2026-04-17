@@ -9,6 +9,7 @@ import type { ApiResponse, RequestConfig } from './types';
 import { ApiError, ErrorType } from './types';
 import { RequestCache } from './request-cache';
 import { CancelManager } from './cancel-manager';
+import { getRootStore } from '@/store';
 import defaultApi from '../index';
 
 // 创建缓存和取消管理器实例
@@ -79,9 +80,15 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
   // 只有 410 = token 失效 才需要清除 token 跳转登录
   // 1001 等业务错误码，即使 code !== 200 也只是业务错误，不需要跳转
   if (!config.skipAuth && data.code === 410) {
-    // 未授权，清除所有 token 并跳转登录
+    // 未授权，清除所有 token 和用户信息并跳转登录
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userInfo');
+    // 重置 MobX 内存状态
+    const rootStore = getRootStore();
+    if (rootStore?.app) {
+      rootStore.app.reset();
+    }
     const currentUrl =
       window.location.pathname + window.location.search + window.location.hash;
     window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
@@ -172,6 +179,12 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         if (!refreshToken) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userInfo');
+          // 重置 MobX 内存状态
+          const rootStore = getRootStore();
+          if (rootStore?.app) {
+            rootStore.app.reset();
+          }
           const currentUrl =
             window.location.pathname +
             window.location.search +
@@ -208,6 +221,12 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
             isRefreshing = false;
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userInfo');
+            // 重置 MobX 内存状态
+            const rootStore = getRootStore();
+            if (rootStore?.app) {
+              rootStore.app.reset();
+            }
             resolvePendingRequests(null);
             if (!config.skipErrorToast) {
               Toast.show({
@@ -251,6 +270,12 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         if (!config.skipAuth) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userInfo');
+          // 重置 MobX 内存状态
+          const rootStore = getRootStore();
+          if (rootStore?.app) {
+            rootStore.app.reset();
+          }
           const currentUrl =
             window.location.pathname +
             window.location.search +

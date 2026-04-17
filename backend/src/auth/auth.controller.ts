@@ -4,6 +4,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthClientService } from '../shared/auth-client.service';
+import { RemoteJwtAuthGuard } from '../shared/remote-jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RefreshDto } from './dto/refresh.dto';
@@ -11,7 +12,6 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../common/guards';
 
 /**
  * 认证控制器
@@ -112,7 +112,7 @@ export class AuthController {
     status: 200,
     description: '登出成功',
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RemoteJwtAuthGuard)
   @ApiBody({ schema: { example: { refreshToken: 'string' } } })
   async logout(
     @CurrentUserId() userId: string,
