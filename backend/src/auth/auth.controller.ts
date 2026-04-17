@@ -2,7 +2,9 @@ import { Controller, Post, Body, Ip, UseGuards, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
+// AuthService has been migrated to auth-service and deleted
+// After full migration to remote mode, we don't need it anymore
+// import { AuthService } from './auth.service';
 import { AuthClientService } from '../shared/auth-client.service';
 import { RemoteJwtAuthGuard } from '../shared/remote-jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
@@ -16,8 +18,8 @@ import { CurrentUserId } from '../common/decorators/current-user.decorator';
 /**
  * 认证控制器
  * 支持双模式：
- * - 本地模式：使用本地认证服务（兼容旧版本）
- * - 远程模式：转发请求到独立 auth-service（新模式）
+ * - 本地模式：使用本地认证服务（兼容旧版本）- code commented out after full migration
+ * - 远程模式：转发请求到独立 auth-service（新模式）- DEFAULT NOW
  * 通过环境变量 REMOTE_AUTH_ENABLE 控制开关
  * 负责处理用户登录、刷新令牌、登出等认证相关接口
  */
@@ -27,13 +29,14 @@ export class AuthController {
   private readonly remoteAuthEnabled: boolean;
 
   constructor(
-    private readonly authService: AuthService,
+    // AuthService migrated to auth-service
+    // private readonly authService: AuthService,
     private readonly authClient: AuthClientService,
     private readonly configService: ConfigService,
   ) {
     this.remoteAuthEnabled = this.configService.get<boolean>(
       'REMOTE_AUTH_ENABLE',
-      false,
+      true, // Default to true after full migration
     );
   }
 
@@ -77,7 +80,8 @@ export class AuthController {
       }>('auth/login', { ...loginDto, clientIp });
       return response.data;
     }
-    return this.authService.login(loginDto, clientIp);
+    // return this.authService.login(loginDto, clientIp);
+    throw new Error('Local authentication is disabled');
   }
 
   @Post('refresh')
@@ -103,7 +107,8 @@ export class AuthController {
       }>('auth/refresh', { refreshToken });
       return response.data;
     }
-    return this.authService.refreshToken(refreshToken);
+    // return this.authService.refreshToken(refreshToken);
+    throw new Error('Local authentication is disabled');
   }
 
   @Post('logout')
@@ -120,22 +125,15 @@ export class AuthController {
     @Body('refreshToken') refreshToken?: string,
   ) {
     if (this.remoteAuthEnabled) {
-      const headers: Record<string, string> = {};
-      if (req.headers.authorization) {
-        headers.Authorization = req.headers.authorization;
-      }
-      await this.authClient.forwardRequest(
-        'auth/logout',
-        {
-          userId,
-          refreshToken,
-        },
-        headers,
-      );
+      await this.authClient.forwardRequest('auth/logout', {
+        userId,
+        refreshToken,
+      });
       return { message: '登出成功' };
     }
-    await this.authService.logout(userId, refreshToken);
-    return { message: '登出成功' };
+    // await this.authService.logout(userId, refreshToken);
+    // return { message: '登出成功' };
+    throw new Error('Local authentication is disabled');
   }
 
   @Post('register')
@@ -173,6 +171,7 @@ export class AuthController {
       }>('auth/register', { ...registerDto, clientIp });
       return response.data;
     }
-    return this.authService.register(registerDto, clientIp);
+    // return this.authService.register(registerDto, clientIp);
+    throw new Error('Local authentication is disabled');
   }
 }

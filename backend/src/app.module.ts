@@ -13,8 +13,10 @@ import { RedisModule } from './redis/redis.module';
 import { CleanupModule } from './cleanup/cleanup.module';
 import { SharedModule } from './shared/shared.module';
 import { CorsMiddleware } from './common/middleware/cors.middleware';
-import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 import { RequestLogMiddleware } from './common/middleware/request-log.middleware';
+// JwtParseMiddleware has been migrated to auth-service
+// When using remote auth mode, use RemoteJwtParseMiddleware from shared module
+// import { JwtParseMiddleware } from './common/middleware/jwt-parse.middleware';
 
 // @Module() 是 NestJS 提供的装饰器，用于声明一个模块（Module）。
 // 模块是 NestJS 应用的基本组织单位，每个应用至少有一个根模块（AppModule）。
@@ -66,7 +68,8 @@ export class AppModule implements NestModule {
     consumer.apply(CorsMiddleware).forRoutes('*');
     // 注册请求日志中间件到所有路由（必须在 JwtParse 之前，才能准确计时）
     consumer.apply(RequestLogMiddleware).forRoutes('*');
-    // 注册 JWT 解析中间件到所有路由
-    consumer.apply(JwtParseMiddleware).forRoutes('*');
+    // JwtParseMiddleware has been migrated to auth-service
+    // When using remote auth mode, JWT is validated via HTTP call to auth-service
+    // consumer.apply(JwtParseMiddleware).forRoutes('*');
   }
 }
