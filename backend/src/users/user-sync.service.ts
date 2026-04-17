@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { safeJsonStringify } from '../common/utils/json.util';
@@ -17,7 +17,7 @@ export interface PreloadedUser {
 }
 
 @Injectable()
-export class UserSyncService implements OnModuleInit {
+export class UserSyncService {
   private readonly logger = new Logger(UserSyncService.name);
   private currentVersion: number | null = null;
   private readonly CURRENT_VERSION_KEY = 'user:full:current-version';
@@ -28,17 +28,6 @@ export class UserSyncService implements OnModuleInit {
     private prisma: PrismaService,
     private redis: RedisService,
   ) {}
-
-  /**
-   * 模块初始化时自动执行全量同步
-   */
-  async onModuleInit() {
-    if (process.env.USER_PRELOAD_ENABLED !== 'false') {
-      await this.syncAllUsersToRedis();
-    } else {
-      this.logger.log('User preload is disabled by configuration');
-    }
-  }
 
   /**
    * 获取当前生效版本号
