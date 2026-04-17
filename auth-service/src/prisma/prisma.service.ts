@@ -169,7 +169,7 @@ export class PrismaService
   private setupEventLogging(): void {
     // 由于 Prisma 类型系统的限制，需要使用 any 绕过类型检查
     // 但运行时这些事件确实存在且能正常工作
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as any)('query', (e: { duration: number; query: string }) => {
       if (e.duration > this.slowQueryThreshold) {
         const msg = `Slow query detected: duration=${e.duration}ms, query=${e.query}`;
@@ -186,6 +186,7 @@ export class PrismaService
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as any)('error', (e: { message: string; target: string }) => {
       const msg = `Database error: ${e.message}`;
       this.logger.error(msg, e.target);
@@ -199,6 +200,7 @@ export class PrismaService
       });
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as any)('warn', (e: { message: string; target: string }) => {
       const msg = `Database warning: ${e.message}`;
       this.logger.warn(msg, e.target);

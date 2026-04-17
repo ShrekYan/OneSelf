@@ -1,6 +1,9 @@
-import { Controller, Post, Body, Ip, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Ip, UseGuards, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
+import { AuthClientService } from '../shared/auth-client.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RefreshDto } from './dto/refresh.dto';
@@ -12,12 +15,27 @@ import { JwtAuthGuard } from '../common/guards';
 
 /**
  * 认证控制器
+ * 支持双模式：
+ * - 本地模式：使用本地认证服务（兼容旧版本）
+ * - 远程模式：转发请求到独立 auth-service（新模式）
+ * 通过环境变量 REMOTE_AUTH_ENABLE 控制开关
  * 负责处理用户登录、刷新令牌、登出等认证相关接口
  */
 @ApiTags('认证')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly remoteAuthEnabled: boolean;
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly authClient: AuthClientService,
+    private readonly configService: ConfigService,
+  ) {
+    this.remoteAuthEnabled = this.configService.get<boolean>(
+      'REMOTE_AUTH_ENABLE',
+      false,
+    );
+  }
 
   @Post('login')
   @ApiOperation({ summary: '用户登录' })
@@ -51,6 +69,14 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Ip() clientIp: string,
   ): Promise<LoginResponseDto> {
+    if (this.remoteAuthEnabled) {
+      const response = await this.authClient.forwardRequest<{
+        code: number;
+        message: string;
+        data: LoginResponseDto;
+      }>('auth/login', { ...loginDto, clientIp });
+      return response.data;
+    }
     return this.authService.login(loginDto, clientIp);
   }
 
@@ -67,9 +93,16 @@ export class AuthController {
     description: '刷新令牌无效或已过期',
   })
   async refreshToken(
-    //@Body('refreshToken')
     @Body('refreshToken') refreshToken: string,
   ): Promise<RefreshResponseDto> {
+    if (this.remoteAuthEnabled) {
+      const response = await this.authClient.forwardRequest<{
+        code: number;
+        message: string;
+        data: RefreshResponseDto;
+      }>('auth/refresh', { refreshToken });
+      return response.data;
+    }
     return this.authService.refreshToken(refreshToken);
   }
 
@@ -83,8 +116,24 @@ export class AuthController {
   @ApiBody({ schema: { example: { refreshToken: 'string' } } })
   async logout(
     @CurrentUserId() userId: string,
+    @Req() req: Request,
     @Body('refreshToken') refreshToken?: string,
   ) {
+    if (this.remoteAuthEnabled) {
+      const headers: Record<string, string> = {};
+      if (req.headers.authorization) {
+        headers.Authorization = req.headers.authorization;
+      }
+      await this.authClient.forwardRequest(
+        'auth/logout',
+        {
+          userId,
+          refreshToken,
+        },
+        headers,
+      );
+      return { message: '登出成功' };
+    }
     await this.authService.logout(userId, refreshToken);
     return { message: '登出成功' };
   }
@@ -116,6 +165,14 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @Ip() clientIp: string,
   ): Promise<RegisterResponseDto> {
+    if (this.remoteAuthEnabled) {
+      const response = await this.authClient.forwardRequest<{
+        code: number;
+        message: string;
+        data: RegisterResponseDto;
+      }>('auth/register', { ...registerDto, clientIp });
+      return response.data;
+    }
     return this.authService.register(registerDto, clientIp);
   }
 }

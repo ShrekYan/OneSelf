@@ -80,7 +80,7 @@ export class UsersService {
 
     // 更新用户信息后，删除缓存保证一致性
     // existing 是查询得到的，肯定有 username
-    const username = (existing).username;
+    const username = existing.username;
     if (username) {
       await this.userSyncService.deleteUserFromRedis(username);
       // 同步更新到预加载缓存（写穿透）
@@ -131,7 +131,7 @@ export class UsersService {
       nickname: user.nickname ?? undefined,
       avatar: user.avatar ?? undefined,
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
       bio: (user as any).bio ?? undefined,
     };
   }

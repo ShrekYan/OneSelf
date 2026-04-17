@@ -47,7 +47,7 @@ export class IntrospectService {
         userId: decoded.sub,
         expiresIn,
       };
-    } catch (error) {
+    } catch {
       return {
         valid: false,
         error: 'INVALID_TOKEN',

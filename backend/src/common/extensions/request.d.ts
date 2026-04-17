@@ -18,6 +18,10 @@ declare global {
 
         [key: string]: unknown;
       };
+      /** JWT 解析后的用户 ID，直接挂载方便使用 */
+      userId?: string;
+      /** Token 剩余有效期（单位：秒） */
+      expiresIn?: number;
     }
   }
 }
