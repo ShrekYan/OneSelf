@@ -1,29 +1,44 @@
 # 全栈博客系统
 
-一个现代化的全栈博客项目，**前端 H5 移动端应用** + **后端 NestJS API 服务**，采用 Monorepo 架构，遵循工程化开发规范。
+一个现代化的全栈博客项目，**前端 H5 移动端应用** + **后端 NestJS 微服务群**，采用 **Monorepo + Turborepo** 架构，遵循工程化开发规范。
 
 ## 📖 项目简介
 
 这是一个功能完整的个人博客系统，支持文章分类浏览、搜索、点赞、用户认证等功能，专为移动端访问优化设计。
 
-**架构图：**
+**整体架构：**
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    前端 H5 移动端应用                          │
-│  React 19 + TypeScript + Vite + MobX + Ant Design Mobile    │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                     前端 H5 移动端应用 (apps/web)                 │
+│        React 19 + TypeScript + Vite + MobX + Ant Design Mobile  │
+└─────────────────────────────────────────────────────────────────┘
                               ↓ HTTP
-┌─────────────────────────────────────────────────────────────┐
-│                 后端 NestJS API 服务                          │
-│       NestJS 11 + Prisma ORM + MySQL + Redis                │
-│   认证模块 / 文章模块 / 分类模块 / 用户模块 / 日志服务         │
-└─────────────────────────────────────────────────────────────┘
+┌───────────────────┐ ┌───────────────────┐ ┌───────────────────┐
+│  backend (core)    │ │  auth-service      │ │   log-service    │
+│  文章/分类/用户业务 │ │  JWT认证/用户管理  │ │   请求日志/审计   │
+└───────────────────┘ └───────────────────┘ └───────────────────┘
                               ↓
 ┌───────────────────┐      ┌───────────────────┐
 │    MySQL 数据库    │      │    Redis 缓存     │
 │  用户 / 文章 / 分类  │      │   Token / 缓存   │
 └───────────────────┘      └───────────────────┘
+```
+
+**Monorepo 目录组织：**
+
+```
+claude/
+├── apps/
+│   └── web/                 # 👈 前端 H5 移动端应用
+├── services/
+│   ├── backend/             # 👈 后端核心业务服务（文章、分类、用户）
+│   ├── auth-service/        # 👈 独立认证授权微服务
+│   └── log-service/         # 👈 集中化日志微服务
+├── packages/                # 共享包（预留）
+├── turbo.json              # Turborepo 配置
+├── pnpm-workspace.yaml      # pnpm 工作区配置
+└── package.json             # 根目录仅保留全局配置
 ```
 
 ---
@@ -201,17 +216,27 @@ backend/src/
 claude/
 ├── .claude/                 # Claude Code 开发规则和配置
 ├── .husky/                  # Git Hooks 配置
-├── src/                     # 前端源码
-├── backend/                 # 后端 NestJS 源码
-├── auth-service/            # 独立认证授权服务（微服务）
-├── log-service/             # 独立日志服务（微服务）
-├── public/                  # 静态资源
-├── docs/                    # 项目文档
-├── .env*                    # 多环境配置文件
-├── package.json             # 根依赖配置
-├── tsconfig.json            # TypeScript 配置
-├── vite.config.ts           # Vite 配置
-├── eslint.config.js         # ESLint 配置
+├── apps/
+│   └── web/                 # 前端 H5 移动端应用源码
+│       ├── src/
+│       │   ├── api/         # API 接口层
+│       │   ├── components/  # 全局公共组件
+│       │   ├── pages/       # 页面组件
+│       │   ├── hooks/       # 自定义 Hooks
+│       │   ├── store/       # 全局状态管理
+│       │   └── ...
+│       ├── package.json
+│       └── vite.config.ts
+├── services/
+│   ├── backend/             # 后端核心业务服务（文章、分类、用户）
+│   ├── auth-service/        # 独立认证授权微服务
+│   └── log-service/         # 集中化日志微服务
+├── packages/                # 共享工具包（预留扩展）
+├── docs/                    # 项目架构文档
+├── .env*                    # 根目录多环境配置模板
+├── package.json             # 根目录仅保留全局配置和工具依赖
+├── pnpm-workspace.yaml      # pnpm 工作区配置
+├── turbo.json              # Turborepo 构建配置
 └── README.md                # 项目说明（本文档）
 ```
 
@@ -222,31 +247,28 @@ claude/
 ### 环境要求
 
 - Node.js >= 20
-- npm >= 9
+- pnpm >= 9
 - MySQL >= 8.0
 - Redis >= 6.0
 
 ### 安装依赖
 
 ```bash
-# 安装前端依赖
-npm install
-
-# 安装后端依赖
-cd backend && npm install
+# 一键安装所有项目依赖（Monorepo）
+pnpm install
 ```
 
 ### 环境配置
 
-**前端**：项目支持多环境配置，通过 `.env.*` 管理：
+**前端**：`apps/web/.env.*` 多环境配置：
 
 | 文件 | 环境 | 启动命令 |
 |------|------|----------|
-| `.env.outDev` | 外测环境 | `npm run dev` (默认) |
-| `.env.test` | 测试环境 | `npm run test-dev` |
-| `.env.sit` | SIT 集成测试 | `npm run sit-dev` |
-| `.env.pre` | 预生产环境 | `npm run pre-dev` |
-| `.env.production` | 生产环境 | `npm run prd-dev` |
+| `.env.outDev` | 外测环境 | `pnpm dev` (默认) |
+| `.env.test` | 测试环境 | `pnpm --filter web test-dev` |
+| `.env.sit` | SIT 集成测试 | `pnpm --filter web sit-dev` |
+| `.env.pre` | 预生产环境 | `pnpm --filter web pre-dev` |
+| `.env.production` | 生产环境 | `pnpm --filter web prd-dev` |
 
 关键环境变量：
 ```env
@@ -255,9 +277,13 @@ VITE_APP_ENV=development                     # 环境名称
 VITE_ENABLE_VCONSOLE=false                   # 是否开启 vConsole 调试
 ```
 
-**后端**：在 `backend/.env` 配置：
+**后端**：各服务独立配置：
+- `services/backend/.env` - 核心业务服务
+- `services/auth-service/.env` - 认证服务
+- `services/log-service/.env` - 日志服务
 
 ```env
+# 通用后端配置示例
 DATABASE_URL="mysql://user:password@localhost:3306/blog"
 REDIS_URL="redis://localhost:6379"
 JWT_SECRET="your-jwt-secret-key"
@@ -267,60 +293,75 @@ PORT=8888
 ### 数据库初始化
 
 ```bash
-cd backend
+# 核心服务数据库初始化
+cd services/backend
 npx prisma generate
 npx prisma db push
+
+# 认证服务数据库初始化
+cd ../auth-service
+npx prisma generate
 ```
 
 ### 开发启动
 
-**前端：**
+使用 Turborepo 并行启动所有服务：
 ```bash
-# 外测环境（默认开发）
-npm run dev
-
-# 其他环境
-npm run test-dev    # 测试环境
-npm run sit-dev     # SIT 环境
-npm run pre-dev     # 预生产
-npm run prd-dev     # 生产
+# 启动所有项目开发模式
+pnpm dev
 ```
 
-**后端：**
+也可以单独启动某个服务：
 ```bash
-cd backend
-npm run start:dev
+# 仅启动前端
+pnpm --filter web dev
+
+# 仅启动后端核心服务
+pnpm --filter backend start:dev
+
+# 仅启动认证服务
+pnpm --filter auth-service start:dev
 ```
 
 后端服务启动后：
-- API 基础路径: `http://localhost:8888/api/`
+- 核心 API: `http://localhost:8888/api/`
 - Swagger 文档: `http://localhost:8888/docs`
+- 认证服务: `http://localhost:8889/`
+- 日志服务: `http://localhost:8890/`
 
 ### 构建打包
 
 ```bash
-# 前端生产构建
-npm run build
+# Turborepo 并行构建所有项目
+pnpm build
 
-# 后端生产构建
-cd backend && npm run build
+# 单独构建某个项目
+pnpm --filter web build
+pnpm --filter backend build
 ```
 
 ---
 
 ## ✅ 验证流程
 
-开发完成后，请依次执行检查：
+使用 Turborepo 对所有项目执行检查：
 
 ```bash
-# 前端检查
-npm run lint          # ESLint 代码检查
-npx tsc --noEmit      # TypeScript 类型检查
+# 对所有项目运行 lint
+pnpm lint
 
-# 后端检查
-cd backend
-npm run lint          # ESLint 代码检查
-npm run build         # 构建检查
+# 单独检查某个项目
+pnpm --filter web lint
+pnpm --filter backend lint
+
+# 类型检查（进入对应项目执行）
+cd apps/web && npx tsc --noEmit
+cd services/backend && npx tsc --noEmit
+cd services/auth-service && npx tsc --noEmit
+cd services/log-service && npx tsc --noEmit
+
+# 全量构建验证
+pnpm build
 ```
 
 ---
@@ -389,15 +430,18 @@ ios >= 9
 ## 🧪 测试
 
 ```bash
-# 前端单元测试
-npm run test          # 交互模式
-npm run test:run      # 单次运行
-npm run test:coverage # 生成覆盖率报告
+# Turborepo 运行所有测试
+pnpm test
 
-# 后端单元测试
-cd backend
-npm run test          # 运行测试
-npm run test:cov      # 覆盖率
+# 前端单元测试
+pnpm --filter web test          # 交互模式
+pnpm --filter web test:run      # 单次运行
+pnpm --filter web test:coverage # 生成覆盖率报告
+
+# 后端单元测试（各服务独立运行）
+pnpm --filter backend test
+pnpm --filter auth-service test
+pnpm --filter log-service test
 ```
 
 ---
