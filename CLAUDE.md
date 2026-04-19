@@ -1,28 +1,36 @@
 # Claude Code 项目指南
 
 ### 项目描述
-全栈博客项目，前端 H5 移动端 + 后端 NestJS API 服务。
+全栈博客项目，**Monorepo 单代码仓库架构**，前端 H5 移动端应用 + 后端多微服务。
 
 ## 🚀 核心技术栈
 
-### 前端
+### 前端（apps/web/）
 - React 19.2.3 + TypeScript 5.5.3
 - Vite 7.3.1 + MobX 6.13.5
 - Ant Design Mobile 5.42.3 + SCSS (CSS Modules)
 
-### 后端
+### 后端（services/）
 - NestJS 11.0.1 + TypeScript 5.7.3
 - Prisma ORM 6.4.1
 
+### 构建工具
+- Turborepo 2.4.2（Monorepo 构建优化）
+
 ## 🛠️ 关键指令
 
-### 前端
+### 根项目（Monorepo 全局）
+- **全项目构建**: `npm run build`
+- **并行开发所有服务**: `npm run dev`
+- **全项目代码检查**: `npm run lint`
+
+### 前端（apps/web/ 目录下）
 - **开发**: `npm run dev` (默认外测环境)
 - **构建**: `npm run build` (全流程)
 - **检查**: `npm run lint` / `npx tsc --noEmit`
 - **各环境开发**: `npm run test-dev` (测试) | `npm run sit-dev` (SIT) | `npm run prd-dev` (生产)
 
-### 后端 (backend 目录)
+### 后端（进入对应服务目录执行，如 services/backend）
 - **开发**: `npm run start:dev`
 - **构建**: `npm run build`
 - **检查**: `npm run lint`
@@ -37,8 +45,8 @@
 ## ✅ 验证流程
 
 完成开发后，请务必依次执行：
-1. `npm run lint` (代码风格校验)
-2. `npx tsc --noEmit` (TypeScript 类型检查)
+1. `npm run lint` (根目录执行，全项目代码风格校验)
+2. 前端目录：`npx tsc --noEmit` (TypeScript 类型检查)
 3. 参照 [.claude/commands/review.md](.claude/commands/review.md) 进行自我审计。
 
 ## 🧠 项目记忆规则
