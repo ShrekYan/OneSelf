@@ -19,6 +19,11 @@ declare global {
         [key: string]: unknown;
       };
     }
+
+    interface Response {
+      /** 捕获到的响应数据，由 ResponseLogInterceptor 添加 */
+      resBody?: unknown;
+    }
   }
 }
 

@@ -8,8 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { LogServiceClientService } from '@/common/log-service';
 
- 
-
 @Injectable()
 export class PrismaService
   extends PrismaClient

@@ -4,6 +4,7 @@ import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { BusinessExceptionFilter } from './filters/business-exception.filter';
 import { PrismaExceptionFilter } from './filters/prisma-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { ResponseLogInterceptor } from './interceptors/response-log.interceptor';
 import { LogServiceModule } from './log-service';
 // JwtAuthGuard has been migrated to auth-service, use RemoteJwtAuthGuard from shared module
 // import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -21,6 +22,8 @@ import { LogServiceModule } from './log-service';
     { provide: APP_FILTER, useClass: PrismaExceptionFilter },
     // 全局响应转换拦截器
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+    // 全局响应日志拦截器，捕获响应数据供日志中间件记录
+    { provide: APP_INTERCEPTOR, useClass: ResponseLogInterceptor },
     // JWT认证守卫 has been migrated to auth-service
     // JwtAuthGuard,
   ],

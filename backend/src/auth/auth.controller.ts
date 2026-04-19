@@ -161,10 +161,10 @@ export class AuthController {
 
         // 如果 auth-service 返回了 HTTP 错误响应（如 401）
         // 使用项目标准 BusinessException 抛出，让全局过滤器处理
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
         if ((error as any).response) {
           // Type assertion for axios error response structure
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
           const errorResponse = (error as any).response as {
             status?: number;
             data?: { message?: string };

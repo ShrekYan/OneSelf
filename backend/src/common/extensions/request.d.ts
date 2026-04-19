@@ -23,6 +23,11 @@ declare global {
       /** Token 剩余有效期（单位：秒） */
       expiresIn?: number;
     }
+
+    interface Response {
+      /** 捕获到的响应数据，由 ResponseLogInterceptor 添加 */
+      resBody?: unknown;
+    }
   }
 }
 

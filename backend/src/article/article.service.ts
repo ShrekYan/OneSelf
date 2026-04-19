@@ -505,7 +505,6 @@ export class ArticleService {
       select: { article_id: true },
       orderBy: { created_at: 'desc' },
     });
-
     // 提取 article_id 到数组
     const articleIds = likes.map((like) => like.article_id);
 

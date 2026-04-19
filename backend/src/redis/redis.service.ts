@@ -9,13 +9,11 @@ import Redis from 'ioredis';
 import { LogServiceClientService } from '@/common/log-service';
 
 @Injectable()
-export class RedisService
-  extends Redis
-  implements OnModuleInit, OnModuleDestroy
-{
+export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
   private readonly maxRetries = 5;
   private readonly initialRetryDelay = 1000;
+  private readonly redis: Redis;
 
   constructor(
     private readonly configService: ConfigService,
@@ -29,7 +27,7 @@ export class RedisService
     const password = configService.get<string>('REDIS_PASSWORD');
     const db = parseInt(configService.get<string>('REDIS_DB') || '0', 10);
 
-    super({
+    this.redis = new Redis({
       host,
       port,
       password: password || undefined,
@@ -46,7 +44,7 @@ export class RedisService
   }
 
   onModuleDestroy() {
-    this.disconnect();
+    this.redis.disconnect();
     const msg = 'Redis disconnected successfully';
     this.logger.log(msg);
     this.logServiceClient.logJsonLog({
@@ -64,10 +62,10 @@ export class RedisService
    */
   private async connectWithRetry(retryCount = 0): Promise<void> {
     try {
-      await this.connect();
-      const host = this.options.host;
-      const port = this.options.port;
-      const db = this.options.db;
+      await this.redis.connect();
+      const host = this.redis.options.host;
+      const port = this.redis.options.port;
+      const db = this.redis.options.db;
 
       if (retryCount > 0) {
         const msg = `Redis connected successfully after ${retryCount} retries, host=${host}, port=${port}, db=${db}`;
@@ -151,7 +149,7 @@ export class RedisService
    */
   async isConnected(): Promise<boolean> {
     try {
-      await this.ping();
+      await this.redis.ping();
       return true;
     } catch (error) {
       const msg = 'Redis health check failed';
@@ -167,6 +165,13 @@ export class RedisService
       });
       return false;
     }
+  }
+
+  /**
+   * 获取原始 Redis 客户端（用于高级操作）
+   */
+  getRawClient(): Redis {
+    return this.redis;
   }
 
   /**
@@ -199,13 +204,13 @@ export class RedisService
   }
 
   /**
-   * 重写 get 方法，添加操作日志
+   * 获取值
    * @param key - Redis 键
    * @returns 值或者 null
    */
-  override async get(key: string): Promise<string | null> {
+  async get(key: string): Promise<string | null> {
     try {
-      const result = await super.get(key);
+      const result = await this.redis.get(key);
       this.logRedisOperation('get', key, true);
       return result;
     } catch (error) {
@@ -215,22 +220,21 @@ export class RedisService
   }
 
   /**
-   * 重写 set 方法，添加操作日志
-   * 支持 ioredis set 的可变参数形式
+   * 设置值
+   * 支持所有 ioredis set 选项（EX、PX、NX、XX 等）
    * @param key - Redis 键
    * @param value - 值
-   * @param args - 额外参数（如 EX, EX 10 等）
+   * @param args - 额外选项参数
    * @returns 'OK'
    */
-
-  override async set(
+  async set(
     key: string,
-    value: string,
-    ...args: (string | number | Buffer)[]
+    value: string | number | Buffer,
+    ...args: (string | number)[]
   ): Promise<'OK'> {
     try {
-       
-      const result = await super.set(key, value, ...args);
+      // @ts-expect-error - ioredis 会正确处理可变参数
+      const result = await this.redis.set(key, value, ...args);
       this.logRedisOperation('set', key, true);
       return result;
     } catch (error) {
@@ -240,43 +244,46 @@ export class RedisService
   }
 
   /**
-   * 重写 del 方法，添加操作日志
-   * 支持 ioredis del 的所有重载形式（删除单个/多个键，带/不带回调）
+   * 删除键
+   * 支持删除单个或多个键
+   * @param keys - 要删除的键列表
    * @returns 删除的键数量
    */
-
-  override del(
-    ...args: (
-      | string
-      | number
-      | Buffer
-      | ((err: Error | null, result: unknown) => void)
-    )[]
-  ): Promise<number> {
+  async del(...keys: string[]): Promise<number> {
     try {
-      // 提取键列表（排除回调函数）
-      const keys = args.filter(
-        (arg) => typeof arg === 'string' || Buffer.isBuffer(arg),
-      ) as string[];
-       
-      const result = super.del(...args);
-
-      // 对每个删除的键都记录日志（只记录 string 类型的键）
+      const result = await this.redis.del(...keys);
+      // 对每个键都记录日志
       keys.forEach((key) => {
-        if (typeof key === 'string') {
-          this.logRedisOperation('del', key, true);
-        }
+        this.logRedisOperation('del', key, true);
       });
-
       return result;
     } catch (error) {
-      // 第一个键用于日志
-      const keys = args.filter(
-        (arg) => typeof arg === 'string' || Buffer.isBuffer(arg),
-      ) as string[];
       const firstKey = keys.length > 0 ? keys[0] : 'unknown';
-      this.logRedisOperation('del', String(firstKey), false, error as Error);
+      this.logRedisOperation('del', firstKey, false, error as Error);
       throw error;
     }
+  }
+
+  /**
+   * Ping Redis 服务器
+   */
+  async ping(): Promise<string> {
+    return this.redis.ping();
+  }
+
+  /**
+   * 创建流水线
+   */
+  pipeline(): ReturnType<Redis['pipeline']> {
+    return this.redis.pipeline();
+  }
+
+  /**
+   * Scan keys - 转发所有参数到原生 scan 方法
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  scan(...args: any[]): Promise<[string, string[]]> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    return (this.redis.scan as any)(...args);
   }
 }

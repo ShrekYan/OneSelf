@@ -89,5 +89,10 @@ declare global {
       error?: Error;
       user?: { id: unknown };
     }
+
+    interface Response {
+      /** 捕获到的响应数据，由 ResponseLogInterceptor 添加 */
+      resBody?: unknown;
+    }
   }
 }

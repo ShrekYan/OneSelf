@@ -1,6 +1,14 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { appendJsonLog } from './file-logger';
+import {
+  sanitizeSensitiveData,
+  truncateLargeData,
+  shouldSkipBodyLogging,
+  getConfigBool,
+  getConfigNumber,
+  getConfigSensitiveFields,
+} from './log-utils';
 
 /**
  * 统一请求日志中间件
@@ -10,9 +18,22 @@ import { appendJsonLog } from './file-logger';
  * - 采用 JSON 格式每一行，方便 Graylog/ELK 采集解析
  * - 按天分片存储，便于管理和清理
  * - 错误信息由 Exception Filter 挂载到 request.error，在这里统一记录
+ * - 收集 query params / route params / request body / response body
  */
 @Injectable()
 export class RequestLogMiddleware implements NestMiddleware {
+  // 从环境变量读取配置，缓存静态值
+  private readonly requestBodyEnabled = getConfigBool(
+    'REQUEST_LOG_BODY_ENABLED',
+    true,
+  );
+  private readonly responseBodyEnabled = getConfigBool(
+    'RESPONSE_LOG_BODY_ENABLED',
+    true,
+  );
+  private readonly maxLength = getConfigNumber('REQUEST_LOG_MAX_LENGTH', 4096);
+  private readonly sensitiveFields = getConfigSensitiveFields();
+
   use(request: Request, response: Response, next: NextFunction): void {
     // 记录请求开始时间，用于计算响应时间
     request.startTime = Date.now();
@@ -50,6 +71,42 @@ export class RequestLogMiddleware implements NestMiddleware {
       userId: request.user?.id,
       env: process.env.NODE_ENV || 'development',
     };
+
+    // 收集请求参数
+    const query = request.query;
+    const params = request.params;
+    let body: unknown = request.body;
+
+    logData.query = query;
+    logData.params = params;
+
+    // 处理请求体
+    if (
+      this.requestBodyEnabled &&
+      body &&
+      Object.keys(body as object).length > 0
+    ) {
+      const contentType = request.headers['content-type'];
+      if (shouldSkipBodyLogging(contentType)) {
+        body = `[SKIPPED: content-type ${contentType}]`;
+      } else {
+        // 脱敏
+        body = sanitizeSensitiveData(body, this.sensitiveFields);
+        // 截断
+        body = truncateLargeData(body, this.maxLength);
+      }
+      logData.body = body;
+    }
+
+    // 处理响应体
+    let resBody: unknown = response.resBody;
+    if (this.responseBodyEnabled && resBody !== undefined) {
+      // 脱敏
+      resBody = sanitizeSensitiveData(resBody, this.sensitiveFields);
+      // 截断
+      resBody = truncateLargeData(resBody, this.maxLength);
+      logData.resBody = resBody;
+    }
 
     // 如果有错误，附加错误信息
     if (request.error && request.error instanceof Error) {
