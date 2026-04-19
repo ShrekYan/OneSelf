@@ -1,0 +1,60 @@
+.linksContainer {
+  background-color: #fff;
+  margin: 0 20px 30px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 6%);
+}
+
+.sectionTitle {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: opacity 0.2s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.linkLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.linkIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.linkText {
+  font-size: 26px;
+  font-weight: 500;
+  color: #333;
+}
+
+.linkArrow {
+  color: #ccc;
+  flex-shrink: 0;
+}

@@ -1,0 +1,39 @@
+.articleFooterContainer {
+  margin-top: 20px;
+  padding: 32px 33px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 4%);
+
+  .authorBio {
+    padding: 28px 24px;
+    background: linear-gradient(135deg, #f8f5ff 0%, #f5f0ff 100%);
+    border-radius: 16px;
+    border: 1px solid #e8e0fe;
+
+    .label {
+      font-size: 26px;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(180deg, $primary-purple 0%, #a77bfa 100%);
+        margin-right: 12px;
+        border-radius: 2px;
+      }
+    }
+
+    .bio {
+      font-size: 28px;
+      line-height: 1.8;
+      color: $text-secondary;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+/**
+ * Lazy-image 懒加载图片组件样式
+ */
+
+.lazyImageRoot {
+  // 根容器，由外部控制尺寸
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

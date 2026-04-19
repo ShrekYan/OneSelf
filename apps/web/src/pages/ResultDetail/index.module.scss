@@ -30,7 +30,7 @@
     left: 20px;
     width: 42px;
     height: 42px;
-    color: #fff;
+    color: #ffffff;
   }
 
   // 3. 导航标题 "购买成功" - top=115 left=307
@@ -40,7 +40,7 @@
     left: 307px;
     font-size: 34px;
     font-weight: 500;
-    color: #fff;
+    color: #ffffff;
   }
 
   // 4. 完成按钮 - top=118 left=664
@@ -49,7 +49,7 @@
     top: 118px;
     right: 36px;
     font-size: 28px;
-    color: #fff;
+    color: #ffffff;
   }
 
   // 5. 导航底部分割线 - top=175
@@ -59,7 +59,7 @@
     left: 0;
     width: 750px;
     height: 1px;
-    background-color: #eee;
+    background-color: #eeeeee;
   }
 
   // 6. 顶部橙色区域背景 - top=172
@@ -83,7 +83,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background-color: #fff;
+    background-color: #ffffff;
   }
 
   // 8. 对勾图标
@@ -109,7 +109,7 @@
     top: 391px;
     left: 255px;
     font-size: 24px;
-    color: #999;
+    color: #999999;
   }
 
   // 11. 白色卡片背景 - top=249 left=20
@@ -119,7 +119,7 @@
     left: 20px;
     width: 710px;
     height: 667px;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 8px;
   }
 
@@ -151,7 +151,7 @@
     top: 555px;
     left: 70px;
     font-size: 28px;
-    color: #333;
+    color: #333333;
   }
 
   // 15. 右箭头 - top=559 left=666
@@ -161,7 +161,7 @@
     left: 666px;
     width: 14px;
     height: 24px;
-    color: #999;
+    color: #999999;
   }
 
   // 16. 购买详情 - top=475 left=70
@@ -170,7 +170,7 @@
     top: 475px;
     left: 70px;
     font-size: 28px;
-    color: #333;
+    color: #333333;
   }
 
   // 17. 提示区域 - top=639 left=70
@@ -188,7 +188,7 @@
       left: 0;
       width: 610px;
       height: 1px;
-      background-color: #eee;
+      background-color: #eeeeee;
     }
 
     .tipContent {
@@ -204,14 +204,14 @@
         width: 16px;
         height: 16px;
         margin-top: 10px;
-        color: #666;
+        color: #666666;
       }
 
       .tipText {
         flex: 1;
         font-size: 24px;
         line-height: 36px;
-        color: #666;
+        color: #666666;
       }
     }
   }
@@ -222,7 +222,7 @@
     top: 1173px;
     left: 70px;
     font-size: 24px;
-    color: #666;
+    color: #666666;
   }
 
   // 19. 底部分隔区域 - top=1155 left=50
@@ -249,7 +249,7 @@
       left: 0;
       width: 710px;
       height: 309px;
-      background-color: #fff;
+      background-color: #ffffff;
       border-radius: 8px;
     }
 
@@ -260,7 +260,7 @@
       left: 30px;
       font-size: 32px;
       font-weight: 500;
-      color: #333;
+      color: #333333;
     }
 
     // 基金项目 - top=102 left=30
@@ -284,7 +284,7 @@
           top: 0;
           left: 1px;
           font-size: 30px;
-          color: #333;
+          color: #333333;
         }
 
         .tagsRow {
@@ -301,7 +301,7 @@
             line-height: 24px;
             text-align: center;
             font-size: 24px;
-            color: #666;
+            color: #666666;
             border: 1px solid #d8d8d8;
             border-radius: 2px;
           }
@@ -323,7 +323,7 @@
         top: 58px;
         left: 408px;
         font-size: 24px;
-        color: #666;
+        color: #666666;
       }
 
       // 加自选图标 - top=29 left=620
@@ -333,7 +333,7 @@
         left: 620px;
         width: 30px;
         height: 30px;
-        color: #999;
+        color: #999999;
       }
     }
 
@@ -367,7 +367,7 @@
     width: 750px;
     height: 140px;
     padding-bottom: env(safe-area-inset-bottom);
-    background-color: #fff;
+    background-color: #ffffff;
 
     .buyAgainBtn {
       width: 750px;
@@ -376,7 +376,7 @@
       text-align: center;
       font-size: 34px;
       font-weight: 500;
-      color: #fff;
+      color: #ffffff;
       background-color: #fc6047;
 
       &:active {
@@ -386,7 +386,7 @@
 
     .safeArea {
       height: 40px;
-      background-color: #fff;
+      background-color: #ffffff;
     }
   }
 }

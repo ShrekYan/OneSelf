@@ -1,0 +1,310 @@
+.searchRoot {
+  min-height: 100vh;
+  background-color: $background-color;
+  display: flex;
+  flex-direction: column;
+  overflow-x: visible;
+  max-width: 750px;
+  margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 搜索栏 */
+.searchBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: $background-white;
+  padding: calc(20px + env(safe-area-inset-top)) 30px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid rgb(224 223 223 / 40%);
+}
+
+.backBtn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+
+  &:active {
+    background-color: $background-light;
+  }
+
+  svg {
+    width: 36px;
+    height: 36px;
+    stroke: $text-primary;
+    stroke-width: 2;
+    fill: none;
+  }
+}
+
+.searchInputWrapper {
+  flex: 1;
+  position: relative;
+  height: 60px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    stroke: $text-tertiary;
+    stroke-width: 2;
+    fill: none;
+  }
+}
+
+.searchInput {
+  width: 100%;
+  height: 100%;
+  padding: 0 60px;
+  font-size: 28px;
+  color: $text-primary;
+  background-color: $background-gray;
+  border: none;
+  border-radius: 30px;
+  outline: none;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.searchInputWrapper .clearBtn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  min-height: 36px;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: $text-tertiary;
+    stroke-width: 2;
+    fill: none;
+  }
+
+  &:active {
+    background-color: rgb(0 0 0 / 5%);
+  }
+}
+
+.searchBtn {
+  padding: 0 30px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 500;
+  color: white;
+  background-color: $primary-purple;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  min-width: 88px;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    background-color: $text-disabled;
+    cursor: not-allowed;
+  }
+}
+
+/* 热门搜索区域 */
+.hotSection {
+  padding: 40px 30px 20px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.sectionTitle {
+  font-size: 34px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+}
+
+.clearBtn {
+  font-size: 26px;
+  color: $text-secondary;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  min-height: 44px;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.hotTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.hotTag {
+  padding: 12px 24px;
+  font-size: 26px;
+  color: $text-secondary;
+  background-color: $background-white;
+  border-radius: 30px;
+  cursor: pointer;
+  border: 1px solid $border-color;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+
+  &:active {
+    background-color: $primary-purple;
+    color: white;
+    border-color: $primary-purple;
+  }
+}
+
+/* 搜索历史区域 */
+.historySection {
+  padding: 20px 30px 40px;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: $background-white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  min-height: 44px;
+
+  &:active {
+    background-color: $background-gray;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $border-color-light;
+  }
+}
+
+.historyKeyword {
+  font-size: 28px;
+  color: $text-primary;
+}
+
+.historyIcon {
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    stroke: $text-tertiary;
+    fill: none;
+  }
+}
+
+.historyLeft {
+  display: flex;
+  align-items: center;
+}
+
+.deleteIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.7;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: $text-tertiary;
+    stroke-width: 2;
+    fill: none;
+  }
+}
+
+/* 空状态 */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 30px;
+
+  svg {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 30px;
+    stroke: $text-tertiary;
+    stroke-width: 1;
+    fill: none;
+  }
+}
+
+.emptyText {
+  font-size: 28px;
+  color: $text-tertiary;
+  margin: 0;
+}
+
+/* 搜索结果区域 */
+.resultSection {
+  flex: 1;
+  padding: 20px 30px;
+}
+
+.loadingText {
+  font-size: 32px;
+  color: $text-secondary;
+  text-align: center;
+  padding: 60px 0;
+}

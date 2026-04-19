@@ -9,12 +9,12 @@
   // 顶部导航栏
   .navBar {
     height: 88px;
-    background-color: #fff;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #eeeeee;
 
     .backIcon {
       position: absolute;
@@ -22,14 +22,14 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 42px;
-      color: #333;
+      color: #333333;
       font-family: iconfont;
       line-height: 42px;
     }
 
     .title {
       font-size: 34px;
-      color: #333;
+      color: #333333;
       font-weight: 400;
       line-height: 34px;
     }
@@ -37,20 +37,19 @@
 
   // Tab 切换栏 - 自定义 antd Tabs 样式
   .tabsWrapper {
-    background-color: #fff;
+    background-color: #ffffff;
     height: 90px;
 
     :global {
+      
       .adm-tabs {
         height: 90px;
-        background-color: #fff;
-
+        background-color: #ffffff;
         --fixed-active-line-width: 40px;
         --active-line-height: 5px;
         --active-line-color: #fc6047;
-        --active-title-color: #333;
+        --active-title-color: #333333;
         --title-font-size: 30px;
-
         .adm-tabs-tab-line{
           left:0;
         }
@@ -77,14 +76,14 @@
               align-items: center;
               justify-content: center;
               font-size: 30px;
-              color: #666;
+              color: #666666;
               font-weight: 400;
               line-height: 30px;
 
               &.adm-tabs-tab-active {
-                color: #333;
+                color: #333333;
                 font-weight: 600;
-                font-family: "PingFang SC Semibold";
+                font-family: PingFang SC Semibold;
               }
             }
           }
@@ -118,7 +117,7 @@
   .transactionItem {
     width: 710px;
     height: 172px;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 0;
     overflow: hidden;
     margin-bottom: 20px;
@@ -134,21 +133,21 @@
 
       .tradeName {
         font-size: 28px;
-        color: #fff;
+        color: #ffffff;
         line-height: 28px;
       }
 
       .tradeTime {
         font-size: 28px;
-        color: #fff;
+        color: #ffffff;
         line-height: 28px;
       }
     }
 
     .itemBody {
       height: 112px;
-      background-color: #fff;
-      border: 1px solid #eee;
+      background-color: #ffffff;
+      border: 1px solid #eeeeee;
       border-top: none;
       display: flex;
       justify-content: space-between;
@@ -158,13 +157,13 @@
 
       .tradeStatus {
         font-size: 32px;
-        color: #666;
+        color: #666666;
         line-height: 32px;
       }
 
       .tradeAmount {
         font-size: 32px;
-        color: #333;
+        color: #333333;
         line-height: 32px;
       }
     }

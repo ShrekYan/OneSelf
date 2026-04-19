@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model RefreshTokens {
+  id            String  @id @db.VarChar(36)
+  user_id       String  @db.VarChar(36)
+  refresh_token String  @unique(map: "uk_refresh_token") @db.VarChar(500)
+  client_ip     String  @db.VarChar(50)
+  expires_at    BigInt
+  revoked       Boolean @default(false)
+  created_at    BigInt
+  users         Users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "refresh_tokens_ibfk_1")
+
+  @@index([expires_at], map: "idx_expires_at")
+  @@index([user_id], map: "idx_user_id")
+  @@map("refresh_tokens")
+}
+
+model Users {
+  id             String           @id @db.VarChar(36)
+  username       String           @unique(map: "uk_username") @db.VarChar(50)
+  password_hash  String           @db.VarChar(255)
+  password_algorithm String?     @db.VarChar(20)
+  email          String?          @db.VarChar(100)
+  nickname       String?          @db.VarChar(50)
+  avatar         String?          @db.VarChar(500)
+  is_active      Boolean          @default(true)
+  created_at     BigInt
+  updated_at     BigInt
+  refresh_tokens RefreshTokens[]
+
+  @@map("users")
+  @@index([is_active], map: "idx_is_active")
+}

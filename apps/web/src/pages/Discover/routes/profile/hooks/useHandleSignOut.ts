@@ -1,0 +1,39 @@
+import { useNavigate } from 'react-router-dom';
+import { Dialog } from 'antd-mobile';
+import { authApi } from '@/api';
+
+/**
+ * 处理退出登录
+ */
+export const useHandleSignOut = () => {
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    const confirmed = await Dialog.confirm({
+      title: 'Confirm Sign Out',
+      content:
+        'Are you sure you want to sign out? You will need to sign in again to access your personal account information after signing out.',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+    });
+
+    if (confirmed) {
+      try {
+        // 从 localStorage 获取 refreshToken 并传递给后端
+        const refreshToken = localStorage.getItem('refreshToken');
+        await authApi.logout(refreshToken ?? undefined);
+        // 清除本地存储的所有认证信息
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userInfo');
+        // 跳转到登录页面
+        navigate('/login');
+      } catch (error) {
+        console.error('Sign out failed:', error);
+        // Error is automatically handled by API interceptor with Toast prompt
+      }
+    }
+  };
+
+  return handleSignOut;
+};

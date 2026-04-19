@@ -1,0 +1,210 @@
+/**
+ * 消息通知页面样式
+ * 设计稿: 750px 宽度
+ * 参考 profile 页面风格设计
+ */
+
+.notificationsRoot {
+  min-height: 100vh;
+  background-color: #fff;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 顶部导航栏 */
+.header {
+  position: sticky;
+  top:0;
+  left:0;
+  z-index: 10;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+
+.backBtn {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: #666;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+}
+
+.pageTitle {
+  position: relative;
+  left:35px;
+  font-size: 36px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-left: 10px;
+}
+
+.markAllPlaceholder {
+  width: 48px;
+}
+
+.markAllBtn {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: $primary-purple;
+  cursor: pointer;
+  border-radius: 24px;
+  height: 48px;
+  white-space: nowrap;
+
+  &:active {
+    background-color: rgb(136 72 249 / 10%);
+  }
+}
+
+/* 自定义 Tabs */
+.tabsContainer {
+  margin: 0 16px 16px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 28px;
+  display: flex;
+  gap: 8px;
+}
+
+.tabItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 20px;
+  font-size: 30px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &.active {
+    background-color: #fff;
+    color: #1a1a1a;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    margin-left: 8px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 12px;
+    line-height: 1;
+  }
+}
+
+/* 内容区域 */
+.content {
+  flex: 1;
+}
+
+.notificationsList {
+  margin: 0 16px;
+  background-color: #f5f5f5;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px;
+  color: #999;
+
+  svg {
+    margin-bottom: 32px;
+  }
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 30px;
+}
+
+/* 底部弹出菜单 */
+.popupBody {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+}
+
+.actionMenu {
+  padding: 16px;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding: 24px 28px;
+  border: none;
+  background: transparent;
+  font-size: 32px;
+  color: #333;
+  cursor: pointer;
+  border-radius: 24px;
+
+  &:active {
+    background-color: #f5f5f5;
+  }
+}
+
+.actionItemDelete {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding: 24px 28px;
+  border: none;
+  background: transparent;
+  font-size: 32px;
+  color: #ff4d4f;
+  cursor: pointer;
+  border-radius: 24px;
+
+  &:active {
+    background-color: rgb(255 77 79 / 10%);
+  }
+}
+
+.loadingMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  font-size: 28px;
+  color: #999;
+}
+
+.noMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  font-size: 26px;
+  color: #999;
+}

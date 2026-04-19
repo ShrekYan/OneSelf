@@ -1,0 +1,13 @@
+.savedRoot {
+  min-height: 100vh;
+  background-color: $background-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: calc($tab-bar-height + env(safe-area-inset-bottom));
+}
+
+.text {
+  color: $text-tertiary;
+  font-size: 22px;
+}

@@ -1,0 +1,81 @@
+/**
+ * 分类相关 API 接口
+ * @description 热门搜索关键词等分类相关接口
+ */
+import { api } from '@/api';
+import type { RequestConfig } from '@/api/core/types';
+import type { HotSearchItem } from '@/pages/Discover/routes/search/constant';
+
+/**
+ * 获取热门关键词响应
+ */
+export interface HotKeywordsResponse {
+  keywords: HotSearchItem[];
+}
+
+/**
+ * 分类项
+ */
+export interface CategoryItem {
+  /** 分类ID */
+  id: string;
+  /** 分类名称 */
+  name: string;
+  /** 该分类下已发布文章数量 */
+  articleCount: number;
+  /** 封面图片URL */
+  imageUrl?: string;
+  /** 分类描述 */
+  description?: string;
+  /** 排序权重 */
+  sortOrder?: number;
+}
+
+/**
+ * 获取分类列表响应
+ */
+export interface CategoryListResponse {
+  /** 分类列表数组 */
+  list: CategoryItem[];
+  /** 分类总数 */
+  total: number;
+}
+
+/**
+ * 分类 API 模块
+ */
+export const categoryApi = {
+  /**
+   * 获取热门搜索关键词
+   * @description 获取当前热门搜索列表，启用缓存（5分钟）
+   */
+  getHotKeywords: async (): Promise<HotSearchItem[]> => {
+    // 注意：拦截器会自动解包，返回的是 data.data 而不是整个 response
+    const response = (await api.get<HotKeywordsResponse>(
+      '/api/v1/category/hot-keywords',
+      {
+        cache: true,
+        cacheTime: 5 * 60 * 1000, // 缓存5分钟
+      } as RequestConfig,
+    )) as unknown as HotKeywordsResponse;
+    // 响应拦截器已解包，直接返回 keywords
+    return response.keywords;
+  },
+
+  /**
+   * 获取分类列表
+   * @description 获取所有激活的文章分类列表，分类数据不常变动，启用缓存（5分钟）
+   */
+  getList: async (): Promise<CategoryListResponse> => {
+    // 注意：拦截器会自动解包，返回的是 data.data 而不是整个 response
+    const response = (await api.get<CategoryListResponse>(
+      '/api/v1/category/list',
+      {
+        cache: true,
+        cacheTime: 5 * 60 * 1000, // 缓存5分钟
+      } as RequestConfig,
+    )) as unknown as CategoryListResponse;
+    // 响应拦截器已解包，直接返回整个响应数据
+    return response;
+  },
+};

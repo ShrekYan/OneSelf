@@ -1,0 +1,41 @@
+
+.categoryTabsRoot {
+  margin: 33px;
+}
+
+.tabsScrollContainer {
+  overflow: auto hidden;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tabsList {
+  display: flex;
+  gap: 20px;
+  padding: 0 33px;
+  min-width: fit-content;
+}
+
+.tab {
+  padding: 16px 32px;
+  border-radius: 40px;
+  font-size: 30px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background-color: $background-light;
+  color: $text-secondary;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &.selected {
+    background-color: $text-primary;
+    color: $background-white;
+  }
+}
