@@ -5,8 +5,39 @@ tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
 ---
 
-<!-- 🔐 项目规范自动加载 - 100% 生效，无需手动调用 -->
+<!-- ============================================================ -->
+<!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
+<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
+<!-- ============================================================ -->
+
+<!-- Skill 入口定义 -->
 #include: ../skills/h5-frontend-developer/h5-frontend-developer.md
+
+<!-- 核心架构规范 -->
+#include: ../skills/h5-frontend-developer/architecture-directory.md
+#include: ../skills/h5-frontend-developer/page-directory-structure.md
+#include: ../skills/h5-frontend-developer/ui-component-spec.md
+#include: ../skills/h5-frontend-developer/logic-data-flow.md
+
+<!-- 问题排查指南 -->
+#include: ../skills/h5-frontend-developer/troubleshooting.md
+
+<!-- 详细规则文件 -->
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
+#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-assets-resources.md
+#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+
+<!-- ============================================================ -->
+<!-- 🔐 第二优先级：代码模板区（预留）                              -->
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<!-- 🔐 第三优先级：工作流程区                                      -->
+<!-- ============================================================ -->
 
 ---
 

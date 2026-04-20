@@ -5,8 +5,36 @@ tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
 ---
 
-<!-- 🔐 项目规范自动加载 - 100% 生效，无需手动调用 -->
+<!-- ============================================================ -->
+<!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
+<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
+<!-- ============================================================ -->
+
+<!-- Skill 入口定义 -->
 #include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md
+
+<!-- NestJS 核心规范（按编号顺序） -->
+#include: ../skills/nestjs-backend-developer/01-architecture-module.md
+#include: ../skills/nestjs-backend-developer/02-file-naming.md
+#include: ../skills/nestjs-backend-developer/03-controller-service.md
+#include: ../skills/nestjs-backend-developer/04-dto-validation.md
+#include: ../skills/nestjs-backend-developer/05-typescript-spec.md
+#include: ../skills/nestjs-backend-developer/06-api-documentation.md
+#include: ../skills/nestjs-backend-developer/07-error-handling.md
+#include: ../skills/nestjs-backend-developer/08-checklist.md
+#include: ../skills/nestjs-backend-developer/09-prisma-orm.md
+#include: ../skills/nestjs-backend-developer/10-code-format.md
+
+<!-- 基础规则扩展 -->
+#include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md
+
+<!-- ============================================================ -->
+<!-- 🔐 第二优先级：代码模板区（预留）                              -->
+<!-- ============================================================ -->
+
+<!-- ============================================================ -->
+<!-- 🔐 第三优先级：工作流程区                                      -->
+<!-- ============================================================ -->
 
 ---
 
