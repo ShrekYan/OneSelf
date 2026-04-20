@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { catchError, firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, EMPTY } from 'rxjs';
 import { AxiosError } from 'axios';
 import { LogDataDto } from './dto';
 import { BatchLogsDto } from './dto';
@@ -32,9 +32,14 @@ export class LogServiceClientService implements OnModuleDestroy {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.loadConfig();
-    if (this.config.enabled && this.config.batchEnabled) {
-      this.startBatchTimer();
+    try {
+      this.loadConfig();
+      if (this.config.enabled && this.config.batchEnabled) {
+        this.startBatchTimer();
+      }
+    } catch (err) {
+      console.log(" [LogServiceClient] Failed to load config");
+      console.log(err);
     }
   }
 
@@ -165,7 +170,8 @@ export class LogServiceClientService implements OnModuleDestroy {
               '[LogServiceClient] Failed to send logs:',
               err.message,
             );
-            throw err;
+            // 错误在内层处理完毕，返回 EMPTY 让流正常结束，不向外抛出
+            return EMPTY;
           }),
         ),
       );
