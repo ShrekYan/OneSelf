@@ -118,3 +118,58 @@ const [articlesWithCategories, total] = await Promise.all([
 
 **记录日期**: 2026-04-16
 **错误原因**: 基于过时错误记忆添加了不必要的 `as any` 类型断言
+
+---
+
+## Claude Code include 指令不递归解析
+
+### 错误场景
+在 Agent 或 Skill 文件中通过 `include:` 引用一个总入口文件（如 `h5-frontend-developer.md`），期望这个入口文件内部的 `#include:` 子文件也能被自动加载。
+
+### 错误现象
+- **代码生成准确率暴跌**：从 95% 下降到 < 50%
+- Agent 完全不知道关键规范（MobX 写法、目录结构、样式规范等）
+- 生成的代码频繁违反项目约定
+- 排查困难，很难意识到是 include 没有生效
+
+### 原因分析
+**Claude Code 的 `include:` 解析器是单层的，不递归**：
+- ✅ `frontend-project-info.md` → `include: h5-frontend-developer.md` → 能正常加载
+- ❌ `h5-frontend-developer.md` 内部的 `#include: architecture-directory.md` 等 11 个子文件 → **不会被加载**
+
+这是 Claude Code 目前的设计限制，不是 bug，只是行为不符合直觉。
+
+### 正确解决方法
+
+#### 方案 A：扁平化全量 include（当前推荐）
+在所有 Agent 文件顶部**显式列出所有要 include 的文件**，不依赖嵌套引用：
+
+```markdown
+<!-- ✅ 正确：全部扁平化列出 -->
+#include: ../skills/h5-frontend-developer/h5-frontend-developer.md
+#include: ../skills/h5-frontend-developer/architecture-directory.md
+#include: ../skills/h5-frontend-developer/page-directory-structure.md
+#include: ../skills/h5-frontend-developer/ui-component-spec.md
+#include: ../skills/h5-frontend-developer/logic-data-flow.md
+#include: ../skills/h5-frontend-developer/troubleshooting.md
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+<!-- ... 其他所有规则文件 -->
+```
+
+#### 方案 B：构建脚本自动化（长期优化）
+写一个 Node 脚本递归解析 `#include:` 指令，生成扁平化后的最终产物，放在 `dist/` 目录供 Agent 引用。
+
+#### 验证方式
+在 Agent 文件开头加上说明文字，确认所有规范都已物理嵌入：
+```markdown
+<!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入 -->
+<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载 -->
+```
+
+---
+
+**记录日期**: 2026-04-21
+**错误原因**: 误以为 Claude Code 的 `include:` 指令会递归解析嵌套引用
+
+---
