@@ -509,7 +509,7 @@ npm run lint          # 代码风格检查
 npx tsc --noEmit     # TypeScript 类型检查
 
 # 后端验证
-cd backend
+cd services/backend
 npm run lint          # 代码风格检查
 npx tsc --noEmit     # TypeScript 类型检查
 ```
