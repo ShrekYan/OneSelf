@@ -3,7 +3,7 @@
 ## 📁 标准目录结构
 
 ```
-src/pages/[PageName]/
+apps/web/src/pages/[PageName]/
 ├── index.tsx                    # 页面主入口（只做组件组合）
 ├── index.module.scss           # 仅页面最外层容器样式
 ├── types.ts                     # 跨组件共享的数据类型定义
@@ -374,7 +374,7 @@ export default usePageStore;
 **要点：**
 - ✅ 使用 `useLocalObservable`（MobX Hook 写法）
 - ✅ **必须使用对象字面量写法，禁止页面级 useStore.ts 使用 class 写法**
-- ⚠️ 例外：**全局 Store** (`src/store/`) 允许使用 `class` + `makeAutoObservable`
+- ⚠️ 例外：**全局 Store** (`apps/web/src/store/`) 允许使用 `class` + `makeAutoObservable`
 - ✅ 禁止使用 observer HOC，必须用 `useObserver`
 - ✅ 页面局部状态，不需要放到全局 Store
 
@@ -411,7 +411,7 @@ export default usePageStore;
 | **易于维护** | 修改哪个组件就进哪个文件夹，不用在大文件搜索 |
 | **可移植性** | 需要复用组件直接复制整个文件夹带走 |
 | **可扩展** | 新增组件不影响现有结构，不会让单个文件膨胀 |
-| **符合规范** | 和 `src/components/` 公共组织结构一致，统一风格 |
+| **符合规范** | 和 `apps/web/src/components/` 公共组织结构一致，统一风格 |
 | **类型安全** | 完整 TypeScript 类型标注，哪里用哪里定义 |
 
 ---

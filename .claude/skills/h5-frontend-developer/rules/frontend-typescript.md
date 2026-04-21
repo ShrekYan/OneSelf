@@ -1,6 +1,6 @@
 ---
-# 限制此规范仅适用于 src 目录下的 .ts 和 .tsx 文件
-pattern: ./src/**/*.{ts,tsx}
+# 限制此规范仅适用于 apps/web/src 目录下的 .ts 和 .tsx 文件
+pattern: ./apps/web/src/**/*.{ts,tsx}
 ---
 
 # TypeScript 开发规范

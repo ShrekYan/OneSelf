@@ -1,8 +1,8 @@
 # 生成前端模块功能介绍文档命令
 
 **触发**: `/frontend-module-doc [模块路径]`
-- `模块路径`: 例如 `src/pages/ArticleDetail` 或 `src/components/LazyImage`
-- 模块类型自动识别：`src/pages/` → 页面级模块，`src/components/` → 公共组件
+- `模块路径`: 例如 `apps/web/src/pages/ArticleDetail` 或 `apps/web/src/components/LazyImage`
+- 模块类型自动识别：`apps/web/src/pages/` → 页面级模块，`apps/web/src/components/` → 公共组件
 
 **行为**: 生成前端 H5 特定模块的详细设计文档，包含组件结构图、数据流图、技术选型、方案详述，输出到 `/docs` 目录用于日后回顾学习设计决策。
 

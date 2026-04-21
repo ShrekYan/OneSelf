@@ -39,10 +39,10 @@
 
 | 场景 | 所在目录 | 根容器命名规则 | 示例 |
 |------|----------|---------------|------|
-| **页面根容器** | `src/pages/[PageName]/` | `{pageName}Container` | `About` → `.aboutContainer` |
-| **页面内子组件** | `src/pages/.../components/[ComponentName]/` | `{componentName}Container` | `ArticleListItem` → `.articleListItemContainer` |
-| **全局公共组件** | `src/components/[ComponentName]/` | `{componentName}Container` | `LazyImage` → `.lazyImageContainer` |
-| **Discover 分页** | `src/pages/Discover/routes/[RouteName]/` | `{routeName}Container` | `profile` → `.profileContainer` |
+| **页面根容器** | `apps/web/src/pages/[PageName]/` | `{pageName}Container` | `About` → `.aboutContainer` |
+| **页面内子组件** | `apps/web/src/pages/.../components/[ComponentName]/` | `{componentName}Container` | `ArticleListItem` → `.articleListItemContainer` |
+| **全局公共组件** | `apps/web/src/components/[ComponentName]/` | `{componentName}Container` | `LazyImage` → `.lazyImageContainer` |
+| **Discover 分页** | `apps/web/src/pages/Discover/routes/[RouteName]/` | `{routeName}Container` | `profile` → `.profileContainer` |
 
 **规则细节**：
 1. 只有根容器需要遵循此规则，内部元素保持原有灵活命名规则不变
@@ -171,7 +171,7 @@ import styles from './index.module.scss';
 
 ### 全局样式
 项目采用 CSS Modules 模块化，**禁止全局样式污染**：
-- 全局样式统一放在 `src/styles/`
+- 全局样式统一放在 `apps/web/src/styles/`
 - 如果真需要全局，请使用 `:global()` 包裹
 
 ---

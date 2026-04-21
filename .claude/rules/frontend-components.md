@@ -1,6 +1,6 @@
 # 公共组件开发规范
 
-本文档定义 `src/components/` 目录下**全局公共组件**的开发规范，所有公共组件必须遵循此规范。
+本文档定义 `apps/web/src/components/` 目录下**全局公共组件**的开发规范，所有公共组件必须遵循此规范。
 
 ---
 
@@ -9,7 +9,7 @@
 每个公共组件必须独立占用一个目录，结构如下：
 
 ```
-src/components/
+apps/web/src/components/
 └── [ComponentName]/    # 组件名：PascalCase
     ├── index.tsx        # 组件源码
     ├── index.module.scss # 组件样式
@@ -18,7 +18,7 @@ src/components/
 
 **示例**：
 ```
-src/components/
+apps/web/src/components/
 ├── LazyImage/
 │   ├── index.tsx
 │   └── index.module.scss
@@ -139,10 +139,10 @@ const LazyImage: React.FC<LazyImageProps> = ({ className, ...rest }) => {
 
 ### 组件导出
 - 使用 `export default` 导出组件
-- 在 `src/components/index.tsx` 统一注册，便于全局导入
+- 在 `apps/web/src/components/index.tsx` 统一注册，便于全局导入
 
 ```typescript
-// src/components/index.tsx
+// apps/web/src/components/index.tsx
 export { default as LazyImage } from './LazyImage';
 export { default as ErrorFallback } from './ErrorFallback';
 ```
@@ -322,7 +322,7 @@ import ErrorFallback from '@/components/ErrorFallback';
 - [ ] 可点击元素尺寸是否 ≥ 44px (设计稿 ≥ 88px)？
 - [ ] 是否添加了 `:active` 点击反馈？
 - [ ] 是否优先使用了 Ant Design Mobile 组件？
-- [ ] 是否已在 `src/components/index.tsx` 注册导出？
+- [ ] 是否已在 `apps/web/src/components/index.tsx` 注册导出？
 - [ ] 是否遵循了导入排序规则？
 - [ ] 是否适配了安全区域？
 - [ ] 是否处理了加载和错误状态？

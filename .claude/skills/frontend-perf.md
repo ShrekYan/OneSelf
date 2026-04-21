@@ -89,8 +89,8 @@ description: 前端移动端 H5 性能优化审查指南，系统性分类检查
 
 | 优化设施 | 位置 | 使用场景 | 正确用法 |
 |----------|------|----------|----------|
-| **请求缓存** | `src/api/request-cache.ts` | 不常变的 GET 数据 | `api.get(url, { cache: true, cacheTime: 5 * 60 * 1000 })` |
-| **重复请求取消** | `src/api/cancel-manager.ts` | 并发重复请求 | 自动处理，无需手动 |
+| **请求缓存** | `apps/web/src/api/request-cache.ts` | 不常变的 GET 数据 | `api.get(url, { cache: true, cacheTime: 5 * 60 * 1000 })` |
+| **重复请求取消** | `apps/web/src/api/cancel-manager.ts` | 并发重复请求 | 自动处理，无需手动 |
 | **路由缓存** | `react-activation` + `react-freeze` | 保留列表状态 | 只缓存列表页，不缓存详情页 |
 | **自动重试** | `axios-instance.ts` | 网络抖动失败 | 自动重试幂等请求 |
 

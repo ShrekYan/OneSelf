@@ -66,7 +66,7 @@ const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>
 - ✅ 只导入需要的 Hook: `import useDebounce from 'react-use/lib/useDebounce';`
 - ✅ 优先使用 react-use 提供的成熟实现
 - ❌ 禁止整体导入 `import { useDebounce } from 'react-use';`（不利于 tree-shaking）
-- ❌ 项目 `src/hooks/` 已有的实现，不重复引入 react-use 版本
+- ❌ 项目 `apps/web/src/hooks/` 已有的实现，不重复引入 react-use 版本
 
 **推荐常用 Hooks**:
 - `useDebounce` - 防抖
@@ -149,7 +149,7 @@ const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>
 
 **示例代码**:
 ```typescript
-// src/api/user/schemas.ts
+// apps/web/src/api/user/schemas.ts
 import { z } from 'zod';
 
 export const userSchema = z.object({
@@ -203,7 +203,7 @@ import classNames from 'classnames';
 
 | 库 | 使用场景 | 要点 |
 |------|----------|------|
-| `axios` | HTTP 请求 | 已经在 `src/api/axios-instance.ts` 配置好拦截器，直接使用 |
+| `axios` | HTTP 请求 | 已经在 `apps/web/src/api/axios-instance.ts` 配置好拦截器，直接使用 |
 | `localforage` | 大体积本地存储 | 异步存储，替代 localStorage 存大数据 |
 | `qrcode` | 生成二维码 | 需要分享二维码海报时使用 |
 | `html2canvas` | HTML 转 Canvas | 生成分享海报图使用 |

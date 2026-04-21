@@ -8,9 +8,9 @@
 
 | Hook 类型 | 存放位置 | 说明 |
 |-----------|----------|------|
-| **通用技术 Hook** | `src/hooks/useXxx.ts` | 与业务无关，解决通用技术问题，可跨页面/项目复用 |
-| **页面专用业务 Hook** | `src/pages/[Page]/hooks/useXxx.ts` | 当前页面专用的业务逻辑 Hook，仅在该页面使用 |
-| **跨页面业务 Hook** | `src/hooks/useXxx.ts` 或 `src/api/[module]/hooks/useXxx.ts` | 多个页面复用的业务逻辑 Hook |
+| **通用技术 Hook** | `apps/web/src/hooks/useXxx.ts` | 与业务无关，解决通用技术问题，可跨页面/项目复用 |
+| **页面专用业务 Hook** | `apps/web/src/pages/[Page]/hooks/useXxx.ts` | 当前页面专用的业务逻辑 Hook，仅在该页面使用 |
+| **跨页面业务 Hook** | `apps/web/src/hooks/useXxx.ts` 或 `apps/web/src/api/[module]/hooks/useXxx.ts` | 多个页面复用的业务逻辑 Hook |
 
 通用规则：
 - **一个 Hook 一个文件**，按功能拆分

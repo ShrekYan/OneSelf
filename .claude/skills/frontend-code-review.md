@@ -28,8 +28,8 @@ model: inherit
 - [ ] `constant.ts` 是否存放页面所有常量配置？
 
 #### API 层规范（遵循 `.claude/rules/frontend-api-design.md`）
-- [ ] 是否按业务模块拆分到 `src/api/[module]/`？
-- [ ] 是否在 `src/api/index.ts` 统一导出？
+- [ ] 是否按业务模块拆分到 `apps/web/src/api/[module]/`？
+- [ ] 是否在 `apps/web/src/api/index.ts` 统一导出？
 - [ ] 所有请求/响应是否有完整 `Params`/`Response` 类型定义？
 - [ ] 缓存配置是否合理（不常变数据开启 `cache: true`）？
 - [ ] 是否使用路径别名 `@/api` 而非相对路径？

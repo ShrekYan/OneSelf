@@ -112,7 +112,7 @@ src/
 **示例：**
 
 ```typescript
-// src/pages/ArticleList/handle.ts
+// apps/web/src/pages/ArticleList/handle.ts
 export const formatPublishTime = (
   publishAt: string,
   relative = true,
@@ -137,7 +137,7 @@ export const formatPublishTime = (
 ```
 
 ```typescript
-// src/pages/ArticleList/__tests__/handle.test.ts
+// apps/web/src/pages/ArticleList/__tests__/handle.test.ts
 import { formatPublishTime } from '../handle';
 
 describe('formatPublishTime', () => {
@@ -240,7 +240,7 @@ describe('useCountDown', () => {
 **示例：**
 
 ```typescript
-// src/pages/ArticleList/useStore.ts
+// apps/web/src/pages/ArticleList/useStore.ts
 import { useLocalObservable } from 'mobx-react';
 
 export function useArticleListStore() {
@@ -273,7 +273,7 @@ export function useArticleListStore() {
 ```
 
 ```typescript
-// src/pages/ArticleList/__tests__/useStore.test.ts
+// apps/web/src/pages/ArticleList/__tests__/useStore.test.ts
 import { renderHook, act } from '@testing-library/react';
 import { useArticleListStore } from '../useStore';
 
@@ -603,7 +603,7 @@ npm run test:run
 npm run test:coverage
 
 # 运行指定文件
-npx vitest run src/components/CountDown/__tests__/index.test.tsx
+npx vitest run apps/web/src/components/CountDown/__tests__/index.test.tsx
 
 # UI 模式
 npm run test:ui

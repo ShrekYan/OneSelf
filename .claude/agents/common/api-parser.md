@@ -13,7 +13,7 @@ model: inherit
 1. 解析各种格式的接口文档
 2. 提取接口信息（模块、方法、路径、参数、响应结构）
 3. **生成**完全符合项目规范的 **前后端** TypeScript 代码：
-   - 前端：API 调用层代码（`src/api/`）
+   - 前端：API 调用层代码（`apps/web/src/api/`）
    - 后端：NestJS 模块骨架（Controller + Service + DTO + Module）
 4. 自动更新入口文件/根模块导出
 
@@ -142,8 +142,8 @@ model: inherit
    b. 处理冲突（同名接口询问用户是否覆盖）
    c. 为每个接口生成 Params 和 Response 接口定义
    d. 生成接口方法，添加到 {moduleName}Api 对象
-   e. 写入模块文件 src/api/{module}/index.ts（新建或追加）
-   f. 更新 src/api/index.ts 入口文件（导入 + 导出）
+   e. 写入模块文件 apps/web/src/api/{module}/index.ts（新建或追加）
+   f. 更新 apps/web/src/api/index.ts 入口文件（导入 + 导出）
    ↓
    ▶️  如果生成后端：
    a. 检查模块是否已存在 → 已存在则读取保留原有代码
@@ -169,8 +169,8 @@ model: inherit
 ### 前端规范
 
 **所有规范严格遵循项目现有文档，直接引用：**
-- API 设计规范 → [.claude/rules/frontend-api-design.md](.claude/rules/frontend-api-design.md)
-- TypeScript 规范 → [.claude/rules/frontend-typescript.md](.claude/rules/frontend-typescript.md)
+- API 设计规范 → [.claude/skills/h5-frontend-developer/rules/frontend-api-design.md](.claude/skills/h5-frontend-developer/rules/frontend-api-design.md)
+- TypeScript 规范 → [.claude/skills/h5-frontend-developer/rules/frontend-typescript.md](.claude/skills/h5-frontend-developer/rules/frontend-typescript.md)
 - 项目整体规范 → [CLAUDE.md](CLAUDE.md)
 
 #### 目录与命名规范（前端）
@@ -178,7 +178,7 @@ model: inherit
 | 元素 | 规则 | 示例 |
 |------|------|------|
 | 模块目录 | 小写 kebab-case | `article`, `user-auth` |
-| 模块文件 | `src/api/{module}/index.ts` | `src/api/article/index.ts` |
+| 模块文件 | `apps/web/src/api/{module}/index.ts` | `apps/web/src/api/article/index.ts` |
 | API 对象 | `{moduleName}Api` (camelCase) | `articleApi`, `userAuthApi` |
 | 接口方法 | 动词开头 camelCase | `getArticleDetail`, `listArticles` |
 | 请求参数接口 | `{MethodName}Params` | `getArticleDetailParams` |
@@ -197,7 +197,7 @@ model: inherit
 
 #### 前端入口文件更新规则
 
-`src/api/index.ts` 需要更新三处：
+`apps/web/src/api/index.ts` 需要更新三处：
 
 1. **导入语句**（按字母顺序插入）：
 ```typescript
@@ -222,13 +222,13 @@ export default {
 ### 后端规范 (NestJS)
 
 **所有规范严格遵循后端现有文档，直接引用：**
-- 后端开发规范 → [backend/.claude/CLAUDE.md](backend/.claude/CLAUDE.md)
+- 后端开发规范 → [.claude/projects/backend-project-info.md](.claude/projects/backend-project-info.md)
 - NestJS 官方约定 → 遵循标准 NestJS 模块化架构
 
 #### 后端模块文件结构
 
 ```
-backend/src/{module}/
+services/backend/src/{module}/
 ├── {module}.controller.ts    # Controller 层（处理 HTTP 请求）
 ├── {module}.service.ts       # Service 层（处理业务逻辑）
 ├── {module}.module.ts        # Module 定义
@@ -258,7 +258,7 @@ backend/src/{module}/
 
 #### 后端根模块更新规则
 
-`backend/src/app.module.ts` 需要更新两处：
+`services/backend/src/app.module.ts` 需要更新两处：
 
 1. **添加导入语句**：
 ```typescript
@@ -394,7 +394,7 @@ import { ArticleModule } from './article/article.module';
 - [ ] API 对象命名是否为 `{module}Api`？
 - [ ] 方法命名是否符合动词契约？
 - [ ] 导入路径是否使用 `@/api` 别名？
-- [ ] `src/api/index.ts` 是否正确更新了导入、命名导出、默认导出？
+- [ ] `apps/web/src/api/index.ts` 是否正确更新了导入、命名导出、默认导出？
 - [ ] 是否移除了调试用的 `console.log`？
 - [ ] 类型导出是否都使用 `export type`？
 
@@ -465,18 +465,18 @@ import { ArticleModule } from './article/article.module';
 
 生成结果：
 📦 前端：
-- 模块: article → `src/api/article/index.ts`
-- 模块: category → `src/api/category/index.ts`
-- 已更新入口: `src/api/index.ts`
+- 模块: article → `apps/web/src/api/article/index.ts`
+- 模块: category → `apps/web/src/api/category/index.ts`
+- 已更新入口: `apps/web/src/api/index.ts`
 
 🏗️ 后端：
-- 模块: article → `backend/src/article/`
+- 模块: article → `services/backend/src/article/`
   - article.controller.ts
   - article.service.ts
   - article.module.ts
   - dto/ (4 个 DTO 文件)
   - dto/index.ts
-- 已更新: `backend/src/app.module.ts`
+- 已更新: `services/backend/src/app.module.ts`
 
 接口数量：
 - article: 5 个接口
@@ -489,7 +489,7 @@ npm run lint
 npx tsc --noEmit
 
 # 后端验证
-cd backend
+cd services/backend
 npm run lint
 npx tsc --noEmit
 ```

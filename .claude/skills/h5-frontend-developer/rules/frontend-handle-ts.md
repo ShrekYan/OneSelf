@@ -8,9 +8,9 @@
 
 | 位置 | 场景 |
 |------|------|
-| `src/pages/[Page]/handle.ts` | 页面级可复用业务逻辑 |
-| `src/pages/[Page]/routes/[Route]/handle.ts` | 嵌套路由子页面的业务逻辑 |
-| `src/components/[Component]/handle.ts` | 全局公共组件的可复用纯逻辑抽取（可选） |
+| `apps/web/src/pages/[Page]/handle.ts` | 页面级可复用业务逻辑 |
+| `apps/web/src/pages/[Page]/routes/[Route]/handle.ts` | 嵌套路由子页面的业务逻辑 |
+| `apps/web/src/components/[Component]/handle.ts` | 全局公共组件的可复用纯逻辑抽取（可选） |
 
 ---
 
@@ -121,7 +121,7 @@ export const formatPublishTime = (
 ❌ MobX 响应式状态定义和修改 → 请放在 `useStore.ts`
 ❌ JSX/UI 渲染代码 → 请放在 `index.tsx` 或组件内
 ❌ 常量配置 → 请放在 `constant.ts`
-❌ 跨页面复用的通用工具 → 请放在 `src/utils/` 或 `src/hooks/`
+❌ 跨页面复用的通用工具 → 请放在 `apps/web/src/utils/` 或 `apps/web/src/hooks/`
 
 ---
 
@@ -130,7 +130,7 @@ export const formatPublishTime = (
 ### 示例一：文章列表页面 `handle.ts`
 
 ```ts
-// src/pages/ArticleList/handle.ts
+// apps/web/src/pages/ArticleList/handle.ts
 import { Dialog } from 'antd-mobile';
 import type { ArticleItem } from './types';
 
@@ -211,7 +211,7 @@ export const copyArticleLink = async (url: string): Promise<boolean> => {
 ### 组件中如何使用
 
 ```tsx
-// src/pages/ArticleList/index.tsx
+// apps/web/src/pages/ArticleList/index.tsx
 import React from 'react';
 import { useObserver } from 'mobx-react';
 import { useNavigate } from 'react-router-dom';
@@ -275,7 +275,7 @@ export default ArticleListPage;
 当逻辑需要依赖 React Hook（如 `useNavigate`）但又想抽离出来时，请放在 `hooks/` 目录：
 
 ```
-src/pages/Profile/
+apps/web/src/pages/Profile/
 ├── index.tsx
 ├── useStore.ts
 ├── handle.ts         # 纯函数
@@ -285,7 +285,7 @@ src/pages/Profile/
 ```
 
 ```ts
-// src/pages/Profile/hooks/useSignOut.ts
+// apps/web/src/pages/Profile/hooks/useSignOut.ts
 import { useNavigate } from 'react-router-dom';
 import { confirmSignOut } from '../handle';
 import { api } from '@/api';
@@ -309,7 +309,7 @@ export const useSignOut = () => {
 ```
 
 ```tsx
-// src/pages/Profile/index.tsx
+// apps/web/src/pages/Profile/index.tsx
 import { useSignOut } from './hooks/useSignOut';
 
 const ProfilePage = () => {

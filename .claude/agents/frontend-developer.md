@@ -70,9 +70,9 @@ model: inherit
 - 合理划分可观察状态，避免不必要的重渲染
 
 ## 3. API 接口开发
-- 按业务领域模块组织在 `src/api/[module]/`
+- 按业务领域模块组织在 `apps/web/src/api/[module]/`
 - 每个接口必须完整定义 Params 和 Response 接口
-- 通过 `src/api/index.ts` 统一导出
+- 通过 `apps/web/src/api/index.ts` 统一导出
 - 合理使用缓存、跳过错误 Toast 等高级配置
 
 ## 4. 移动端适配开发
@@ -120,8 +120,8 @@ model: inherit
 - `.claude/skills/h5-frontend-developer/*.md` - H5 开发完整规范系列
 - `.claude/rules/frontend-typescript.md` - TypeScript 编码规范
 - `.claude/rules/frontend-api-design.md` - API 设计规范
-- `src/api/CLAUDE.md` - API 详细规范
-- `src/components/CLAUDE.md` - 公共组件规范
+- `apps/web/src/api/CLAUDE.md` - API 详细规范
+- `apps/web/src/components/CLAUDE.md` - 公共组件规范
 - `.claude/commands/review.md` - 代码审查清单
 - `commitlint.config.js` - Git 提交信息规范
 

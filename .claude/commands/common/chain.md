@@ -53,7 +53,7 @@ flowchart TD
 ## 🔗 调用链预演：「创建发现页面」
 
 ### 📋 任务
-> 在 `src/pages/Discover` 创建发现页面，遵循项目规范
+> 在 `apps/web/src/pages/Discover` 创建发现页面，遵循项目规范
 
 ### 📊 流程图
 
@@ -90,8 +90,8 @@ flowchart TD
 
 | 操作 | 路径 |
 |------|------|
-| 新建 | `src/pages/Discover/index.tsx` |
-| 新建 | `src/pages/Discover/index.module.scss` |
+| 新建 | `apps/web/src/pages/Discover/index.tsx` |
+| 新建 | `apps/web/src/pages/Discover/index.module.scss` |
 | 读取 | `CLAUDE.md` |
 | 读取 | `.../h5-frontend-developer.md` |
 
@@ -150,8 +150,8 @@ flowchart TD
 |------|------|
 | 读取 | `CLAUDE.md` |
 | 读取 | `.claude/skills/*.md` |
-| 新建 | `src/components/ComponentName/index.tsx` |
-| 新建 | `src/components/ComponentName/index.module.scss` |
+| 新建 | `apps/web/src/components/ComponentName/index.tsx` |
+| 新建 | `apps/web/src/components/ComponentName/index.module.scss` |
 
 ---
 

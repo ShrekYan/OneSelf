@@ -14,8 +14,8 @@ model: inherit
 
 | 文档类型 | 存放位置 | 适用场景 |
 |----------|----------|----------|
-| 组件文档 | `src/components/ComponentName/README.md` | **公共可复用组件必须写** |
-| 页面文档 | `src/pages/PageName/README.md` | **仅复杂业务页面需要**，简单页面不用写 |
+| 组件文档 | `apps/web/src/components/ComponentName/README.md` | **公共可复用组件必须写** |
+| 页面文档 | `apps/web/src/pages/PageName/README.md` | **仅复杂业务页面需要**，简单页面不用写 |
 | API/Hook | JSDoc 注释写在代码中 | 所有导出的 API 接口、自定义 Hook、工具函数 |
 
 ---
@@ -25,7 +25,7 @@ model: inherit
 **每个公共可复用组件必须包含 `README.md`**，位于组件目录下：
 
 ```
-src/components/
+apps/web/src/components/
 └── CountDown/
     ├── index.tsx
     ├── index.module.scss
@@ -181,7 +181,7 @@ return (
 API 文档**通过 TypeScript 类型 + JSDoc 注释实现**，不需要单独的 README 文件：
 
 ```typescript
-// src/api/user/types.ts
+// apps/web/src/api/user/types.ts
 /** 用户信息 */
 export interface UserInfo {
   /** 用户ID */
@@ -200,7 +200,7 @@ export interface LoginRequest {
   code: string;
 }
 
-// src/api/user/index.ts
+// apps/web/src/api/user/index.ts
 /** 手机号验证码登录 */
 export async function login(
   params: LoginRequest

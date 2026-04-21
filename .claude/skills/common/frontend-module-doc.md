@@ -17,8 +17,8 @@
 ## 模块类型自动识别
 
 根据路径自动判断模块类型：
-- `src/pages/**` → **页面级模块** - 完整页面功能
-- `src/components/**` → **公共组件** - 可复用UI组件
+- `apps/web/src/pages/**` → **页面级模块** - 完整页面功能
+- `apps/web/src/components/**` → **公共组件** - 可复用UI组件
 
 不同类型对应不同的章节结构。
 
@@ -62,7 +62,7 @@
 - {其他第三方库} - 用途
 
 **内部依赖**（项目内模块）：
-- {API 模块} `src/api/xxx` - 用途
+- {API 模块} `apps/web/src/api/xxx` - 用途
 - {公共组件} `@/components/xxx` - 用途
 - {自定义 Hooks} `@/hooks/xxx` - 用途
 
@@ -96,7 +96,7 @@ flowchart TD
     end
 
     subgraph "外部依赖"
-        API[API Layer<br/>src/api/module]:::api
+        API[API Layer<br/>apps/web/src/api/module]:::api
         G[Global Store]:::global
     end
 
@@ -462,7 +462,7 @@ frontend/docs/{module-name}-{YYYYMMDD}.md
 ## 执行流程
 
 1. **解析参数**：获取用户指定的模块路径
-2. **自动识别**：根据路径判断模块类型（`src/pages/` → 页面，`src/components/` → 组件）
+2. **自动识别**：根据路径判断模块类型（`apps/web/src/pages/` → 页面，`apps/web/src/components/` → 组件）
 3. **确认存在**：检查路径是否存在，是否是前端模块
 4. **探索代码**：
    - 读取模块目录结构

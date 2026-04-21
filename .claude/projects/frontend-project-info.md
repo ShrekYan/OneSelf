@@ -14,11 +14,10 @@
 ## 📁 关键目录结构
 
 ```
-src/
+apps/web/src/
 ├── api/                # API 接口层（按业务领域拆分）
-│   ├── [module]/       # 业务模块：定义接口函数 + 类型
-│   ├── index.ts        # 统一出口，导出所有模块 API
-│   └── axios-instance.ts  # Axios 实例配置 + 拦截器
+│   ├── core/           # 核心工具：axios-instance / types / request-cache / cancel-manager
+│   └── [module]/       # 业务模块：定义接口函数 + 类型
 ├── assets/             # 静态资源
 │   ├── images/         # 业务图片（命名：kebab-case）
 │   └── icons/          # SVG 图标（命名：*-icon.svg）
@@ -31,6 +30,7 @@ src/
 │       ├── useStore.ts # 页面局部状态（MobX useLocalObservable）
 │       ├── constant.ts # 页面常量定义
 │       ├── handle.ts   # 页面事件处理 / 业务逻辑
+│       ├── types.ts    # 页面类型定义
 │       ├── components/ # 页面内部分拆的子组件
 │       └── index.module.scss # 页面样式
 ├── store/              # 全局 Store（如果需要）
@@ -59,7 +59,7 @@ src/
 3. **状态管理**: 使用 MobX + `useObserver` (Hook 写法)，**禁止使用 observer HOC**。
 4. **组件拆分**: 优先使用 `antd-mobile`；长页面必须按功能模块拆分子组件。
 5. **强类型**: 必须为所有代码（Props, API, Store）添加显式 TypeScript 类型。
-6. **API 规范**: 在 `src/api/` 定义，必须包含 Request/Response 完整类型。
+6. **API 规范**: 在 `apps/web/src/api/` 定义，必须包含 Request/Response 完整类型。
 7. **移动端**: 基于 750px 设计稿编写 px，插件会自动转换为 vw。
 
 ## 📚 规范索引 (模块化拆分)
@@ -71,7 +71,7 @@ src/
 - **Hooks 与错误处理**: [.claude/rules/frontend-hooks-error-handling.md](.claude/rules/frontend-hooks-error-handling.md)
 - **静态资源规范**: [.claude/rules/frontend-assets-resources.md](.claude/rules/frontend-assets-resources.md)
 - **第三方库规范**: [.claude/rules/frontend-third-party-libraries.md](.claude/rules/frontend-third-party-libraries.md)
-- **公共组件规范**: [src/components/CLAUDE.md](src/components/CLAUDE.md)
+- **公共组件规范**: [apps/web/src/components/CLAUDE.md](apps/web/src/components/CLAUDE.md)
 - **代码审查清单**: [.claude/commands/review.md](.claude/commands/review.md)
 - **提交规范**: [commitlint.config.js](commitlint.config.js)
 
