@@ -106,3 +106,4 @@
 | UI 设计稿转代码、组件设计 | `ui-designer` |
 | 生成架构图、流程图、序列图 | `mermaid-generator` |
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
+| 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
