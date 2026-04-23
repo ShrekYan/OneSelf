@@ -18,10 +18,42 @@ model: inherit
 
 **适用范围**：仅用于审查 NestJS 后端代码，前端代码审查请使用全局 `code-reviewer`。
 
-## 项目规范引用（必须严格遵循）
+## 项目规范引用（必须严格遵循，直接 include 避免嵌套不解析）
 
-include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md
+#include: ../skills/nestjs-backend-developer/01-architecture-module.md
+#include: ../skills/nestjs-backend-developer/02-file-naming.md
+#include: ../skills/nestjs-backend-developer/03-controller-service.md
+#include: ../skills/nestjs-backend-developer/04-dto-validation.md
+#include: ../skills/nestjs-backend-developer/05-typescript-spec.md
+#include: ../skills/nestjs-backend-developer/06-api-documentation.md
+#include: ../skills/nestjs-backend-developer/07-error-handling.md
+#include: ../skills/nestjs-backend-developer/08-checklist.md
+#include: ../skills/nestjs-backend-developer/09-prisma-orm.md
+#include: ../skills/nestjs-backend-developer/10-code-format.md
+#include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md
 
 ---
 
-include: ../skills/nestjs-code-review.md
+<!-- ============================================================ -->
+<!-- 🔐 代码审查检查清单（逐条对照，不得遗漏）                       -->
+<!-- ============================================================ -->
+
+## 🔴 代码审查必须检查
+
+| 优先级 | 检查项 |
+|--------|--------|
+| 🔴 P0 | 是否使用了 `any` 类型？ |
+| 🔴 P0 | 架构分层是否清晰（Controller → Service → Prisma）？ |
+| 🔴 P0 | DTO 是否有完整的 `class-validator` 验证装饰器？ |
+| 🟡 P1 | 文件命名是否符合规范（`xxx.controller.ts` / `xxx.service.ts`）？ |
+| 🟡 P1 | Prisma 访问是否使用了不必要的 `as any`？ |
+| 🟡 P1 | 错误处理是否使用了自定义异常，而不是直接 `throw new Error()`？ |
+| 🟡 P1 | API 是否有完整的 Swagger 文档装饰器？ |
+| 🟢 P2 | 导入排序是否规范？ |
+| 🟢 P2 | 代码格式是否一致？ |
+
+**审查输出格式**：按优先级分类列出问题 → 每个问题说明原因 → 给出正确代码示例。
+
+---
+
+#include: ../skills/nestjs-code-review.md

@@ -83,3 +83,26 @@
    - 根据用户描述，整理成标准格式（补全缺失必要信息，但不要编造内容）
    - 追加到文件末尾
    - 保持原有内容不变
+
+---
+
+## 🤖 Agent 自动触发规则
+
+当用户输入符合以下特征时，**自动使用对应的专属 Agent**，无需用户手动指定：
+
+| 用户输入特征 | 自动使用 Agent |
+|-------------|---------------|
+| 开发前端页面、组件、API、Hook | `frontend-developer` |
+| 开发 NestJS 后端、Controller、Service、Module | `backend-architect` |
+| 审查前端代码质量 | `frontend-code-reviewer` |
+| 审查后端代码质量 | `nestjs-code-review` |
+| 前端性能问题分析、优化 | `frontend-performance-expert` |
+| 后端性能问题分析、优化 | `nestjs-performance-audit` |
+| 前端单元测试编写 | `frontend-test-writer` |
+| 后端单元测试编写 | `nestjs-test-writer` |
+| 前端安全漏洞扫描 | `frontend-security-auditor` |
+| 后端安全漏洞扫描 | `nestjs-security-audit` |
+| 搜索代码、组件、调用链 | `search-expert` |
+| UI 设计稿转代码、组件设计 | `ui-designer` |
+| 生成架构图、流程图、序列图 | `mermaid-generator` |
+| 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |

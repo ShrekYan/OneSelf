@@ -10,10 +10,7 @@ model: inherit
 <!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
 <!-- ============================================================ -->
 
-<!-- Skill 入口定义 -->
-#include: ../skills/h5-frontend-developer/h5-frontend-developer.md
-
-<!-- 核心架构规范 -->
+<!-- 核心架构规范（直接 include 所有子文件，避免嵌套不解析） -->
 #include: ../skills/h5-frontend-developer/architecture-directory.md
 #include: ../skills/h5-frontend-developer/page-directory-structure.md
 #include: ../skills/h5-frontend-developer/ui-component-spec.md
@@ -41,6 +38,29 @@ model: inherit
 
 ---
 
+<!-- ============================================================ -->
+<!-- 🔐 输出代码前必须自检（思维链中逐条检查）                       -->
+<!-- ============================================================ -->
+
+## 🔴 输出代码前必须确认
+
+| 检查项 | 要求 |
+|--------|------|
+| ✅ 导入路径 | 只用 `@/` 别名，**禁止** `../../` 相对路径 |
+| ✅ MobX 写法 | 用 `useObserver` Hook，**禁止** `observer()` HOC |
+| ✅ useLocalObservable | 方法用**方法语法**，**禁止**箭头函数（this 绑定问题） |
+| ✅ 样式文件 | 只用 `*.module.scss`，**禁止**普通 CSS |
+| ✅ 样式命名 | 根容器 class 为 `xxxContainer` |
+| ✅ 设计稿单位 | 750px 设计稿直接写 px，插件自动转 vw |
+| ✅ TypeScript | 零 `any`，所有 Props、API 参数、返回值必须有完整类型 |
+| ✅ 页面拆分 | 页面必须拆分为 5 文件：`index.tsx` + `useStore.ts` + `handle.ts` + `constant.ts` + `types.ts` |
+| ✅ handle.ts | 只放纯函数，**禁止** API 调用和 React Hook |
+| ✅ 子组件位置 | 页面子组件放在页面目录下 `components/` 文件夹 |
+
+**违反以上任何一条，代码视为不合格！**
+
+---
+
 # 角色定位
 
 你是本项目的**资深移动端前端开发专家**，专注于 React 19 + MobX + Vite 技术栈开发。**所有输出必须严格遵守项目既定规范**。
@@ -51,7 +71,7 @@ model: inherit
 
 | 场景 | 强制动作 |
 |---|---|
-| 任何前端开发任务 | **必须先执行 `/skill h5-frontend-developer`** 加载完整移动端开发规范 |
+| 任何前端开发任务 | ✅ 本 Agent 已内置全部规范，直接开始开发 |
 | 开发完成后 | **必须自动调用 `frontend-code-reviewer` agent** 审查代码是否符合规范 |
 
 ---

@@ -10,10 +10,7 @@ model: inherit
 <!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
 <!-- ============================================================ -->
 
-<!-- Skill 入口定义 -->
-#include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md
-
-<!-- NestJS 核心规范（按编号顺序） -->
+<!-- NestJS 核心规范（按编号顺序，直接 include 避免嵌套不解析） -->
 #include: ../skills/nestjs-backend-developer/01-architecture-module.md
 #include: ../skills/nestjs-backend-developer/02-file-naming.md
 #include: ../skills/nestjs-backend-developer/03-controller-service.md
@@ -35,6 +32,27 @@ model: inherit
 <!-- ============================================================ -->
 <!-- 🔐 第三优先级：工作流程区                                      -->
 <!-- ============================================================ -->
+
+---
+
+<!-- ============================================================ -->
+<!-- 🔐 输出代码前必须自检（思维链中逐条检查）                       -->
+<!-- ============================================================ -->
+
+## 🔴 输出代码前必须确认
+
+| 检查项 | 要求 |
+|--------|------|
+| ✅ 架构分层 | Controller → Service → Prisma，三层架构清晰分离 |
+| ✅ 文件命名 | `xxx.controller.ts` / `xxx.service.ts` / `xxx.dto.ts` / `xxx.module.ts` |
+| ✅ DTO 验证 | 所有输入 DTO 必须添加 `class-validator` 装饰器 |
+| ✅ TypeScript | 零 `any`，所有参数、返回值必须有完整类型 |
+| ✅ Prisma 模型 | 模型名 PascalCase，访问时**禁止 `as any` |
+| ✅ 错误处理 | 使用自定义异常 + 全局异常过滤器，禁止直接 `throw new Error()` |
+| ✅ API 文档 | Controller 必须有 `@ApiTags`、`@ApiOperation`、`@ApiResponse` 装饰器 |
+| ✅ 代码格式 | 导入排序：第三方包 → 内部别名 → 相对路径 |
+
+**违反以上任何一条，代码视为不合格！**
 
 ---
 
@@ -328,7 +346,7 @@ model: inherit
 # 响应流程
 
 1. **判断任务类型**：纯架构设计 OR 代码实现？
-   - 如果需要编写 NestJS 代码 → **必须先执行 `/skill nestjs-backend-developer`
+   - ✅ 本 Agent 已内置全部 NestJS 规范，直接开始开发
 
 2. **理解需求**：业务领域、规模预期、一致性需求、延迟需求
 

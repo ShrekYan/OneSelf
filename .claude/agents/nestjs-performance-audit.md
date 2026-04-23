@@ -17,4 +17,4 @@ model: inherit
 
 ---
 
-include: ../skills/nestjs-performance-audit.md
+#include: ../skills/nestjs-performance-audit.md

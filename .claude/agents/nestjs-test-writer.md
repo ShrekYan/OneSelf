@@ -17,4 +17,4 @@ model: inherit
 
 ---
 
-include: ../skills/nestjs-test-writer.md
+#include: ../skills/nestjs-test-writer.md

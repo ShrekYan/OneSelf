@@ -174,35 +174,25 @@ import LazyImage from '@/components/LazyImage';
 
 ## 纯组件原则
 
-公共组件必须是**纯组件**：
+公共组件必须是**纯组件**，以下规则严格执行：
 
-1. **数据输入**：所有数据来自 Props
-2. **事件输出**：所有用户交互通过回调通知父组件
-3. **局部状态**：只有组件自身的交互状态（如：展开/收起、加载中）可以使用 React `useState`
-4. **无副作用依赖**：不直接调用 API，不访问全局 Store
-5. **无业务绑定**：不绑定特定业务逻辑，保持通用性
+| 规则 | 要求 | 反例 |
+|------|------|------|
+| 数据输入 | 所有数据来自 Props | 直接调用 API、访问全局 Store |
+| 事件输出 | 所有用户交互通过 `onXxx` 回调通知父组件 | 直接修改全局状态、调用父组件方法 |
+| 局部状态 | 只有组件自身的交互状态可以使用 `useState` | 使用 MobX、Context 等全局状态 |
+| 无副作用 | 不直接调用 API、不产生副作用 | 在组件内 `fetch()`、`axios.get()` |
+| 无业务绑定 | 不绑定特定业务逻辑，保持通用性 | 硬编码业务 ID、特定业务逻辑判断 |
 
-**反例**：
-```typescript
-// ❌ 错误：公共组件直接调用 API
-const UserAvatar = () => {
-  const [user, setUser] = useState();
-  useEffect(() => {
-    api.user.getCurrent().then(res => setUser(res.data));
-  }, []);
-  return <img src={user.avatar} />;
-};
+**正反示例对比**：
 
-// ❌ 错误：公共组件直接使用全局 Store
-const UserAvatar = () => {
-  const { userStore } = useStores();
-  return <img src={userStore.currentUser?.avatar} />;
-};
-```
+| ❌ 错误（业务绑定） | ✅ 正确（纯组件） |
+|---------------------|-------------------|
+| 直接使用 `useStores()` 获取全局数据 | 通过 `props` 传入所有数据 |
+| 直接调用 `api.user.getCurrent()` | 通过 `props.onClick` 通知父组件 |
 
-**正例**：
-```typescript
-// ✅ 正确：通过 Props 传入
+```tsx
+// ✅ 正确示例
 interface UserAvatarProps {
   src: string;
   size?: number;
@@ -222,15 +212,15 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ src, size = 40, onClick }) => {
 
 ## 移动端适配
 
-公共组件必须适配移动端 H5：
-
-1. **点击区域**：可点击元素最小尺寸 **≥ 44px × 44px**（对应 750 设计稿 88px）
-2. **单位**：基于 750px 设计稿使用 px，由插件自动转 vw
-3. **安全区域**：底部组件需要适配 `env(safe-area-inset-bottom)`
-4. **点击反馈**：可点击元素添加 `:active` 透明度变化
+| 适配项 | 要求 | 代码示例 |
+|--------|------|---------|
+| 点击区域 | 可点击元素最小尺寸 **≥ 44px × 44px**（750 设计稿 88px | `min-height: 88px;` |
+| 单位 | 基于 750px 设计稿写 px，插件自动转 vw | `width: 200px;` |
+| 安全区域 | 底部组件适配底部安全区域 | `padding-bottom: env(safe-area-inset-bottom);` |
+| 点击反馈 | 可点击元素 `:active` 状态透明度变化 | `&:active { opacity: 0.8; }` |
 
 ```scss
-// 示例
+// 完整示例
 .actionButton {
   min-height: 88px;
   padding-bottom: env(safe-area-inset-bottom);
@@ -244,34 +234,32 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ src, size = 40, onClick }) => {
 
 ## 性能优化
 
-- 使用 `React.memo` 避免不必要重渲染
-- 使用 `useCallback` 缓存回调函数
-- 使用 `useMemo` 缓存计算结果
-- 非首屏大图需要懒加载
+| 优化手段 | 适用场景 |
+|----------|---------|
+| `React.memo` | 频繁重渲染的组件，props 变化不频繁 |
+| `useCallback` | 传递给子组件的回调函数 |
+| `useMemo` | 复杂计算结果、大数组、对象计算 |
+| 懒加载 | 非首屏大图、长列表、低优先级组件 |
 
 ```typescript
-// 对于需要频繁重渲染的组件
-const MyComponent = React.memo<MyProps>(({ prop1, prop2 }) => {
-  const handleClick = useCallback(() => {
-    // ...
-  }, [dependency]);
+// ✅ 标准写法
+const MyComponent = React.memo<MyProps>(({ data, onItemClick }) => {
+  const handleClick = useCallback((id) => onItemClick(id), [onItemClick]);
 
-  const computedValue = useMemo(() => {
-    return heavyCalculation(data);
-  }, [data]);
+  const sortedData = useMemo(() => heavySort(data), [data]);
 
   // ...
 });
-
-export default MyComponent;
 ```
 
 ---
 
 ## 错误处理
 
-- 高风险动态组件可以嵌套错误边界隔离
-- 使用项目内置 `ErrorFallback`
+| 场景 | 处理方案 |
+|------|---------|
+| 高风险动态组件 | 嵌套 `ErrorBoundary` 隔离 |
+| 普通组件 | 使用项目内置 `ErrorFallback` |
 
 ```tsx
 import { ErrorBoundary } from 'react-error-boundary';
@@ -286,16 +274,15 @@ import ErrorFallback from '@/components/ErrorFallback';
 
 ## 可访问性
 
-- 添加适当的 `aria-label` 给无文本可点击元素
-- 可点击元素使用 `button` 或 `a`，不使用 `div`
-- 图片添加 `alt` 属性
+| 要求 | 正确 | 错误 |
+|------|------|------|
+| 无文本可点击元素 | 添加 `aria-label` | 只放图标无说明 |
+| 可点击元素标签 | `<button>` 或 `<a>` | `<div onClick={...}>` |
+| 图片 | 必须有 `alt` 属性 | 空 alt |
 
 ```tsx
 // ✅ 正确
-<button
-  aria-label="关闭弹窗"
-  onClick={onClose}
->
+<button aria-label="关闭弹窗" onClick={onClose}>
   <CloseIcon />
 </button>
 

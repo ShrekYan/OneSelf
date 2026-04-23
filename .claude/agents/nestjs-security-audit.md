@@ -17,4 +17,4 @@ model: inherit
 
 ---
 
-include: ../skills/nestjs-security-audit.md
+#include: ../skills/nestjs-security-audit.md
