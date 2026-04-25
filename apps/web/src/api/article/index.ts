@@ -200,11 +200,9 @@ export const articleApi = {
   },
 
   /**
-   * 获取指定用户点赞的所有文章ID列表
+   * 获取当前用户点赞的所有文章ID列表
    */
-  getUserLikeList: async (
-    data: UserLikeListByUserIdRequest,
-  ): Promise<UserLikeListByUserIdResponse> => {
-    return await api.post('/api/v1/article/user-likes', data);
+  getUserLikeList: async (): Promise<UserLikeListByUserIdResponse> => {
+    return await api.post('/api/v1/article/user-likes');
   },
 };

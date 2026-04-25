@@ -155,7 +155,7 @@ export function useHomeStore(): HomeStoreType {
       const userId = rootStore.app.userInfo?.id;
       if (!userId) return null;
 
-      const response = await api.article.getUserLikeList({ userId });
+      const response = await api.article.getUserLikeList();
       return response.articleIds;
     },
 
@@ -166,10 +166,16 @@ export function useHomeStore(): HomeStoreType {
           isLiked:
             this.likedArticleIds.has(article.id) ?? article.isLiked ?? false,
         }));
+        console.log(this.articles);
       });
     },
 
     async fetchInitialData(): Promise<void> {
+      // 修复：在获取数据前先清空旧的点赞状态，避免跨用户残留
+      runInAction(() => {
+        this.likedArticleIds = new Set();
+      });
+
       const userId = rootStore.app.userInfo?.id;
 
       // 并发发起所有请求（包括用户点赞列表）
@@ -222,9 +228,8 @@ export function useHomeStore(): HomeStoreType {
       }
 
       // 所有数据获取完成后，统一应用点赞状态到文章列表
-      if (this.likedArticleIds.size > 0) {
-        this.applyLikeStatusToArticles();
-      }
+      // 修复：无条件执行，确保空集合时也能清除所有 isLiked 标记
+      this.applyLikeStatusToArticles();
 
       // 统一关闭 loading
       this.setLoading(false);

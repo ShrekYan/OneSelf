@@ -124,11 +124,14 @@
   svg {
     width: 24px;
     height: 24px;
+  }
+
+  svg path {
     fill: currentcolor;
   }
 
-  &:hover {
-    color: #8848f9;
+  &.active:hover {
+    color: #ff4d4f;
   }
 
   &.active {

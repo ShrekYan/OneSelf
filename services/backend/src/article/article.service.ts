@@ -20,7 +20,6 @@ import {
   UserLikeListResponseDto,
   CheckLikeStatusRequestDto,
   CheckLikeStatusResponseDto,
-  UserLikeListByUserIdRequestDto,
   UserLikeListByUserIdResponseDto,
 } from './dto';
 import { convertArticleContentBlocks } from './utils/article-content.converter';
@@ -494,9 +493,9 @@ export class ArticleService {
     }
   }
 
-  async getUserLikeListByUserId(
-    params: UserLikeListByUserIdRequestDto,
-  ): Promise<UserLikeListByUserIdResponseDto> {
+  async getUserLikeListByUserId(params: {
+    userId: string;
+  }): Promise<UserLikeListByUserIdResponseDto> {
     const { userId } = params;
 
     // 查询该用户所有点赞记录，只选择 article_id 字段，不关联文章完整信息

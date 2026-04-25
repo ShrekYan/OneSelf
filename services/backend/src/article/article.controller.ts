@@ -16,7 +16,6 @@ import {
   UserLikeListResponseDto,
   CheckLikeStatusRequestDto,
   CheckLikeStatusResponseDto,
-  UserLikeListByUserIdRequestDto,
   UserLikeListByUserIdResponseDto,
 } from './dto';
 
@@ -80,11 +79,11 @@ export class ArticleController {
 
   @UseGuards(RemoteJwtAuthGuard)
   @Post('user-likes')
-  @ApiOperation({ summary: '根据用户ID查询指定用户点赞的所有文章ID列表' })
+  @ApiOperation({ summary: '查询当前用户点赞的所有文章ID列表' })
   getUserLikeListByUserId(
-    @Body() body: UserLikeListByUserIdRequestDto,
+    @CurrentUserId() userId: string,
   ): Promise<UserLikeListByUserIdResponseDto> {
-    return this.articleService.getUserLikeListByUserId(body);
+    return this.articleService.getUserLikeListByUserId({ userId });
   }
 
   @Post('list-by-user')
