@@ -199,7 +199,7 @@ export class ArticleService {
     const isLiked = !!existingLike;
 
     // 使用事务处理：保证点赞记录和计数同时更新
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async tx => {
       if (isLiked) {
         // 取消点赞：删除记录，计数减 1
         await tx.articleLikes.delete({
@@ -301,7 +301,7 @@ export class ArticleService {
 
     // 转换为 ArticleListItemDto 格式
     const list: ArticleListItemDto[] = likesWithArticles
-      .map((like) => {
+      .map(like => {
         const article = like.articles as Articles & {
           categories: { id: string; name: string };
         };
@@ -336,7 +336,7 @@ export class ArticleService {
           readTime: article.read_time ?? undefined,
         } as ArticleListItemDto;
       })
-      .filter((item) => item !== null);
+      .filter(item => item !== null);
 
     return {
       list,
@@ -372,7 +372,7 @@ export class ArticleService {
         where: { id },
         data: { views: { increment: 1 } },
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('递增阅读量失败:', err);
       });
 
@@ -394,7 +394,7 @@ export class ArticleService {
     const tags: string[] = article.tags
       ? article.tags
           .split(',')
-          .map((t) => t.trim())
+          .map(t => t.trim())
           .filter(Boolean)
       : [];
 
@@ -505,7 +505,7 @@ export class ArticleService {
       orderBy: { created_at: 'desc' },
     });
     // 提取 article_id 到数组
-    const articleIds = likes.map((like) => like.article_id);
+    const articleIds = likes.map(like => like.article_id);
 
     return { articleIds };
   }

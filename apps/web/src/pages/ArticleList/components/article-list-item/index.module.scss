@@ -129,6 +129,14 @@
   &:hover {
     color: #8848f9;
   }
+
+  &.active {
+    color: #ff4d4f;
+
+    &:hover {
+      color: #ff4d4f;
+    }
+  }
 }
 
 .coverContainer {

@@ -44,7 +44,7 @@ const ArticleListPage: React.FC = () => {
 
   // 使用 reaction 监听 categories 长度变化，分类加载完成后：
   // 第一步：从 URL 初始化选中分类
-  // 第二步：直接请求文章，保证顺序可靠
+  // 第二步：调用 fetchInitialData 并发请求文章和点赞列表
   useEffect(() => {
     const dispose = reaction(
       () => store.categories.length,
@@ -70,8 +70,6 @@ const ArticleListPage: React.FC = () => {
             // 没有 categoryId 参数，默认选中全部
             handle.handleTabChange(store, 'all');
           }
-          // 分类设置完成后，直接请求文章（顺序保证：先设置再请求）
-          store.fetchArticles();
         }
       },
       { fireImmediately: true }, // 初始化时立即检查
@@ -79,22 +77,6 @@ const ArticleListPage: React.FC = () => {
 
     return dispose; // 组件卸载时清理 reaction
   }, [categoryId, store]);
-
-  // 仅监听用户手动切换分类，分类变化后重新获取文章
-  // 初始化已经由上面的 reaction 保证，不需要 fireImmediately
-  useEffect(() => {
-    const dispose = reaction(
-      () => store.selectedCategoryId,
-      () => {
-        // 只有当分类列表已经加载完成才请求
-        if (store.categories.length > 0) {
-          store.fetchArticles();
-        }
-      },
-    );
-
-    return dispose; // 组件卸载时清理 reaction，防止内存泄漏
-  }, [store]);
 
   return useObserver(() => {
     return (
@@ -130,7 +112,12 @@ const ArticleListPage: React.FC = () => {
             ref={categoryTabsRef}
             tabs={store.categories}
             selectedId={store.selectedCategoryId}
-            onTabChange={tabId => handle.handleTabChange(store, tabId)}
+            onTabChange={tabId => {
+              // 用户手动点击时：只有分类变化才请求，避免重复
+              if (store.selectedCategoryId !== tabId) {
+                handle.handleTabChange(store, tabId);
+              }
+            }}
           />
 
           {/* 文章列表区域 */}

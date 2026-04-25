@@ -45,7 +45,7 @@
 ## ✅ 验证流程
 
 完成开发后，请务必依次执行：
-1. `npm run lint` (根目录执行，全项目代码风格校验)
+1. `npm run lint` (在修改的子项目目录执行，不要在根目录执行全项目检查)
 2. 前端目录：`npx tsc --noEmit` (TypeScript 类型检查)
 3. 参照 [.claude/commands/review.md](.claude/commands/review.md) 进行自我审计。
 

@@ -60,17 +60,7 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read f; echo \"$f\" | grep -qE '\\.(ts|tsx)$' && npx prettier --write \"$f\"; exit 0; }"
-          }
-        ]
-      }
-    ]
+    "PostToolUse": []
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": false,
