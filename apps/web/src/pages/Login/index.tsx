@@ -15,6 +15,7 @@ import {
   handleUserAgreement,
   handlePrivacyPolicy,
 } from './handle';
+import { safeRedirectUrl } from '@/utils/security';
 import styles from './index.module.scss';
 
 /**
@@ -41,15 +42,13 @@ const Login: React.FC = () => {
   });
 
   /**
-   * 从 URL query 获取重定向地址
+   * 从 URL query 获取安全的重定向地址
+   * 使用安全验证函数防止开放重定向攻击
    */
   const getRedirectUrl = (): string => {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
-    if (redirect) {
-      return redirect;
-    }
-    return '/';
+    return safeRedirectUrl(redirect);
   };
 
   // 监听协议勾选状态
