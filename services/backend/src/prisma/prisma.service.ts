@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Injectable,
   OnModuleInit,
@@ -171,7 +172,6 @@ export class PrismaService
     // 由于 Prisma 类型系统的限制，需要使用未知类型绕过类型检查
     // 但运行时这些事件确实存在且能正常工作
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as unknown as (...args: any[]) => void)(
       'query',
       (e: { duration: number; query: string }) => {
@@ -191,7 +191,6 @@ export class PrismaService
       },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as unknown as (...args: any[]) => void)(
       'error',
       (e: { message: string; target: string }) => {
@@ -208,7 +207,6 @@ export class PrismaService
       },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$on as unknown as (...args: any[]) => void)(
       'warn',
       (e: { message: string; target: string }) => {

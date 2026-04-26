@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Injectable,
   OnModuleInit,
@@ -282,9 +283,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
    * Scan keys - 转发所有参数到原生 scan 方法
    */
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scan(...args: any[]): Promise<[string, string[]]> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return (this.redis.scan as any)(...args);
   }
 }
