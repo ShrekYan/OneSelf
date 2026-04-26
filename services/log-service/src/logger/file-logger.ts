@@ -78,7 +78,7 @@ export function appendJsonLog(data: Record<string, unknown>): void {
 
     // 如果启用了 Graylog，同时发送
     if (config.graylogEnabled && config.graylogHost) {
-      sendToGraylog(config, logData).catch((err) => {
+      sendToGraylog(config, logData).catch(err => {
         console.warn('[GRAYLOG] Failed to send log:', err);
       });
     }

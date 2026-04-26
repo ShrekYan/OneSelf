@@ -44,13 +44,13 @@ export function sanitizeSensitiveData(
   }
 
   if (Array.isArray(data)) {
-    return data.map((item) => sanitizeSensitiveData(item, sensitiveFields));
+    return data.map(item => sanitizeSensitiveData(item, sensitiveFields));
   }
 
   const result = { ...data };
   for (const [key, value] of Object.entries(result)) {
     if (
-      fieldsToSanitize.some((field) =>
+      fieldsToSanitize.some(field =>
         key.toLowerCase().includes(field.toLowerCase()),
       )
     ) {
@@ -130,6 +130,6 @@ export function getConfigSensitiveFields(): string[] {
   }
   return val
     .split(',')
-    .map((s) => s.trim())
+    .map(s => s.trim())
     .filter(Boolean);
 }

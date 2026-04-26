@@ -163,7 +163,7 @@ export class AuthController {
         }>('auth/refresh', { refreshToken });
       // 转发 auth-service 返回的 HttpOnly Cookie 到前端
       this.forwardAuthCookies(res, headers);
-       
+
       return data.data;
     }
     // return this.authService.refreshToken(refreshToken);

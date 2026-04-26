@@ -98,7 +98,7 @@ export async function sendToGraylog(
       jsonBuffer.length,
       config.graylogPort,
       config.graylogHost,
-      (err) => {
+      err => {
         socket.close();
         if (err) {
           reject(err);
