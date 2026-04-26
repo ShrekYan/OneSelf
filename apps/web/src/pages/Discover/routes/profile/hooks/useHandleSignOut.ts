@@ -19,12 +19,11 @@ export const useHandleSignOut = () => {
 
     if (confirmed) {
       try {
-        // 从 localStorage 获取 refreshToken 并传递给后端
+        // ✅ Token 通过 HttpOnly Cookie 携带，后端登出接口会自动清除 Cookie
+        // 兼容：从 localStorage 读取 refreshToken（旧登录用户）
         const refreshToken = localStorage.getItem('refreshToken');
         await authApi.logout(refreshToken ?? undefined);
-        // 清除本地存储的所有认证信息
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        // 清除本地存储的用户信息（Token 由后端 Cookie 机制处理）
         localStorage.removeItem('userInfo');
         // 跳转到登录页面
         navigate('/login');

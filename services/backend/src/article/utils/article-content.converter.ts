@@ -57,7 +57,7 @@ export function convertArticleContentBlocks(
             type: 'list',
             items: content
               .split(',')
-              .map((item) => item.trim())
+              .map(item => item.trim())
               .filter(Boolean),
           };
 

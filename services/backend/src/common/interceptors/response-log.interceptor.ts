@@ -26,7 +26,7 @@ export class ResponseLogInterceptor implements NestInterceptor<
     const response = ctx.getResponse<Express.Response>();
 
     return next.handle().pipe(
-      map((data) => {
+      map(data => {
         // 将响应数据挂载到 response 上供日志中间件使用（语义更清晰）
         (response as Express.Response & { resBody?: unknown }).resBody = data;
         return data;

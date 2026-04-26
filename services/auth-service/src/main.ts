@@ -5,10 +5,14 @@ import './preload';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Cookie 解析中间件（XSS 防护：HttpOnly Cookie 存储 Token）
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({

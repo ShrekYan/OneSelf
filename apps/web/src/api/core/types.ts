@@ -19,7 +19,8 @@ export type RequestConfig = AxiosRequestConfig & {
   retry?: number; // 重试次数
   retryDelay?: number; // 重试延迟(ms)
   skipErrorToast?: boolean; // 跳过错误提示
-  skipAuth?: boolean; // 跳过认证
+  skipAuth?: boolean; // 跳过认证（不自动添加 Authorization header）
+  skipRedirect?: boolean; // 跳过重定向（410 时不跳转登录）
   cache?: boolean; // 是否缓存
   cacheTime?: number; // 缓存时间(ms)
   __retryCount?: number; // 内部重试计数

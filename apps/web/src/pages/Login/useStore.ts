@@ -73,9 +73,8 @@ export const useLoginStore = () => {
         );
 
         // 拦截器已经过滤，能走到这里说明 code === 200
-        // 保存 token 和用户信息到 localStorage（与注册页保持一致）
-        localStorage.setItem('accessToken', result.accessToken);
-        localStorage.setItem('refreshToken', result.refreshToken);
+        // ✅ Token 由后端通过 HttpOnly Cookie 设置，前端不存储（防 XSS 攻击）
+        // 仅在 MobX 内存中保存用户信息用于 UI 展示
         localStorage.setItem('userInfo', JSON.stringify(result.user));
 
         this.isLoading = false;

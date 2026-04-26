@@ -72,6 +72,25 @@ export class AuthClientService {
   }
 
   /**
+   * 向 auth-service 发送请求（包含完整 headers）
+   * 用于需要转发 Set-Cookie 的场景
+   */
+  async forwardRequestWithHeaders<T>(
+    path: string,
+    body: unknown,
+    headers?: Record<string, string>,
+  ): Promise<{ data: T; headers: Record<string, string[]> }> {
+    const url = `${this.authServiceBaseUrl}/api/v1/${path}`;
+    const response = await firstValueFrom(
+      this.httpService.post(url, body, { headers }),
+    );
+    return {
+      data: response.data as T,
+      headers: response.headers as Record<string, string[]>,
+    };
+  }
+
+  /**
    * 向 auth-service 发送健康检查请求
    * @returns 健康检查响应
    */

@@ -21,18 +21,20 @@ export class CorsMiddleware implements NestMiddleware {
     const origin = request.get('Origin');
 
     // 情况一：ALLOWED_ORIGINS 为空 → 允许所有来源（开发环境）
+    // ✅ 修复：启用 withCredentials 后，浏览器不允许 Access-Control-Allow-Origin 为 '*'
+    // 必须回显请求的具体 origin，无 origin 时回退到 '*'
     if (
       !allowedOrigins ||
       allowedOrigins.trim() === '' ||
       allowedOrigins === '*'
     ) {
-      response.setHeader('Access-Control-Allow-Origin', '*');
+      response.setHeader('Access-Control-Allow-Origin', origin || '*');
     } else if (origin) {
       // 情况二：生产环境模式，检查 origin 是否在白名单中
       const allowedOriginList = allowedOrigins
         .split(',')
-        .map((o) => o.trim())
-        .filter((o) => o);
+        .map(o => o.trim())
+        .filter(o => o);
 
       if (allowedOriginList.includes(origin)) {
         // Origin 在白名单中，允许该具体来源

@@ -118,9 +118,8 @@ export const useRegisterStore = () => {
           skipErrorToast: true, // 不使用拦截器自动提示，我们自己处理
         });
 
-        // 保存 token 和用户信息到 localStorage
-        localStorage.setItem('accessToken', result.accessToken);
-        localStorage.setItem('refreshToken', result.refreshToken);
+        // ✅ Token 由后端通过 HttpOnly Cookie 设置，前端不存储（防 XSS 攻击）
+        // 仅在 MobX 内存中保存用户信息用于 UI 展示
         localStorage.setItem('userInfo', JSON.stringify(result.user));
 
         this.isLoading = false;
