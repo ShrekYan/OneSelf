@@ -139,6 +139,7 @@ export class AuthController {
   ): Promise<RefreshResponseDto> {
     if (this.remoteAuthEnabled) {
       // ✅ 修复：严谨的空值判断，排除空字符串
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const refreshTokenFromCookie = req.cookies?.refreshToken;
       const refreshToken =
