@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Injectable,
   OnModuleInit,
@@ -284,7 +283,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
    */
 
   scan(...args: any[]): Promise<[string, string[]]> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return (this.redis.scan as any)(...args);
   }
 }

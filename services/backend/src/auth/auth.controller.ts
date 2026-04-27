@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Controller,
   Post,
@@ -144,7 +142,6 @@ export class AuthController {
 
       const refreshTokenFromCookie = req.cookies?.refreshToken;
       const refreshToken =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         refreshTokenFromCookie && refreshTokenFromCookie.trim() !== ''
           ? (refreshTokenFromCookie as string)
           : refreshTokenFromBody;
@@ -217,10 +214,10 @@ export class AuthController {
 
         // 如果 auth-service 返回了 HTTP 错误响应（如 401）
         // 使用项目标准 BusinessException 抛出，让全局过滤器处理
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
         if ((error as any).response) {
           // Type assertion for axios error response structure
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
           const errorResponse = (error as any).response as {
             status?: number;
             data?: { message?: string };
