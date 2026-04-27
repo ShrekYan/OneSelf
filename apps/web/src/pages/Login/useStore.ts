@@ -1,15 +1,7 @@
 import { useLocalObservable } from 'mobx-react';
 import { authApi } from '@/api';
-import type { LoginFormData } from './schema';
+import type { LoginFormData, LoginApiResponse } from './types';
 import type { LoginResponse } from '@/api/auth';
-
-/**
- * 登录 API 响应类型
- */
-export interface LoginApiResponse {
-  success: boolean;
-  message?: string;
-}
 
 /**
  * 登录页面状态管理接口
