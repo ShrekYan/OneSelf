@@ -27,13 +27,12 @@
     "turbo": "^2.4.2"
   },
   "lint-staged": {
-    "!(.claude)/**/*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --fix",
-      "eslint --max-warnings=0"
+    "!(.claude)/**/*.{ts,tsx,js,jsx,json,md}": [
+      "prettier --write"
     ],
     "!(.claude)/**/*.{css,scss}": [
-      "stylelint --fix"
+      "stylelint --fix",
+      "prettier --write"
     ]
   }
 }

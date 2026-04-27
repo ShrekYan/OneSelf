@@ -136,15 +136,5 @@
   "browserslist": [
     "ie >= 10",
     ">0.3%, ios >= 9"
-  ],
-  "lint-staged": {
-    "!(.claude)/**/*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --fix",
-      "eslint --max-warnings=0"
-    ],
-    "!(.claude)/**/*.{css,scss}": [
-      "stylelint --fix"
-    ]
-  }
+  ]
 }

@@ -60,7 +60,6 @@ export class RemoteJwtAuthGuard implements CanActivate {
   }
 
   private extractTokenFromCookie(request: Request): string | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return request.cookies?.accessToken;
   }
 }
