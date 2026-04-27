@@ -28,10 +28,119 @@
 
 ### 关键约束
 
-`handle.ts` **两条铁律**：
+`handle.ts` **三条铁律**：
 1. **禁止定义自定义 Hook**：不能出现 `useXxx` 这种以 `use` 开头的函数
 2. **禁止在内部调用 React Hook**：React Hook 只能在组件或其他 Hook 中调用
 3. **禁止存放 API 调用**：API 调用属于副作用，需要修改状态时放在 `useStore.ts`，不需要修改状态时放在 `hooks/`
+
+---
+
+## ✅ 纯函数纯度检测清单
+
+编写 `handle.ts` 中的函数时，必须满足以下全部条件：
+
+| 检测项 | 要求 | 说明 |
+|--------|------|------|
+| **确定性** | 相同输入永远产生相同输出 | 不能依赖外部可变状态（如全局变量、随机数、当前时间等），**例外**：Date.now()、Math.random() 等原生方法可使用但需在注释中注明 |
+| **不可变性** | 不修改外部传入的参数对象 | 传入的数组、对象等参数不能被直接修改，需要时应创建副本 |
+| **无副作用** | 不触发网络请求或异步操作 | 禁止 `fetch`、`axios`、`Promise` 等异步操作 |
+| **Hook 隔离** | 不调用任何 React Hook | 包括 `useState`、`useEffect`、`useNavigate`、`useLocation` 等 |
+| **无状态修改** | 不修改 MobX 状态 | 状态修改必须放在 `useStore.ts` |
+
+---
+
+## ❌ 副作用对照表
+
+以下操作都属于副作用，**禁止**出现在 `handle.ts` 中：
+
+| 操作类型 | 反例 | 正确存放位置 |
+|---------|------|-------------|
+| **网络请求** | `api.user.getUserInfo()`<br>`fetch(url)` | `useStore.ts` 或 `hooks/` |
+| **DOM 操作** | `document.getElementById()`<br>`window.scrollTo()` | 组件内或 `hooks/` |
+| **React Hook** | `useNavigate()`<br>`useLocation()` | 组件内或 `hooks/` |
+| **状态修改** | `store.loading = true` | `useStore.ts` |
+| **定时器** | `setTimeout()`<br>`setInterval()` | 组件内或 `hooks/` |
+| **事件订阅** | `window.addEventListener()` | 组件内或 `hooks/` |
+
+### ✅ 例外白名单（允许在 handle.ts 中使用）
+
+| 操作 | 说明 |
+|------|------|
+| `Dialog.confirm()` | antd-mobile 的确认弹窗，返回 Promise<boolean> |
+| `Toast.show()` | 轻量提示（建议尽量放在调用方处理） |
+| `navigator.clipboard.writeText()` | 剪贴板操作 |
+| `console.log/error/warn` | 日志输出 |
+| `Date.now()` / `new Date()` | 时间获取 |
+| `Math.random()` | 随机数生成 |
+
+---
+
+## ❌ 反例展示
+
+### 反例 1：包含 API 调用
+
+```typescript
+// ❌ 错误：handle.ts 中调用 API
+export const deleteArticle = async (id: string): Promise<void> => {
+  await api.article.delete(id); // 副作用：网络请求
+};
+
+// ✅ 正确：放在 useStore.ts 中
+async deleteArticle(id: string) {
+  this.loading = true;
+  await api.article.delete(id);
+  this.loading = false;
+}
+```
+
+### 反例 2：修改传入参数
+
+```typescript
+// ❌ 错误：直接修改传入的参数对象
+export const formatArticle = (article: Article): void => {
+  article.publishTime = new Date(article.publishTime).toLocaleDateString();
+};
+
+// ✅ 正确：创建副本返回，不修改原对象
+export const formatArticle = (article: Article): Article => {
+  return {
+    ...article,
+    publishTime: new Date(article.publishTime).toLocaleDateString(),
+  };
+};
+```
+
+### 反例 3：使用 React Hook
+
+```typescript
+// ❌ 错误：handle.ts 中使用 Hook
+import { useNavigate } from 'react-router-dom';
+
+export const goToDetail = (id: string): void => {
+  const navigate = useNavigate(); // React 规则违反
+  navigate(`/article/${id}`);
+};
+
+// ✅ 正确：放在 hooks/useGoToDetail.ts 中
+export const useGoToDetail = () => {
+  const navigate = useNavigate();
+  return (id: string) => navigate(`/article/${id}`);
+};
+```
+
+### 反例 4：定义自定义 Hook
+
+```typescript
+// ❌ 错误：handle.ts 中定义 Hook
+export const useArticleFilter = (list: Article[]) => {
+  return list.filter(item => item.published);
+};
+
+// ✅ 正确：纯函数，不需要 use 前缀
+export const filterPublishedArticles = (list: Article[]): Article[] => {
+  return list.filter(item => item.published);
+};
+```
 
 ---
 
@@ -327,13 +436,27 @@ const ProfilePage = () => {
 
 编写或修改 `handle.ts` 后请检查：
 
-- [ ] 是否只存放纯函数和无副作用逻辑？
-- [ ] 是否没有 API 调用？（API 调用应该在 store 或 hook）
-- [ ] 是否没有调用任何 React Hook？
-- [ ] 是否没有定义以 `use` 开头的自定义 Hook？
-- [ ] 是否所有函数都使用具名导出？
-- [ ] 是否所有参数和返回值都有显式类型声明？
-- [ ] 函数命名是否符合规范？
+### 纯函数检测
+
+- [ ] ✅ 相同输入是否永远产生相同输出？
+- [ ] ✅ 是否没有修改外部传入的参数对象？
+- [ ] ✅ 是否没有网络请求和异步操作？
+- [ ] ✅ 是否没有调用任何 React Hook？
+- [ ] ✅ 是否没有定义以 `use` 开头的自定义 Hook？
+
+### 代码规范
+
+- [ ] ✅ 是否所有函数都使用具名导出？
+- [ ] ✅ 是否所有参数和返回值都有显式类型声明？
+- [ ] ✅ 函数命名是否符合规范？
+- [ ] ✅ 函数职责是否单一？
+
+### 分工校验
+
+- [ ] ✅ 是否没有修改 MobX 状态？
+- [ ] ✅ 是否没有 DOM 操作和事件订阅？
+- [ ] ✅ 是否没有定时器和副作用？
+- [ ] ✅ 复杂业务 Hook 是否已抽取到 `hooks/` 目录？
 
 ---
 

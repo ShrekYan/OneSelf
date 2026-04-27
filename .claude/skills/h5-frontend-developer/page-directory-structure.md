@@ -6,13 +6,13 @@
 apps/web/src/pages/[PageName]/
 ├── index.tsx                    # 页面主入口（只做组件组合）
 ├── index.module.scss           # 仅页面最外层容器样式
-├── types.ts                     # 跨组件共享的数据类型定义
+├── types.ts                     # ✅ 必选：页面级跨组件共享的数据类型定义
 ├── constant.ts                  # 常量配置聚合导出（仅非展示性常量）
 ├── handle.ts                    # 纯业务逻辑函数（无副作用、无 Hook 依赖）
 ├── schema.ts                    # (可选) Zod 表单验证 Schema（仅含表单页面需要）
 ├── mock.ts                      # Mock 数据 / 静态业务数据
 ├── useStore.ts                  # 页面级 MobX 局部状态（useLocalObservable，包含 API 调用）
-├── hooks/                      # (可选) 页面专用业务 Hooks（依赖 React Hook 的逻辑）
+├── hooks/                      # (可选) 页面专用业务 Hooks（符合拆分阈值时创建）
 │   └── useXxx.ts               # 一个 Hook 一个文件，仅当前页面使用
 └── components/                 # 页面内子组件目录
     ├── index.ts                # 统一聚合导出所有子组件
@@ -40,7 +40,7 @@ apps/web/src/pages/[PageName]/
 | `schema.ts` | Zod 表单验证 Schema 定义 + 类型派生 | 没有表单验证的页面不要创建此文件 |
 | `mock.ts` | 存放 Mock 数据 / 静态业务数据 | 开发环境真实接口对接后可移除 |
 | `useStore.ts` | MobX 管理页面局部状态 + 修改状态的动作（包含 API 调用） | 不需要全局状态时才用这个 |
-| `hooks/` | 存放当前页面专用的业务 Hooks（依赖 React Hook 的逻辑） | 通用技术 Hook 和跨页面复用 Hook 不放这里 |
+| `hooks/` | 存放当前页面专用的业务 Hooks（依赖 React Hook 的逻辑） | 通用技术 Hook 和跨页面复用 Hook 不放这里，**详见 `rules/frontend-hooks-ts.md` 拆分阈值** |
 | `components/` | 存放拆分后的功能区块组件 | 不放非组件文件 |
 
 ---
@@ -197,11 +197,17 @@ export { default as Footer } from './Footer';
 
 ---
 
-### 5. types.ts - 跨组件共享类型
+### 5. types.ts - ✅ 必选：页面级跨组件共享类型
 
 ```typescript
 /**
  * 页面数据类型定义
+ *
+ * 类型分层原则（严格遵守）：
+ * 1. 全局 API 响应类型（DTO）→ apps/web/src/types/（页面不重复定义）
+ * 2. 页面级 Store 接口类型 → useStore.ts 内定义
+ * 3. 页面级跨组件共享类型 → types.ts（本文件）
+ * 4. 组件私有 Props → 组件文件内定义
  */
 
 /**
@@ -234,9 +240,13 @@ export type IconKey =
 ```
 
 **要点：**
+- ✅ **必选文件**，所有页面必须创建
 - ✅ 只有**跨多个组件共享**的数据类型才放这里
+- ✅ 存放范围：页面内多个子组件共享的数据结构、页面专用的枚举类型、从全局 DTO 派生的页面 VO 类型
+- ✅ 所有类型导出必须使用 `export type`，便于 Tree-shaking
 - ✅ 组件私有 `Props` 放在组件自己文件内
 - ✅ 使用 PascalCase 命名接口
+- ❌ **禁止存放 API DTO 类型**，统一从 `apps/web/src/types/` 导入
 
 ---
 
@@ -384,13 +394,13 @@ export default usePageStore;
 
 - [ ] `index.tsx` 页面入口，只做组件组合
 - [ ] `index.module.scss` 仅页面容器样式
-- [ ] `types.ts` 存放跨组件共享数据类型
+- [ ] ✅ `types.ts` 必选，存放页面级跨组件共享数据类型
 - [ ] `constant.ts` 聚合导出常量
 - [ ] `handle.ts` 纯业务逻辑函数（无副作用、无 Hook 依赖）
 - [ ] `mock.ts` 存放 Mock/静态数据
 - [ ] `schema.ts` 有表单验证时才创建，存放 Zod Schema（无表单则不需要）
 - [ ] `useStore.ts` MobX 局部状态（包含 API 调用）
-- [ ] `hooks/` 存放页面专用业务 Hooks（依赖 Hook 的逻辑，有需要时才创建）
+- [ ] `hooks/` 符合拆分阈值时创建，存放页面专用业务 Hooks
 - [ ] `components/index.ts` 统一导出子组件
 - [ ] 每个子组件 `ComponentName/index.tsx` + `index.module.scss`
 - [ ] 子组件根容器类名：`componentNameContainer`
