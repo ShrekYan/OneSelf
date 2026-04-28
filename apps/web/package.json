@@ -16,6 +16,7 @@
     "pre-build": "vite build --mode pre",
     "build": "tsc -b && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:staged": "lint-staged",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
@@ -136,5 +137,8 @@
   "browserslist": [
     "ie >= 10",
     ">0.3%, ios >= 9"
-  ]
+  ],
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": "eslint --max-warnings 0"
+  }
 }
