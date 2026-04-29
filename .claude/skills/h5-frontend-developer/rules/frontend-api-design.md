@@ -190,6 +190,88 @@ defaultApi.yourModule = yourModuleApi;
 
 ---
 
+---
+
+## 🔒 HttpOnly Cookie 安全规范（强制）
+
+### 背景
+为防范 XSS 攻击窃取 Token，本项目采用 **HttpOnly Cookie + SameSite** 的安全认证方案。
+
+### 核心规则
+
+| 规则 | 要求 |
+|------|------|
+| ✅ **Token 存储** | 前端 **禁止** 存储 accessToken/refreshToken |
+| ✅ **Axios 配置** | 必须开启 `withCredentials: true` |
+| ✅ **Token 刷新** | 刷新接口不传参数，后端从 Cookie 自动读取 |
+| ✅ **请求头** | 禁止手动设置 `Authorization` 头（Cookie 自动携带） |
+| ✅ **登出流程** | 调用登出接口，后端清除 Cookie |
+
+### 兼容策略
+- **旧用户**：localStorage 中 refreshToken 可作为降级参数传入
+- **新用户**：完全依赖 Cookie，不传任何参数
+
+### 刷新 Token 的正确实现
+
+```typescript
+// ❌ 错误：导入聚合 API 对象导致循环依赖
+import defaultApi from '../index';
+defaultApi.auth.refreshToken();
+
+// ✅ 正确：在 axios-instance 内部直接调用
+// 不依赖业务层 API，避免循环
+const refreshResponse = await api.post(
+  '/api/v1/auth/refresh',
+  { refreshToken }, // 可选，仅兼容旧用户
+  { skipAuth: true, skipErrorToast: true }
+);
+```
+
+---
+
+## 🔄 循环依赖防范指南
+
+### API 模块分层原则
+
+```
+┌─────────────────────────────────────────┐
+│              业务 API 层                │
+│  auth / user / product / article        │
+└────────────┬────────────────────────────┘
+             │ 依赖
+┌────────────▼────────────────────────────┐
+│              API 聚合层                 │
+│  @/api/index - defaultApi 导出对象      │
+└────────────┬────────────────────────────┘
+             │ 依赖
+┌────────────▼────────────────────────────┐
+│              核心工具层                 │
+│  axios-instance / request-cache / types │
+└─────────────────────────────────────────┘
+```
+
+### 禁止的依赖方向
+
+- ❌ **核心层 → 聚合层**：axios-instance 禁止 import @/api
+- ❌ **核心层 → 业务层**：axios-instance 禁止直接导入 auth/user 等
+- ✅ **业务层 → 聚合层**：业务 API 可以 import { api } from '@/api'
+
+### 循环依赖检测
+
+1. **开发环境**：Vite 控制台会有 `Circular dependency` 警告
+2. **构建检测**：使用 `madge` 工具检测
+   ```bash
+   npx madge --circular src/api/
+   ```
+
+### 修复方案优先级
+
+1. **分层重构**：将刷新逻辑抽离到 core 层内部，不依赖业务层
+2. **延迟导入**：使用函数级别的 import，而非模块顶层
+3. **动态 import**：`import('../auth').then(...)`
+
+---
+
 ## 检查清单 (Checklist)
 
 在提交 API 相关代码前，请确认：
@@ -199,6 +281,8 @@ defaultApi.yourModule = yourModuleApi;
 - [ ] **导出**: 是否已在 `apps/web/src/api/index.ts` 中完成注册？
 - [ ] **类型**: 是否为每个 API 定义了 Params 和 Response 类型？
 - [ ] **清理**: 是否移除了调试用的 `console.log`？
+- [ ] **安全**: 是否遵守 HttpOnly Cookie 规范，未在前端存储 Token？
+- [ ] **架构**: 没有引入新的循环依赖（核心层不导入聚合层）？
 
 ---
 
@@ -208,3 +292,4 @@ defaultApi.yourModule = yourModuleApi;
 2. **复用类型**: 基础的业务实体（如 `User`, `Product`）应在 `apps/web/src/types/` 中定义，API 模块仅引用。
 3. **防御性编程**: 对后端返回的不确定性数据（如 `null` 或 `undefined`），在 Response 类型中明确标注并做好降级处理。
 4. **统一入口**: 组件中始终使用 `import api from '@/api'` 导入，不要直接导入业务模块。
+5. **分层意识**: 编写核心层代码时，始终检查导入语句，避免向上层依赖。
