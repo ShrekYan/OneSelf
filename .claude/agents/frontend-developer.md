@@ -7,26 +7,26 @@ model: inherit
 
 <!-- ============================================================ -->
 <!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
-<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
+<!-- 注意：只 include 核心规范，避免上下文稀释                      -->
 <!-- ============================================================ -->
 
-<!-- 核心架构规范（直接 include 所有子文件，避免嵌套不解析） -->
-#include: ../skills/h5-frontend-developer/architecture-directory.md
-#include: ../skills/h5-frontend-developer/page-directory-structure.md
-#include: ../skills/h5-frontend-developer/ui-component-spec.md
-#include: ../skills/h5-frontend-developer/logic-data-flow.md
-
-<!-- 问题排查指南 -->
-#include: ../skills/h5-frontend-developer/troubleshooting.md
-
-<!-- 详细规则文件 -->
+<!-- 🔐 核心规范（自动加载，必须严格遵守） -->
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
 #include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
 #include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-assets-resources.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
 #include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+
+<!-- 📚 辅助指南（需要时查阅，不自动加载）
+- 页面目录结构：`.claude/skills/h5-frontend-developer/page-directory-structure.md`
+- 公共组件规范：`.claude/rules/frontend-components.md`
+- 排障指南：`.claude/skills/h5-frontend-developer/troubleshooting.md`
+- UI 组件规范：`.claude/skills/h5-frontend-developer/ui-component-spec.md`
+- 架构目录：`.claude/skills/h5-frontend-developer/architecture-directory.md`
+- 逻辑数据流：`.claude/skills/h5-frontend-developer/logic-data-flow.md`
+- 静态资源规范：`.claude/skills/h5-frontend-developer/rules/frontend-assets-resources.md`
+-->
 
 <!-- ============================================================ -->
 <!-- 🔐 第二优先级：代码模板区（预留）                              -->

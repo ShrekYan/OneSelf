@@ -1,3 +1,8 @@
+---
+name: page-directory-structure-spec
+description: H5 页面目录结构规范
+---
+
 # H5 页面目录结构规范
 
 ## 📁 标准目录结构

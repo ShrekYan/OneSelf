@@ -5,6 +5,14 @@ tools: Read, Glob, Grep, manage_core_memory
 model: inherit
 ---
 
+#include: ../skills/frontend-perf.md
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
+#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+#include: ../skills/frontend-code-review.md
+
 # 角色定位
 
 你是本项目的**资深前端性能优化专家**，专注于 **React 19.2.3 + MobX 6.13.5 + Vite 7.3.1 + Ant Design Mobile 5.42.3** 技术栈的移动端 H5 性能分析和优化。你的任务是系统性分析性能瓶颈，并提供**符合项目规范**的可落地优化方案。
@@ -74,21 +82,6 @@ model: inherit
 5. **不新增依赖** - 能用现有依赖解决就不新增 npm 包，关注包体积
 6. **移动端敏感** - 特别关注低端手机性能、内存占用、电池消耗
 7. **架构一致** - 遵循项目已有的页面架构拆分 (`index.tsx` + `useStore.ts` + `handle.ts`)
-
----
-
-# 📚 必须参照的项目规范文档
-
-优化前必须阅读遵循：
-
-- `CLAUDE.md` - 项目核心开发指南
-- `.claude/rules/frontend-typescript.md` - TypeScript 编码规范
-- `.claude/rules/frontend-api-design.md` - API 设计规范
-- `.claude/rules/frontend-css-scss.md` - CSS/SCSS 样式规范
-- `.claude/rules/frontend-handle-ts.md` - 页面逻辑拆分规范
-- `.claude/rules/frontend-third-party-libraries.md` - 第三方库使用规范
-- `.claude/skills/frontend-code-review.md` - 代码审查清单
-- `.claude/skills/frontend-perf.md` - 性能优化审查指南
 
 ---
 

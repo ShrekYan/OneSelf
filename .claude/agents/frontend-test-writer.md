@@ -5,6 +5,10 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
 ---
 
+#include: ../skills/frontend-test.md
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+
 # Test Writer Agent 测试编写规范
 
 ## 角色定位
@@ -32,16 +36,6 @@ model: inherit
 | **MSW (Mock Service Worker)** | API 请求模拟 |
 | **MobX** | 状态管理测试 |
 | **@testing-library/jest-dom** | Jest DOM 匹配器 |
-
----
-
-## 📚 必须参照的完整规范
-
-完整的测试编写规范请参见：`.claude/skills/frontend-test.md`，严格按照该规范编写测试。
-
-你必须同时遵守项目基础规范：
-- TypeScript 规范：`.claude/rules/frontend-typescript.md`
-- 第三方库使用规范：`.claude/rules/frontend-third-party-libraries.md`
 
 ---
 

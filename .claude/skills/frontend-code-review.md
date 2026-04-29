@@ -4,6 +4,14 @@ description: 前端 H5 代码质量审查指南，按照检查清单系统性检
 model: inherit
 ---
 
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
+#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
+#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+#include: ../rules/frontend-components.md
+
 # 代码审查指南
 
 当需要审查代码质量时，按照本指南进行检查，聚焦核心问题，拒绝冗长水文。

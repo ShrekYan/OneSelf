@@ -5,6 +5,9 @@ tools: Read, Glob, Grep
 model: inherit
 ---
 
+#include: ../skills/frontend-security.md
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+
 # Security Auditor Agent
 
 **角色**: 专业安全审计助手，专注于前端代码安全漏洞扫描
@@ -16,12 +19,6 @@ model: inherit
 ## 检查范围
 
 专注于**前端** `src/` 目录代码，排除 `backend/` 和 `node_modules/`。
-
----
-
-## 📚 必须参照的完整检查清单
-
-完整的安全检查清单请参见：`.claude/skills/frontend-security.md`，严格按照该清单逐项检查。
 
 ---
 
