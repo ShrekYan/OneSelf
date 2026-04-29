@@ -2,26 +2,26 @@
  * 处理忘记密码点击
  */
 export const handleForgotPassword = (): void => {
-  console.log('Navigate to forgot password page');
+  // 预留扩展点，后续可添加埋点统计等逻辑
 };
 
 /**
  * Handle register click
  */
 export const handleRegister = (): void => {
-  console.log('Navigate to register page');
+  // 预留扩展点，后续可添加埋点统计等逻辑
 };
 
 /**
  * Handle user agreement click
  */
 export const handleUserAgreement = (): void => {
-  console.log('Open user agreement page');
+  // 预留扩展点，后续可添加埋点统计等逻辑
 };
 
 /**
  * Handle privacy policy click
  */
 export const handlePrivacyPolicy = (): void => {
-  console.log('Open privacy policy page');
+  // 预留扩展点，后续可添加埋点统计等逻辑
 };

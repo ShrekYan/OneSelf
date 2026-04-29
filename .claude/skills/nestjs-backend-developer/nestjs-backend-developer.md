@@ -18,6 +18,10 @@ description: NestJS 后端开发工程师的代码规范和最佳实践。在开
 #include: 08-checklist.md
 #include: 09-prisma-orm.md
 #include: 10-code-format.md
+#include: 11-security-authentication.md
+#include: 12-middleware.md
+#include: 13-redis-integration.md
+#include: 14-cross-service-http.md
 
 <!-- 引用基础规范 -->
 #include: ./rules/nestjs-typescript.md

@@ -1,5 +1,6 @@
 import { useLocalObservable } from 'mobx-react';
 import { authApi } from '@/api';
+import { secureSessionStorage } from '@/utils/secure-storage';
 import type { LoginFormData, LoginApiResponse } from './types';
 import type { LoginResponse } from '@/api/auth';
 
@@ -66,15 +67,18 @@ export const useLoginStore = () => {
 
         // 拦截器已经过滤，能走到这里说明 code === 200
         // ✅ Token 由后端通过 HttpOnly Cookie 设置，前端不存储（防 XSS 攻击）
-        // ✅ userInfo 存储在 sessionStorage，浏览器关闭时自动清除
-        sessionStorage.setItem('userInfo', JSON.stringify(result.user));
+        // ✅ userInfo 编码后存储在 sessionStorage，浏览器关闭时自动清除
+        secureSessionStorage.set('userInfo', result.user);
 
         this.isLoading = false;
         return {
           success: true,
         };
       } catch (error) {
-        console.error('Login failed:', error);
+        // 生产环境不输出详细错误堆栈
+        if (import.meta.env.DEV) {
+          console.error('Login failed:', error);
+        }
         this.isLoading = false;
         // code !== 200 会被拦截器 reject，进入这里
         return {

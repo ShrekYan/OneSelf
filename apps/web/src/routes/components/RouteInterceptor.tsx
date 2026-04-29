@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalStore } from '@/store';
 import { getCurrentUser, UserDto } from '@/api/auth';
+import { secureSessionStorage } from '@/utils/secure-storage';
 
 /**
  * 路由配置信息，只需要 RouteConfig 的必要字段
@@ -75,18 +76,13 @@ export const RouteInterceptor: React.FC<RouteInterceptorProps> = ({
     const checkAuth = async () => {
       // 🟡 第一步：检查 sessionStorage 缓存优化性能
       // 注意：这只是性能优化，接口验证才是真正的认证依据
-      const cachedUserInfo = sessionStorage.getItem('userInfo');
+      const cachedUserInfo = secureSessionStorage.get<UserDto>('userInfo');
       if (cachedUserInfo) {
-        try {
-          app.setUserInfo(JSON.parse(cachedUserInfo) as UserDto as Parameters<typeof app.setUserInfo>[0]);
-          if (isMounted) {
-            setAuthState({ status: 'authenticated' });
-          }
-          return;
-        } catch {
-          // 解析失败，清理无效缓存，继续走接口验证
-          sessionStorage.removeItem('userInfo');
+        app.setUserInfo(cachedUserInfo as Parameters<typeof app.setUserInfo>[0]);
+        if (isMounted) {
+          setAuthState({ status: 'authenticated' });
         }
+        return;
       }
 
       // ✅ 第二步：无缓存 → 调用后端接口验证（Cookie 自动携带）
@@ -96,15 +92,18 @@ export const RouteInterceptor: React.FC<RouteInterceptorProps> = ({
 
       try {
         const userInfo = await getCurrentUser();
-        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+        secureSessionStorage.set('userInfo', userInfo);
         app.setUserInfo(userInfo as Parameters<typeof app.setUserInfo>[0]);
         if (isMounted) {
           setAuthState({ status: 'authenticated' });
         }
       } catch {
-        console.warn('认证检查失败，跳转登录页');
+        // 生产环境不输出警告
+        if (import.meta.env.DEV) {
+          console.warn('认证检查失败，跳转登录页');
+        }
         // Token 验证失败，清理无效缓存
-        sessionStorage.removeItem('userInfo');
+        secureSessionStorage.remove('userInfo');
         if (isMounted) {
           setAuthState({ status: 'unauthenticated' });
         }

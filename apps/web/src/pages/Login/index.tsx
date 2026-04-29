@@ -118,7 +118,6 @@ const Login: React.FC = () => {
   const onSubmit = handleSubmit(async (formData: LoginFormData) => {
     try {
       const apiResult = await store.login(formData);
-      console.log(apiResult);
       if (apiResult.success) {
         Toast.show({
           icon: 'success',
@@ -138,7 +137,10 @@ const Login: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Login error:', error);
+      // 生产环境不输出详细错误堆栈
+      if (import.meta.env.DEV) {
+        console.error('Login error:', error);
+      }
       Toast.show({
         icon: 'fail',
         content: 'Login failed, please try again later',

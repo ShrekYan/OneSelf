@@ -2,13 +2,16 @@
 
 ## 核心技术栈
 - **NestJS 11.0** + **TypeScript 5.7**
-- **Prisma ORM 6.4** - 数据库访问
+- **Prisma ORM 6.4** - 数据库访问（带连接重试、慢查询检测）
 - **@nestjs/config** - 环境配置管理
 - **@nestjs/swagger** - API 文档自动生成
 - **class-validator** - 数据验证
 - **class-transformer** - 类型转换
 - **jsonwebtoken** - JWT 认证
-- **bcrypt** - 密码加密
+- **argon2** - 密码加密（Argon2id，目前最安全的密码哈希算法）
+- **ioredis** - Redis 客户端（会话管理、缓存、分布式锁）
+- **@nestjs/axios** + **axios** - HTTP 客户端（跨服务调用）
+- **cookie-parser** - Cookie 解析（HttpOnly Cookie 安全）
 - **Jest** - 单元测试
 
 ## 统一响应格式
@@ -83,4 +86,39 @@ import { QueryArticleListDto } from './dto/query-article-list.dto';
 - **全局注册**: `PrismaModule` 是 `@Global()`，所有模块直接注入
 - **注入方式**: `constructor(private readonly prisma: PrismaService) {}`
 - **不使用 Repository 模式**: Prisma 已经是数据访问抽象，不需要额外包装
+- **增强功能**: 连接重试机制、慢查询检测、详细错误日志
+
+---
+
+## 微服务架构说明
+
+项目采用**独立认证服务**的微服务架构：
+
 ```
+┌─────────────────────────────────────────────────────────────┐
+│                     auth-service (认证中心)                  │
+│  - 登录/注册/刷新 Token                                     │
+│  - Token 验证接口 (/auth/introspect)                        │
+│  - 用户信息管理                                              │
+│  - 本地 JWT 验证 (JwtAuthGuard)                              │
+└─────────────────────────────────────────────────────────────┘
+                              ↓ HTTP
+┌─────────────────────────────────────────────────────────────┐
+│                      backend (主业务服务)                     │
+│  - 文章/分类/评论等业务模块                                  │
+│  - 通过 RemoteJwtAuthGuard 调用 auth-service 验证 Token      │
+│  - 所有业务接口统一的认证机制                                │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     log-service (日志服务)                    │
+│  - 集中接收和存储所有服务的日志                              │
+│  - 日志查询和分析                                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 架构优势
+
+1.  **认证逻辑集中**：认证逻辑只在 auth-service 维护，避免重复开发
+2.  **安全边界清晰**：JWT 密钥只在 auth-service 中，其他服务不需要知道密钥
+3.  **可独立扩展**：auth-service 可以独立部署和扩展
+4.  **统一安全策略**：所有服务使用相同的 HttpOnly Cookie 安全策略

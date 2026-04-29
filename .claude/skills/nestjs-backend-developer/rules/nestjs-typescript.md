@@ -193,6 +193,32 @@ model User {
 - 统一返回格式，分页数据使用 `{ data: T[], total: number }`
 - 错误码遵循 HTTP 状态码语义
 
+### 密码加密规范
+
+- **必须使用 Argon2id 算法**（通过 `argon2` 包）
+- ❌ **不再使用 bcrypt**：抗 GPU/ASIC 攻击能力弱
+- 推荐配置：
+  - `type: argon2.argon2id`
+  - `memoryCost: 1 << 16` (64MB)
+  - `timeCost: 3`
+  - `parallelism: 1`
+
+```typescript
+// ✅ 正确示例
+import * as argon2 from 'argon2';
+
+// 哈希密码
+const passwordHash = await argon2.hash(password, {
+  type: argon2.argon2id,
+  memoryCost: 1 << 16,
+  timeCost: 3,
+  parallelism: 1,
+});
+
+// 验证密码
+const isValid = await argon2.verify(passwordHash, password);
+```
+
 ---
 
 ## 检查清单
