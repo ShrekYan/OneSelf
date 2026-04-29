@@ -1,7 +1,47 @@
 # Claude Code 项目指南
 
 ### 项目描述
-全栈博客项目，**Monorepo 单代码仓库架构**，前端 H5 移动端应用 + 后端多微服务。
+全栈博客项目，**Monorepo 单代码仓库多系统架构**，包含前端 H5 移动端应用 + 后端多微服务 + 跨系统共享包。
+
+---
+
+## 🏗️ 系统架构与职责边界
+
+```
+claude (Monorepo 根)
+├── apps/                    # 应用系统
+│   └── web/                 # 前端 H5 移动端博客应用
+│
+├── services/                # 后端微服务
+│   ├── auth-service/        # 认证授权服务 - 登录、注册、Token 管理
+│   ├── backend/             # 主业务服务 - 博客文章、评论、用户管理
+│   └── log-service/         # 日志服务 - 操作日志、审计日志、行为分析
+│
+└── packages/                # 跨系统共享包
+    └── shared-logging/      # 统一日志格式与上报 - 所有 NestJS 服务共用
+```
+
+### 各系统职责说明
+
+| 系统 | 目录 | 职责范围 | 技术栈 |
+|------|------|---------|--------|
+| **web** | `apps/web/` | 用户端 H5 应用，页面渲染、交互逻辑、状态管理 | React 19 + MobX |
+| **auth-service** | `services/auth-service/` | 认证领域：登录、注册、权限校验、Session 管理 | NestJS 11 |
+| **backend** | `services/backend/` | 核心业务：文章 CRUD、评论系统、用户管理 | NestJS 11 + Prisma |
+| **log-service** | `services/log-service/` | 日志领域：操作记录、审计追踪、行为数据采集 | NestJS 11 |
+| **shared-logging** | `packages/shared-logging/` | 共享组件：统一日志格式、日志上报 SDK | TypeScript |
+
+### 服务间依赖关系
+
+```
+web (前端)
+    ↓ 调用
+auth-service (认证) ←→ backend (主业务) ←→ log-service (日志)
+                                    ↓
+                          shared-logging (共享包)
+```
+
+---
 
 ## 🚀 核心技术栈
 
@@ -14,6 +54,10 @@
 - NestJS 11.0.1 + TypeScript 5.7.3
 - Prisma ORM 6.4.1
 
+### 共享包（packages/）
+- 纯 TypeScript 库
+- 无业务逻辑，仅提供通用能力
+
 ### 构建工具
 - Turborepo 2.4.2（Monorepo 构建优化）
 
@@ -24,16 +68,59 @@
 - **并行开发所有服务**: `npm run dev`
 - **全项目代码检查**: `npm run lint`
 
-### 前端（apps/web/ 目录下）
+### 🔄 多系统开发流程
+
+#### 单系统开发（推荐，隔离性好）
+```bash
+# 前端开发
+cd apps/web && npm run dev
+
+# 单个后端服务开发
+cd services/auth-service && npm run start:dev
+cd services/backend && npm run start:dev
+cd services/log-service && npm run start:dev
+
+# 共享包开发
+cd packages/shared-logging && npm run build
+```
+
+#### 全系统并行开发（联调场景）
+```bash
+# 根目录执行，同时启动所有服务
+npm run dev
+```
+
+#### 前端（apps/web/ 目录下）
 - **开发**: `npm run dev` (默认外测环境)
 - **构建**: `npm run build` (全流程)
 - **检查**: `npm run lint` / `npx tsc --noEmit`
 - **各环境开发**: `npm run test-dev` (测试) | `npm run sit-dev` (SIT) | `npm run prd-dev` (生产)
 
-### 后端（进入对应服务目录执行，如 services/backend）
-- **开发**: `npm run start:dev`
+#### 后端（进入对应服务目录执行）
+```bash
+# 各服务独立开发
+cd services/auth-service && npm run start:dev
+cd services/backend && npm run start:dev
+cd services/log-service && npm run start:dev
+```
 - **构建**: `npm run build`
 - **检查**: `npm run lint`
+
+### 📦 共享包开发规范
+
+#### packages/ 目录规则
+1. **纯技术库**：不包含业务逻辑，仅提供通用能力
+2. **单向依赖**：只能被其他包引用，不能引用业务服务
+3. **同步更新**：修改共享包必须同步更新所有使用方
+4. **破坏性变更**：必须在 commit body 中详细说明影响范围
+
+#### 跨系统修改提交规范
+```bash
+# 同时修改多个系统
+feat(auth+web): 统一登录状态管理
+fix(backend+shared): 修复日志格式兼容性问题
+refactor(auth+backend+log): 抽离通用响应格式
+```
 
 ## 📚 项目规范入口
 
@@ -90,20 +177,36 @@
 
 当用户输入符合以下特征时，**自动使用对应的专属 Agent**，无需用户手动指定：
 
+### 前端相关
 | 用户输入特征 | 自动使用 Agent |
 |-------------|---------------|
 | 开发前端页面、组件、API、Hook | `frontend-developer` |
-| 开发 NestJS 后端、Controller、Service、Module | `backend-architect` |
 | 审查前端代码质量 | `frontend-code-reviewer` |
-| 审查后端代码质量 | `nestjs-code-review` |
 | 前端性能问题分析、优化 | `frontend-performance-expert` |
-| 后端性能问题分析、优化 | `nestjs-performance-audit` |
 | 前端单元测试编写 | `frontend-test-writer` |
-| 后端单元测试编写 | `nestjs-test-writer` |
 | 前端安全漏洞扫描 | `frontend-security-auditor` |
-| 后端安全漏洞扫描 | `nestjs-security-audit` |
-| 搜索代码、组件、调用链 | `search-expert` |
 | UI 设计稿转代码、组件设计 | `ui-designer` |
+
+### 后端相关
+| 用户输入特征 | 自动使用 Agent |
+|-------------|---------------|
+| 开发 NestJS 后端、Controller、Service、Module | `backend-architect` |
+| 审查后端代码质量 | `nestjs-code-review` |
+| 后端性能问题分析、优化 | `nestjs-performance-audit` |
+| 后端单元测试编写 | `nestjs-test-writer` |
+| 后端安全漏洞扫描 | `nestjs-security-audit` |
+| 微服务间接口联调、契约设计 | `api-integration` |
+
+### 架构与跨系统相关
+| 用户输入特征 | 自动使用 Agent |
+|-------------|---------------|
+| 开发共享包、公共工具库 | `package-developer` |
+| 跨系统架构设计、重构 | `architect-planner` |
 | 生成架构图、流程图、序列图 | `mermaid-generator` |
+
+### 通用工具
+| 用户输入特征 | 自动使用 Agent |
+|-------------|---------------|
+| 搜索代码、组件、调用链 | `search-expert` |
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
 | 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
