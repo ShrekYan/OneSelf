@@ -24,7 +24,7 @@ export const useHandleSignOut = () => {
         const refreshToken = localStorage.getItem('refreshToken');
         await authApi.logout(refreshToken ?? undefined);
         // 清除本地存储的用户信息（Token 由后端 Cookie 机制处理）
-        localStorage.removeItem('userInfo');
+        sessionStorage.removeItem('userInfo');
         // 跳转到登录页面
         navigate('/login');
       } catch (error) {

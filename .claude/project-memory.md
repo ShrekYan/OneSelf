@@ -173,3 +173,53 @@ const [articlesWithCategories, total] = await Promise.all([
 **错误原因**: 误以为 Claude Code 的 `include:` 指令会递归解析嵌套引用
 
 ---
+
+## API 模块循环依赖导致 "Cannot access 'api' before initialization"
+
+### 错误场景
+在 `api/auth/index.ts` 中使用相对路径导入 `axios-instance`，修改接口函数后浏览器控制台报错无法初始化。
+
+### 错误现象
+```
+Uncaught ReferenceError: Cannot access 'api' before initialization
+    at index.ts:43:20
+```
+
+### 原因分析
+**形成了循环依赖链**：
+```
+1. api/core/axios-instance.ts
+   ↳ import defaultApi from '../index'  (第13行)
+
+2. api/index.ts
+   ↳ import * as authApi from './auth'  (第10行)
+
+3. api/auth/index.ts
+   ↳ import api from '../core/axios-instance'  (第1行)
+
+↺ 回到第一步，形成死循环！
+```
+
+当模块初始化时，`api` 变量还未完成赋值就被引用，导致初始化顺序错误。
+
+### 正确解决方法
+**打破循环依赖链**，将相对路径导入改为从 `@/api` 入口导入：
+
+❌ 错误写法：
+```typescript
+import api from '../core/axios-instance';
+```
+
+✅ 正确写法：
+```typescript
+import { api } from '@/api';
+```
+
+**原理**：从 `@/api` 入口导入时，`api` 变量已在 `api/index.ts:22` 完成导出声明，不会在初始化阶段直接引用 `axios-instance` 的默认导出。
+
+---
+
+**记录日期**: 2026-04-29
+**错误原因**: API 模块间形成循环依赖链，相对路径导入导致初始化顺序错误
+
+---

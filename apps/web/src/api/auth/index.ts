@@ -1,4 +1,4 @@
-import api from '../core/axios-instance';
+import { api } from '@/api';
 
 /**
  * 刷新令牌请求参数
@@ -130,4 +130,16 @@ export async function login(
   config?: RequestConfig,
 ): Promise<LoginResponse> {
   return await api.post('/api/v1/auth/login', data, config);
+}
+
+/**
+ * 获取当前登录用户信息
+ * ✅ skipAuth：不需要认证，避免 401 拦截导致死循环
+ * ✅ skipErrorToast：静默失败，统一由 RouteInterceptor 处理跳转
+ */
+export async function getCurrentUser(): Promise<UserDto> {
+  return await api.post('/api/v1/user/info', {}, {
+    skipAuth: true,
+    skipErrorToast: true,
+  } as RequestConfig);
 }

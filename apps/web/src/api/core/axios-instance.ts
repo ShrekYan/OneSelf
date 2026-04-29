@@ -83,7 +83,7 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
   // ✅ skipRedirect 与 skipAuth 解耦：refreshToken 可跳过认证但不跳过重定向
   if (!config.skipRedirect && data.code === 410) {
     // 未授权，清除用户信息并跳转登录
-    localStorage.removeItem('userInfo');
+    sessionStorage.removeItem('userInfo');
     // 重置 MobX 内存状态
     const rootStore = getRootStore();
     if (rootStore?.app) {
@@ -170,7 +170,7 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         // ✅ 如果是刷新 token 接口本身失败（skipAuth=true），直接跳转登录
         // 避免无限递归调用 refreshToken（当 Cookie 中 refreshToken 也失效时）
         if (config.skipAuth) {
-          localStorage.removeItem('userInfo');
+          sessionStorage.removeItem('userInfo');
           const rootStore = getRootStore();
           if (rootStore?.app) {
             rootStore.app.reset();
@@ -229,7 +229,7 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
             // 刷新失败（refreshToken 也失效了），清除用户信息跳转登录
             // ✅ Token 由后端 HttpOnly Cookie 机制处理，前端无需手动清除
             isRefreshing = false;
-            localStorage.removeItem('userInfo');
+            sessionStorage.removeItem('userInfo');
             // 重置 MobX 内存状态
             const rootStore = getRootStore();
             if (rootStore?.app) {
@@ -277,7 +277,7 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         // ✅ Token 由后端 HttpOnly Cookie 机制处理，前端无需手动清除
         // ✅ skipRedirect 与 skipAuth 解耦
         if (!config.skipRedirect) {
-          localStorage.removeItem('userInfo');
+          sessionStorage.removeItem('userInfo');
           // 重置 MobX 内存状态
           const rootStore = getRootStore();
           if (rootStore?.app) {
@@ -371,13 +371,8 @@ api.interceptors.request.use(
     requestConfig.cancelToken = source.token;
     cancelManager.addRequest(requestConfig, source);
 
-    // 添加认证 token
-    if (!requestConfig.skipAuth) {
-      const token = localStorage.getItem('accessToken');
-      if (token && requestConfig.headers) {
-        requestConfig.headers.Authorization = `Bearer ${token}`;
-      }
-    }
+    // ✅ Cookie Only 认证模式：Token 由 HttpOnly Cookie 自动携带
+    // 前端不存储也不手动设置 Authorization Header，防止 XSS 窃取
 
     // 添加时间戳
     if (requestConfig.method === 'get') {

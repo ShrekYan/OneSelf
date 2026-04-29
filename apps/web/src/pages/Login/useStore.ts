@@ -66,8 +66,8 @@ export const useLoginStore = () => {
 
         // 拦截器已经过滤，能走到这里说明 code === 200
         // ✅ Token 由后端通过 HttpOnly Cookie 设置，前端不存储（防 XSS 攻击）
-        // 仅在 MobX 内存中保存用户信息用于 UI 展示
-        localStorage.setItem('userInfo', JSON.stringify(result.user));
+        // ✅ userInfo 存储在 sessionStorage，浏览器关闭时自动清除
+        sessionStorage.setItem('userInfo', JSON.stringify(result.user));
 
         this.isLoading = false;
         return {

@@ -3,8 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
 import { UserSyncService } from './user-sync.service';
-import { UserInfoDto } from './dto';
-import { UpdateProfileDto } from './dto';
+import { UserDto, UpdateProfileDto } from './dto';
 import type { Users } from '@prisma/client';
 
 /**
@@ -23,7 +22,7 @@ export class UsersService {
    * @param userId - 用户 ID
    * @returns 用户信息 DTO
    */
-  async getUserInfo(userId: string): Promise<UserInfoDto> {
+  async getUserInfo(userId: string): Promise<UserDto> {
     const user = await this.prismaService.users.findUnique({
       where: { id: userId },
     });
@@ -44,7 +43,7 @@ export class UsersService {
   async updateProfile(
     userId: string,
     updateDto: UpdateProfileDto,
-  ): Promise<UserInfoDto> {
+  ): Promise<UserDto> {
     // 检查用户是否存在
 
     const existing = await this.prismaService.users.findUnique({
@@ -123,17 +122,13 @@ export class UsersService {
    * @param user - 用户实体
    * @returns 用户信息 DTO
    */
-  private mapToDto(user: Users): UserInfoDto {
+  private mapToDto(user: Users): UserDto {
     return {
       id: user.id,
       username: user.username,
       email: user.email ?? undefined,
       nickname: user.nickname ?? undefined,
       avatar: user.avatar ?? undefined,
-
-      // bio 是可选扩展字段，可能不在 Prisma 生成类型中
-
-      bio: (user as any).bio ?? undefined,
     };
   }
 }
