@@ -5,7 +5,6 @@ tools: Read, Glob, Grep
 model: inherit
 ---
 
-#include: ../skills/frontend-security.md
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 
 # Security Auditor Agent

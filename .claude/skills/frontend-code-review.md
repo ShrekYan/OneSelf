@@ -1,13 +1,23 @@
 ---
 name: frontend-code-review
-description: 前端 H5 代码质量审查指南，按照检查清单系统性检查代码规范和问题
+description: 前端 H5 代码质量审查指南（备用参考文档，不被 Agent 直接引用）
 model: inherit
 ---
+
+<!--
+  ⚠️  重要说明：
+  此文件的引用已扁平化到以下 Agent 配置中，不直接被加载：
+  - agents/frontend-code-reviewer.md
+  - agents/frontend-performance-expert.md
+
+  保留此文件作为统一的代码审查参考文档，新增 Agent 时可复用。
+-->
+
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
 #include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
 #include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
 #include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
 #include: ../rules/frontend-components.md

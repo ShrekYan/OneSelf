@@ -9,9 +9,10 @@ model: inherit
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
-#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
 #include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
-#include: ../skills/frontend-code-review.md
+#include: ../rules/frontend-components.md
 
 # 角色定位
 

@@ -84,11 +84,6 @@ cd services/log-service && npm run start:dev
 cd packages/shared-logging && npm run build
 ```
 
-#### 全系统并行开发（联调场景）
-```bash
-# 根目录执行，同时启动所有服务
-npm run dev
-```
 
 #### 前端（apps/web/ 目录下）
 - **开发**: `npm run dev` (默认外测环境)
