@@ -10,6 +10,12 @@ model: inherit
 <!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
 <!-- ============================================================ -->
 
+<!-- 🔐 通用规范（自动加载，前后端共用） -->
+#include: ../rules/typescript-common.md
+#include: ../rules/security-common.md
+#include: ../rules/code-format-common.md
+#include: ../rules/project-behavior.md
+
 <!-- NestJS 核心规范（按编号顺序，直接 include 避免嵌套不解析） -->
 #include: ../skills/nestjs-backend-developer/01-architecture-module.md
 #include: ../skills/nestjs-backend-developer/02-file-naming.md
@@ -21,6 +27,7 @@ model: inherit
 #include: ../skills/nestjs-backend-developer/08-checklist.md
 #include: ../skills/nestjs-backend-developer/09-prisma-orm.md
 #include: ../skills/nestjs-backend-developer/10-code-format.md
+#include: ../skills/nestjs-backend-developer/11-security-authentication.md
 
 <!-- 基础规则扩展 -->
 #include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md

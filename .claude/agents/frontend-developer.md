@@ -10,7 +10,13 @@ model: inherit
 <!-- 注意：只 include 核心规范，避免上下文稀释                      -->
 <!-- ============================================================ -->
 
-<!-- 🔐 核心规范（自动加载，必须严格遵守） -->
+<!-- 🔐 通用规范（自动加载，前后端共用） -->
+#include: ../rules/typescript-common.md
+#include: ../rules/security-common.md
+#include: ../rules/code-format-common.md
+#include: ../rules/project-behavior.md
+
+<!-- 🔐 前端特有规范（自动加载，必须严格遵守） -->
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
 #include: ../skills/h5-frontend-developer/rules/frontend-api-design.md

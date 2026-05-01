@@ -1,4 +1,8 @@
-# 11 - 安全认证规范
+# 11 - 安全认证规范（NestJS 后端特有）
+
+> **通用安全规范**：已抽离至 `.claude/rules/security-common.md`，本文件仅定义后端特有规范。
+
+---
 
 ## 概述
 
@@ -8,17 +12,11 @@
 
 ---
 
-## 1. HttpOnly Cookie 安全策略
+## 1. HttpOnly Cookie 安全策略（后端特有）
 
-### 1.1 为什么使用 HttpOnly Cookie
+**通用安全规范**：见 `.claude/rules/security-common.md`
 
-| 攻击类型 | HttpOnly 的防护作用 |
-|---------|-------------------|
-| **XSS 攻击** | JavaScript 无法读取 HttpOnly Cookie，防止 Token 被窃取 |
-| **CSRF 攻击** | 配合 SameSite 属性，防止跨站请求伪造 |
-| **前端安全** | Token 不存储在 localStorage/sessionStorage 中 |
-
-### 1.2 启用 Cookie Parser
+### 1.1 启用 Cookie Parser
 
 所有服务必须在 `main.ts` 中启用 cookie-parser：
 
@@ -35,7 +33,7 @@ async function bootstrap() {
 }
 ```
 
-### 1.3 Cookie 安全配置标准
+### 1.2 Cookie 安全配置标准
 
 设置 Token Cookie 时必须使用以下安全配置：
 
@@ -198,6 +196,8 @@ export class RemoteJwtAuthGuard implements CanActivate {
 
 ## 4. 密码加密规范
 
+**通用安全规范**：见 `.claude/rules/security-common.md`
+
 ### 4.1 算法选择
 
 | 算法 | 状态 | 说明 |
@@ -243,9 +243,9 @@ export class PasswordService {
 ### 4.3 安全注意事项
 
 - ✅ 密码哈希只能单向，不能解密
-- ✅ 数据库中只存储哈希值，绝不存储明文密码
+- ✅ 数据库中只存储哈希值，**绝不存储明文密码**
 - ✅ 登录失败时不要提示"用户名不存在"或"密码错误"的具体差异
-- ✅ 应使用统一的错误提示："用户名或密码错误"（防止账户枚举攻击）
+- ✅ 应使用统一错误提示："用户名或密码错误"（防止账户枚举攻击）
 
 ---
 
@@ -275,7 +275,7 @@ Value: Set of token values (用户所有有效 Refresh Token)
 TTL: 7天 (与最长的 Token 过期时间一致)
 ```
 
-### 5.3 核心功能
+### 5.3 核心功能实现
 
 ```typescript
 @Injectable()
@@ -383,4 +383,4 @@ async getProfile(@CurrentUserId() userId: string) {
 - [ ] 敏感信息（密码、Token）是否不会记录到日志？
 - [ ] Auth Guard 是否正确处理了 Token 无效和过期的情况？
 - [ ] 远程认证失败时是否返回适当的错误信息，不暴露服务细节？
-- [ ] 所有需要认证的接口是否都正确使用了 Auth Guard？
+- [ ] 所有需要认证的接口是否正确使用了 Auth Guard？

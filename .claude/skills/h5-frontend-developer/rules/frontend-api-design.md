@@ -3,7 +3,11 @@
 pattern: ./apps/web/src/api/**/*
 ---
 
-# API 设计规范
+# 前端 API 设计规范
+
+> **通用安全规范**：已抽离至 `.claude/rules/security-common.md`，本文件仅定义前端 API 特有规范。
+
+---
 
 ## 概述
 
@@ -190,26 +194,23 @@ defaultApi.yourModule = yourModuleApi;
 
 ---
 
----
+## 🔒 HttpOnly Cookie 前端约束（强制）
 
-## 🔒 HttpOnly Cookie 安全规范（强制）
+**通用安全规范**：见 `.claude/rules/security-common.md`
 
-### 背景
-为防范 XSS 攻击窃取 Token，本项目采用 **HttpOnly Cookie + SameSite** 的安全认证方案。
-
-### 核心规则
+### 前端特有约束
 
 | 规则 | 要求 |
 |------|------|
-| ✅ **Token 存储** | 前端 **禁止** 存储 accessToken/refreshToken |
+| ✅ **Token 存储** | 前端 **禁止** 存储 accessToken/refreshToken 到 localStorage/sessionStorage |
 | ✅ **Axios 配置** | 必须开启 `withCredentials: true` |
 | ✅ **Token 刷新** | 刷新接口不传参数，后端从 Cookie 自动读取 |
 | ✅ **请求头** | 禁止手动设置 `Authorization` 头（Cookie 自动携带） |
 | ✅ **登出流程** | 调用登出接口，后端清除 Cookie |
 
 ### 兼容策略
-- **旧用户**：localStorage 中 refreshToken 可作为降级参数传入
-- **新用户**：完全依赖 Cookie，不传任何参数
+- **旧用户**: localStorage 中 refreshToken 可作为降级参数传入
+- **新用户**: 完全依赖 Cookie，不传任何参数
 
 ### 刷新 Token 的正确实现
 
@@ -252,23 +253,23 @@ const refreshResponse = await api.post(
 
 ### 禁止的依赖方向
 
-- ❌ **核心层 → 聚合层**：axios-instance 禁止 import @/api
-- ❌ **核心层 → 业务层**：axios-instance 禁止直接导入 auth/user 等
-- ✅ **业务层 → 聚合层**：业务 API 可以 import { api } from '@/api'
+- ❌ **核心层 → 聚合层**: axios-instance 禁止 import @/api
+- ❌ **核心层 → 业务层**: axios-instance 禁止直接导入 auth/user 等
+- ✅ **业务层 → 聚合层**: 业务 API 可以 import { api } from '@/api'
 
 ### 循环依赖检测
 
-1. **开发环境**：Vite 控制台会有 `Circular dependency` 警告
-2. **构建检测**：使用 `madge` 工具检测
+1. **开发环境**: Vite 控制台会有 `Circular dependency` 警告
+2. **构建检测**: 使用 `madge` 工具检测
    ```bash
    npx madge --circular src/api/
    ```
 
 ### 修复方案优先级
 
-1. **分层重构**：将刷新逻辑抽离到 core 层内部，不依赖业务层
-2. **延迟导入**：使用函数级别的 import，而非模块顶层
-3. **动态 import**：`import('../auth').then(...)`
+1. **分层重构**: 将刷新逻辑抽离到 core 层内部，不依赖业务层
+2. **延迟导入**: 使用函数级别的 import，而非模块顶层
+3. **动态 import**: `import('../auth').then(...)`
 
 ---
 

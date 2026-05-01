@@ -1,14 +1,18 @@
-# 10 - 代码格式与工具链规范
+# 10 - 代码格式与工具链规范（NestJS 后端特有）
 
-## 工具链版本
-
-- **ESLint**: 9.18 (使用 flat config 格式，配置文件 `eslint.config.mjs`)
-- **Prettier**: 3.4.2 (代码格式化)
-- **TypeScript**: 5.7.3 (严格模式开启)
+> **通用代码格式规范**：已抽离至 `.claude/rules/code-format-common.md`，本文件仅定义后端特有规范。
 
 ---
 
-## ESLint 配置要点
+## 1. 工具链版本
+
+- **ESLint**: 9.18（使用 flat config 格式，配置文件 `eslint.config.mjs`）
+- **Prettier**: 3.4.2（代码格式化）
+- **TypeScript**: 5.7.3（严格模式开启）
+
+---
+
+## 2. ESLint 配置要点
 
 当前配置：
 - 继承 `eslint:recommended` + `typescript-eslint/recommended`
@@ -26,7 +30,9 @@
 
 ---
 
-## Prettier 配置
+## 3. Prettier 配置
+
+**通用配置**：见 `.claude/rules/code-format-common.md`
 
 项目配置：
 ```json
@@ -42,17 +48,19 @@
 
 ---
 
-## 导入排序
+## 4. 导入排序（后端特有）
 
-导入按以下顺序分组，每组之间空一行：
+**通用原则**：见 `.claude/rules/code-format-common.md`
 
-1. **NestJS 官方包** (`@nestjs/*`)
-2. **第三方包** (其他 node_modules 包)
-3. **Prisma 类型** (`@prisma/client`)
-4. **内部模块** (`src/...` 或 `@common/...`)
-5. **当前模块相对导入** (`./`, `../`)
+导入按以下顺序分组，每组之间空一行。同一组内按字母顺序排列。
 
-同一组内按字母顺序排序。
+| 顺序 | 分组 | 示例 |
+|------|------|------|
+| 1 | NestJS 官方包 | `@nestjs/*` |
+| 2 | 第三方包 | 其他 node_modules 包 |
+| 3 | Prisma 类型 | `@prisma/client` |
+| 4 | 内部模块 | `src/...` 或 `@common/...` |
+| 5 | 当前模块相对导入 | `./`, `../` |
 
 示例：
 ```typescript
@@ -72,7 +80,7 @@ import { ArticleService } from './article.service';
 
 ---
 
-## 代码格式检查
+## 5. 代码格式检查
 
 开发完成后必须执行：
 
@@ -89,17 +97,7 @@ npx tsc --noEmit
 
 ---
 
-## 缩进与空行
-
-- 缩进使用 2 个空格，不使用 tab
-- 大括号前后需要空格
-- 文件末尾保留一个空行
-- 逻辑块之间保留一个空行提高可读性
-- 导入分组之间保留一个空行
-
----
-
-## 检查清单
+## 6. 检查清单
 
 - [ ] 执行过 `npm run lint --fix` 修复了所有错误？
 - [ ] 执行过 `npm run format` 格式化了所有代码？

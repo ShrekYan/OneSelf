@@ -119,10 +119,29 @@ refactor(auth+backend+log): 抽离通用响应格式
 
 ## 📚 项目规范入口
 
+### 🎯 通用规则（前后端共用）
+
+- **TypeScript 通用规范**: [.claude/rules/typescript-common.md](.claude/rules/typescript-common.md) - 严格模式、any 限制、空值处理、异步规范等
+- **安全通用规范**: [.claude/rules/security-common.md](.claude/rules/security-common.md) - HttpOnly Cookie、Token 安全、密码加密、错误信息安全
+- **代码格式通用规范**: [.claude/rules/code-format-common.md](.claude/rules/code-format-common.md) - 缩进、引号、分号、导入排序、工具链配置
+- **全局行为规范**: [.claude/rules/project-behavior.md](.claude/rules/project-behavior.md) - 代码复用、影响范围确认、安全底线
+
+### 📱 前端特有规范
+
 - **前端 H5 项目信息**: [.claude/projects/frontend-project-info.md](.claude/projects/frontend-project-info.md)
-- **后端 NestJS 项目信息**: [.claude/projects/backend-project-info.md](.claude/projects/backend-project-info.md)
 - **公共组件开发规范**: [.claude/rules/frontend-components.md](.claude/rules/frontend-components.md)
-- **全局行为规范**: [.claude/rules/project-behavior.md](.claude/rules/project-behavior.md)
+- 更多前端规则详见：`.claude/skills/h5-frontend-developer/rules/`
+
+### 🖥️ 后端特有规范
+
+- **后端 NestJS 项目信息**: [.claude/projects/backend-project-info.md](.claude/projects/backend-project-info.md)
+- 更多后端规则详见：`.claude/skills/nestjs-backend-developer/`
+
+### 📐 规范引用原则
+
+- **Agent 自动加载**：前端开发 Agent 和后端架构师 Agent 会自动先加载通用规则，再加载各自技术栈的特有规则
+- **不重复原则**：通用规则在 rules/ 目录统一维护，前后端特有规则只包含该技术栈独有的内容
+- **向后兼容**：原有规则文件保留，只做内容精简，不影响现有工作流
 
 ## ✅ 验证流程
 
