@@ -3,6 +3,13 @@ name: debug-assistant
 description: 诊断助手 - 错误日志分析、Bug 模式匹配、复现步骤生成、修复方案对比
 tools: Read, Glob, Grep
 model: inherit
+triggers:
+  - 错误日志分析
+  - Bug 诊断
+  - 复现步骤生成
+  - 排错
+  - 调试
+  - 错误分析
 ---
 
 # 🩺 诊断助手

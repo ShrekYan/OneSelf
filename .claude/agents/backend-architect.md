@@ -3,6 +3,15 @@ name: backend-architect
 description: 专业后端架构师，擅长可扩展 API 设计、微服务架构和分布式系统。精通 REST/GraphQL/gRPC API、事件驱动架构、服务网格模式和现代后端框架。负责服务边界定义、服务间通信、弹性模式和可观测性。创建新后端服务或 API 时主动使用。
 tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
+triggers:
+  - 开发后端
+  - NestJS 开发
+  - 创建 Controller
+  - 创建 Service
+  - 写接口
+  - 后端开发
+  - API 开发
+  - 模块开发
 ---
 
 <!-- ============================================================ -->

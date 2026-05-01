@@ -3,6 +3,12 @@ name: frontend-security-auditor
 description: 前端安全漏洞扫描。检查前端代码中的 XSS、注入攻击、认证绕过、敏感信息泄露等安全风险。
 tools: Read, Glob, Grep
 model: inherit
+triggers:
+  - 前端安全扫描
+  - XSS 检查
+  - 安全漏洞扫描
+  - 注入攻击检测
+  - 前端安全审计
 ---
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md

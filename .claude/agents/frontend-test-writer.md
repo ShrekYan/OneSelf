@@ -3,6 +3,12 @@ name: frontend-test-writer
 description: 为前端组件和函数编写单元测试和集成测试。使用 Vitest + React Testing Library。专注于 React + MobX 前端项目。
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
+triggers:
+  - 前端单元测试
+  - Vitest 测试
+  - React 测试
+  - 写测试用例
+  - 测试用例编写
 ---
 
 #include: ../skills/frontend-test.md

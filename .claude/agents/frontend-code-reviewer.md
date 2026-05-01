@@ -1,8 +1,15 @@
 ---
-name: frontend-code-reviewer-agent
+name: frontend-code-reviewer
 description: 审查代码质量，专注 TypeScript 类型安全、React 最佳实践和性能问题。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+triggers:
+  - 审查前端代码
+  - 代码质量检查
+  - Code Review
+  - CR 前端
+  - 前端代码审查
+  - 检查代码质量
 ---
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md

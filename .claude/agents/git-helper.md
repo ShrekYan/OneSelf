@@ -2,6 +2,12 @@
 name: git-helper
 description: Git 操作助手，智能生成 Commit 信息、管理分支、生成 PR 描述
 subagent_type: Agent
+triggers:
+  - Git 提交信息
+  - 生成 commit message
+  - 分支管理
+  - PR 描述生成
+  - Git 操作
 ---
 
 #include: ../skills/common/commit.md

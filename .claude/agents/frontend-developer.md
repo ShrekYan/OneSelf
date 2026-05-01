@@ -1,8 +1,19 @@
 ---
-name: frontend-developer-agent
+name: frontend-developer
 description: 构建 React 移动端 H5 组件，遵循项目规范开发。精通 React 19、MobX 和 Vite 移动端架构。
 tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
+triggers:
+  - 开发前端页面
+  - 创建组件
+  - 写前端
+  - 前端开发
+  - 开发 H5
+  - React 开发
+  - 开发页面
+  - 新建页面
+  - 前端组件
+  - Hook 开发
 ---
 
 <!-- ============================================================ -->

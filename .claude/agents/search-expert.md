@@ -3,6 +3,12 @@ name: search-expert
 description: 智能代码搜索专家 - 按功能、组件、调用链搜索全栈代码（React + NestJS）
 tools: Read, Glob, Grep
 model: inherit
+triggers:
+  - 搜索代码
+  - 查找组件
+  - 搜索调用链
+  - 代码搜索
+  - 找文件
 ---
 
 # 代码搜索专家

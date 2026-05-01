@@ -189,7 +189,14 @@ refactor(auth+backend+log): 抽离通用响应格式
 
 ## 🤖 Agent 自动触发规则
 
-当用户输入符合以下特征时，**自动使用对应的专属 Agent**，无需用户手动指定：
+### 🔐 核心调用机制
+
+当用户输入符合以下特征时，**必须使用 `Agent` 工具调用对应的专属 Agent**，无需用户手动指定。
+
+**调用参数说明**：
+- `description`：简短描述任务内容（3-5 个词）
+- `prompt`：详细的任务描述和需求
+- `subagent_type`：下方表格中列的 Agent 名称
 
 ### 前端相关
 | 用户输入特征 | 自动使用 Agent |
@@ -200,6 +207,7 @@ refactor(auth+backend+log): 抽离通用响应格式
 | 前端单元测试编写 | `frontend-test-writer` |
 | 前端安全漏洞扫描 | `frontend-security-auditor` |
 | UI 设计稿转代码、组件设计 | `ui-designer` |
+| 设计系统、主题、组件库架构 | `design-system-architect` |
 
 ### 后端相关
 | 用户输入特征 | 自动使用 Agent |
@@ -209,13 +217,11 @@ refactor(auth+backend+log): 抽离通用响应格式
 | 后端性能问题分析、优化 | `nestjs-performance-audit` |
 | 后端单元测试编写 | `nestjs-test-writer` |
 | 后端安全漏洞扫描 | `nestjs-security-audit` |
-| 微服务间接口联调、契约设计 | `api-integration` |
+| 解析接口文档生成前后端 API 代码 | `api-parser` |
 
 ### 架构与跨系统相关
 | 用户输入特征 | 自动使用 Agent |
 |-------------|---------------|
-| 开发共享包、公共工具库 | `package-developer` |
-| 跨系统架构设计、重构 | `architect-planner` |
 | 生成架构图、流程图、序列图 | `mermaid-generator` |
 
 ### 通用工具
@@ -224,3 +230,4 @@ refactor(auth+backend+log): 抽离通用响应格式
 | 搜索代码、组件、调用链 | `search-expert` |
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
 | 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
+| Git 提交信息生成、分支管理、PR 描述 | `git-helper` |

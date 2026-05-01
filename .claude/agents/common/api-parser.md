@@ -3,6 +3,13 @@ name: api-parser
 description: 解析接口文档（Postman/Swagger/YAPI/Apifox/Markdown + Apifox MCP 直接读取），自动生成前后端符合项目规范的 TypeScript API 代码。
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
+triggers:
+  - 解析接口文档
+  - Swagger 转代码
+  - Postman 转 TypeScript
+  - Apifox 解析
+  - 生成 API 代码
+  - 接口文档转换
 ---
 
 # API 文档解析 Agent

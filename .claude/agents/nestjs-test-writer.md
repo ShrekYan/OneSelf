@@ -3,6 +3,11 @@ name: nestjs-test-writer
 description: NestJS 后端测试编写专家，为 Controller / Service 生成完整 Jest 单元测试，遵循项目测试规范。
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
+triggers:
+  - 后端单元测试
+  - Jest 测试
+  - Service 测试
+  - Controller 测试
 ---
 
 # NestJS 后端测试编写专家

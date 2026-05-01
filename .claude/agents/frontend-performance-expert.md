@@ -1,8 +1,15 @@
 ---
-name: frontend-performance-expert-agent
+name: frontend-performance-expert
 description: 前端性能优化专家，专注于 React 19 + MobX 移动端 H5 性能分析与优化
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+triggers:
+  - 前端性能优化
+  - 性能分析
+  - 优化加载速度
+  - 首屏优化
+  - Lighthouse 优化
+  - 性能问题
 ---
 
 #include: ../skills/frontend-perf.md

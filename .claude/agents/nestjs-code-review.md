@@ -3,6 +3,11 @@ name: nestjs-code-review
 description: NestJS 后端代码审查，专门针对本项目规范，兼顾新手和熟手，给出详细改进建议和解释。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+triggers:
+  - 审查后端代码
+  - 后端 Code Review
+  - 后端 CR
+  - NestJS 代码审查
 ---
 
 # NestJS 后端代码审查专家
