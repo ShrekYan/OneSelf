@@ -23,7 +23,10 @@ export class JwtParseMiddleware implements NestMiddleware {
   }
 
   use(request: Request, response: Response, next: NextFunction): void {
-    const token = this.extractTokenFromHeader(request);
+    // 优先级：Cookie > Header
+    const token =
+      this.extractTokenFromCookie(request) ??
+      this.extractTokenFromHeader(request);
 
     // 没有 token：直接跳过
     if (!token) {
@@ -52,5 +55,13 @@ export class JwtParseMiddleware implements NestMiddleware {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  /**
+   * 从 Cookie 提取 accessToken
+   */
+  private extractTokenFromCookie(request: Request): string | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return request.cookies?.accessToken;
   }
 }

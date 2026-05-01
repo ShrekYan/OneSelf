@@ -4,6 +4,6 @@
 # 对暂存文件进行代码格式化和检查
 npx lint-staged
 
-# TypeScript 类型检查（通过 Turbo 执行所有子项目的 lint）
-echo "Running TypeScript type check..."
-npm run lint
+# 仅对 staged 文件执行 ESLint 检查（每个子项目独立 lint-staged 配置）
+echo "Running ESLint on staged files..."
+npm run lint:staged

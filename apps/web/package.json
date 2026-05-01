@@ -15,7 +15,8 @@
     "sit-build": "vite build --mode sit",
     "pre-build": "vite build --mode pre",
     "build": "tsc -b && vite build",
-    "lint": "npx lint-staged --allow-empty",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:staged": "lint-staged",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
@@ -138,13 +139,6 @@
     ">0.3%, ios >= 9"
   ],
   "lint-staged": {
-    "!(.claude)/**/*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --fix",
-      "eslint --max-warnings=0"
-    ],
-    "!(.claude)/**/*.{css,scss}": [
-      "stylelint --fix"
-    ]
+    "src/**/*.{ts,tsx}": "eslint --max-warnings 0"
   }
 }

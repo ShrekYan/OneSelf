@@ -18,7 +18,7 @@ export class TransformInterceptor<T> implements NestInterceptor<
     next: CallHandler<T>,
   ): Observable<ApiResult<T> | Record<string, unknown>> {
     return next.handle().pipe(
-      map((data) => {
+      map(data => {
         // 如果已经是 ApiResult 格式，直接返回，不再重复包装
         if (data instanceof ApiResult) {
           return data;

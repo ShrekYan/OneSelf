@@ -1,22 +1,22 @@
-# NestJS TypeScript 开发规范
+# NestJS TypeScript 开发规范（后端特有）
 
-本文档定义 NestJS 后端项目的 TypeScript 开发规范。本项目是前后端分离项目，后端独立维护自身开发规范。
+> **通用 TypeScript 规范**：已抽离至 `.claude/rules/typescript-common.md`，本文件仅定义后端特有规范。
 
 ---
 
-## 核心原则
+## 核心原则补充
 
-- **严格模式**: 必须开启 `strict: true`，严禁关闭核心检查
-- **零 any**: 严禁滥用 `any`，应使用 `unknown` 结合类型守卫
-- **类型优先**: 先定义类型/DTO/Entity，再编写业务逻辑
+- **严格模式**: 必须开启 `strict: true`（通用规范已定义）
+- **零 any**: 严禁滥用 `any`，应使用 `unknown` 结合类型守卫（通用规范已定义）
+- **类型优先**: 先定义类型/DTO/Entity，再编写业务逻辑（通用规范已定义）
 - **class 优先**: NestJS 基于类架构，DTO、Entity、Controller 都使用 class
 - **装饰器规范**: 正确使用 NestJS/Prisma/TypeORM 装饰器
 
 ---
 
-## 基础类型声明
+## 1. 基础类型声明规范
 
-### type vs interface vs class
+### type vs interface vs class 选择
 
 | 场景 | 使用 | 示例 |
 |---|---|---|
@@ -38,19 +38,14 @@ enum UserStatus {
 }
 ```
 
-### 空值处理
-
-- 可选字段 `?:`，可能为 `null` 必须 `T | null`
-- 使用可选链 `?.`，空值合并 `??`
-
 ---
 
-## 类与装饰器规范
+## 2. 类与装饰器规范
 
 ### DTO 类（数据传输对象）
 
 - 必须使用 `class`
-- 每个字段必须添加校验装饰器 (`@IsString()`, `@IsInt()`, 等)
+- 每个字段必须添加校验装饰器（`@IsString()`, `@IsInt()` 等）
 - 使用 `class-validator` + `class-transformer`
 - 分组校验（创建 vs 更新）
 
@@ -100,7 +95,7 @@ export class User {
 
 - 类名必须以 `Controller` 结尾
 - 路由路径使用 `@Controller()` 装饰器
-- HTTP 方法使用正确的装饰器 (`@Get()`, `@Post()`, `@Put()`, `@Delete()`)
+- HTTP 方法使用正确的装饰器（`@Get()`, `@Post()`, `@Put()`, `@Delete()`）
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
@@ -119,7 +114,7 @@ export class UsersController {
 
 ---
 
-## 依赖注入
+## 3. 依赖注入规范
 
 - 构造函数注入，必须添加 `private readonly`
 - 不要使用属性注入（不稳定）
@@ -135,7 +130,7 @@ constructor(usersService: UsersService) {} // 缺少 private readonly
 
 ---
 
-## 异步与错误处理
+## 4. 异步与错误处理规范
 
 - 所有异步方法必须显式标注 `Promise<T>` 返回类型
 - 使用 `try/catch` 捕获异常
@@ -152,9 +147,7 @@ async findOne(id: number): Promise<User> {
 }
 ```
 
----
-
-## 错误处理
+### 错误处理原则
 
 - 使用 NestJS 内置异常层：`HttpException` 及其子类
 - 自定义异常继承 `HttpException`
@@ -171,7 +164,7 @@ try {
 
 ---
 
-## 项目特定规则
+## 5. 项目特定规则
 
 ### Prisma 使用规范
 
@@ -193,9 +186,37 @@ model User {
 - 统一返回格式，分页数据使用 `{ data: T[], total: number }`
 - 错误码遵循 HTTP 状态码语义
 
+### 密码加密规范
+
+**通用安全规范**：见 `.claude/rules/security-common.md`
+
+- **必须使用 Argon2id 算法**（通过 `argon2` 包）
+- ❌ **不再使用 bcrypt**：抗 GPU/ASIC 攻击能力弱
+- 推荐配置：
+  - `type: argon2.argon2id`
+  - `memoryCost: 1 << 16`（64MB）
+  - `timeCost: 3`
+  - `parallelism: 1`
+
+```typescript
+// ✅ 正确示例
+import * as argon2 from 'argon2';
+
+// 哈希密码
+const passwordHash = await argon2.hash(password, {
+  type: argon2.argon2id,
+  memoryCost: 1 << 16,
+  timeCost: 3,
+  parallelism: 1,
+});
+
+// 验证密码
+const isValid = await argon2.verify(passwordHash, password);
+```
+
 ---
 
-## 检查清单
+## 6. 检查清单
 
 生成代码前，请确认：
 

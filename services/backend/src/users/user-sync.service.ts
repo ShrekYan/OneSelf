@@ -131,7 +131,7 @@ export class UserSyncService {
       // 4. 异步清理旧版本（不阻塞启动）
       if (oldVersion !== null && oldVersion !== newVersion) {
         setImmediate(() => {
-          void this.cleanupOldVersion(oldVersion!).catch((err) => {
+          void this.cleanupOldVersion(oldVersion!).catch(err => {
             this.logger.error(
               `Failed to cleanup old version ${oldVersion}, will retry on next sync: ${err instanceof Error ? err.message : String(err)}`,
             );
@@ -233,7 +233,7 @@ export class UserSyncService {
 
       // 给 Redis 喘口气，避免批量删除占满 CPU
       if (deletedCount % 10000 === 0 && deletedCount > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100));
         this.logger.debug(
           `Cleaned up ${deletedCount} keys from old version ${oldVersion}`,
         );

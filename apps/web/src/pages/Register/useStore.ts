@@ -118,10 +118,9 @@ export const useRegisterStore = () => {
           skipErrorToast: true, // 不使用拦截器自动提示，我们自己处理
         });
 
-        // 保存 token 和用户信息到 localStorage
-        localStorage.setItem('accessToken', result.accessToken);
-        localStorage.setItem('refreshToken', result.refreshToken);
-        localStorage.setItem('userInfo', JSON.stringify(result.user));
+        // ✅ Token 由后端通过 HttpOnly Cookie 设置，前端不存储（防 XSS 攻击）
+        // ✅ userInfo 存储在 sessionStorage，浏览器关闭时自动清除
+        sessionStorage.setItem('userInfo', JSON.stringify(result.user));
 
         this.isLoading = false;
 

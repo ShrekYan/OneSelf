@@ -1,3 +1,11 @@
+---
+name: frontend-components-spec
+description: 公共组件开发规范
+---
+
+#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
+#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+
 # 公共组件开发规范
 
 本文档定义 `apps/web/src/components/` 目录下**全局公共组件**的开发规范，所有公共组件必须遵循此规范。
@@ -206,68 +214,6 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ src, size = 40, onClick }) => {
     </div>
   );
 };
-```
-
----
-
-## 移动端适配
-
-| 适配项 | 要求 | 代码示例 |
-|--------|------|---------|
-| 点击区域 | 可点击元素最小尺寸 **≥ 44px × 44px**（750 设计稿 88px | `min-height: 88px;` |
-| 单位 | 基于 750px 设计稿写 px，插件自动转 vw | `width: 200px;` |
-| 安全区域 | 底部组件适配底部安全区域 | `padding-bottom: env(safe-area-inset-bottom);` |
-| 点击反馈 | 可点击元素 `:active` 状态透明度变化 | `&:active { opacity: 0.8; }` |
-
-```scss
-// 完整示例
-.actionButton {
-  min-height: 88px;
-  padding-bottom: env(safe-area-inset-bottom);
-  &:active {
-    opacity: 0.8;
-  }
-}
-```
-
----
-
-## 性能优化
-
-| 优化手段 | 适用场景 |
-|----------|---------|
-| `React.memo` | 频繁重渲染的组件，props 变化不频繁 |
-| `useCallback` | 传递给子组件的回调函数 |
-| `useMemo` | 复杂计算结果、大数组、对象计算 |
-| 懒加载 | 非首屏大图、长列表、低优先级组件 |
-
-```typescript
-// ✅ 标准写法
-const MyComponent = React.memo<MyProps>(({ data, onItemClick }) => {
-  const handleClick = useCallback((id) => onItemClick(id), [onItemClick]);
-
-  const sortedData = useMemo(() => heavySort(data), [data]);
-
-  // ...
-});
-```
-
----
-
-## 错误处理
-
-| 场景 | 处理方案 |
-|------|---------|
-| 高风险动态组件 | 嵌套 `ErrorBoundary` 隔离 |
-| 普通组件 | 使用项目内置 `ErrorFallback` |
-
-```tsx
-import { ErrorBoundary } from 'react-error-boundary';
-import ErrorFallback from '@/components/ErrorFallback';
-
-<ErrorBoundary FallbackComponent={ErrorFallback}>
-  <HighRiskComponent />
-</ErrorBoundary>
 ```
 
 ---

@@ -24,7 +24,10 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    // 优先级：Cookie > Header
+    const token =
+      this.extractTokenFromCookie(request) ??
+      this.extractTokenFromHeader(request);
 
     if (!token) {
       throw new UnauthorizedException({
@@ -55,5 +58,13 @@ export class JwtAuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  /**
+   * 从 Cookie 提取 accessToken
+   */
+  private extractTokenFromCookie(request: Request): string | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return request.cookies?.accessToken;
   }
 }

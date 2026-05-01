@@ -5,11 +5,15 @@ import './preload';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   //AppModule 是 NestJS 应用的根模块，负责启动应用并配置全局依赖。
   const app = await NestFactory.create(AppModule);
+
+  // Cookie 解析中间件（XSS 防护：HttpOnly Cookie 存储 Token）
+  app.use(cookieParser());
 
   // 全局验证管道：自动校验所有进入控制器的请求体/DTO
   // whitelist=true          → 只保留 DTO（Data Transfer Object，数据传输对象）中声明的属性，多余字段被过滤

@@ -5,9 +5,11 @@ import {
   Ip,
   UseGuards,
   Req,
+  Res,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 // AuthService has been migrated to auth-service and deleted
@@ -37,6 +39,7 @@ import { BusinessErrorCode } from '../common/constants/business-error-codes';
 @Controller('auth')
 export class AuthController {
   private readonly remoteAuthEnabled: boolean;
+  private readonly isProduction: boolean;
 
   constructor(
     // AuthService migrated to auth-service
@@ -48,6 +51,24 @@ export class AuthController {
       'REMOTE_AUTH_ENABLE',
       true, // Default to true after full migration
     );
+    this.isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+  }
+
+  /**
+   * 转发 auth-service 返回的 Set-Cookie 到客户端
+   */
+  private forwardAuthCookies(
+    res: Response,
+    sourceHeaders: Record<string, string[]>,
+  ): void {
+    const setCookie =
+      sourceHeaders['set-cookie'] || sourceHeaders['Set-Cookie'];
+    if (setCookie && Array.isArray(setCookie)) {
+      setCookie.forEach(cookie => {
+        res.append('Set-Cookie', cookie);
+      });
+    }
   }
 
   @Post('login')
@@ -81,14 +102,18 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Ip() clientIp: string,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
     if (this.remoteAuthEnabled) {
-      const response = await this.authClient.forwardRequest<{
-        code: number;
-        message: string;
-        data: LoginResponseDto;
-      }>('auth/login', { ...loginDto, clientIp });
-      return response.data;
+      const { data, headers } =
+        await this.authClient.forwardRequestWithHeaders<{
+          code: number;
+          message: string;
+          data: LoginResponseDto;
+        }>('auth/login', { ...loginDto, clientIp });
+      // 转发 auth-service 返回的 HttpOnly Cookie 到前端
+      this.forwardAuthCookies(res, headers);
+      return data.data;
     }
     // return this.authService.login(loginDto, clientIp);
     throw new Error('Local authentication is disabled');
@@ -107,15 +132,38 @@ export class AuthController {
     description: '刷新令牌无效或已过期',
   })
   async refreshToken(
-    @Body('refreshToken') refreshToken: string,
+    // ✅ 优先级：Cookie > Body（兼容新旧两种模式）
+    @Body('refreshToken') refreshTokenFromBody: string | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<RefreshResponseDto> {
     if (this.remoteAuthEnabled) {
-      const response = await this.authClient.forwardRequest<{
-        code: number;
-        message: string;
-        data: RefreshResponseDto;
-      }>('auth/refresh', { refreshToken });
-      return response.data;
+      // ✅ 修复：严谨的空值判断，排除空字符串
+
+      const refreshTokenFromCookie = req.cookies?.refreshToken;
+      const refreshToken =
+        refreshTokenFromCookie && refreshTokenFromCookie.trim() !== ''
+          ? (refreshTokenFromCookie as string)
+          : refreshTokenFromBody;
+
+      // ✅ 修复：没有有效 Token 时提前返回 410
+      if (!refreshToken) {
+        throw new UnauthorizedException({
+          code: 'MISSING_REFRESH_TOKEN',
+          message: '缺少刷新令牌',
+        });
+      }
+
+      const { data, headers } =
+        await this.authClient.forwardRequestWithHeaders<{
+          code: number;
+          message: string;
+          data: RefreshResponseDto;
+        }>('auth/refresh', { refreshToken });
+      // 转发 auth-service 返回的 HttpOnly Cookie 到前端
+      this.forwardAuthCookies(res, headers);
+
+      return data.data;
     }
     // return this.authService.refreshToken(refreshToken);
     throw new Error('Local authentication is disabled');
@@ -132,6 +180,7 @@ export class AuthController {
   async logout(
     @CurrentUserId() userId: string,
     @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
     @Body('refreshToken') refreshToken?: string,
   ) {
     if (this.remoteAuthEnabled) {
@@ -146,14 +195,18 @@ export class AuthController {
         : undefined;
 
       try {
-        await this.authClient.forwardRequest(
-          'auth/logout',
-          {
-            userId,
-            refreshToken,
-          },
-          headers,
-        );
+        const { headers: responseHeaders } =
+          await this.authClient.forwardRequestWithHeaders(
+            'auth/logout',
+            {
+              userId,
+              refreshToken,
+            },
+            headers,
+          );
+
+        // 转发 auth-service 的清除 Cookie 响应
+        this.forwardAuthCookies(res, responseHeaders);
 
         return { message: '登出成功' };
       } catch (error: unknown) {
@@ -161,10 +214,10 @@ export class AuthController {
 
         // 如果 auth-service 返回了 HTTP 错误响应（如 401）
         // 使用项目标准 BusinessException 抛出，让全局过滤器处理
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+
         if ((error as any).response) {
           // Type assertion for axios error response structure
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+
           const errorResponse = (error as any).response as {
             status?: number;
             data?: { message?: string };
@@ -225,14 +278,18 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDto,
     @Ip() clientIp: string,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<RegisterResponseDto> {
     if (this.remoteAuthEnabled) {
-      const response = await this.authClient.forwardRequest<{
-        code: number;
-        message: string;
-        data: RegisterResponseDto;
-      }>('auth/register', { ...registerDto, clientIp });
-      return response.data;
+      const { data, headers } =
+        await this.authClient.forwardRequestWithHeaders<{
+          code: number;
+          message: string;
+          data: RegisterResponseDto;
+        }>('auth/register', { ...registerDto, clientIp });
+      // 转发 auth-service 返回的 HttpOnly Cookie 到前端
+      this.forwardAuthCookies(res, headers);
+      return data.data;
     }
     // return this.authService.register(registerDto, clientIp);
     throw new Error('Local authentication is disabled');

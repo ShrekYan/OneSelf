@@ -1,4 +1,4 @@
-import api from '../core/axios-instance';
+import { api } from '@/api';
 
 /**
  * 刷新令牌请求参数
@@ -70,14 +70,16 @@ import type { RequestConfig } from '../core/types';
 
 /**
  * 使用刷新令牌获取新的访问令牌
- * @param refreshToken - 刷新令牌
+ * ✅ Cookie 模式：refreshToken 从 HttpOnly Cookie 自动读取，无需传参
+ * @param refreshToken - 刷新令牌（可选，兼容旧用户从 localStorage 传入）
  * @returns 新的访问令牌信息
  */
 export async function refreshToken(
-  refreshToken: string,
+  refreshToken?: string,
 ): Promise<RefreshTokenResponse> {
   return await api.post('/api/v1/auth/refresh', { refreshToken }, {
     skipErrorToast: true,
+    skipAuth: true, // 刷新 Token 接口不需要认证，避免 401 时无限循环
   } as RequestConfig);
 }
 
@@ -128,4 +130,16 @@ export async function login(
   config?: RequestConfig,
 ): Promise<LoginResponse> {
   return await api.post('/api/v1/auth/login', data, config);
+}
+
+/**
+ * 获取当前登录用户信息
+ * ✅ skipAuth：不需要认证，避免 401 拦截导致死循环
+ * ✅ skipErrorToast：静默失败，统一由 RouteInterceptor 处理跳转
+ */
+export async function getCurrentUser(): Promise<UserDto> {
+  return await api.post('/api/v1/user/info', {}, {
+    skipAuth: true,
+    skipErrorToast: true,
+  } as RequestConfig);
 }

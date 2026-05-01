@@ -2,7 +2,7 @@
  * 移动端登录页面
  * @description 移动端用户登录页面，包含手机号/用户名、密码输入、协议勾选等功能
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,9 +12,11 @@ import { useLoginStore } from './useStore';
 import { loginSchema, type LoginFormData } from './schema';
 import {
   handleForgotPassword,
+  handleRegister,
   handleUserAgreement,
   handlePrivacyPolicy,
 } from './handle';
+import { safeRedirectUrl } from '@/utils/security';
 import styles from './index.module.scss';
 
 /**
@@ -41,15 +43,13 @@ const Login: React.FC = () => {
   });
 
   /**
-   * 从 URL query 获取重定向地址
+   * 从 URL query 获取安全的重定向地址
+   * 使用安全验证函数防止开放重定向攻击
    */
   const getRedirectUrl = (): string => {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
-    if (redirect) {
-      return redirect;
-    }
-    return '/';
+    return safeRedirectUrl(redirect);
   };
 
   // 监听协议勾选状态
@@ -58,16 +58,58 @@ const Login: React.FC = () => {
   /**
    * 跳转到注册页面
    */
-  const goToRegister = () => {
+  const goToRegister = useCallback(() => {
     navigate('/register');
-  };
+  }, [navigate]);
 
   /**
    * 跳转到忘记密码页面
    */
-  const goToForgotPassword = () => {
+  const goToForgotPassword = useCallback(() => {
     navigate('/forgot-password');
-  };
+  }, [navigate]);
+
+  /**
+   * 处理忘记密码点击
+   */
+  const handleForgotPasswordClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    handleForgotPassword();
+    goToForgotPassword();
+  }, [goToForgotPassword, handleForgotPassword]);
+
+  /**
+   * 处理用户协议点击
+   */
+  const handleUserAgreementClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    handleUserAgreement();
+    Toast.show({
+      content: 'Open user agreement page',
+      position: 'bottom',
+    });
+  }, [handleUserAgreement]);
+
+  /**
+   * 处理隐私政策点击
+   */
+  const handlePrivacyPolicyClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    handlePrivacyPolicy();
+    Toast.show({
+      content: 'Open privacy policy page',
+      position: 'bottom',
+    });
+  }, [handlePrivacyPolicy]);
+
+  /**
+   * 处理注册链接点击
+   */
+  const handleRegisterLinkClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    handleRegister();
+    goToRegister();
+  }, [goToRegister, handleRegister]);
 
   /**
    * 处理登录提交
@@ -76,7 +118,6 @@ const Login: React.FC = () => {
   const onSubmit = handleSubmit(async (formData: LoginFormData) => {
     try {
       const apiResult = await store.login(formData);
-      console.log(apiResult);
       if (apiResult.success) {
         Toast.show({
           icon: 'success',
@@ -96,7 +137,10 @@ const Login: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Login error:', error);
+      // 生产环境不输出详细错误堆栈
+      if (import.meta.env.DEV) {
+        console.error('Login error:', error);
+      }
       Toast.show({
         icon: 'fail',
         content: 'Login failed, please try again later',
@@ -225,11 +269,7 @@ const Login: React.FC = () => {
               <a
                 href="#"
                 className={styles.forgotLink}
-                onClick={e => {
-                  e.preventDefault();
-                  handleForgotPassword();
-                  goToForgotPassword();
-                }}
+                onClick={handleForgotPasswordClick}
               >
                 Forgot Password
               </a>
@@ -247,10 +287,7 @@ const Login: React.FC = () => {
                 <a
                   href="#"
                   className={styles.link}
-                  onClick={e => {
-                    e.preventDefault();
-                    handleUserAgreement();
-                  }}
+                  onClick={handleUserAgreementClick}
                 >
                   User Agreement
                 </a>
@@ -258,10 +295,7 @@ const Login: React.FC = () => {
                 <a
                   href="#"
                   className={styles.link}
-                  onClick={e => {
-                    e.preventDefault();
-                    handlePrivacyPolicy();
-                  }}
+                  onClick={handlePrivacyPolicyClick}
                 >
                   Privacy Policy
                 </a>
@@ -301,10 +335,7 @@ const Login: React.FC = () => {
             <a
               href="#"
               className={styles.registerLink}
-              onClick={e => {
-                e.preventDefault();
-                goToRegister();
-              }}
+              onClick={handleRegisterLinkClick}
             >
               Sign Up
             </a>

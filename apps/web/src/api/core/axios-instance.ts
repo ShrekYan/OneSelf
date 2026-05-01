@@ -51,6 +51,7 @@ const isDev = () => {
 const api: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
+  withCredentials: true, // 跨域携带 Cookie（HttpOnly Token 防 XSS 攻击）
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
   },
@@ -77,13 +78,12 @@ function handleBusinessError(data: ApiResponse, config: RequestConfig) {
   }
 
   // 特殊错误码处理
-  // 只有 410 = token 失效 才需要清除 token 跳转登录
-  // 1001 等业务错误码，即使 code !== 200 也只是业务错误，不需要跳转
-  if (!config.skipAuth && data.code === 410) {
-    // 未授权，清除所有 token 和用户信息并跳转登录
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userInfo');
+  // 只有 410 = token 失效 才需要清除用户信息并跳转登录
+  // ✅ Token 由后端 HttpOnly Cookie 机制处理，前端无需手动清除
+  // ✅ skipRedirect 与 skipAuth 解耦：refreshToken 可跳过认证但不跳过重定向
+  if (!config.skipRedirect && data.code === 410) {
+    // 未授权，清除用户信息并跳转登录
+    sessionStorage.removeItem('userInfo');
     // 重置 MobX 内存状态
     const rootStore = getRootStore();
     if (rootStore?.app) {
@@ -167,31 +167,39 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
         errorType = ErrorType.UNAUTHORIZED;
         errorMessage = '访问令牌已过期';
 
-        // 已标记为重试，不重复刷新，直接返回错误
-        if (config.__isRetry) {
-          errorMessage = '刷新后请求仍然失败';
-          break;
-        }
-
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        // 没有刷新令牌，直接清除所有令牌跳转登录
-        if (!refreshToken) {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userInfo');
-          // 重置 MobX 内存状态
+        // ✅ 如果是刷新 token 接口本身失败（skipAuth=true），直接跳转登录
+        // 避免无限递归调用 refreshToken（当 Cookie 中 refreshToken 也失效时）
+        if (config.skipAuth) {
+          sessionStorage.removeItem('userInfo');
           const rootStore = getRootStore();
           if (rootStore?.app) {
             rootStore.app.reset();
+          }
+          if (!config.skipErrorToast) {
+            Toast.show({
+              icon: 'fail',
+              content: '会话已过期，请重新登录',
+            });
           }
           const currentUrl =
             window.location.pathname +
             window.location.search +
             window.location.hash;
           window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+          return Promise.reject(
+            new ApiError(errorMessage, errorType, status, error),
+          );
+        }
+
+        // 已标记为重试，不重复刷新，直接返回错误
+        if (config.__isRetry) {
+          errorMessage = '刷新后请求仍然失败';
           break;
         }
+
+        // ✅ Cookie 模式：refreshToken 存储在 HttpOnly Cookie 中，前端读不到
+        // 直接调用刷新接口，后端会从 Cookie 读取 refreshToken
+        // 只有刷新接口返回失败（refreshToken 也过期了），才跳转登录
 
         // 如果正在刷新中，将请求加入队列等待
         if (isRefreshing) {
@@ -205,23 +213,23 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
           });
         }
 
-        // 开始刷新
+        // 开始刷新：不传参数，后端从 Cookie 读取 refreshToken
+        // ✅ 兼容新旧用户：旧用户 localStorage 有值、新用户 Cookie 有值，后端都支持
         isRefreshing = true;
         defaultApi.auth
-          .refreshToken(refreshToken)
+          .refreshToken()
           .then(response => {
-            // 刷新成功，保存新 token
-            localStorage.setItem('accessToken', response.accessToken);
+            // ✅ Token 刷新后由后端通过 HttpOnly Cookie 更新
+            // 前端不存储 accessToken，仅传递给等待的请求用于 Header 兼容
             isRefreshing = false;
             resolvePendingRequests(response.accessToken);
             return Promise.resolve(response.accessToken);
           })
           .catch(() => {
-            // 刷新失败（refreshToken 也失效了），清除所有 token 跳转登录
+            // 刷新失败（refreshToken 也失效了），清除用户信息跳转登录
+            // ✅ Token 由后端 HttpOnly Cookie 机制处理，前端无需手动清除
             isRefreshing = false;
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userInfo');
+            sessionStorage.removeItem('userInfo');
             // 重置 MobX 内存状态
             const rootStore = getRootStore();
             if (rootStore?.app) {
@@ -266,11 +274,10 @@ async function handleStatusError(error: AxiosError, config: RequestConfig) {
       case 410:
         errorType = ErrorType.UNAUTHORIZED;
         errorMessage = '未授权，请重新登录';
-        // 只有不需要skipAuth=false 不对，应该是：只有非 skipAuth 才跳转
-        if (!config.skipAuth) {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userInfo');
+        // ✅ Token 由后端 HttpOnly Cookie 机制处理，前端无需手动清除
+        // ✅ skipRedirect 与 skipAuth 解耦
+        if (!config.skipRedirect) {
+          sessionStorage.removeItem('userInfo');
           // 重置 MobX 内存状态
           const rootStore = getRootStore();
           if (rootStore?.app) {
@@ -364,13 +371,8 @@ api.interceptors.request.use(
     requestConfig.cancelToken = source.token;
     cancelManager.addRequest(requestConfig, source);
 
-    // 添加认证 token
-    if (!requestConfig.skipAuth) {
-      const token = localStorage.getItem('accessToken');
-      if (token && requestConfig.headers) {
-        requestConfig.headers.Authorization = `Bearer ${token}`;
-      }
-    }
+    // ✅ Cookie Only 认证模式：Token 由 HttpOnly Cookie 自动携带
+    // 前端不存储也不手动设置 Authorization Header，防止 XSS 窃取
 
     // 添加时间戳
     if (requestConfig.method === 'get') {

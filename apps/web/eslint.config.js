@@ -40,7 +40,7 @@ export default tseslint.config(
     },
   },
 
-  // 5. React specific rules
+  // 6. React specific rules
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {

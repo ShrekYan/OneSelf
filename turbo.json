@@ -12,6 +12,10 @@
     "lint": {
       "outputs": []
     },
+    "lint:staged": {
+      "outputs": [],
+      "cache": false
+    },
     "test": {
       "outputs": []
     }

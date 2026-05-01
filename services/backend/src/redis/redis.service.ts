@@ -102,7 +102,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
           stack: error instanceof Error ? error.stack : undefined,
           env: process.env.NODE_ENV || 'development',
         });
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise(resolve => setTimeout(resolve, delay));
         await this.connectWithRetry(retryCount + 1);
       } else {
         const msg = `Redis connection failed after ${this.maxRetries} retries. Giving up.`;
@@ -253,7 +253,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     try {
       const result = await this.redis.del(...keys);
       // 对每个键都记录日志
-      keys.forEach((key) => {
+      keys.forEach(key => {
         this.logRedisOperation('del', key, true);
       });
       return result;
@@ -281,9 +281,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   /**
    * Scan keys - 转发所有参数到原生 scan 方法
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   scan(...args: any[]): Promise<[string, string[]]> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
     return (this.redis.scan as any)(...args);
   }
 }

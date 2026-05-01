@@ -3,6 +3,14 @@ name: mermaid-generator
 description: 专业的 Mermaid 图表生成专家，严格遵循项目语法规范生成流程图、架构图、序列图。
 tools: Read
 model: inherit
+triggers:
+  - 画架构图
+  - 生成流程图
+  - 时序图
+  - 序列图
+  - Mermaid 图表
+  - 架构图
+  - 数据流图
 ---
 
 # 角色定位

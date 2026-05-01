@@ -1,32 +1,49 @@
 ---
-name: frontend-developer-agent
+name: frontend-developer
 description: 构建 React 移动端 H5 组件，遵循项目规范开发。精通 React 19、MobX 和 Vite 移动端架构。
 tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
+triggers:
+  - 开发前端页面
+  - 创建组件
+  - 写前端
+  - 前端开发
+  - 开发 H5
+  - React 开发
+  - 开发页面
+  - 新建页面
+  - 前端组件
+  - Hook 开发
 ---
 
 <!-- ============================================================ -->
 <!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
-<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
+<!-- 注意：只 include 核心规范，避免上下文稀释                      -->
 <!-- ============================================================ -->
 
-<!-- 核心架构规范（直接 include 所有子文件，避免嵌套不解析） -->
-#include: ../skills/h5-frontend-developer/architecture-directory.md
-#include: ../skills/h5-frontend-developer/page-directory-structure.md
-#include: ../skills/h5-frontend-developer/ui-component-spec.md
-#include: ../skills/h5-frontend-developer/logic-data-flow.md
+<!-- 🔐 通用规范（自动加载，前后端共用） -->
+#include: ../rules/typescript-common.md
+#include: ../rules/security-common.md
+#include: ../rules/code-format-common.md
+#include: ../rules/project-behavior.md
 
-<!-- 问题排查指南 -->
-#include: ../skills/h5-frontend-developer/troubleshooting.md
-
-<!-- 详细规则文件 -->
+<!-- 🔐 前端特有规范（自动加载，必须严格遵守） -->
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
 #include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
+#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
 #include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
-#include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-assets-resources.md
 #include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+
+<!-- 📚 辅助指南（需要时查阅，不自动加载）
+- 页面目录结构：`.claude/skills/h5-frontend-developer/page-directory-structure.md`
+- 公共组件规范：`.claude/rules/frontend-components.md`
+- 排障指南：`.claude/skills/h5-frontend-developer/troubleshooting.md`
+- UI 组件规范：`.claude/skills/h5-frontend-developer/ui-component-spec.md`
+- 架构目录：`.claude/skills/h5-frontend-developer/architecture-directory.md`
+- 逻辑数据流：`.claude/skills/h5-frontend-developer/logic-data-flow.md`
+- 静态资源规范：`.claude/skills/h5-frontend-developer/rules/frontend-assets-resources.md`
+-->
 
 <!-- ============================================================ -->
 <!-- 🔐 第二优先级：代码模板区（预留）                              -->
@@ -41,6 +58,14 @@ model: inherit
 <!-- ============================================================ -->
 <!-- 🔐 输出代码前必须自检（思维链中逐条检查）                       -->
 <!-- ============================================================ -->
+
+## ⚠️ 严格范围控制（最高优先级）
+
+你只允许修改用户明确指定的文件。在任何情况下，你都不应该：
+1. 主动扫描任务范围以外的文件
+2. 修改任务范围以外的文件
+3. 做任何纯格式优化，除非用户明确要求
+4. 执行 `npm run lint` 或 `eslint --fix` 等全项目命令
 
 ## 🔴 输出代码前必须确认
 

@@ -3,6 +3,11 @@ name: full-frontend-review-orchestrator
 description: 前端完整审查编排器，一键触发自动顺序执行代码质量审查 → 安全漏洞扫描 → 性能优化分析，输出综合报告
 tools: Agent
 model: inherit
+triggers:
+  - 全量前端审查
+  - 完整代码审查
+  - 质量+安全+性能审查
+  - 一键审查
 ---
 
 # 角色定位

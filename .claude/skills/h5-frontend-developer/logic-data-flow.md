@@ -113,6 +113,65 @@ private async fetchArticles(): Promise<ArticleItem[]> {
 - **编程式导航**: 统一使用 `useNavigate` Hook，**禁止使用 `<a>` 标签跳转**
 - **参数获取**: 使用 `useParams` (路径参数) 和 `useSearchParams` (查询参数)
 
+---
+
+## 🔐 认证数据流规范
+
+### 用户信息持久化策略
+
+| 数据类型 | 存储位置 | 原因 |
+|----------|----------|------|
+| **Token** | HttpOnly Cookie | 安全，防 XSS，前端不可访问 |
+| **用户信息（非敏感）** | sessionStorage | 页面刷新恢复，关闭浏览器自动清除 |
+| **权限状态** | MobX 内存 | 随应用生命周期管理 |
+
+### 认证流程边界分工
+
+| 层级 | 职责 | 示例 |
+|------|------|------|
+| **API 拦截器** | 处理 401 自动刷新，管理请求队列，Token 失效跳转 | axios-instance.ts 中的 401 处理器 |
+| **路由拦截器** | 页面级别的登录校验，未登录跳转 | RouteInterceptor.tsx 组件 |
+| **Store 状态** | 内存中的用户信息和权限管理 | AppStore.ts 的 userInfo 状态 |
+
+### 状态同步原则
+
+1. **Token 状态**：完全由后端 Cookie 管理，前端只读
+2. **用户信息**：由 sessionStorage 持久化，Store 初始化时读取
+3. **登出流程**：同时清除 sessionStorage + 调用后端接口清除 Cookie
+
+### 认证相关代码边界
+
+```typescript
+// ✅ 正确：API 拦截器处理 401 刷新，不导入业务层
+// apps/web/src/api/core/axios-instance.ts
+async function handle401Error() {
+  // 内部实现刷新逻辑，不依赖 auth 模块
+  const response = await api.post('/api/v1/auth/refresh', {}, { skipAuth: true });
+  return response;
+}
+
+// ✅ 正确：Store 延迟获取，不在模块顶层初始化
+import { getRootStore } from '@/store';
+
+function onAuthFail() {
+  const rootStore = getRootStore(); // 运行时获取，避免循环依赖
+  rootStore.app.reset();
+}
+
+// ❌ 错误：模块顶层导入完整的 Store
+import { rootStore } from '@/store'; // 可能导致循环依赖
+```
+
+### 安全检查清单
+
+- [ ] **Token 安全**：没有任何地方将 Token 存入 localStorage/sessionStorage
+- [ ] **Cookie 配置**：axios 开启了 `withCredentials: true`
+- [ ] **敏感数据**：用户敏感信息（手机号、密码）不存入本地
+- [ ] **跳转逻辑**：认证失效跳转会带上当前页面 redirect 参数
+- [ ] **状态重置**：登出后所有相关的 Store 状态都已重置
+
+---
+
 ## 常用工具
 - **es-toolkit**: `debounce`, `throttle`
 - **classnames**: 条件类名合并

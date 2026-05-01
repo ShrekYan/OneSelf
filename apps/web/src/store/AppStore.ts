@@ -1,5 +1,6 @@
 import { runInAction } from 'mobx';
 import { useLocalObservable } from 'mobx-react';
+import { secureSessionStorage } from '@/utils/secure-storage';
 
 /**
  * 用户信息接口
@@ -16,39 +17,21 @@ export interface UserInfo {
 export interface MobxStoreType {
   isLoading: boolean;
   userInfo: UserInfo | null;
-  token: string;
   setLoading: (value: boolean) => void;
   setUserInfo: (info: UserInfo | null) => void;
-  setToken: (token: string) => void;
   reset: () => void;
 }
 
 type UseMobxStoreType = () => MobxStoreType;
 
 const useMobxStore: UseMobxStoreType = () => {
-  // 初始化时从 localStorage 恢复已保存的用户信息
-  const initialUserInfo = ((): UserInfo | null => {
-    try {
-      const stored = localStorage.getItem('userInfo');
-      if (!stored) return null;
-      return JSON.parse(stored) as UserInfo;
-    } catch {
-      return null;
-    }
-  })();
-
-  const initialToken = ((): string => {
-    try {
-      return localStorage.getItem('accessToken') || '';
-    } catch {
-      return '';
-    }
-  })();
+  // 初始化时从 sessionStorage 恢复已保存的用户信息
+  // ✅ sessionStorage 在浏览器关闭时自动清除，避免用户信息泄露风险
+  const initialUserInfo = secureSessionStorage.get<UserInfo>('userInfo');
 
   const store = useLocalObservable<MobxStoreType>(() => ({
     isLoading: false,
     userInfo: initialUserInfo,
-    token: initialToken,
 
     setLoading(value: boolean) {
       runInAction(() => {
@@ -62,17 +45,10 @@ const useMobxStore: UseMobxStoreType = () => {
       });
     },
 
-    setToken(token: string) {
-      runInAction(() => {
-        store.token = token;
-      });
-    },
-
     reset() {
       runInAction(() => {
         store.isLoading = false;
         store.userInfo = null;
-        store.token = '';
       });
     },
   }));

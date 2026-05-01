@@ -13,7 +13,10 @@ export class RemoteJwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    // 优先级：Cookie > Header
+    const token =
+      this.extractTokenFromCookie(request) ??
+      this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException({
         code: 'MISSING_TOKEN',
@@ -54,5 +57,9 @@ export class RemoteJwtAuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  private extractTokenFromCookie(request: Request): string | undefined {
+    return request.cookies?.accessToken;
   }
 }

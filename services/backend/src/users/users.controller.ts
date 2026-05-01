@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Put, Body, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -8,7 +8,7 @@ import {
 import { RemoteJwtAuthGuard } from '../shared/remote-jwt-auth.guard';
 import { CurrentUserId } from '../common/decorators/current-user.decorator';
 import { UsersService } from './users.service';
-import { UserInfoDto, UpdateProfileDto } from './dto';
+import { UserDto, UpdateProfileDto } from './dto';
 
 /**
  * 用户信息控制器
@@ -21,14 +21,14 @@ import { UserInfoDto, UpdateProfileDto } from './dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('info')
+  @Post('info')
   @ApiOperation({ summary: '获取当前用户信息' })
   @ApiResponse({
     status: 200,
     description: '获取成功',
-    type: UserInfoDto,
+    type: UserDto,
   })
-  getUserInfo(@CurrentUserId() userId: string): Promise<UserInfoDto> {
+  getUserInfo(@CurrentUserId() userId: string): Promise<UserDto> {
     return this.usersService.getUserInfo(userId);
   }
 
@@ -37,12 +37,12 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: '更新成功',
-    type: UserInfoDto,
+    type: UserDto,
   })
   updateProfile(
     @CurrentUserId() userId: string,
     @Body() updateDto: UpdateProfileDto,
-  ): Promise<UserInfoDto> {
+  ): Promise<UserDto> {
     return this.usersService.updateProfile(userId, updateDto);
   }
 }

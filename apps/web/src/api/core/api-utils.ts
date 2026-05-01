@@ -29,19 +29,18 @@ export const apiUtils = {
   },
 
   /**
-   * 设置 token
+   * 设置 token（向后兼容，仅用于设置默认 headers，不存储到 localStorage）
+   * ✅ Token 通过 HttpOnly Cookie 自动携带，防止 XSS 攻击
    * @param token - 认证令牌
    */
   setToken: (token: string) => {
     api.defaults.headers.Authorization = `Bearer ${token}`;
-    localStorage.setItem('token', token);
   },
 
   /**
-   * 清除 token
+   * 清除 token（向后兼容）
    */
   clearToken: () => {
     delete api.defaults.headers.Authorization;
-    localStorage.removeItem('token');
   },
 };

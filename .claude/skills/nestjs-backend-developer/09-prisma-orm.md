@@ -121,6 +121,129 @@ users Users @relation(fields: [user_id], references: [id], onDelete: Cascade, on
 - **类型获取**: 从 `@prisma/client` 导入生成的类型
 - **查询构造**: 直接使用 Prisma 强大的查询 API，无需自己编写 SQL
 
+### 增强型 PrismaService
+
+项目的 PrismaService 不仅是基础的数据库连接，还包含以下生产级增强功能：
+
+#### 1. 连接重试机制
+
+数据库连接失败时自动重试，避免临时网络波动导致服务启动失败：
+
+```typescript
+private async connectWithRetry(maxRetries: number, delayMs: number): Promise<void> {
+  let lastError: Error | undefined;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await this.$connect();
+      this.logger.log('数据库连接成功');
+      return;
+    } catch (error) {
+      lastError = error as Error;
+      this.logger.warn(`数据库连接失败 (尝试 ${i + 1}/${maxRetries}): ${error.message}`);
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  this.logger.error(`数据库连接失败，已达最大重试次数: ${lastError?.message}`);
+  throw lastError;
+}
+```
+
+#### 2. 慢查询检测
+
+自动检测执行时间超过阈值的查询，并记录警告日志：
+
+```typescript
+private readonly SLOW_QUERY_THRESHOLD = 1000; // 1 秒
+
+private setupEventLogging(): void {
+  this.$on('query' as any, (e: any) => {
+    const duration = Number(e.duration);
+    if (duration > this.SLOW_QUERY_THRESHOLD) {
+      this.logger.warn(
+        `慢查询检测: ${e.query} (${duration}ms) ` +
+        `Params: ${e.params.substring(0, 200)}${e.params.length > 200 ? '...' : ''}`
+      );
+    }
+  });
+}
+```
+
+#### 3. 详细错误和警告日志
+
+```typescript
+this.$on('error' as any, (e: any) => {
+  this.logger.error(`Prisma 错误: ${e.message}`, e.stack);
+});
+
+this.$on('warn' as any, (e: any) => {
+  this.logger.warn(`Prisma 警告: ${e.message}`);
+});
+```
+
+#### 4. 完整的 PrismaService 模板
+
+```typescript
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
+
+@Injectable()
+export class PrismaService
+  extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'error' | 'warn'>
+  implements OnModuleInit, OnModuleDestroy
+{
+  private readonly logger = new Logger(PrismaService.name);
+  private readonly SLOW_QUERY_THRESHOLD = 1000; // 1 秒
+
+  constructor() {
+    super({
+      log: [
+        { emit: 'event', level: 'query' },
+        { emit: 'event', level: 'error' },
+        { emit: 'event', level: 'warn' },
+      ],
+    });
+  }
+
+  async onModuleInit() {
+    // 带重试的数据库连接（5 次重试，每次间隔 2 秒）
+    await this.connectWithRetry(5, 2000);
+    // 设置事件日志监听
+    this.setupEventLogging();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+    this.logger.log('数据库连接已关闭');
+  }
+
+  private async connectWithRetry(maxRetries: number, delayMs: number): Promise<void> {
+    // 连接重试逻辑（见上文）
+  }
+
+  private setupEventLogging(): void {
+    // 慢查询检测 + 错误/警告日志（见上文）
+  }
+}
+```
+
+### PrismaModule 定义
+
+```typescript
+import { Global, Module } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+
+@Global()
+@Module({
+  providers: [PrismaService],
+  exports: [PrismaService],
+})
+export class PrismaModule {}
+```
+
 示例：
 ```typescript
 @Injectable()
@@ -348,3 +471,8 @@ const articles = await this.prisma.article.findMany({
 - [ ] 分页查询是否同时返回总数？
 - [ ] 从查询结果转换到 DTO 时是否正确完成下划线到驼峰的命名转换？
 - [ ] 常用查询字段是否添加了索引？
+- [ ] PrismaService 是否实现了连接重试机制？
+- [ ] 是否配置了慢查询检测阈值？
+- [ ] 是否正确实现了 OnModuleInit 和 OnModuleDestroy 生命周期？
+- [ ] 慢查询日志是否截断了过长的参数，避免日志过大？
+- [ ] Prisma 错误和警告是否有独立的日志记录？
