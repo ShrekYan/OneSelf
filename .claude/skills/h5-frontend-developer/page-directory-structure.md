@@ -13,11 +13,10 @@ apps/web/src/pages/[PageName]/
 ├── index.module.scss           # 仅页面最外层容器样式
 ├── types.ts                     # ✅ 必选：页面级跨组件共享的数据类型定义
 ├── constant.ts                  # 常量配置聚合导出（仅非展示性常量）
-├── handle.ts                    # 纯业务逻辑函数（无副作用、无 Hook 依赖）
 ├── schema.ts                    # (可选) Zod 表单验证 Schema（仅含表单页面需要）
 ├── mock.ts                      # Mock 数据 / 静态业务数据
 ├── useStore.ts                  # 页面级 MobX 局部状态（useLocalObservable，包含 API 调用）
-├── hooks/                      # (可选) 页面专用业务 Hooks（符合拆分阈值时创建）
+├── hooks/                      # (可选) 页面专用业务 Hooks（逻辑复杂时创建）
 │   └── useXxx.ts               # 一个 Hook 一个文件，仅当前页面使用
 └── components/                 # 页面内子组件目录
     ├── index.ts                # 统一聚合导出所有子组件
@@ -41,11 +40,10 @@ apps/web/src/pages/[PageName]/
 | `index.module.scss` | 页面根容器样式（背景、间距、最大宽度） | 不放各个子组件的样式 |
 | `types.ts` | 集中定义**跨组件共享**的数据结构 | 组件私有 Props 不要放这里 |
 | `constant.ts` | 聚合导出**非展示性**常量、枚举、配置项 | **禁止存放页面展示文案**，展示文案直接写在 JSX |
-| `handle.ts` | 聚合纯业务逻辑函数（无副作用、无 Hook 依赖） | 禁止 API 调用、禁止使用 React Hook、禁止定义自定义 Hook |
 | `schema.ts` | Zod 表单验证 Schema 定义 + 类型派生 | 没有表单验证的页面不要创建此文件 |
 | `mock.ts` | 存放 Mock 数据 / 静态业务数据 | 开发环境真实接口对接后可移除 |
 | `useStore.ts` | MobX 管理页面局部状态 + 修改状态的动作（包含 API 调用） | 不需要全局状态时才用这个 |
-| `hooks/` | 存放当前页面专用的业务 Hooks（依赖 React Hook 的逻辑） | 通用技术 Hook 和跨页面复用 Hook 不放这里，**详见 `rules/frontend-hooks-ts.md` 拆分阈值** |
+| `hooks/` | 存放当前页面专用的业务 Hooks（逻辑复杂时创建） | 通用技术 Hook 和跨页面复用 Hook 不放这里，简单逻辑直接写在组件内 |
 | `components/` | 存放拆分后的功能区块组件 | 不放非组件文件 |
 
 ---
@@ -401,11 +399,10 @@ export default usePageStore;
 - [ ] `index.module.scss` 仅页面容器样式
 - [ ] ✅ `types.ts` 必选，存放页面级跨组件共享数据类型
 - [ ] `constant.ts` 聚合导出常量
-- [ ] `handle.ts` 纯业务逻辑函数（无副作用、无 Hook 依赖）
 - [ ] `mock.ts` 存放 Mock/静态数据
 - [ ] `schema.ts` 有表单验证时才创建，存放 Zod Schema（无表单则不需要）
 - [ ] `useStore.ts` MobX 局部状态（包含 API 调用）
-- [ ] `hooks/` 符合拆分阈值时创建，存放页面专用业务 Hooks
+- [ ] `hooks/` 逻辑复杂时创建，存放页面专用业务 Hooks（简单逻辑不需要）
 - [ ] `components/index.ts` 统一导出子组件
 - [ ] 每个子组件 `ComponentName/index.tsx` + `index.module.scss`
 - [ ] 子组件根容器类名：`componentNameContainer`
