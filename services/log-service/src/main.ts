@@ -5,10 +5,26 @@ import './preload';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // 响应压缩中间件：压缩大于 1KB 的 JSON/文本响应，减少传输体积
+  app.use(
+    compression({
+      threshold: 1024,
+      level: 6,
+      filter: (req, res) => {
+        // 跳过已压缩的二进制格式
+        if (String(res.getHeader('Content-Type') || '').includes('image/')) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -44,4 +60,4 @@ async function bootstrap() {
   console.log(`🚀 Alternative: http://localhost:${port}`);
   console.log(`📚 API Documentation: http://127.0.0.1:${port}/docs`);
 }
-bootstrap();
+void bootstrap();

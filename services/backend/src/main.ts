@@ -6,6 +6,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -14,6 +15,21 @@ async function bootstrap() {
 
   // Cookie 解析中间件（XSS 防护：HttpOnly Cookie 存储 Token）
   app.use(cookieParser());
+
+  // 响应压缩中间件：压缩大于 1KB 的 JSON/文本响应，减少传输体积
+  app.use(
+    compression({
+      threshold: 1024,
+      level: 6,
+      filter: (req, res) => {
+        // 跳过已压缩的二进制格式
+        if (String(res.getHeader('Content-Type') || '').includes('image/')) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   // 全局验证管道：自动校验所有进入控制器的请求体/DTO
   // whitelist=true          → 只保留 DTO（Data Transfer Object，数据传输对象）中声明的属性，多余字段被过滤
