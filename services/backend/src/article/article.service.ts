@@ -1,6 +1,6 @@
-import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { IdGenerator } from '../common/utils/id-generator';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { BusinessErrorCode } from '../common/constants/business-error-codes';
 import type { Articles, Prisma } from '@prisma/client';
@@ -219,7 +219,7 @@ export class ArticleService {
         // 添加点赞：创建记录，计数加 1
         await tx.articleLikes.create({
           data: {
-            id: crypto.randomUUID(),
+            id: IdGenerator.generateLikeId(),
             article_id: articleId,
             user_id: userId,
             created_at: BigInt(Date.now()),

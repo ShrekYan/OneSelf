@@ -1,6 +1,7 @@
 import { Injectable, HttpStatus, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
+import { IdGenerator } from '@/common/utils/id-generator';
 import { PasswordCacheService } from './password-cache.service';
 import { UserSyncService } from '@/users/user-sync.service';
 import { RefreshTokenRedisService } from './refresh-token-redis.service';
@@ -118,21 +119,8 @@ export class AuthService {
       );
     }
 
-    // 查找最后一个用户获取最大 ID 并递增
-    const lastUser = await this.prismaService.users.findFirst({
-      orderBy: { id: 'desc' },
-      select: { id: true },
-    });
-
-    // 解析生成新 ID
-    let nextNumber = 1;
-    if (lastUser?.id) {
-      const match = lastUser.id.match(/^author-(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1], 10) + 1;
-      }
-    }
-    const newId = `author-${nextNumber}`;
+    // 生成 UUID v4 作为用户 ID
+    const newId = IdGenerator.generateUserId();
 
     // 加密密码 - 新用户默认使用 argon2id
     const passwordHash = await argon2.hash(password, this.argon2Options);

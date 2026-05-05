@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UserInfoDto {
   @ApiProperty({
     description: '用户 ID',
-    example: 'author-1',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   id: string;
 
