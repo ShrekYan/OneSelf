@@ -19,6 +19,9 @@ triggers:
 <!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
 <!-- ============================================================ -->
 
+<!-- 🔐 架构决策（第一优先级，必须遵守） -->
+#include: ../DECISIONS.md
+
 <!-- 🔐 通用规范（自动加载，前后端共用） -->
 #include: ../rules/typescript-common.md
 #include: ../rules/security-common.md

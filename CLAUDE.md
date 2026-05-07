@@ -3,6 +3,28 @@
 ### 项目描述
 全栈博客项目，**Monorepo 单代码仓库多系统架构**，包含前端 H5 移动端应用 + 后端多微服务 + 跨系统共享包。
 
+### 🔴 核心架构决策（自动加载）
+
+#### 后端架构决策
+本项目所有后端架构决策已固化在 `.claude/DECISIONS.md`，包括：
+- 认证安全：HttpOnly Cookie、Argon2id 密码加密
+- 数据库规范：Prisma PascalCase 命名、BigInt 时间戳
+- 微服务边界：auth-service / backend / log-service 职责划分
+- 性能优化：Redis 缓存、响应压缩、连接重试策略
+- 异常处理：三层过滤器、统一响应格式
+
+#### 前端架构决策
+本项目所有前端架构决策已固化在 `.claude/FRONTEND-DECISIONS.md`，包括：
+- 技术栈：React 19 + Vite + TypeScript + MobX + Ant Design Mobile
+- 状态管理：MobX 双轨架构 + useObserver Hook
+- 页面架构：5 文件标准拆分模式（index/useStore/handle/constant/types）
+- 样式方案：SCSS + CSS Modules + 设计令牌体系
+- 路由架构：React Router v6 模块化 + KeepAlive + 路由守卫
+- API 架构：Axios 分层封装 + RequestCache + HttpOnly Cookie
+- 导入规范：@/ 别名 + 统一导入排序
+
+**Claude 每次启动会自动加载以上文件，请严格遵守所有已确认的决策。**
+
 ---
 
 ## 🏗️ 系统架构与职责边界
