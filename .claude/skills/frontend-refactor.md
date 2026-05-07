@@ -29,9 +29,9 @@ description: 前端代码重构分析规范，提供结构化重构建议和实�
 
 | 检查项 | 规范要求 |
 |--------|----------|
-| **目录结构** | 页面是否遵循 `index.tsx` + `useStore.ts` + `handle.ts` + `constant.ts` + `components/` 拆分 |
+| **目录结构** | 页面是否遵循 `index.tsx` + `useStore.ts` + `constant.ts` + `types.ts` + `hooks/` + `components/` 拆分 |
 | **useStore.ts** | 页面级 Store 是否使用 `useLocalObservable` + **对象字面量**，禁止 class 写法 |
-| **handle.ts** | 是否只存放**纯函数**，无副作用、无 API 调用、不调用 React Hook |
+| **hooks/** | 复杂业务逻辑是否抽离到 `hooks/useXxx.ts`，纯函数是否正确放置 |
 | **样式文件** | 是否使用 `index.module.scss`，class 命名是否 camelCase，根容器是否遵循 `{pageName}Container` 命名规则 |
 | **导入路径** | 是否使用路径别名 `@/`，禁止 `../../../../` 长相对路径 |
 | **TypeScript** | 是否滥用 `any`，类型是否使用 `export type` 导出，是否优先使用联合类型代替 `enum` |
@@ -52,7 +52,7 @@ description: 前端代码重构分析规范，提供结构化重构建议和实�
 - 📐 [API 设计规范](../rules/frontend-api-design.md)
 - 📐 [TypeScript 规范](../rules/frontend-typescript.md)
 - 📐 [CSS/SCSS 规范](../rules/frontend-css-scss.md)
-- 📐 [handle.ts 规范](../rules/frontend-handle-ts.md)
+- 📐 [Hooks 开发规范](../rules/frontend-hooks-ts.md)
 - 📐 [Hooks 与错误处理规范](../rules/frontend-hooks-error-handling.md)
 - 📐 [第三方库规范](../rules/frontend-third-party-libraries.md)
 
@@ -92,10 +92,10 @@ description: 前端代码重构分析规范，提供结构化重构建议和实�
 
 | 场景 | 问题 | 解决方案 |
 |------|------|----------|
-| **所有逻辑都在 index.tsx** | 页面未按职责拆分 | 拆分为：`index.tsx`（UI 渲染） + `useStore.ts`（状态 + 动作） + `handle.ts`（纯函数） + `constant.ts`（常量） |
+| **所有逻辑都在 index.tsx** | 页面未按职责拆分 | 拆分为：`index.tsx`（UI 渲染） + `useStore.ts`（状态 + 动作） + `hooks/`（业务逻辑） + `constant.ts`（常量） |
 | **页面 Store 使用 class** | 违反项目 MobX 写法 | 重构为 `useLocalObservable(() => ({ ... }))` 对象字面量 |
-| **handle.ts 中有 API 调用** | 副作用放错了位置 | API 调用移到 `useStore.ts` 或 `hooks/` |
-| **handle.ts 调用 React Hook** | 违反 React 规则 | Hook 逻辑移到 `hooks/useXxx.ts` |
+| **纯函数逻辑混在组件中** | 不利于复用和测试 | 纯函数移到 `useStore.ts` 或 `utils.ts` |
+| **复杂业务逻辑未抽离** | 组件太臃肿，难以测试 | 抽离到 `hooks/useXxx.ts` 自定义 Hook |
 | **样式不是 *.module.scss** | 违反 CSS Modules 规范 | 重命名并调整 import 方式 |
 | **class 使用 kebab-case** | 违反 camelCase 规范 | 重命名为 camelCase |
 | **整体导入 react-use/lodash** | 不利于 tree-shaking，包体积过大 | 改为按需导入 |
@@ -152,8 +152,10 @@ apps/web/src/pages/ArticleList/index.tsx  # 800 行，包含一切
 apps/web/src/pages/ArticleList/
   ├── index.tsx         # 只做 UI 渲染和组件组合（~100 行）
   ├── useStore.ts       # MobX 状态 + 修改状态的动作（含 API 调用）
-  ├── handle.ts         # 纯函数：数据格式化、过滤、排序
+  ├── hooks/            # 页面级自定义 Hooks：复杂业务逻辑
+  │   └── useArticleList.ts
   ├── constant.ts       # 常量配置
+  ├── types.ts          # 类型定义
   └── components/       # 拆分出的子组件
       ├── ArticleItem/
       └── FilterBar/
@@ -190,32 +192,6 @@ export function useArticleListStore() {
 
   return store;
 }
-```
-
-**handle.ts 正确分工：**
-```typescript
-// ✅ handle.ts - 只放纯函数，无副作用
-export const formatPublishTime = (publishAt: string): string => {
-  return dayjs(publishAt).format('YYYY-MM-DD');
-};
-
-export const filterArticlesByCategory = (
-  articles: ArticleItem[],
-  categoryId: string,
-): ArticleItem[] => {
-  if (categoryId === 'all') return articles;
-  return articles.filter(item => item.categoryId === categoryId);
-};
-
-export const confirmDeleteArticle = async (): Promise<boolean> => {
-  return await Dialog.confirm({ ... }); // 简单交互允许
-};
-
-// ❌ 这些不能放 handle.ts
-// - API 调用 → 放 useStore.ts
-// - 调用 React Hook → 放 hooks/useXxx.ts
-// - 自定义 Hook (useXXX) → 放 hooks/useXxx.ts
-// - MobX 状态定义 → 放 useStore.ts
 ```
 
 **根容器 CSS 命名规范：**

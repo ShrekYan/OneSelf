@@ -40,9 +40,9 @@ model: inherit
 ### 🔴 架构规范（必须检查，违反即中等以上）
 
 #### 页面目录结构规范（遵循 `CLAUDE.md`）
-- [ ] 页面是否按职责拆分：`index.tsx` + `useStore.ts` + `handle.ts` + `constant.ts` + `components/`？
+- [ ] 页面是否按职责拆分：`index.tsx` + `useStore.ts` + `constant.ts` + `types.ts` + `hooks/` + `components/`？
 - [ ] `useStore.ts` 是否使用 `useLocalObservable` + **对象字面量**写法？（禁止页面级使用 class）
-- [ ] `handle.ts` 是否只存放**纯函数**？无 API 调用、不调用 React Hook、无自定义 Hook？
+- [ ] 复杂业务逻辑是否抽离到 `hooks/useXxx.ts`？纯函数是否正确放置？
 - [ ] `constant.ts` 是否存放页面所有常量配置？
 
 #### API 层规范（遵循 `.claude/rules/frontend-api-design.md`）
@@ -85,10 +85,10 @@ model: inherit
 - [ ] 是否适配安全区域（`env(safe-area-inset-bottom)` 等）？
 - [ ] 是否合理使用全局样式变量？
 
-### 🔵 业务逻辑拆分（遵循 `.claude/rules/frontend-handle-ts.md`）
-- [ ] `handle.ts` 是否只存放纯函数、无副作用逻辑？
+### 🔵 业务逻辑拆分（遵循 `.claude/rules/frontend-hooks-ts.md`）
+- [ ] 纯函数是否正确放置在 `useStore.ts` 或 `utils.ts`？
 - [ ] API 调用是否放在 `useStore.ts` 或 `hooks/`？
-- [ ] 需要 React Hook 的业务逻辑是否放在 `hooks/useXxx.ts`？
+- [ ] 复杂业务逻辑是否抽离到 `hooks/useXxx.ts`？
 - [ ] 所有函数是否使用具名导出？（禁止 `export default`）
 
 ### 🔵 自定义 Hooks 规范（遵循 `.claude/rules/frontend-hooks-error-handling.md`）

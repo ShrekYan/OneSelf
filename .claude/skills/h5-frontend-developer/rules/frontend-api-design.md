@@ -66,7 +66,7 @@ apps/web/src/api/
 ## 核心功能特性
 
 ### ✅ 自动化特性
-- [x] **智能 Token 注入**: 拦截器自动从 Storage 获取 Token
+- [x] **HttpOnly Cookie 认证**: Token 由后端设置 Cookie，浏览器自动携带
 - [x] **Token 自动刷新**: 401 时自动刷新 Token，支持请求队列等待
 - [x] **全局异常捕获**: 拦截器内置 `Toast` 提示，支持静默模式
 - [x] **幂等性保障**: 自动取消重复的并发请求（`cancel-manager`）

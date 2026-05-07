@@ -5,7 +5,7 @@
 
 ## ESLint 避坑
 - **禁止空接口**: 不要定义 `interface Props {}`，无 props 时直接不写。
-- **Hook 作用域**: Hook 只能在组件或自定义 Hook 中调用。如需在 `handle.ts` 中使用导航，应由组件通过参数传入或使用自定义 Hook 包装。
+- **Hook 作用域**: Hook 只能在组件或自定义 Hook 中调用。业务逻辑应抽离到 `hooks/useXxx.ts`，不能在普通函数文件中调用 Hook。
 
 ## 性能与安全
 - **严格类型**: 严禁滥用 `any`，优先使用 `unknown` + 类型守卫。

@@ -1,5 +1,7 @@
 # hooks 目录规范
 
+**重要架构决策**：`handle.ts` 已废弃，复杂业务逻辑统一抽离到 `hooks/useXxx.ts`。
+
 本文档定义页面级 `hooks/` 目录的拆分时机、职责边界、命名规范和分工原则。
 
 ---
@@ -47,7 +49,7 @@
 - ✅ 发起 API 调用（网络请求）
 - ✅ 操作浏览器缓存（`localStorage`、`sessionStorage`）
 - ✅ 页面路由跳转
-- ✅ 纯数据处理、格式化、计算（不需要额外的 handle.ts）
+- ✅ 纯数据处理、格式化、计算（纯函数可以直接放在 useStore.ts 中或抽离到 utils）
 - ✅ 弹窗确认、Toast 提示等交互逻辑
 
 ### 禁止的操作
@@ -113,7 +115,7 @@ export const useSignOut = (): (() => Promise<void>) => {
   const navigate = useNavigate();
 
   const signOut = async (): Promise<void> => {
-    // 1. 弹窗确认（纯交互逻辑直接写在 Hook 中，不需要额外 handle.ts）
+    // 1. 弹窗确认（纯交互逻辑直接写在 Hook 中，不需要独立 handle 文件）
     const confirmed = await Dialog.confirm({
       title: '确认退出',
       content: '确定要退出当前账号吗？',
@@ -203,7 +205,7 @@ const ArticleListPage: React.FC = () => {
 为什么需要这样设计？
 
 1. **符合 React 规则**：React Hook 只能在 Hook 或组件中调用，这是官方规范
-2. **降低认知负担**：不需要再纠结"这是纯函数吗？该放 handle 还是 hooks？"
+2. **降低认知负担**：handle.ts 已废弃，不再需要纠结"该放 handle 还是 hooks？"
 3. **职责清晰**：状态修改放 `useStore.ts`，复杂业务放 `hooks/`，简单逻辑写组件内，各司其职
 4. **易于测试**：Hooks 可以用 React Testing Library 独立测试
 5. **易于复用**：相同逻辑可以被多个组件调用，不需要重复编写

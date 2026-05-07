@@ -210,9 +210,14 @@ export class RemoteJwtAuthGuard implements CanActivate {
 
 ```typescript
 import * as argon2 from 'argon2';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class PasswordService {
+  private readonly CACHE_TTL = 24 * 60 * 60; // 24 小时（ADR-005 架构决策）
+
+  constructor(private readonly redis: Redis) {}
+
   /**
    * 哈希密码 - 使用 Argon2id 算法
    */
@@ -227,15 +232,43 @@ export class PasswordService {
   }
 
   /**
-   * 验证密码
+   * 验证密码 - 使用缓存优化性能（ADR-005 架构决策）
+   * 1. 优先使用缓存验证，降低 CPU 消耗
+   * 2. 缓存未命中时使用 Argon2 验证
+   * 3. 验证成功后缓存结果
    */
-  async verify(hash: string, password: string): Promise<boolean> {
+  async verify(userId: string, hash: string, password: string): Promise<boolean> {
+    // 步骤 1: 优先查缓存
+    const cacheKey = `pwd_hash:${userId}`;
+    const cachedHash = await this.redis.get(cacheKey);
+
+    if (cachedHash) {
+      // 缓存命中，直接比较哈希值（已在缓存中存储的是算法+哈希）
+      return cachedHash === hash;
+    }
+
+    // 步骤 2: 缓存未命中，使用 Argon2 验证
     try {
-      return argon2.verify(hash, password);
+      const isValid = await argon2.verify(hash, password);
+
+      // 步骤 3: 验证成功后缓存结果（TTL 24 小时）
+      if (isValid) {
+        await this.redis.setex(cacheKey, this.CACHE_TTL, hash);
+      }
+
+      return isValid;
     } catch (error) {
       // 验证失败（格式错误等），返回 false 而非抛出异常
       return false;
     }
+  }
+
+  /**
+   * 密码修改后立即删除缓存（ADR-005 边界约束）
+   */
+  async invalidateCache(userId: string): Promise<void> {
+    const cacheKey = `pwd_hash:${userId}`;
+    await this.redis.del(cacheKey);
   }
 }
 ```

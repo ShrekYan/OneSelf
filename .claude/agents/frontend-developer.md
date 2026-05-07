@@ -78,8 +78,8 @@ triggers:
 | ✅ 样式命名 | 根容器 class 为 `xxxContainer` |
 | ✅ 设计稿单位 | 750px 设计稿直接写 px，插件自动转 vw |
 | ✅ TypeScript | 零 `any`，所有 Props、API 参数、返回值必须有完整类型 |
-| ✅ 页面拆分 | 页面必须拆分为 5 文件：`index.tsx` + `useStore.ts` + `handle.ts` + `constant.ts` + `types.ts` |
-| ✅ handle.ts | 只放纯函数，**禁止** API 调用和 React Hook |
+| ✅ 页面拆分 | 页面必须拆分为 4 文件：`index.tsx` + `useStore.ts` + `constant.ts` + `types.ts` |
+| ✅ 业务逻辑 | 复杂逻辑抽离到 `hooks/useXxx.ts`，纯函数放 `useStore.ts` 或 `utils.ts` |
 | ✅ 子组件位置 | 页面子组件放在页面目录下 `components/` 文件夹 |
 
 **违反以上任何一条，代码视为不合格！**

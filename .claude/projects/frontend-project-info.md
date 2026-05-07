@@ -29,8 +29,8 @@ apps/web/src/
 │       ├── index.tsx   # 页面入口（只做渲染和组合）
 │       ├── useStore.ts # 页面局部状态（MobX useLocalObservable）
 │       ├── constant.ts # 页面常量定义
-│       ├── handle.ts   # 页面事件处理 / 业务逻辑
 │       ├── types.ts    # 页面类型定义
+│       ├── hooks/      # 页面级自定义 Hooks（复杂业务逻辑）
 │       ├── components/ # 页面内部分拆的子组件
 │       └── index.module.scss # 页面样式
 ├── store/              # 全局 Store（如果需要）

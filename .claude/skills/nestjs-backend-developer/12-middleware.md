@@ -255,6 +255,44 @@ export class AuthModule implements NestModule {
 
 ---
 
+### 3.4 CompressionMiddleware - 响应压缩中间件
+
+**功能**：对 HTTP 响应进行 GZIP 压缩，减少网络传输体积，提升 API 响应速度。
+
+```typescript
+import * as compression from 'compression';
+import { NestFactory } from '@nestjs/core';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // ✅ 标准压缩配置（遵循 ADR-010 架构决策）
+  app.use(
+    compression({
+      threshold: 1024, // 大于 1KB 才压缩
+      level: 6, // 压缩级别 6（性能与压缩率平衡）
+      filter: (req, res) => {
+        // 跳过图片等已压缩的二进制格式
+        const contentType = res.getHeader('Content-Type');
+        if (contentType && contentType.toString().startsWith('image/')) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
+}
+```
+
+**注册方式**：全局注册（main.ts）
+
+**架构决策依据**（ADR-010）：
+- ✅ **阈值 1KB**：小响应不压缩，避免 CPU 开销大于节省的传输时间
+- ✅ **压缩级别 6**：在压缩率和 CPU 消耗之间取得最佳平衡
+- ✅ **跳过图片**：图片等二进制格式通常已经压缩，再次压缩无意义且浪费 CPU
+
+---
+
 ## 4. 中间件、Guard、Interceptor 的选择
 
 经常混淆这三种 NestJS 增强机制，以下是选择指南：

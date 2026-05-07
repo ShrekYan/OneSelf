@@ -40,6 +40,8 @@ triggers:
 #include: ../skills/nestjs-backend-developer/09-prisma-orm.md
 #include: ../skills/nestjs-backend-developer/10-code-format.md
 #include: ../skills/nestjs-backend-developer/11-security-authentication.md
+#include: ../skills/nestjs-backend-developer/12-middleware.md
+#include: ../skills/nestjs-backend-developer/13-scheduled-tasks.md
 
 <!-- 基础规则扩展 -->
 #include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md

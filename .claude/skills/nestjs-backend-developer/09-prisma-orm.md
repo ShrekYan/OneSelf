@@ -460,7 +460,7 @@ const articles = await this.prisma.article.findMany({
 
 ---
 
-## 检查清单
+## 8. 检查清单
 - [ ] Schema 中每个模型和字段都有 `///` 文档注释吗？
 - [ ] 模型名 PascalCase，表名使用 `@@map` 指定下划线复数？
 - [ ] 表名和字段名是否遵循下划线命名规范？

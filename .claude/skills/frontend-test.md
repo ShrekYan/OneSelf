@@ -13,7 +13,7 @@ description: 前端单元测试生成规范，基于 Vitest + React Testing Libr
 
 - **测试框架**: Vitest + React Testing Library
 - **用户交互**: `@testing-library/user-event`
-- **被测对象**: React 组件、自定义 Hooks、工具函数、MobX Store、`handle.ts` 纯函数
+- **被测对象**: React 组件、自定义 Hooks、工具函数、MobX Store、纯函数工具方法
 - **API 模拟**: MSW (Mock Service Worker)
 
 ---
@@ -47,10 +47,10 @@ src/
     └── ArticleList/
         ├── index.tsx
         ├── useStore.ts         # 页面 Store (useLocalObservable)
-        ├── handle.ts           # 页面纯函数
+        ├── hooks/              # 页面级自定义 Hooks
         └── __tests__/
-            ├── handle.test.ts  # handle 测试
-            └── useStore.test.ts # useStore 测试
+            ├── useStore.test.ts # useStore 测试
+            └── useXxx.test.ts   # Hooks 测试
 ```
 
 **规则：**
@@ -76,7 +76,7 @@ src/
 ### 测试什么
 
 ✅ **应该测试：**
-- `handle.ts` 纯函数 - 各种输入输出、分支处理
+- 纯函数（`useStore.ts` 中、`utils/` 下）- 各种输入输出、分支处理
 - 工具函数 - 纯函数的各种输入输出
 - 自定义 Hooks - 状态变化和副作用
 - MobX Store - 业务逻辑和状态变更
@@ -100,9 +100,9 @@ src/
 
 ## 各类测试编写规范
 
-### 1. handle.ts 纯函数测试（项目特有）
+### 1. 纯函数测试（项目特有）
 
-项目使用 `handle.ts` 存放页面纯函数（数据格式化、过滤、排序等），**必须**写单元测试，因为都是纯函数非常容易测试，覆盖率要求 100%。
+**适用范围**：`useStore.ts` 中的纯函数、`utils/` 目录下的工具函数、数据格式化、过滤、排序等逻辑。**必须**写单元测试，因为都是纯函数非常容易测试，覆盖率要求 100%。
 
 **规则：**
 - 测试所有输入分支
@@ -112,7 +112,7 @@ src/
 **示例：**
 
 ```typescript
-// apps/web/src/pages/ArticleList/handle.ts
+// apps/web/src/pages/ArticleList/useStore.ts
 export const formatPublishTime = (
   publishAt: string,
   relative = true,
@@ -137,8 +137,8 @@ export const formatPublishTime = (
 ```
 
 ```typescript
-// apps/web/src/pages/ArticleList/__tests__/handle.test.ts
-import { formatPublishTime } from '../handle';
+// apps/web/src/pages/ArticleList/__tests__/useStore.test.ts
+import { formatPublishTime } from '../useStore';
 
 describe('formatPublishTime', () => {
   it('should return relative time within one hour', () => {
@@ -163,7 +163,7 @@ describe('formatPublishTime', () => {
 ### 2. 工具函数测试
 
 **规则：**
-- 和 handle.ts 纯函数一样要求 100% 覆盖率
+- 和纯函数测试一样要求 100% 覆盖率
 - 测试所有分支和边界
 
 **示例同上，格式一致。**
@@ -505,7 +505,7 @@ vi.mock('../index.module.scss', () => ({
 
 | 模块 | 最低覆盖率 |
 |------|-----------|
-| handle.ts 纯函数 | **100%** |
+| 纯函数（useStore/utils） | **100%** |
 | 工具函数 | **100%** |
 | 自定义 Hooks | **100%** |
 | MobX Store | 90% |

@@ -84,7 +84,7 @@ flowchart TD
     subgraph "页面模块 - {ModuleName}"
         A[PageEntry<br/>index.tsx]:::entry
         S[Store<br/>useStore.ts]:::store
-        H[Handler<br/>handle.ts]:::logic
+        H[Hooks<br/>hooks/useXxx.ts]:::logic
         C[Constants<br/>constant.ts]:::const
         T[Types<br/>types.ts]:::type
         SS[Styles<br/>index.module.scss]:::style
@@ -170,18 +170,18 @@ sequenceDiagram
     participant User as 用户
     participant Page as 页面组件
     participant Store as useStore
-    participant Handler as handle.ts
+    participant Hooks as hooks/useXxx.ts
     participant API as API 层
     participant Backend as 后端服务
 
     User->>Page: 进入页面
     Page->>Store: 初始化 Store
-    Store->>Handler: 触发加载数据
-    Handler->>API: 调用接口
+    Store->>Hooks: 触发加载数据
+    Hooks->>API: 调用接口
     API->>Backend: HTTP 请求
     Backend-->>API: 返回数据
-    API-->>Handler: Response 数据
-    Handler-->>Store: 更新状态
+    API-->>Hooks: Response 数据
+    Hooks-->>Store: 更新状态
     Store-->>Page: 状态变化
     Page-->>User: 渲染完成
 ```
@@ -246,7 +246,8 @@ sequenceDiagram
 {模块路径}/
 ├── index.tsx           # 页面入口（只做渲染和组合）
 ├── useStore.ts         # 页面局部状态（MobX）
-├── handle.ts           # 页面事件处理/业务逻辑
+├── hooks/              # 页面级自定义 Hooks（复杂业务逻辑）
+│   └── useXxx.ts
 ├── constant.ts         # 页面常量定义
 ├── types.ts            # 类型定义
 ├── mock.ts             # Mock 数据（可选）
@@ -275,7 +276,7 @@ sequenceDiagram
 |------|----------|
 | `index.tsx` | {说明 UI 渲染和组件组合职责} |
 | `useStore.ts` | {说明局部状态管理职责} |
-| `handle.ts` | {说明业务逻辑和事件处理职责} |
+| `hooks/useXxx.ts` | {说明业务逻辑和副作用处理职责} |
 | `constant.ts` | {说明常量定义职责} |
 | `types.ts` | {说明类型定义职责} |
 | `*.module.scss` | {说明样式方案} |
