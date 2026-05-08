@@ -21,6 +21,9 @@ triggers:
 <!-- 注意：只 include 核心规范，避免上下文稀释                      -->
 <!-- ============================================================ -->
 
+<!-- 🔐 架构决策（第一优先级，必须遵守） -->
+#include: ../FRONTEND-DECISIONS.md
+
 <!-- 🔐 通用规范（自动加载，前后端共用） -->
 #include: ../rules/typescript-common.md
 #include: ../rules/security-common.md
