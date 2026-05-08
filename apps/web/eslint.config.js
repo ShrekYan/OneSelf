@@ -4,6 +4,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
+import claudeArchitecture from '../../.claude/contracts/index.js';
 
 export default tseslint.config(
   // 1. Global ignores
@@ -72,6 +73,19 @@ export default tseslint.config(
     },
   },
 
-  // 9. Prettier config must be last
+  // 9. Claude Architecture Rules - 架构契约校验
+  {
+    plugins: {
+      '@claude/architecture': {
+        rules: claudeArchitecture.rules,
+      },
+    },
+    rules: {
+      '@claude/architecture/adr-003-no-localstorage-token': 'error',
+      '@claude/architecture/fadr-003-no-mobx-observer-hoc': 'error',
+    },
+  },
+
+  // 10. Prettier config must be last
   prettierConfig,
 );

@@ -60,7 +60,18 @@
         ]
       }
     ],
-    "PostToolUse": []
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/contracts/cli/post-edit-check.js",
+            "onFailure": "notify"
+          }
+        ]
+      }
+    ]
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": false,

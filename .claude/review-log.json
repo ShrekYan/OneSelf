@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0",
+  "project": "claude-blog-monorepo",
+  "lastUpdated": null,
+  "violations": [],
+  "monthlyStats": {
+    "totalReviews": 0,
+    "totalViolations": 0,
+    "topViolatedDecisions": []
+  },
+  "usageGuide": {
+    "howToRecord": "Claude 每次编辑代码后，PostToolUse 钩子会自动运行架构检查并记录违规",
+    "autoHook": "已通过 .claude/settings.json 中的 PostToolUse 钩子自动触发",
+    "autoCheckScript": ".claude/contracts/cli/post-edit-check.js",
+    "monthlyReview": "每个月花 30 分钟分析：哪条规则被违反最多？如何优化规则描述？"
+  }
+}

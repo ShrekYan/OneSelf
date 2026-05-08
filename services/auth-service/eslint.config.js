@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
+import claudeArchitecture from '../../.claude/contracts/index.js';
 
 export default tseslint.config(
   // 1. Global ignores
@@ -55,6 +56,20 @@ export default tseslint.config(
     },
   },
 
-  // 9. Prettier config must be last
+  // 9. Claude Architecture Rules - 架构契约校验
+  // 注意：auth-service 不启用 ADR-002，因为它本身就是认证服务，需要使用 jsonwebtoken
+  {
+    plugins: {
+      '@claude/architecture': {
+        rules: claudeArchitecture.rules,
+      },
+    },
+    rules: {
+      '@claude/architecture/adr-004-no-bcrypt-new-password': 'error',
+      '@claude/architecture/adr-006-no-prisma-as-any': 'error',
+    },
+  },
+
+  // 10. Prettier config must be last
   prettierConfig,
 );
