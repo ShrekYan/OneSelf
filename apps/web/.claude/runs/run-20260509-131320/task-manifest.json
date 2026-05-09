@@ -1,0 +1,36 @@
+{
+  "project_name": "Button 组件开发",
+  "tasks": {
+    "T001": {
+      "id": "T001",
+      "name": "实现 Button 类型定义",
+      "description": "定义 Button 组件的 TypeScript 类型接口，包括 Props、Variant、Size 等所有类型定义",
+      "dependencies": [],
+      "output_files": [
+        "src/components/Button/index.tsx",
+        "src/components/Button/index.module.scss"
+      ],
+      "status": "pending"
+    },
+    "T002": {
+      "id": "T002",
+      "name": "实现 Button 组件逻辑",
+      "description": "实现 Button 组件的核心渲染逻辑，包括点击事件、禁用状态、加载状态等",
+      "dependencies": ["T001"],
+      "output_files": [
+        "src/components/Button/index.tsx"
+      ],
+      "status": "pending"
+    },
+    "T003": {
+      "id": "T003",
+      "name": "实现 Button 样式",
+      "description": "实现 Button 组件的 SCSS 样式，包括 primary、default、warning、danger 等变体和不同尺寸",
+      "dependencies": ["T001"],
+      "output_files": [
+        "src/components/Button/index.module.scss"
+      ],
+      "status": "pending"
+    }
+  }
+}
