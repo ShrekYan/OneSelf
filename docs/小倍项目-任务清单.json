@@ -1,0 +1,285 @@
+{
+  "project_name": "小倍项目",
+  "manifest_version": "1.0",
+  "generated_at": "2026-05-08",
+  "source": "XMind 思维导图解析 - 完整依赖标注版",
+  "tasks": [
+    {
+      "task_id": "T001",
+      "module": "重要事项",
+      "business_goal": "实现小倍跳转到其他小程序的功能，提供完整的代码示例",
+      "input_constraints": "需要实现 jumpToOtherMiniProgram 函数，处理 path 参数，进行 weWebVewIndex 路径拼接",
+      "output_specification": "提供可直接使用的跳转函数代码示例，包含路径处理逻辑",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T002",
+      "module": "重要事项",
+      "business_goal": "配置中欧财富投顾小程序的 APPID",
+      "input_constraints": "生产环境 APPID: wx60f8e0Dec2c8814，开发环境 APPID: vvx3dF9s2aa01ae6055",
+      "output_specification": "在项目配置文件中正确配置生产和开发环境的小程序 APPID",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T003",
+      "module": "重要事项",
+      "business_goal": "将小倍项目代码集成到公司的公Code项目中",
+      "input_constraints": "需要遵守公司公Code项目的代码规范和目录结构",
+      "output_specification": "小倍项目代码成功合并到公Code项目，可正常编译运行",
+      "explicit_dependencies": ["T001", "T002"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T004",
+      "module": "影响面分析",
+      "business_goal": "验证中欧财富小程序新注册接口能够正确带入 EXT 信息",
+      "input_constraints": "EXT 信息包含渠道相关参数",
+      "output_specification": "新注册接口请求中包含完整的 EXT 渠道信息",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T005",
+      "module": "影响面分析",
+      "business_goal": "在中欧财富小程序注册页面接口中带入 EXT 信息",
+      "input_constraints": "EXT 信息从本地缓存或启动参数获取",
+      "output_specification": "注册页面所有接口请求都携带 EXT 渠道信息",
+      "explicit_dependencies": ["T004"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T006",
+      "module": "影响面分析",
+      "business_goal": "在融入的 H5 页面中带入 EXT 信息，本次交易相关页面需要带上 EXT",
+      "input_constraints": "H5 页面通过 URL 参数或全局变量获取 EXT 信息",
+      "output_specification": "所有交易相关的 H5 页面都正确携带 EXT 渠道信息",
+      "explicit_dependencies": ["T004", "T005"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T007",
+      "module": "小倍小程序跳转",
+      "business_goal": "实现微信小程序启动时自动获取 ext 配置参数并持久化到本地缓存",
+      "input_constraints": "在 App.onLaunch 或 App.onShow 生命周期中获取 ext 信息",
+      "output_specification": "ext 配置参数成功存储到 wx.setStorageSync 中，可在全局访问",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T008",
+      "module": "小倍小程序跳转",
+      "business_goal": "实现关闭或退出小程序后再次进入时读取渠道信息的功能",
+      "input_constraints": "避免微信小程序长期使用同一个渠道信息导致统计数据不正确",
+      "output_specification": "每次小程序重新打开时都重新读取最新的渠道信息",
+      "explicit_dependencies": ["T007"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T009",
+      "module": "小倍小程序跳转",
+      "business_goal": "打通微信小程序渠道信息在程序中的新鲜度，支持两种配置方式",
+      "input_constraints": "方式1：通过微信小程序参数配置渠道信息；方式2：通过跳转链接后面拼接渠道信息",
+      "output_specification": "两种渠道信息配置方式都能正常工作，渠道信息实时更新",
+      "explicit_dependencies": ["T007", "T008"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T010",
+      "module": "小倍小程序跳转",
+      "business_goal": "完成渠道参数的配置工作",
+      "input_constraints": "根据渠道业务需求配置相应的参数",
+      "output_specification": "所有渠道参数配置完成并可正常读取",
+      "explicit_dependencies": ["T009"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T011",
+      "module": "小倍小程序跳转",
+      "business_goal": "配置并准备多个测试链接",
+      "input_constraints": "需要覆盖不同场景、不同渠道参数的测试链接",
+      "output_specification": "提供完整的测试链接列表，便于测试人员验证功能",
+      "explicit_dependencies": ["T010"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T012",
+      "module": "小倍小程序跳转",
+      "business_goal": "配置并准备多个开发/测试环境链接",
+      "input_constraints": "区分开发环境和测试环境的不同链接",
+      "output_specification": "开发环境和测试环境的链接配置完成",
+      "explicit_dependencies": ["T011"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T013",
+      "module": "小倍小程序跳转",
+      "business_goal": "实现渠道项目获取渠道信息的方法",
+      "input_constraints": "full_channel.getBaseChannelInfo() 获取完整信息，channel.getChannelExtParams() 获取硬编码参数，支持专题页面、投顾产品详情页等跳转入口",
+      "output_specification": "渠道信息获取方法封装完成，各跳转入口能正确获取渠道信息",
+      "explicit_dependencies": ["T009", "T010"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T014",
+      "module": "策略详情页",
+      "business_goal": "完成渠道项目的功能迁移，包括变量迁移、方法迁移、跳转迁移",
+      "input_constraints": "需要将原有渠道项目的功能完整迁移到新架构下",
+      "output_specification": "渠道项目所有功能迁移完成，变量、方法、跳转正常工作",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "high",
+      "split_recommendation": "建议拆分为：1）变量定义迁移；2）工具方法迁移；3）页面跳转逻辑迁移三个子任务分别实现"
+    },
+    {
+      "task_id": "T015",
+      "module": "策略详情页",
+      "business_goal": "新增普通发车详情接口 /v1/normal/departDetail",
+      "input_constraints": "根据接口文档定义请求参数和响应数据结构",
+      "output_specification": "接口定义完成，可正常请求和返回数据",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T016",
+      "module": "策略详情页",
+      "business_goal": "配置策略详情页相关的枚举值",
+      "input_constraints": "foDetailTypeCode: 0003（普通发车），aipTypeCode: 04（交易式定投），subscriptionTypeCode: 80（普通发车），aipSceneTypeCode: 10（普通理财场景）",
+      "output_specification": "所有枚举值在 enumeration 配置文件中定义完成",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T017",
+      "module": "策略详情页",
+      "business_goal": "实现公用逻辑判断方法 isNormalDepartFollowAip",
+      "input_constraints": "根据接口返回数据判断是否为普通发车类型",
+      "output_specification": "判断方法能正确识别普通发车场景",
+      "explicit_dependencies": ["T016"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T018",
+      "module": "策略详情页",
+      "business_goal": "使用 proxy 代理配置接口 mock 数据",
+      "input_constraints": "为策略详情页相关接口配置 mock 数据",
+      "output_specification": "本地开发环境可通过 mock 数据调试页面",
+      "explicit_dependencies": ["T015"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T019",
+      "module": "策略详情页",
+      "business_goal": "绘制策略详情页组件，定义样式结构及功能",
+      "input_constraints": "定义静态资源文件和组件模版，根据原生设计生成大致样式，通过 AI 生成配合人工细节调优",
+      "output_specification": "策略详情页组件样式结构完整，mock 数据能正确填充页面，动态进度条等交互功能正常",
+      "explicit_dependencies": ["T018"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T020",
+      "module": "策略详情页",
+      "business_goal": "实现策略详情信息和购买逻辑",
+      "input_constraints": "如果为普通发车，隐藏主理人信息，展示普通发车模块",
+      "output_specification": "普通发车场景下页面展示正确，购买流程逻辑正确",
+      "explicit_dependencies": ["T017", "T019"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T021",
+      "module": "策略详情页",
+      "business_goal": "实现组件初始化逻辑，多个接口并发请求获取数据",
+      "input_constraints": "根据用户登录状态并发不同的接口，代码优化逻辑，批量钩子逻辑，不同接口返回做不同处理",
+      "output_specification": "组件初始化时接口并发请求正常，根据登录状态正确请求对应接口",
+      "explicit_dependencies": ["T015", "T016"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T022",
+      "module": "策略详情页",
+      "business_goal": "实现组件功能，使用接口相关数据填充页面字段",
+      "input_constraints": "所有页面字段都需要从接口数据中正确映射",
+      "output_specification": "页面所有字段都正确显示接口返回的数据",
+      "explicit_dependencies": ["T021"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T023",
+      "module": "策略详情页",
+      "business_goal": "完成组件中的点击事件处理，包括订单事件处理、跳转、弹窗提示等",
+      "input_constraints": "需要处理多种交互场景的点击事件",
+      "output_specification": "所有点击事件响应正确，跳转正常，弹窗提示显示正确",
+      "explicit_dependencies": ["T022"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T024",
+      "module": "策略详情页",
+      "business_goal": "实现人工 T0 节到节能和逻辑处理",
+      "input_constraints": "根据业务需求实现相关逻辑",
+      "output_specification": "人工 T0 相关功能正常工作",
+      "explicit_dependencies": [],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T025",
+      "module": "策略详情页",
+      "business_goal": "实现查看往期功能，跳转到历史列表页面",
+      "input_constraints": "需要区分渠道项目或 Regalny 的不同跳转方式",
+      "output_specification": "点击查看往期能正确跳转到对应历史列表页面",
+      "explicit_dependencies": ["T023", "T013"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T026",
+      "module": "策略详情页",
+      "business_goal": "实现发车日期判断逻辑，判断当前日期是否在最新的发车有效期内",
+      "input_constraints": "发车有效状态包括：生效中、未在效期内、已过期",
+      "output_specification": "能正确判断发车状态并在页面上显示相应提示",
+      "explicit_dependencies": ["T022"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T027",
+      "module": "策略详情页",
+      "business_goal": "实现发车建议功能，获取后台的发车指数并展示",
+      "input_constraints": "本期观点分5格展示，发车摘要获取后台配置，5格都不展示时查看详情后配置组件链接",
+      "output_specification": "发车指数、本期观点、发车摘要都正确展示",
+      "explicit_dependencies": ["T021", "T022"],
+      "estimated_size_risk": "medium"
+    },
+    {
+      "task_id": "T028",
+      "module": "策略详情页",
+      "business_goal": "实现立即跟投按钮功能",
+      "input_constraints": "点击后验证客户是否已授权：已授权跳转原计划详情页，未授权跳转创建跟投页面",
+      "output_specification": "立即跟投按钮根据授权状态正确跳转到对应页面",
+      "explicit_dependencies": ["T023"],
+      "estimated_size_risk": "low"
+    },
+    {
+      "task_id": "T029",
+      "module": "策略详情页",
+      "business_goal": "实现订阅指导功能",
+      "input_constraints": "点击后需要登录验证，已订阅展示已订阅描述，未订阅展示未订阅描述，使用通用组件 CommonWinedWhat 的 checkIsUserSubscribe 方法",
+      "output_specification": "订阅指导功能正常，根据订阅状态显示正确描述",
+      "explicit_dependencies": ["T023"],
+      "estimated_size_risk": "low"
+    }
+  ],
+  "summary": {
+    "total_tasks": 29,
+    "risk_distribution": {
+      "low": 20,
+      "medium": 7,
+      "high": 2
+    },
+    "modules": ["重要事项", "影响面分析", "小倍小程序跳转", "策略详情页"],
+    "dependency_stats": {
+      "with_dependencies": 21,
+      "no_dependencies": 8,
+      "avg_dependencies_per_task": 1.38
+    },
+    "new_interfaces": ["/v1/normal/departDetail", "/v2/product/detail", "/v1/aip/list", "/v1/event/center/queryRemindTaskList", "/v1/event/center/remindTaskOperation"]
+  }
+}

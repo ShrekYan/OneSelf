@@ -245,6 +245,7 @@ refactor(auth+backend+log): 抽离通用响应格式
 | 用户输入特征 | 自动使用 Agent |
 |-------------|---------------|
 | 生成架构图、流程图、序列图 | `mermaid-generator` |
+| XMind 思维导图转任务清单、结构化任务解析 | `xmind-task-parser` |
 
 ### 通用工具
 | 用户输入特征 | 自动使用 Agent |
