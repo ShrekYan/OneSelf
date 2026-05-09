@@ -127,17 +127,64 @@ triggers:
 }
 ```
 
-## 10. 执行计划文件保存
+## 10. 文件保存规则（强制执行）
 
-必须将完整执行计划保存为 Markdown 文件，路径：
+### 10.1 必须保存 task-manifest.json
+
+**必须首先**将完整的结构化任务清单保存为 JSON 文件，路径：
+`.claude/runs/{run-id}/task-manifest.json`
+
+文件内容就是【输出格式】中定义的完整 JSON 结构，包含：
+- project_name
+- source_xmind
+- manifest_version
+- generated_at
+- demand_context
+- tasks 数组（所有任务的完整信息）
+- execution_plan（包含拓扑排序和并行分组）
+
+### 10.2 必须初始化 task-status.json
+
+**必须初始化**任务状态文件，路径：
+`.claude/runs/{run-id}/task-status.json`
+
+文件格式：
+```json
+{
+  "tasks": {
+    "T001": { "status": "pending", "name": "任务名称", "dependencies": ["..."] },
+    "T002": { "status": "pending", "name": "任务名称", "dependencies": ["..."] }
+  },
+  "execution_order": ["T001", "T002", "..."],
+  "parallel_groups": [["T001"], ["T002", "T003"]]
+}
+```
+
+status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed` (已完成) / `skipped` (已跳过)
+
+### 10.3 必须保存 execution-plan.md
+
+然后将人类可读的执行计划保存为 Markdown 文件，路径：
 `.claude/runs/{run-id}/execution-plan.md`
 
 文件内容包含：
 - 项目基本信息
 - 依赖关系图
 - 执行顺序说明
+- 并行分组详情
 - 每个任务的摘要信息
 - 风险说明
+- 质量门禁
+- 验收标准
+
+### 10.4 保存顺序要求
+
+1. ✅ **先保存 task-manifest.json**（机器可读的结构化数据）
+2. ✅ **再初始化 task-status.json**（任务状态跟踪）
+3. ✅ **再保存 execution-plan.md**（人类可读的执行计划）
+4. ✅ **最后在对话中展示结果**
+
+**三个文件必须都保存，缺一不可。**
 
 ---
 
@@ -193,6 +240,7 @@ triggers:
 4. ❌ **严禁在 JSON 外添加说明文字** - 只输出纯 JSON 内容
 5. ❌ **严禁添加代码块标记** - 不要使用 ```json 包裹输出
 6. ❌ **严禁省略 explicit_dependencies 字段** - 即使无依赖也必须设置为 `[]`
+7. ❌ **严禁只保存 execution-plan.md 而不保存 task-manifest.json** - 两个文件必须都保存
 
 ---
 
@@ -206,8 +254,11 @@ triggers:
 - [ ] `agent_type` 已正确推断
 - [ ] `input_constraints` 已注入对应项目规范
 - [ ] 粒度风险已正确评估
-- [ ] `execution_plan` 已生成
+- [ ] `execution_plan` 已生成（包含拓扑排序和并行分组）
 - [ ] JSON 语法完全正确，可直接被机器解析
+- [ ] ✅ **task-manifest.json 已保存到正确路径**
+- [ ] ✅ **task-status.json 已初始化到正确路径**
+- [ ] ✅ **execution-plan.md 已保存到正确路径**
 - [ ] 没有添加任何解释性文字或注释
 
 ---

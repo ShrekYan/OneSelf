@@ -1,5 +1,5 @@
-name: XMind 自动执行工作流 - 审核模式
-description: 解析 XMind 导出的 Markdown 文件，生成任务方案 → 人工审核 → 逐条执行，支持完整审核流程
+name: XMind 工作流 - 纯人工控制模式
+description: 解析 XMind 导出的 Markdown 文件，生成结构化任务清单，人工输入任务编号控制执行，支持完整代码审核
 
 inputs:
   - name: file_path
@@ -10,7 +10,7 @@ steps:
   - name: 初始化运行环境
     description: 创建运行目录和基础文件
     run: |
-      echo "🚀 开始 XMind 工作流 - 审核模式"
+      echo "🚀 开始 XMind 工作流 - 纯人工控制模式"
       echo ""
       echo "📂 文件路径：{{ file_path }}"
       echo ""
@@ -34,7 +34,15 @@ steps:
         "run_id": "run-$RUN_ID",
         "source_file": "{{ file_path }}",
         "start_time": "$(date -Iseconds)",
-        "mode": "review-mode"
+        "mode": "manual-control"
+      }
+      EOF
+
+      # 初始化任务状态文件
+      cat > "$RUN_DIR/task-status.json" << EOF
+      {
+        "tasks": {},
+        "execution_order": []
       }
       EOF
 
@@ -45,7 +53,7 @@ steps:
     description: 调用 xmind-task-parser Agent 解析 XMind，生成结构化任务清单
     run: |
       source .claude/runs/.last-run
-      echo "🧠 步骤 1/5：解析 XMind，生成任务清单"
+      echo "🧠 解析 XMind，生成结构化任务清单"
       echo ""
       echo "请调用 xmind-task-parser Agent 解析以下文件内容："
       echo ""
@@ -57,70 +65,45 @@ steps:
       echo "- 同时在对话中展示任务清单概览"
       echo ""
 
-  - name: 确认执行计划
-    description: 展示执行计划并等待用户确认开始
+  - name: 显示状态看板，等待人工指令
+    description: 显示任务状态看板，完全由人工输入指令控制
     run: |
       source .claude/runs/.last-run
-      echo "📊 步骤 2/5：执行计划已生成"
-      echo ""
-      echo "📂 任务清单已保存到：$RUN_DIR/task-manifest.json"
-      echo "📂 执行计划已保存到：$RUN_DIR/execution-plan.md"
       echo ""
       echo "========================================"
-      echo "请审核上述任务清单和执行计划"
+      echo "✅ XMind 解析完成！进入纯人工控制模式"
       echo "========================================"
       echo ""
-      echo "输入 '开始' 进入任务审核执行流程，或提出修改意见。"
-
-  - name: 逐条审核执行任务（主循环）
-    description: 按依赖顺序逐条生成方案 → 审核 → 执行
-    run: |
-      source .claude/runs/.last-run
-      echo "⚡ 步骤 3/5：进入任务审核执行流程"
+      echo "📊 状态看板使用说明："
       echo ""
-      echo "运行目录：$RUN_DIR"
+      echo "AI 不主动执行任何任务，完全由你控制！"
+      echo "所有方案和执行结果都会被永久保存，100% 可追溯。"
       echo ""
-      echo "请按以下流程执行每个任务："
-      echo ""
-      echo "1. 读取 $RUN_DIR/task-manifest.json 中的任务清单"
-      echo "2. 按依赖拓扑排序确定执行顺序"
-      echo "3. 对每个任务按顺序执行："
-      echo "   a. 调用 task-scheme-generator 生成任务方案"
-      echo "   b. 展示方案供用户审核"
-      echo "   c. 根据用户选择：确认执行 / 修改方案 / 跳过 / 终止"
-      echo "   d. 执行任务并保存结果"
+      echo "可用指令："
+      echo "  T001         → 生成 T001 方案并审核执行"
+      echo "  view T001    → 只查看 T001 方案，不执行"
+      echo "  status       → 刷新显示状态看板"
+      echo "  report       → 查看执行报告"
+      echo "  exit         → 退出工作流，生成最终报告"
       echo ""
       echo "========================================"
-
-  - name: 生成最终交付报告
-    description: 所有任务完成后生成完整的交付报告
-    run: |
-      source .claude/runs/.last-run
-      echo "📦 步骤 4/5：生成最终交付报告"
+      echo "📦 强制保存的可追溯文件："
+      echo "  • scheme.md  → 完整代码方案（审核用）"
+      echo "  • result.md  → 执行结果 + 质量检查记录"
+      echo "  • task-status.json → 任务状态跟踪"
+      echo "  • task-manifest.json → 结构化任务清单"
+      echo "========================================"
       echo ""
-      echo "请汇总所有任务的执行结果，生成最终交付报告："
+      echo "请读取 $RUN_DIR/task-manifest.json 和 $RUN_DIR/task-status.json"
+      echo "并显示当前所有任务的状态看板"
       echo ""
-      echo "报告内容包含："
-      echo "- 执行概览（成功/跳过/失败数量）"
-      echo "- 修改文件清单"
-      echo "- 需人工关注项"
-      echo "- 验证步骤"
-      echo "- Git Commit 建议"
+      echo "📋 任务执行后逻辑："
+      echo "  1. 每个任务执行完成后，自动检查所有任务状态"
+      echo "  2. 如果所有任务都是 completed 或 skipped，自动生成 final-report.md"
+      echo "  3. 生成报告后显示提示：🎉 所有任务已完成，最终报告已生成"
       echo ""
-      echo "保存到：$RUN_DIR/final-report.md"
-
-  - name: 完成
-    description: 工作流执行完成
-    run: |
-      source .claude/runs/.last-run
+      echo "💡 提示："
+      echo "  • 状态图标：[⏸️] 待执行  [📋] 审核中  [✅] 已完成  [⏭️] 已跳过"
+      echo "  • 执行任务请调用 task-executor Agent，确保所有文件被正确保存"
+      echo "  • 所有任务完成后自动生成最终报告，无需手动输入 exit"
       echo ""
-      echo "🎉 XMind 工作流执行完成！"
-      echo ""
-      echo "📂 所有执行记录已保存到：$RUN_DIR/"
-      echo ""
-      echo "📦 最终交付报告：$RUN_DIR/final-report.md"
-      echo ""
-      echo "💡 下一步："
-      echo "   1. 查看并验证代码变更"
-      echo "   2. 根据建议提交 Git Commit"
-      echo "   3. 进行功能测试"
