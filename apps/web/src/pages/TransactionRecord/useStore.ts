@@ -5,7 +5,7 @@ import type { TabType, TransactionItem } from './index';
 export function useTransactionRecordStore() {
   const store = useLocalObservable(() => ({
     // 当前激活的 Tab
-    activeTab: 'inTransit' as TabType,
+    activeTab: 'inTransit',
 
     // 模拟交易列表数据（实际应该从 API 获取）
     transactionList: [

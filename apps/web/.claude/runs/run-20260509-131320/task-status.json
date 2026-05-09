@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "T001": { "status": "completed", "name": "实现 Button 类型定义", "dependencies": [] },
+    "T002": { "status": "completed", "name": "实现 Button 组件逻辑", "dependencies": ["T001"] },
+    "T003": { "status": "completed", "name": "实现 Button 样式", "dependencies": ["T001"] }
+  },
+  "execution_order": ["T001", "T002", "T003"],
+  "parallel_groups": [["T001"], ["T002", "T003"]]
+}
