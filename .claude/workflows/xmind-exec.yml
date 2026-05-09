@@ -1,75 +1,126 @@
-name: XMind 自动执行工作流
-description: 解析 XMind 导出的 Markdown 文件，自动转换为结构化任务并执行
+name: XMind 自动执行工作流 - 审核模式
+description: 解析 XMind 导出的 Markdown 文件，生成任务方案 → 人工审核 → 逐条执行，支持完整审核流程
 
 inputs:
   - name: file_path
     description: XMind 导出的 Markdown 文件路径（如 docs/strategy-detail-xmind.md）
     required: true
-  - name: auto_confirm
-    description: 是否自动确认执行计划（true/false，默认 false 需要手动确认）
-    default: "false"
 
 steps:
-  - name: 校验输入文件
-    description: 检查文件是否存在且格式正确
+  - name: 初始化运行环境
+    description: 创建运行目录和基础文件
     run: |
-      echo "📥 开始处理 XMind 文件：{{ file_path }}"
+      echo "🚀 开始 XMind 工作流 - 审核模式"
+      echo ""
+      echo "📂 文件路径：{{ file_path }}"
       echo ""
 
-      if [ ! -f "{{ file_path }}" ]; then
-        echo "❌ 文件不存在：{{ file_path }}"
-        exit 1
-      fi
+      # 生成唯一 run-id
+      RUN_ID=$(date +%Y%m%d-%H%M%S)
+      RUN_DIR=".claude/runs/run-$RUN_ID"
+      echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
+      echo "RUN_DIR=$RUN_DIR" >> .claude/runs/.last-run
 
-      echo "✅ 文件存在"
+      # 创建目录结构
+      mkdir -p "$RUN_DIR"
+      mkdir -p "$RUN_DIR/tasks"
+
+      echo "📂 运行目录：$RUN_DIR"
       echo ""
-      echo "📄 文件内容预览："
-      head -20 "{{ file_path }}"
+
+      # 保存运行基本信息
+      cat > "$RUN_DIR/run-info.json" << EOF
+      {
+        "run_id": "run-$RUN_ID",
+        "source_file": "{{ file_path }}",
+        "start_time": "$(date -Iseconds)",
+        "mode": "review-mode"
+      }
+      EOF
+
+      echo "✅ 运行环境初始化完成"
       echo ""
 
   - name: 解析 XMind 生成任务清单
-    description: 调用 xmind-task-parser Agent 解析 Markdown 并生成结构化任务清单
+    description: 调用 xmind-task-parser Agent 解析 XMind，生成结构化任务清单
     run: |
-      echo "🧠 调用 XMind 任务解析器..."
+      source .claude/runs/.last-run
+      echo "🧠 步骤 1/5：解析 XMind，生成任务清单"
+      echo ""
+      echo "请调用 xmind-task-parser Agent 解析以下文件内容："
+      echo ""
+      echo "文件路径：{{ file_path }}"
+      echo ""
+      echo "输出要求："
+      echo "- 保存任务清单 JSON 到：$RUN_DIR/task-manifest.json"
+      echo "- 生成执行计划文档到：$RUN_DIR/execution-plan.md"
+      echo "- 同时在对话中展示任务清单概览"
       echo ""
 
-      # 读取文件内容
-      XMIND_CONTENT=$(cat "{{ file_path }}")
-
-      # 输出给用户，让 xmind-task-parser Agent 处理
-      echo "✅ XMind 内容已加载，请 xmind-task-parser Agent 解析并输出任务清单 JSON："
-      echo ""
-      echo "```markdown"
-      echo "$XMIND_CONTENT"
-      echo "```"
-      echo ""
-      echo "📋 请 xmind-task-parser Agent 按规范输出纯 JSON 内容。"
-
-  - name: 执行任务清单
-    description: 调用 task-orchestrator Agent 按依赖顺序执行任务
+  - name: 确认执行计划
+    description: 展示执行计划并等待用户确认开始
     run: |
-      echo "⚡ 任务清单已生成，请 task-orchestrator Agent 校验并执行任务。"
+      source .claude/runs/.last-run
+      echo "📊 步骤 2/5：执行计划已生成"
       echo ""
-      echo "自动确认模式：{{ auto_confirm }}"
+      echo "📂 任务清单已保存到：$RUN_DIR/task-manifest.json"
+      echo "📂 执行计划已保存到：$RUN_DIR/execution-plan.md"
       echo ""
-      echo "请按以下步骤执行："
-      echo "1. 校验任务清单 JSON 格式"
-      echo "2. 生成执行计划并展示"
-      echo "{% if auto_confirm == 'false' %}3. 等待用户确认后开始执行{% endif %}"
-      echo "{% if auto_confirm == 'true' %}3. 自动开始执行{% endif %}"
-      echo "4. 按依赖顺序执行每个任务"
-      echo "5. 执行质量门禁检查"
-      echo "6. 生成最终交付报告"
+      echo "========================================"
+      echo "请审核上述任务清单和执行计划"
+      echo "========================================"
+      echo ""
+      echo "输入 '开始' 进入任务审核执行流程，或提出修改意见。"
+
+  - name: 逐条审核执行任务（主循环）
+    description: 按依赖顺序逐条生成方案 → 审核 → 执行
+    run: |
+      source .claude/runs/.last-run
+      echo "⚡ 步骤 3/5：进入任务审核执行流程"
+      echo ""
+      echo "运行目录：$RUN_DIR"
+      echo ""
+      echo "请按以下流程执行每个任务："
+      echo ""
+      echo "1. 读取 $RUN_DIR/task-manifest.json 中的任务清单"
+      echo "2. 按依赖拓扑排序确定执行顺序"
+      echo "3. 对每个任务按顺序执行："
+      echo "   a. 调用 task-scheme-generator 生成任务方案"
+      echo "   b. 展示方案供用户审核"
+      echo "   c. 根据用户选择：确认执行 / 修改方案 / 跳过 / 终止"
+      echo "   d. 执行任务并保存结果"
+      echo ""
+      echo "========================================"
+
+  - name: 生成最终交付报告
+    description: 所有任务完成后生成完整的交付报告
+    run: |
+      source .claude/runs/.last-run
+      echo "📦 步骤 4/5：生成最终交付报告"
+      echo ""
+      echo "请汇总所有任务的执行结果，生成最终交付报告："
+      echo ""
+      echo "报告内容包含："
+      echo "- 执行概览（成功/跳过/失败数量）"
+      echo "- 修改文件清单"
+      echo "- 需人工关注项"
+      echo "- 验证步骤"
+      echo "- Git Commit 建议"
+      echo ""
+      echo "保存到：$RUN_DIR/final-report.md"
 
   - name: 完成
     description: 工作流执行完成
     run: |
+      source .claude/runs/.last-run
       echo ""
-      echo "🎉 XMind → AI 执行工作流完成！"
+      echo "🎉 XMind 工作流执行完成！"
       echo ""
-      echo "📦 交付报告已生成，请查看上面的输出。"
+      echo "📂 所有执行记录已保存到：$RUN_DIR/"
       echo ""
-      echo "💡 建议："
-      echo "   1. 查看需人工关注项并处理"
-      echo "   2. 按验证步骤测试功能"
-      echo "   3. 使用建议的 Git Commit 信息提交代码"
+      echo "📦 最终交付报告：$RUN_DIR/final-report.md"
+      echo ""
+      echo "💡 下一步："
+      echo "   1. 查看并验证代码变更"
+      echo "   2. 根据建议提交 Git Commit"
+      echo "   3. 进行功能测试"
