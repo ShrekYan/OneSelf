@@ -1,5 +1,5 @@
-name: XMind 工作流 - 纯人工控制模式
-description: 解析 XMind 导出的 Markdown 文件，生成结构化任务清单，人工输入任务编号控制执行，支持完整代码审核
+name: XMind 工作流 - 五要素智能执行模式 v3.2（先审后写）
+description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件。
 
 inputs:
   - name: file_path
@@ -7,13 +7,147 @@ inputs:
     required: true
 
 steps:
-  - name: 初始化运行环境
-    description: 创建运行目录和基础文件
+  # ============================================================================
+  # 第一步：优先检查已有解析结果
+  # ============================================================================
+  - name: 🔍 【第一步】优先检查已有解析结果
+    description: 在创建新目录之前先检查是否已有相同 XMind 的解析结果，有则直接复用整个运行目录
     run: |
-      echo "🚀 开始 XMind 工作流 - 纯人工控制模式"
+      # --------------------------------------------------------------------------
+      # 1. 初始化基本信息
+      # --------------------------------------------------------------------------
+      echo "🚀 开始 XMind 工作流 - 五要素智能执行模式 v3.1"
       echo ""
       echo "📂 文件路径：{{ file_path }}"
       echo ""
+
+      TARGET_FILE="{{ file_path }}"
+      TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
+
+      echo "🔍 执行铁律：优先检查已有解析结果（创建新目录前）"
+      echo ""
+      echo "目标文件：$TARGET_FILE"
+      echo "绝对路径：$TARGET_ABS_PATH"
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 2. 清理半完成目录（解决重复生成 execution-plan 问题）
+      # --------------------------------------------------------------------------
+      # 问题根因：xmind-task-parser 中断时可能只保存了 execution-plan.md
+      # 但没保存 task-manifest.json，导致第二次执行时创建新目录造成重复
+      echo "🧹 清理无效的半完成目录（有 execution-plan 但无 task-manifest）"
+      for run_dir in .claude/runs/run-*; do
+        if [ -d "$run_dir" ]; then
+          if [ -f "$run_dir/execution-plan.md" ] && [ ! -f "$run_dir/task-manifest.json" ]; then
+            echo "  🗑️  清理半完成目录：$run_dir"
+            rm -rf "$run_dir"
+          fi
+        fi
+      done
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 3. 查找已有解析结果（按时间倒序，优先最新）
+      # --------------------------------------------------------------------------
+      FOUND_MANIFEST=""
+      for manifest in $(find .claude/runs -name "task-manifest.json" -type f 2>/dev/null | sort -r); do
+        SOURCE_XMIND=$(cat "$manifest" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source_xmind',''))" 2>/dev/null)
+        if [ -n "$SOURCE_XMIND" ] && [ "$SOURCE_XMIND" = "$TARGET_ABS_PATH" ]; then
+          FOUND_MANIFEST="$manifest"
+          break
+        fi
+      done
+
+      # --------------------------------------------------------------------------
+      # 4. 找到已有结果：直接复用整个运行目录
+      # --------------------------------------------------------------------------
+      if [ -n "$FOUND_MANIFEST" ]; then
+        echo "✅ 找到已有解析结果：$FOUND_MANIFEST"
+        echo ""
+
+        EXISTING_RUN_DIR=$(dirname "$FOUND_MANIFEST")
+        RUN_ID=$(basename "$EXISTING_RUN_DIR" | sed 's/^run-//')
+
+        # 覆盖 .last-run，直接指向已有目录
+        echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
+        echo "RUN_DIR=$EXISTING_RUN_DIR" >> .claude/runs/.last-run
+
+        # ------------------------------------------------------------------------
+        # 4.1 输出任务清单概览
+        # ------------------------------------------------------------------------
+        python3 << EOF
+import json
+
+with open('$EXISTING_RUN_DIR/task-manifest.json', 'r') as f:
+    manifest = json.load(f)
+
+print("📋 已复用已有运行目录：$EXISTING_RUN_DIR")
+print("=" * 70)
+print(f"{'任务ID':<6} {'目标':<35} {'执行模式':<15} {'状态':<10}")
+print("=" * 70)
+
+with open('$EXISTING_RUN_DIR/task-status.json', 'r') as f:
+    status = json.load(f)
+
+for task in manifest.get('tasks', []):
+    task_id = task.get('task_id')
+    task_status = status.get('tasks', {}).get(task_id, {}).get('status', 'pending')
+    mode = task.get('execution_mode', 'review-first')
+    if mode == 'plan-only':
+        mode_icon = "📋 plan-only"
+    elif mode == 'review-first':
+        mode_icon = "👀 review-first"
+    else:
+        mode_icon = "⚡ auto-exec"
+    if task_status == 'completed':
+        status_icon = "✅"
+    elif task_status == 'reviewing':
+        status_icon = "📋"
+    else:
+        status_icon = "⏸️"
+    print(f"  {task_id:<4} | {task.get('goal')[:33]:<35} | {mode_icon:<15} | {status_icon} {task_status}")
+print("=" * 70)
+EOF
+
+        # ------------------------------------------------------------------------
+        # 4.2 更新 run-info 标记为继续执行
+        # ------------------------------------------------------------------------
+        python3 << EOF
+import json
+from datetime import datetime
+
+with open('$EXISTING_RUN_DIR/run-info.json', 'r') as f:
+    run_info = json.load(f)
+    run_info['continue_execution'] = True
+    run_info['last_resume_time'] = datetime.now().isoformat()
+with open('$EXISTING_RUN_DIR/run-info.json', 'w') as f:
+    json.dump(run_info, f, indent=2, ensure_ascii=False)
+EOF
+
+        echo ""
+        echo "✅ 已直接复用整个运行目录，继续之前的执行状态"
+        echo "⚠️  跳过目录创建、跳过重复解析，状态完全继承"
+        echo ""
+        echo "🔄 请继续输入任务指令（如 T001, T002 等）"
+
+      # --------------------------------------------------------------------------
+      # 5. 未找到已有结果：标记需要创建新目录和解析
+      # --------------------------------------------------------------------------
+      else
+        echo "⚠️  未找到已有解析结果，将创建新目录并执行新的解析"
+        touch .claude/runs/.parse-needed
+        touch .claude/runs/.init-needed
+      fi
+      echo ""
+
+  # ============================================================================
+  # 第二步：初始化新运行环境（仅当没有已有结果时）
+  # ============================================================================
+  - name: 初始化新运行环境（仅当没有已有结果时）
+    description: 仅当没有已有解析结果时，才创建新的运行目录和基础文件
+    if: '[ -f .claude/runs/.init-needed ]'
+    run: |
+      rm -f .claude/runs/.init-needed
 
       # 生成唯一 run-id
       RUN_ID=$(date +%Y%m%d-%H%M%S)
@@ -25,16 +159,21 @@ steps:
       mkdir -p "$RUN_DIR"
       mkdir -p "$RUN_DIR/tasks"
 
-      echo "📂 运行目录：$RUN_DIR"
+      echo "📂 新建运行目录：$RUN_DIR"
       echo ""
+
+      # 获取文件绝对路径
+      TARGET_FILE="{{ file_path }}"
+      TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
 
       # 保存运行基本信息
       cat > "$RUN_DIR/run-info.json" << EOF
       {
         "run_id": "run-$RUN_ID",
         "source_file": "{{ file_path }}",
+        "source_file_abs": "$TARGET_ABS_PATH",
         "start_time": "$(date -Iseconds)",
-        "mode": "manual-control"
+        "mode": "smart-execution-v3.1"
       }
       EOF
 
@@ -42,78 +181,170 @@ steps:
       cat > "$RUN_DIR/task-status.json" << EOF
       {
         "tasks": {},
-        "execution_order": []
+        "execution_order": [],
+        "parallel_groups": []
       }
       EOF
 
-      echo "✅ 运行环境初始化完成"
+      echo "✅ 新运行环境初始化完成"
       echo ""
 
-  - name: 解析 XMind 生成任务清单
-    description: 调用 xmind-task-parser Agent 解析 XMind，生成结构化任务清单
+  # ============================================================================
+  # 第三步：解析 XMind 生成任务清单（仅当需要时）
+  # ============================================================================
+  - name: 🧠 解析 XMind 生成任务清单（仅当需要时）
+    description: 仅当没有已有解析结果时，调用 xmind-task-parser Agent 解析
+    if: '[ -f .claude/runs/.parse-needed ]'
     run: |
       source .claude/runs/.last-run
-      echo "🧠 解析 XMind，生成结构化任务清单"
+      rm -f .claude/runs/.parse-needed
+
+      echo "🧠 解析 XMind（v3.0 五要素深度解析）"
       echo ""
       echo "请调用 xmind-task-parser Agent 解析以下文件内容："
       echo ""
       echo "文件路径：{{ file_path }}"
       echo ""
-      echo "输出要求："
+      echo "输出要求（v3.0）："
+      echo "- 支持任意深度嵌套检测五要素"
+      echo "- 提取五要素：goal / context / quality_standards / constraints / execution_mode"
       echo "- 保存任务清单 JSON 到：$RUN_DIR/task-manifest.json"
       echo "- 生成执行计划文档到：$RUN_DIR/execution-plan.md"
-      echo "- 同时在对话中展示任务清单概览"
+      echo "- 在 task-status.json 中记录每个任务的 execution_mode"
+      echo "- 同时在对话中展示任务清单概览（包含执行模式）"
       echo ""
 
+  # ============================================================================
+  # 第四步：显示状态看板，等待人工指令
+  # ============================================================================
   - name: 显示状态看板，等待人工指令
-    description: 显示任务状态看板，完全由人工输入指令控制
+    description: 显示任务状态看板，支持三种执行模式，完全由人工输入指令控制
     run: |
       source .claude/runs/.last-run
       echo ""
       echo "========================================"
-      echo "✅ XMind 解析完成！进入纯人工控制模式"
+      echo "✅ XMind 解析完成！进入五要素智能执行模式 v3.0"
       echo "========================================"
       echo ""
-      echo "📊 状态看板使用说明："
+
+      # --------------------------------------------------------------------------
+      # 执行模式说明
+      # --------------------------------------------------------------------------
+      echo "📊 执行模式说明（每个任务独立）："
       echo ""
-      echo "AI 不主动执行任何任务，完全由你控制！"
+      echo "  📋 plan-only     → 只生成方案，不执行代码"
+      echo "  👀 review-first  → 生成方案 + 理由，用户确认后再执行（默认）"
+      echo "  ⚡ auto-exec     → 自动执行，不需要确认"
+      echo ""
+
+      echo "========================================"
+      echo "📊 状态看板使用说明："
+      echo "========================================"
+      echo ""
       echo "所有方案和执行结果都会被永久保存，100% 可追溯。"
       echo ""
+
+      # --------------------------------------------------------------------------
+      # 可用指令说明
+      # --------------------------------------------------------------------------
       echo "可用指令："
-      echo "  T001         → 生成 T001 方案并审核执行"
+      echo "  T001         → 执行 T001（根据该任务的 execution_mode 决定是否需要确认）"
       echo "  view T001    → 只查看 T001 方案，不执行"
+      echo "  exec T001    → 强制直接执行 T001，跳过审核"
+      echo "  yes          → 确认当前方案，开始执行"
+      echo "  no           → 取消当前任务"
+      echo "  edit 你的修改意见 → 根据你的意见调整方案，支持多轮迭代"
+      echo "                  示例：edit 把枚举名改成 DepartType，放到 constants 目录"
       echo "  status       → 刷新显示状态看板"
       echo "  report       → 查看执行报告"
       echo "  exit         → 退出工作流，生成最终报告"
       echo ""
+
+      # --------------------------------------------------------------------------
+      # 重要说明
+      # --------------------------------------------------------------------------
       echo "========================================"
       echo "📦 强制保存的可追溯文件："
-      echo "  • scheme.md  → 完整代码方案（审核用）"
-      echo "  • result.md  → 执行结果 + 质量检查记录"
-      echo "  • task-status.json → 任务状态跟踪"
-      echo "  • task-manifest.json → 结构化任务清单"
+      echo "  • scheme.md      → 完整代码方案（审核用）"
+      echo "  • result.md      → 执行结果 + 质量检查记录"
+      echo "  • task-status.json → 任务状态跟踪（包含 execution_mode）"
+      echo "  • task-manifest.json → 结构化任务清单（五要素完整信息）"
       echo "========================================"
       echo ""
+
       echo "⚠️  关键：必须以 $RUN_DIR/task-status.json 为状态的唯一真相来源"
       echo "请按以下顺序读取："
-      echo "  1. 首先读取 $RUN_DIR/task-status.json → 获取所有任务的真实状态"
-      echo "  2. 然后读取 $RUN_DIR/task-manifest.json → 补充任务的业务信息"
+      echo "  1. 首先读取 $RUN_DIR/task-status.json → 获取所有任务的真实状态 + execution_mode"
+      echo "  2. 然后读取 $RUN_DIR/task-manifest.json → 补充任务的五要素完整信息"
       echo ""
+
       echo "特别注意："
       echo "  • 每个任务的 status 必须从 task-status.json 读取"
+      echo "  • 每个任务的 execution_mode 决定执行行为"
       echo "  • status = 'completed' → 显示为 [✅] 已完成"
-      echo "  • status = 'pending' → 显示为 [⏸️] 待执行"
+      echo "  • status = 'pending'   → 显示为 [⏸️] 待执行"
+      echo "  • status = 'reviewing' → 显示为 [📋] 审核中"
       echo "  • 不要将已完成的任务显示为待执行"
       echo ""
-      echo "然后显示当前所有任务的状态看板"
+
+      echo "然后显示当前所有任务的状态看板（显示每个任务的 execution_mode）"
       echo ""
+
+      # --------------------------------------------------------------------------
+      # 任务执行后逻辑
+      # --------------------------------------------------------------------------
       echo "📋 任务执行后逻辑："
       echo "  1. 每个任务执行完成后，自动检查所有任务状态"
       echo "  2. 如果所有任务都是 completed 或 skipped，自动生成 final-report.md"
       echo "  3. 生成报告后显示提示：🎉 所有任务已完成，最终报告已生成"
       echo ""
-      echo "💡 提示："
-      echo "  • 状态图标：[⏸️] 待执行  [📋] 审核中  [✅] 已完成  [⏭️] 已跳过"
-      echo "  • 执行任务请调用 task-executor Agent，确保所有文件被正确保存"
-      echo "  • 所有任务完成后自动生成最终报告，无需手动输入 exit"
+
+      # --------------------------------------------------------------------------
+      # 方案确认交互流程
+      # --------------------------------------------------------------------------
+      echo "💡 方案确认交互流程（重要）："
+      echo "  当方案展示后，你可以："
+      echo ""
+      echo "  • yes        → ✅ 确认方案，开始执行代码"
+      echo "  • no         → ❌ 取消任务，不执行任何修改"
+      echo "  • edit + 意见 → 🔄 根据你的修改意见重新生成方案"
+      echo "                  支持多轮迭代，直到你满意再输入 yes 确认"
+      echo ""
+      echo "  示例：edit 把枚举名改成 DepartType，放到 constants 目录"
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 任务指令说明
+      # --------------------------------------------------------------------------
+      echo "💡 任务指令说明（task-executor v3.0 - 先审后写）："
+      echo "  • 当用户输入 T001 时："
+      echo "    1. 读取 T001 的 execution_mode"
+      echo "    2. 如果是 plan-only：只在控制台展示方案，不写任何文件，不执行"
+      echo "    3. 如果是 review-first：控制台展示方案 + 理由 → 用户确认后才写文件 + 执行"
+      echo "    4. 如果是 auto-exec：直接生成方案并执行，执行完成后一次性写文件"
+      echo "    5. 自动记录当前任务到 $RUN_DIR/.current-task（仅记录 task_id）"
+      echo ""
+      echo "  • 当用户输入 exec T001 时："
+      echo "    强制直接执行，忽略 execution_mode"
+      echo ""
+
+      echo "💡 【铁律 - 6 条红线全部保留，只调整写入时机】"
+      echo "  ✅ 红线 1：scheme.md 必须写，但只在 yes 确认后写（第一次也是最后一次）"
+      echo "  ✅ 红线 2：result.md 必须写，执行完成后写"
+      echo "  ✅ 红线 3：task-status.json 必须更新，执行完成后更新"
+      echo "  ✅ 红线 4：代码方案必须完整，不能用摘要"
+      echo "  ✅ 红线 5：严禁自动推进到下一个任务"
+      echo "  ✅ 红线 6：所有任务完成时自动生成 final-report.md"
+      echo ""
+      echo "  💡 内存迭代，零中间文件："
+      echo "  ✅ 所有 edit 迭代都在内存中完成，不写任何中间文件"
+      echo "  ✅ no 取消时，什么都不写，干净退出"
+      echo ""
+
+      echo "💡 用户指令行为："
+      echo "  • T00x → 读取任务 → 控制台展示方案 → 不写任何文件 → 等待 yes/no/edit"
+      echo "  • edit xxx → 内存中修改方案 → 控制台展示 → 不写任何文件"
+      echo "  • yes → 写 scheme.md → 执行代码 → 写 result.md → 更新 status → 清理状态"
+      echo "  • no → 清理状态 → 不写任何文件 → 干净退出"
+      echo "  • exec T00x → 直接执行 → 执行完一次性写所有文件"
       echo ""
