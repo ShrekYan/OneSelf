@@ -284,14 +284,31 @@ EOF
       TARGET_FILE="{{ file_path }}"
       TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
 
-      # 保存运行基本信息
+      # 保存运行基本信息（与 Agent 格式完全一致）
       cat > "$RUN_DIR/run-info.json" << EOF
       {
-        "run_id": "run-$RUN_ID",
+        "run_id": "$RUN_ID",
         "source_file": "{{ file_path }}",
         "source_file_abs": "$TARGET_ABS_PATH",
         "start_time": "$(date -Iseconds)",
-        "mode": "smart-execution-v3.1"
+        "mode": "smart-execution-v3.3",
+        "continue_execution": false,
+        "last_resume_time": null,
+        "parser_version": "3.3"
+      }
+      EOF
+
+      # 正式目录也写入 run-info.json
+      cat > "$TASKS_DIR/run-info.json" << EOF
+      {
+        "run_id": "$RUN_ID",
+        "source_file": "{{ file_path }}",
+        "source_file_abs": "$TARGET_ABS_PATH",
+        "start_time": "$(date -Iseconds)",
+        "mode": "smart-execution-v3.3",
+        "continue_execution": false,
+        "last_resume_time": null,
+        "parser_version": "3.3"
       }
       EOF
 

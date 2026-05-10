@@ -283,13 +283,37 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
 - 质量门禁
 - 验收标准
 
-### 11.6 保存顺序要求（双目录策略）
+### 11.6 必须生成 run-info.json（双目录策略 v3.3 新增）
 
-1. ✅ **先保存 task-manifest.json** → 同时写入正式目录 + 临时目录
-2. ✅ **再保存 task-definition.md** → 写入正式目录
-3. ✅ **再初始化 task-status.json** → 同时写入正式目录 + 临时目录
-4. ✅ **再保存 execution-plan.md** → 写入临时目录
-5. ✅ **最后在对话中展示结果**
+**必须生成**运行元信息文件，写入两个位置：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/run-info.json` | 永久存储 |
+| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/run-info.json` | 兼容保留 |
+
+文件格式（标准统一）：
+```json
+{
+  "run_id": "{run-id}",
+  "source_file": "原始文件相对路径",
+  "source_file_abs": "原始文件绝对路径",
+  "start_time": "ISO 8601 格式时间",
+  "mode": "smart-execution-v3.3",
+  "continue_execution": false,
+  "last_resume_time": null,
+  "parser_version": "3.3"
+}
+```
+
+### 11.7 保存顺序要求（双目录策略）
+
+1. ✅ **先保存 run-info.json** → 同时写入正式目录 + 临时目录（NEW！）
+2. ✅ **再保存 task-manifest.json** → 同时写入正式目录 + 临时目录
+3. ✅ **再保存 task-definition.md** → 写入正式目录
+4. ✅ **再初始化 task-status.json** → 同时写入正式目录 + 临时目录
+5. ✅ **再保存 execution-plan.md** → 写入临时目录
+6. ✅ **最后在对话中展示结果**
 
 **所有文件必须都保存，缺一不可。**
 
