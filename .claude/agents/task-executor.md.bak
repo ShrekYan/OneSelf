@@ -34,86 +34,6 @@ triggers:
 
 ---
 
-# 📤 多阶段项目产物记录（v3.1 新增）
-
-## 1. 任务产物自动记录
-
-每个任务执行完成后，**必须自动识别并记录**该任务产生的所有文件：
-
-| 产物类型 | 识别规则 | 示例 |
-|---------|---------|------|
-| `api` | 文件路径包含 `controller`、`service`、`api` | 新增登录接口 |
-| `type` | 文件路径包含 `types`、`interface`、`dto` | User 类型定义 |
-| `component` | 文件路径包含 `components`、`pages` | Button 组件 |
-| `utility` | 文件路径包含 `utils`、`helpers`、`tools` | 日期格式化工具 |
-| `config` | 文件路径包含 `config`、`constant` | 配置文件 |
-| `other` | 其他所有文件 | 通用文件 |
-
-每个产物记录格式：
-```json
-{
-  "type": "api",
-  "name": "任务目标描述",
-  "path": "文件的完整路径",
-  "usage": "简要说明如何使用",
-  "task_id": "T001"
-}
-```
-
----
-
-## 2. 「给下一阶段提示」功能（XMind 配置）
-
-在 XMind 任务节点中添加子节点，内容包含：
-```
-给下一阶段提示：xxxx
-下一阶段注意：xxxx
-提示下一阶段：xxxx
-```
-
-执行器会自动收集所有提示内容，保存到 `output-manifest.json`。
-
----
-
-## 3. output-manifest.json 自动生成
-
-当**所有任务都完成**时（执行到阶段 5 检测到 all completed），**必须自动生成**此文件：
-
-```json
-{
-  "run_dir": "run-20260510-100000-阶段一-后端API层",
-  "phase_name": "从 task-manifest 的 project_name 提取",
-  "completed_at": "ISO 时间戳",
-  "task_count": 15,
-  "nextTaskId": 16,
-  "outputs": [
-    {
-      "type": "api",
-      "name": "用户登录接口",
-      "path": "services/auth/src/login.controller.ts",
-      "usage": "POST /v1/auth/login，参数：{ phone, password }",
-      "task_id": "T001"
-    }
-  ],
-  "hintsForNextPhase": [
-    "发车接口路径是 /v1/normal/departDetail",
-    "User 类型已定义在 packages/types/user.ts"
-  ]
-}
-```
-
----
-
-## 4. nextTaskId 计算规则
-
-`nextTaskId` = 本阶段最后一个任务的 ID 数字部分 + 1
-
-示例：
-- 本阶段任务：T001 ~ T015 → nextTaskId = 16
-- 本阶段任务：T016 ~ T022 → nextTaskId = 23
-
----
-
 # 📋 执行流程（先审后写 v3.0）
 
 ---
@@ -404,20 +324,13 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
    - 读取 task-status.json
    - 如果所有任务状态都是 `completed` 或 `skipped`（没有 `pending` 任务）
    - **自动生成 final-report.md**，保存到运行目录
-   - **v3.1 新增：自动生成 output-manifest.json**（多阶段项目产物清单）
-   - 在状态看板底部显示提示：`🎉 所有任务已完成，最终报告 + 产物清单已生成`
+   - 在状态看板底部显示提示：`🎉 所有任务已完成，最终报告已生成`
 
 ---
 
-## 阶段 6：自动生成最终报告 + 产物清单（当所有任务完成时 - v3.1 增强）
+## 阶段 6：自动生成最终报告（当所有任务完成时）
 
-当检测到所有任务完成时，**必须同时生成以下两个文件**：
-
----
-
-### 6.1 生成 final-report.md（保持不变）
-
-内容保持不变，包含：
+当检测到所有任务完成时，必须生成 `final-report.md`，包含以下内容：
 
 1. 项目概述（名称、执行时间、运行目录）
 2. 执行概览统计（总任务数、已完成、已跳过、完成率）
@@ -427,44 +340,10 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
 6. Git Commit 建议
 7. 验收标准检查
 
----
-
-### 6.2 生成 output-manifest.json（v3.1 新增 - 多阶段产物清单）
-
-**必须生成**到运行目录下，格式严格按照以下 JSON：
-
-```json
-{
-  "run_dir": "当前运行目录名",
-  "phase_name": "从 task-manifest.json 的 project_name 提取",
-  "completed_at": "ISO 时间戳",
-  "task_count": "本阶段任务总数",
-  "nextTaskId": "最后一个任务 ID 数字 + 1",
-  "outputs": [
-    {
-      "type": "api/type/component/utility/config/other",
-      "name": "任务目标描述",
-      "path": "文件的完整路径",
-      "usage": "简要说明如何使用（1 句话）",
-      "task_id": "T001"
-    }
-  ],
-  "hintsForNextPhase": [
-    "从所有任务中收集的「给下一阶段提示：xxx」内容"
-  ]
-}
-```
-
----
-
-### 6.3 生成规则说明
-
-- **重要提示**：
-  - 生成报告后不需要询问用户，直接生成即可
-  - 报告是信息汇总，不修改任何业务代码，零风险
-  - 如果用户后续重新执行任务，需要重新生成更新版的报告
-- **多阶段项目**：output-manifest.json 是下一个阶段 `--depends-on` 的基础，必须确保格式正确、JSON 有效
-- **单阶段项目**：也会生成此文件，方便以后扩展为多阶段项目
+**重要提示：**
+- 生成报告后不需要询问用户，直接生成即可
+- 报告是信息汇总，不修改任何业务代码，零风险
+- 如果用户后续重新执行任务，需要重新生成更新版的报告
 
 ---
 
@@ -529,19 +408,5 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
 
 ---
 
-**Agent 版本**：v3.1 - 先审后写 + 多阶段产物支持
-**最后更新**：2026-05-10（新增多阶段项目支持 - 自动生成 output-manifest.json、任务产物自动记录、nextTaskId 自动计算）
-
----
-
-# 📋 向后兼容说明（v3.0 → v3.1）
-
-✅ **100% 完全兼容**，旧项目不受任何影响：
-- 所有现有执行流程完全不变
-- output-manifest.json 是额外生成的，不影响任何现有文件
-- 单阶段项目也会生成此文件，只是你可能用不上
-- 不需要修改任何现有配置或 XMind 文件
-
-只有当你需要多阶段项目时，才需要：
-1. 下一个阶段解析时传 `--depends-on=run-xxx` 参数
-2. XMind 中可以选择性添加「给下一阶段提示：xxx」节点
+**Agent 版本**：v3.0 - 先审后写（先在控制台审方案，yes 后一次性写文件）
+**最后更新**：2026-05-10
