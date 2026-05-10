@@ -1,0 +1,204 @@
+name: XMind 全局状态看板 v1.0（物理多开专用）
+description: 跨所有 run 目录聚合显示任务状态，支持查看多窗口并发执行进度、依赖关系和文件修改冲突。默认只读，不修改任何文件。
+
+inputs:
+  - name: mode
+    description: "显示模式：summary（总览）、full（详细）、deps（依赖）、conflicts（冲突）"
+    required: false
+    default: "summary"
+
+steps:
+  - name: 📊 生成全局状态看板
+    run: |
+      MODE="{{ mode }}"
+      RUNS_DIR=".claude/runs"
+      TOTAL_RUNS=0
+      TOTAL_TASKS=0
+      TOTAL_COMPLETED=0
+      TOTAL_REVIEWING=0
+      TOTAL_PENDING=0
+
+      echo ""
+      echo "╔══════════════════════════════════════════════════════════════════════════╗"
+      echo "║                    📊 XMind 全局状态看板 v1.0                            ║"
+      echo "║                    跨窗口聚合状态 · 只读 · 零副作用                       ║"
+      echo "╚══════════════════════════════════════════════════════════════════════════╝"
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 1. 收集所有有效 run 目录
+      # --------------------------------------------------------------------------
+      declare -A RUN_INFO
+      declare -A RUN_TASK_STATUS
+      declare -A ALL_FILES_MODIFIED  # 记录所有被修改的文件，用于冲突检测
+
+      for run_dir in "$RUNS_DIR"/run-*; do
+        if [ ! -d "$run_dir" ]; then
+          continue
+        fi
+
+        # 检查是否有 task-manifest.json（有效 run 目录）
+        if [ ! -f "$run_dir/task-manifest.json" ]; then
+          continue
+        fi
+
+        TOTAL_RUNS=$((TOTAL_RUNS + 1))
+        RUN_BASENAME=$(basename "$run_dir")
+
+        # 读取基本信息
+        PROJECT_NAME=$(cat "$run_dir/task-manifest.json" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('project_name','未知项目'))" 2>/dev/null || echo "未知项目")
+        SOURCE_FILE=$(cat "$run_dir/task-manifest.json" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source_xmind',''))" 2>/dev/null || echo "")
+        SOURCE_SHORT=$(basename "$SOURCE_FILE" 2>/dev/null || echo "$SOURCE_FILE")
+
+        # 统计任务状态
+        TASK_STATS=$(cat "$run_dir/task-status.json" 2>/dev/null | python3 << 'EOF'
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    tasks = d.get('tasks', {})
+    total = len(tasks)
+    completed = sum(1 for t in tasks.values() if t.get('status') == 'completed')
+    reviewing = sum(1 for t in tasks.values() if t.get('status') == 'reviewing')
+    pending = sum(1 for t in tasks.values() if t.get('status') in ('pending', ''))
+    print(f"{total} {completed} {reviewing} {pending}")
+except:
+    print("0 0 0 0")
+EOF
+)
+        read t_total t_completed t_reviewing t_pending <<< "$TASK_STATS"
+
+        TOTAL_TASKS=$((TOTAL_TASKS + t_total))
+        TOTAL_COMPLETED=$((TOTAL_COMPLETED + t_completed))
+        TOTAL_REVIEWING=$((TOTAL_REVIEWING + t_reviewing))
+        TOTAL_PENDING=$((TOTAL_PENDING + t_pending))
+
+        # 计算进度
+        if [ $t_total -gt 0 ]; then
+          PROGRESS=$((t_completed * 100 / t_total))
+        else
+          PROGRESS=0
+        fi
+
+        RUN_INFO["$RUN_BASENAME"]="$PROGRESS%|$t_total|$t_completed|$t_reviewing|$t_pending|$PROJECT_NAME|$SOURCE_SHORT"
+
+        # 收集该 run 下所有已修改的文件（用于冲突检测）
+        while IFS= read -r result_file; do
+          if [ -f "$result_file" ]; then
+            # 从 result.md 中提取已修改的文件
+            while IFS= read -r file_line; do
+              if echo "$file_line" | grep -qE "^(✅|📝) .+\.(ts|tsx|js|jsx|scss|css|yml|yaml|json|md)$"; then
+                FILE_PATH=$(echo "$file_line" | sed -E 's/^(✅|📝) //' | sed 's/ (已创建|已更新)$//')
+                if [ -n "$FILE_PATH" ] && [ "$FILE_PATH" != "" ]; then
+                  if [ -n "${ALL_FILES_MODIFIED[$FILE_PATH]}" ]; then
+                    ALL_FILES_MODIFIED["$FILE_PATH"]="${ALL_FILES_MODIFIED[$FILE_PATH]} $RUN_BASENAME"
+                  else
+                    ALL_FILES_MODIFIED["$FILE_PATH"]="$RUN_BASENAME"
+                  fi
+                fi
+              fi
+            done < "$result_file"
+          fi
+        done < <(find "$run_dir" -maxdepth 2 -name "result*.md" 2>/dev/null)
+
+      done
+
+      # --------------------------------------------------------------------------
+      # 2. 汇总统计（summary 模式）
+      # --------------------------------------------------------------------------
+      echo "📈 全局汇总"
+      echo "────────────────────────────────────────────────────────────────────────────"
+      printf "  %-20s %3d 个运行目录\n" "活跃项目数：" "$TOTAL_RUNS"
+      printf "  %-20s %3d 个任务\n" "总任务数：" "$TOTAL_TASKS"
+      printf "  %-20s %3d 个 ✅ 已完成\n" "已完成：" "$TOTAL_COMPLETED"
+      printf "  %-20s %3d 个 📋 审核中\n" "审核中：" "$TOTAL_REVIEWING"
+      printf "  %-20s %3d 个 ⏸️  待执行\n" "待执行：" "$TOTAL_PENDING"
+      if [ $TOTAL_TASKS -gt 0 ]; then
+        GLOBAL_PROGRESS=$((TOTAL_COMPLETED * 100 / TOTAL_TASKS))
+        printf "  %-20s %3d%%\n" "总体进度：" "$GLOBAL_PROGRESS"
+      fi
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 3. 各项目详细状态（full 模式）
+      # --------------------------------------------------------------------------
+      if [ "$MODE" = "summary" ] || [ "$MODE" = "full" ]; then
+        echo "📂 各项目状态明细"
+        echo "────────────────────────────────────────────────────────────────────────────"
+        printf "  %-28s %6s %4s %4s %4s  %s\n" "Run 目录" "进度" "总" "完成" "待审" "项目名称"
+        echo "  ───────────────────────────────────────────────────────────────────────"
+
+        # 按进度排序显示
+        for run_name in $(printf "%s\n" "${!RUN_INFO[@]}" | sort); do
+          IFS='|' read -r progress total completed reviewing pending proj_name source <<< "${RUN_INFO[$run_name]}"
+
+          # 进度条
+          BAR_LEN=10
+          FILLED=$((progress * BAR_LEN / 100))
+          EMPTY=$((BAR_LEN - FILLED))
+          BAR=$(printf "%0.s█" $(seq 1 $FILLED))$(printf "%0.s░" $(seq 1 $EMPTY))
+
+          NAME_DISPLAY=$proj_name
+          if [ ${#proj_name} -gt 25 ]; then
+            NAME_DISPLAY="${proj_name:0:22}..."
+          fi
+
+          printf "  %-28s [%s]%3d%% %3d %4d %4d  %s\n" "$run_name" "$BAR" "$progress" "$total" "$completed" "$reviewing" "$NAME_DISPLAY"
+        done
+        echo ""
+      fi
+
+      # --------------------------------------------------------------------------
+      # 4. 冲突检测（conflicts 模式或 summary 模式显示摘要）
+      # --------------------------------------------------------------------------
+      echo "⚠️  文件修改冲突检测"
+      echo "────────────────────────────────────────────────────────────────────────────"
+      HAS_CONFLICTS=0
+      CONFLICT_COUNT=0
+
+      for file_path in "${!ALL_FILES_MODIFIED[@]}"; do
+        RUN_COUNT=$(echo "${ALL_FILES_MODIFIED[$file_path]}" | wc -w | tr -d ' ')
+        if [ "$RUN_COUNT" -gt 1 ]; then
+          HAS_CONFLICTS=1
+          CONFLICT_COUNT=$((CONFLICT_COUNT + 1))
+          if [ "$MODE" = "conflicts" ] || [ "$MODE" = "full" ]; then
+            echo "  ❌ $file_path"
+            echo "     → 被以下目录同时修改：${ALL_FILES_MODIFIED[$file_path]}"
+          fi
+        fi
+      done
+
+      if [ $HAS_CONFLICTS -eq 0 ]; then
+        echo "  ✅ 未检测到跨窗口文件修改冲突"
+      else
+        echo "  ⚠️  检测到 $CONFLICT_COUNT 个文件存在跨窗口修改冲突！"
+        if [ "$MODE" = "summary" ]; then
+          echo "     使用 /workflow xmind-status.yml conflicts 查看详情"
+        fi
+      fi
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 5. 依赖关系检查提示
+      # --------------------------------------------------------------------------
+      echo "🔗 依赖检查"
+      echo "────────────────────────────────────────────────────────────────────────────"
+      echo "  每个任务执行前会自动检查："
+      echo "    1. 本项目内前置任务是否完成"
+      echo "    2. 跨项目任务依赖是否完成（通过 output-manifest.json）"
+      echo "    3. 是否有其他窗口正在修改目标文件"
+      echo ""
+      echo "  💡 提示：依赖检查仅为警告性质，不阻止执行，可通过 exec 强制执行"
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # 6. 使用说明
+      # --------------------------------------------------------------------------
+      echo "📖 使用说明"
+      echo "────────────────────────────────────────────────────────────────────────────"
+      echo "  /workflow xmind-status.yml          → 总览模式（默认）"
+      echo "  /workflow xmind-status.yml full     → 详细模式（显示所有任务）"
+      echo "  /workflow xmind-status.yml conflicts → 冲突模式（仅显示文件冲突）"
+      echo ""
+      echo "  ✅ 完全只读，不修改任何文件，100% 安全"
+      echo "  ✅ 失败时自动降级，不影响主工作流"
+      echo ""

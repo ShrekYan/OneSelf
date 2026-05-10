@@ -220,10 +220,16 @@ xmind-task-parser docs/小贝3-阶段二.md --depends-on=run-20260510-100000
 
 ---
 
-### 11.2 必须保存 task-manifest.json
+### 11.2 必须保存 task-manifest.json（双目录策略 v3.2）
 
-**必须首先**将完整的结构化任务清单保存为 JSON 文件，路径：
-`.claude/runs/{run-id}/task-manifest.json`
+**🔧 源头改造：双目录写入策略**
+
+**必须首先**将完整的结构化任务清单保存为 JSON 文件，写入两个位置：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-manifest.json` | 永久存储，版本控制 |
+| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/task-manifest.json` | 兼容保留，可清理 |
 
 文件内容就是【输出格式】中定义的完整 JSON 结构，包含：
 - project_name
@@ -234,10 +240,19 @@ xmind-task-parser docs/小贝3-阶段二.md --depends-on=run-20260510-100000
 - tasks 数组（所有任务的完整信息）
 - execution_plan（包含拓扑排序和并行分组）
 
-### 11.3 必须初始化 task-status.json
+### 11.3 必须保存 task-definition.md（新增）
 
-**必须初始化**任务状态文件，路径：
-`.claude/runs/{run-id}/task-status.json`
+**必须复制**任务定义文件到正式目录：
+`tasks/{project_name}/{task_name}/task-definition.md`
+
+### 11.4 必须初始化 task-status.json（双目录策略）
+
+**必须初始化**任务状态文件，写入两个位置：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-status.json` | 永久存储 |
+| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/task-status.json` | 兼容保留 |
 
 文件格式：
 ```json
@@ -253,7 +268,7 @@ xmind-task-parser docs/小贝3-阶段二.md --depends-on=run-20260510-100000
 
 status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed` (已完成) / `skipped` (已跳过)
 
-### 11.4 必须保存 execution-plan.md
+### 11.5 必须保存 execution-plan.md
 
 然后将人类可读的执行计划保存为 Markdown 文件，路径：
 `.claude/runs/{run-id}/execution-plan.md`
@@ -268,14 +283,17 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
 - 质量门禁
 - 验收标准
 
-### 11.5 保存顺序要求
+### 11.6 保存顺序要求（双目录策略）
 
-1. ✅ **先保存 task-manifest.json**（机器可读的结构化数据）
-2. ✅ **再初始化 task-status.json**（任务状态跟踪，包含 execution_mode）
-3. ✅ **再保存 execution-plan.md**（人类可读的执行计划）
-4. ✅ **最后在对话中展示结果**
+1. ✅ **先保存 task-manifest.json** → 同时写入正式目录 + 临时目录
+2. ✅ **再保存 task-definition.md** → 写入正式目录
+3. ✅ **再初始化 task-status.json** → 同时写入正式目录 + 临时目录
+4. ✅ **再保存 execution-plan.md** → 写入临时目录
+5. ✅ **最后在对话中展示结果**
 
-**三个文件必须都保存，缺一不可。**
+**所有文件必须都保存，缺一不可。**
+
+> 💡 **改造说明**：执行完成后，所有核心文件已自动保存到 `tasks/` 正式目录，无需手动整理！
 
 ---
 
@@ -367,8 +385,9 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
 - [ ] 粒度风险已正确评估
 - [ ] `execution_plan` 已生成（包含拓扑排序和并行分组）
 - [ ] JSON 语法完全正确，可直接被机器解析
-- [ ] ✅ **task-manifest.json 已保存到正确路径**
-- [ ] ✅ **task-status.json 已初始化到正确路径（包含 execution_mode）**
+- [ ] ✅ **task-manifest.json 已保存到正式目录 + 临时目录**
+- [ ] ✅ **task-definition.md 已保存到正式目录**
+- [ ] ✅ **task-status.json 已初始化到正式目录 + 临时目录（包含 execution_mode）**
 - [ ] ✅ **execution-plan.md 已保存到正确路径**
 - [ ] 没有添加任何解释性文字或注释
 

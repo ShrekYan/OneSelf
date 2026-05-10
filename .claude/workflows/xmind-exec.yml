@@ -1,92 +1,186 @@
-name: XMind 工作流 - 五要素智能执行模式 v3.2（先审后写）
-description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件。
+name: XMind 工作流 - 五要素智能执行模式 v3.3（先审后写）
+description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件；4) 支持 --run 参数直接指定 run 目录。
 
 inputs:
   - name: file_path
-    description: XMind 导出的 Markdown 文件路径（如 docs/strategy-detail-xmind.md）
+    description: XMind 导出的 Markdown 文件路径（如 docs/strategy-detail-xmind.md）或 --run 目录名（如 run-20260509-103000）
     required: true
 
 steps:
   # ============================================================================
-  # 第一步：优先检查已有解析结果
+  # 第一步：检测执行模式（--run 直接指定目录 / 正常文件路径）
   # ============================================================================
-  - name: 🔍 【第一步】优先检查已有解析结果
-    description: 在创建新目录之前先检查是否已有相同 XMind 的解析结果，有则直接复用整个运行目录
+  - name: 🔍 【第一步】检测执行模式
+    description: 支持两种模式：1) --run 目录名直接进入 2) 正常文件路径按原逻辑执行
     run: |
       # --------------------------------------------------------------------------
       # 1. 初始化基本信息
       # --------------------------------------------------------------------------
-      echo "🚀 开始 XMind 工作流 - 五要素智能执行模式 v3.1"
-      echo ""
-      echo "📂 文件路径：{{ file_path }}"
-      echo ""
-
-      TARGET_FILE="{{ file_path }}"
-      TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
-
-      echo "🔍 执行铁律：优先检查已有解析结果（创建新目录前）"
-      echo ""
-      echo "目标文件：$TARGET_FILE"
-      echo "绝对路径：$TARGET_ABS_PATH"
+      INPUT="{{ file_path }}"
+      echo "🚀 开始 XMind 工作流 - 五要素智能执行模式 v3.3"
       echo ""
 
       # --------------------------------------------------------------------------
-      # 2. 清理半完成目录（解决重复生成 execution-plan 问题）
+      # 2. 检测是否为 --run 模式
       # --------------------------------------------------------------------------
-      # 问题根因：xmind-task-parser 中断时可能只保存了 execution-plan.md
-      # 但没保存 task-manifest.json，导致第二次执行时创建新目录造成重复
-      echo "🧹 清理无效的半完成目录（有 execution-plan 但无 task-manifest）"
-      for run_dir in .claude/runs/run-*; do
-        if [ -d "$run_dir" ]; then
-          if [ -f "$run_dir/execution-plan.md" ] && [ ! -f "$run_dir/task-manifest.json" ]; then
-            echo "  🗑️  清理半完成目录：$run_dir"
-            rm -rf "$run_dir"
-          fi
-        fi
-      done
-      echo ""
+      if echo "$INPUT" | grep -qE "^--run\s+"; then
+        # --run 模式：直接提取目录名
+        RUN_DIR_NAME=$(echo "$INPUT" | sed 's/^--run\s*//' | xargs)  # 去掉 --run 和空格
+        RUN_DIR=".claude/runs/$RUN_DIR_NAME"
 
-      # --------------------------------------------------------------------------
-      # 3. 查找已有解析结果（按时间倒序，优先最新）
-      # --------------------------------------------------------------------------
-      FOUND_MANIFEST=""
-      for manifest in $(find .claude/runs -name "task-manifest.json" -type f 2>/dev/null | sort -r); do
-        SOURCE_XMIND=$(cat "$manifest" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source_xmind',''))" 2>/dev/null)
-        if [ -n "$SOURCE_XMIND" ] && [ "$SOURCE_XMIND" = "$TARGET_ABS_PATH" ]; then
-          FOUND_MANIFEST="$manifest"
-          break
-        fi
-      done
-
-      # --------------------------------------------------------------------------
-      # 4. 找到已有结果：直接复用整个运行目录
-      # --------------------------------------------------------------------------
-      if [ -n "$FOUND_MANIFEST" ]; then
-        echo "✅ 找到已有解析结果：$FOUND_MANIFEST"
+        echo "🔧 模式：--run 直接指定目录"
+        echo "📂 目标目录：$RUN_DIR"
         echo ""
 
-        EXISTING_RUN_DIR=$(dirname "$FOUND_MANIFEST")
-        RUN_ID=$(basename "$EXISTING_RUN_DIR" | sed 's/^run-//')
+        # 检查目录是否存在
+        if [ ! -d "$RUN_DIR" ]; then
+          echo "❌ 错误：目录不存在：$RUN_DIR"
+          echo ""
+          echo "可用的 run 目录："
+          ls -1 .claude/runs/ | grep run- | head -10
+          exit 1
+        fi
 
-        # 覆盖 .last-run，直接指向已有目录
-        echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
-        echo "RUN_DIR=$EXISTING_RUN_DIR" >> .claude/runs/.last-run
+        # 检查必要文件是否存在
+        if [ ! -f "$RUN_DIR/task-manifest.json" ]; then
+          echo "❌ 错误：目录中找不到 task-manifest.json"
+          exit 1
+        fi
+
+        if [ ! -f "$RUN_DIR/task-status.json" ]; then
+          echo "❌ 错误：目录中找不到 task-status.json"
+          exit 1
+        fi
+
+        # 直接写入 .last-run，跳过所有匹配逻辑
+        echo "RUN_ID=$RUN_DIR_NAME" > .claude/runs/.last-run
+        echo "RUN_DIR=$RUN_DIR" >> .claude/runs/.last-run
+
+        echo "✅ 已直接指定运行目录：$RUN_DIR"
+        echo ""
+
+        # 标记为 --run 模式，跳过后续解析步骤
+        touch .claude/runs/.run-mode
+        touch .claude/runs/.skip-parse
+        touch .claude/runs/.skip-init
+
+      else
+        # 正常文件路径模式
+        echo "🔧 模式：文件路径匹配"
+        echo "📂 文件路径：$INPUT"
+        echo ""
+
+        TARGET_FILE="$INPUT"
+        TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
+
+        echo "🔍 执行铁律：优先检查已有解析结果（创建新目录前）"
+        echo ""
+        echo "目标文件：$TARGET_FILE"
+        echo "绝对路径：$TARGET_ABS_PATH"
+        echo ""
+
+        # 保存到临时文件供后续步骤使用
+        echo "TARGET_ABS_PATH=$TARGET_ABS_PATH" > .claude/runs/.target-path
+      fi
+
+      # --------------------------------------------------------------------------
+      # P0: 竞态条件防护（物理多开专用）
+      # 使用 mkdir 原子操作防止多个窗口同时创建同一个项目的 run 目录
+      # --------------------------------------------------------------------------
+      if [ ! -f .claude/runs/.run-mode ]; then
+        source .claude/runs/.target-path 2>/dev/null
+
+        # 基于 XMind 文件绝对路径生成唯一锁 ID（兼容 macOS/Linux）
+        if command -v md5sum >/dev/null 2>&1; then
+          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | md5sum | cut -d' ' -f1)
+        elif command -v md5 >/dev/null 2>&1; then
+          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | md5 -q)
+        else
+          # 没有 md5 命令时，使用文件名的 base64 作为锁 ID
+          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | base64 | tr -d '/=' | head -c 16)
+        fi
+        LOCK_FILE=".claude/runs/.lock.${LOCK_ID}"
+        LOCK_ACQUIRED=0
+
+        echo "🔒 P0 竞态条件检查..."
+
+        # 最多重试 10 次（累计等待约 55 秒）
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+          if mkdir "$LOCK_FILE" 2>/dev/null; then
+            LOCK_ACQUIRED=1
+            echo "✅ 拿到锁，继续执行"
+            # 注册退出时自动释放锁
+            trap "rmdir '$LOCK_FILE' 2>/dev/null" EXIT
+            break
+          else
+            echo "⏳ 另一个窗口正在处理，等待 $i 秒..."
+            sleep $i
+          fi
+        done
+
+        if [ $LOCK_ACQUIRED -eq 0 ]; then
+          echo ""
+          echo "❌ 超时：另一个窗口仍在处理，请稍后重试"
+          echo "   如果确认没有其他窗口在运行，请手动删除："
+          echo "   rmdir $LOCK_FILE"
+          exit 1
+        fi
+
+        echo ""
+      fi
+
+      # --------------------------------------------------------------------------
+      # 2. 如果不是 --run 模式：清理半完成目录 + 查找已有解析结果
+      # --------------------------------------------------------------------------
+      if [ ! -f .claude/runs/.run-mode ]; then
+        # 加载 TARGET_ABS_PATH
+        source .claude/runs/.target-path 2>/dev/null
+
+        # 清理半完成目录
+        echo "🧹 清理无效的半完成目录（有 execution-plan 但无 task-manifest）"
+        for run_dir in .claude/runs/run-*; do
+          if [ -d "$run_dir" ]; then
+            if [ -f "$run_dir/execution-plan.md" ] && [ ! -f "$run_dir/task-manifest.json" ]; then
+              echo "  🗑️  清理半完成目录：$run_dir"
+              rm -rf "$run_dir"
+            fi
+          fi
+        done
+        echo ""
+
+        # 查找已有解析结果（按时间倒序，优先最新）
+        FOUND_MANIFEST=""
+        for manifest in $(find .claude/runs -name "task-manifest.json" -type f 2>/dev/null | sort -r); do
+          SOURCE_XMIND=$(cat "$manifest" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source_xmind',''))" 2>/dev/null)
+          if [ -n "$SOURCE_XMIND" ] && [ "$SOURCE_XMIND" = "$TARGET_ABS_PATH" ]; then
+            FOUND_MANIFEST="$manifest"
+            break
+          fi
+        done
+      fi
+
+      # --------------------------------------------------------------------------
+      # 3. 统一输出任务清单（--run 模式 和 正常匹配模式 都走这里）
+      # --------------------------------------------------------------------------
+      if [ -f .claude/runs/.run-mode ] || [ -n "$FOUND_MANIFEST" ]; then
+        # 加载 .last-run 获取实际目录
+        source .claude/runs/.last-run
 
         # ------------------------------------------------------------------------
-        # 4.1 输出任务清单概览
+        # 3.1 输出任务清单概览
         # ------------------------------------------------------------------------
         python3 << EOF
 import json
 
-with open('$EXISTING_RUN_DIR/task-manifest.json', 'r') as f:
+with open('$RUN_DIR/task-manifest.json', 'r') as f:
     manifest = json.load(f)
 
-print("📋 已复用已有运行目录：$EXISTING_RUN_DIR")
+print("📋 运行目录：$RUN_DIR")
 print("=" * 70)
 print(f"{'任务ID':<6} {'目标':<35} {'执行模式':<15} {'状态':<10}")
 print("=" * 70)
 
-with open('$EXISTING_RUN_DIR/task-status.json', 'r') as f:
+with open('$RUN_DIR/task-status.json', 'r') as f:
     status = json.load(f)
 
 for task in manifest.get('tasks', []):
@@ -110,30 +204,29 @@ print("=" * 70)
 EOF
 
         # ------------------------------------------------------------------------
-        # 4.2 更新 run-info 标记为继续执行
+        # 3.2 更新 run-info 标记为继续执行
         # ------------------------------------------------------------------------
         python3 << EOF
 import json
 from datetime import datetime
 
-with open('$EXISTING_RUN_DIR/run-info.json', 'r') as f:
+with open('$RUN_DIR/run-info.json', 'r') as f:
     run_info = json.load(f)
     run_info['continue_execution'] = True
     run_info['last_resume_time'] = datetime.now().isoformat()
-with open('$EXISTING_RUN_DIR/run-info.json', 'w') as f:
+with open('$RUN_DIR/run-info.json', 'w') as f:
     json.dump(run_info, f, indent=2, ensure_ascii=False)
 EOF
 
         echo ""
-        echo "✅ 已直接复用整个运行目录，继续之前的执行状态"
-        echo "⚠️  跳过目录创建、跳过重复解析，状态完全继承"
+        echo "✅ 已进入运行目录，继续之前的执行状态"
         echo ""
-        echo "🔄 请继续输入任务指令（如 T001, T002 等）"
+        echo "🔄 请输入任务指令（如 T001, T002 等）"
 
       # --------------------------------------------------------------------------
-      # 5. 未找到已有结果：标记需要创建新目录和解析
+      # 4. 未找到已有结果：标记需要创建新目录和解析（仅非 --run 模式）
       # --------------------------------------------------------------------------
-      else
+      elif [ ! -f .claude/runs/.run-mode ] && [ -z "$FOUND_MANIFEST" ]; then
         echo "⚠️  未找到已有解析结果，将创建新目录并执行新的解析"
         touch .claude/runs/.parse-needed
         touch .claude/runs/.init-needed
@@ -149,17 +242,42 @@ EOF
     run: |
       rm -f .claude/runs/.init-needed
 
-      # 生成唯一 run-id
+      # 从文件名提取项目名称和任务名称（智能识别）
+      FILE_NAME=$(basename "{{ file_path }}" .md)
+
+      # 🔧 智能识别：检查文件名是否包含 - 分隔符
+      if echo "$FILE_NAME" | grep -q '-'; then
+        # 格式 A：{项目名}-{任务名}.md（多阶段/多任务项目）
+        PROJECT_NAME=$(echo "$FILE_NAME" | cut -d'-' -f1)
+        TASK_NAME=$(echo "$FILE_NAME" | cut -d'-' -f2-)
+      else
+        # 格式 B：{需求名}.md（单需求，无阶段）
+        PROJECT_NAME="单需求"
+        TASK_NAME="$FILE_NAME"
+      fi
+
+      # 🔧 源头改造：正式存储目录（永久保留）
+      TASKS_DIR="tasks/${PROJECT_NAME}/${TASK_NAME}"
+      # 临时运行目录（兼容保留，可清理）
       RUN_ID=$(date +%Y%m%d-%H%M%S)
-      RUN_DIR=".claude/runs/run-$RUN_ID"
+      RUN_DIR=".claude/runs/${FILE_NAME}-run-${RUN_ID}"
+
+      # 保存路径信息供后续步骤使用
       echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
       echo "RUN_DIR=$RUN_DIR" >> .claude/runs/.last-run
+      echo "TASKS_DIR=$TASKS_DIR" >> .claude/runs/.last-run
+      echo "PROJECT_NAME=$PROJECT_NAME" >> .claude/runs/.last-run
+      echo "TASK_NAME=$TASK_NAME" >> .claude/runs/.last-run
 
       # 创建目录结构
-      mkdir -p "$RUN_DIR"
+      mkdir -p "$TASKS_DIR"  # ✅ 正式目录，永久存储
+      mkdir -p "$RUN_DIR"    # ⚠️ 临时目录，兼容保留
       mkdir -p "$RUN_DIR/tasks"
 
-      echo "📂 新建运行目录：$RUN_DIR"
+      echo "📂 新建运行目录"
+      echo "   📍 正式存储：$TASKS_DIR"
+      echo "   ⚠️  临时运行：$RUN_DIR"
+      echo "   💡 执行完成后，文件将自动保存到正式目录，无需手动整理"
       echo ""
 
       # 获取文件绝对路径
@@ -205,26 +323,109 @@ EOF
       echo ""
       echo "文件路径：{{ file_path }}"
       echo ""
-      echo "输出要求（v3.0）："
+      echo "输出要求（v3.1 - 双目录存储）："
       echo "- 支持任意深度嵌套检测五要素"
       echo "- 提取五要素：goal / context / quality_standards / constraints / execution_mode"
-      echo "- 保存任务清单 JSON 到：$RUN_DIR/task-manifest.json"
+      echo "- ✅ 正式目录：保存任务清单 JSON 到：$TASKS_DIR/task-manifest.json"
+      echo "- ✅ 正式目录：复制任务定义到：$TASKS_DIR/task-definition.md"
+      echo "- ⚠️  临时目录：保存任务清单 JSON 到：$RUN_DIR/task-manifest.json（兼容保留）"
       echo "- 生成执行计划文档到：$RUN_DIR/execution-plan.md"
       echo "- 在 task-status.json 中记录每个任务的 execution_mode"
       echo "- 同时在对话中展示任务清单概览（包含执行模式）"
+      echo ""
+      echo "💡 改造说明：双目录写入策略，文件自动保存到 tasks/ 正式目录，无需手动整理"
       echo ""
 
   # ============================================================================
   # 第四步：显示状态看板，等待人工指令
   # ============================================================================
   - name: 显示状态看板，等待人工指令
-    description: 显示任务状态看板，支持三种执行模式，完全由人工输入指令控制
+    description: 显示任务状态看板，支持三种执行模式，完全由人工输入指令控制。新增：P1 跨窗口依赖检查 + 并发修改警告
     run: |
       source .claude/runs/.last-run
       echo ""
       echo "========================================"
-      echo "✅ XMind 解析完成！进入五要素智能执行模式 v3.0"
+      echo "✅ XMind 解析完成！进入五要素智能执行模式 v3.3"
       echo "========================================"
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # P1: 跨窗口依赖检查
+      # 扫描所有 run 目录，检查前置依赖是否完成
+      # --------------------------------------------------------------------------
+      echo "🔗 P1 跨窗口依赖检查..."
+      DEPS_WARNING=0
+
+      # 检查本项目内的依赖
+      if [ -f "$RUN_DIR/task-manifest.json" ]; then
+        python3 << 'EOF'
+import json
+import sys
+
+with open(sys.argv[1], 'r') as f:
+    manifest = json.load(f)
+
+tasks = manifest.get('tasks', [])
+warnings = 0
+
+for task in tasks:
+    task_id = task.get('task_id', '')
+    deps = task.get('explicit_dependencies', [])
+    if deps:
+        print(f"  {task_id}: 依赖 {', '.join(deps)}")
+
+if warnings > 0:
+    print(f"  ⚠️  共 {warnings} 个任务存在未完成的依赖")
+EOF
+      fi
+
+      echo ""
+
+      # --------------------------------------------------------------------------
+      # P1: 并发修改警告检查
+      # 扫描所有 run 目录的 result.md，检查是否有其他窗口正在修改相同文件
+      # --------------------------------------------------------------------------
+      echo "⚠️  P1 并发文件修改检查..."
+      CONFLICT_COUNT=0
+
+      # 收集所有已修改的文件
+      declare -A FILE_OWNERS
+      while IFS= read -r result_file; do
+        if [ -f "$result_file" ]; then
+          RUN_DIR=$(dirname "$result_file")
+          RUN_NAME=$(basename "$RUN_DIR")
+          while IFS= read -r file_line; do
+            if echo "$file_line" | grep -qE "^(✅|📝) .+\.(ts|tsx|js|jsx|scss|css|yml|yaml|json|md)$"; then
+              FILE_PATH=$(echo "$file_line" | sed -E 's/^(✅|📝) //' | sed 's/ (已创建|已更新)$//')
+              if [ -n "$FILE_PATH" ]; then
+                if [ -n "${FILE_OWNERS[$FILE_PATH]}" ]; then
+                  FILE_OWNERS["$FILE_PATH"]="${FILE_OWNERS[$FILE_PATH]} $RUN_NAME"
+                else
+                  FILE_OWNERS["$FILE_PATH"]="$RUN_NAME"
+                fi
+              fi
+            fi
+          done < "$result_file"
+        fi
+      done < <(find .claude/runs -maxdepth 2 -name "result*.md" 2>/dev/null)
+
+      # 检查冲突
+      for file_path in "${!FILE_OWNERS[@]}"; do
+        OWNER_COUNT=$(echo "${FILE_OWNERS[$file_path]}" | wc -w | tr -d ' ')
+        if [ "$OWNER_COUNT" -gt 1 ]; then
+          CONFLICT_COUNT=$((CONFLICT_COUNT + 1))
+          echo "  ⚠️  $file_path"
+          echo "     → 被以下目录修改：${FILE_OWNERS[$file_path]}"
+        fi
+      done
+
+      if [ $CONFLICT_COUNT -eq 0 ]; then
+        echo "  ✅ 未检测到跨窗口文件修改冲突"
+      else
+        echo ""
+        echo "  💡 提示：以上文件已被多个窗口修改，可能存在冲突"
+        echo "     执行时会再次警告，也可以使用 exec 强制执行"
+      fi
       echo ""
 
       # --------------------------------------------------------------------------

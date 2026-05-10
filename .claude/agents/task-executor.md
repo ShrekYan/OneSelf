@@ -271,11 +271,18 @@ triggers:
 
 ---
 
-### 4.2 🔒 保存 scheme.md（强制，第一级保障）
+### 4.2 🔒 保存 scheme.md（双目录策略 v3.2，第一级保障）
 
+> **🔧 源头改造：双目录写入策略**
+>
 > **这是第一次写追溯文件，也是唯一一次写 scheme.md**
 
-**必须保存**到：`{run_dir}/tasks/{task_id}/scheme.md`
+**必须同时保存到两个位置**：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/scheme.md` | 永久存储，版本控制 |
+| ⚠️ **临时目录（兼容）** | `{run_dir}/tasks/{task_id}/scheme.md` | 兼容保留，可清理 |
 
 文件内容必须包含：
 1. 任务概述（ID、名称、模块、业务目标）
@@ -286,16 +293,23 @@ triggers:
 6. 注意事项与风险点
 7. 质量检查要点
 
-**✅ 保存后必须验证**：
+**✅ 保存后必须验证两个目录的文件**：
 - 重新读取文件，确认大小 > 100 字节
 - 确认包含完整代码内容
 - **验证失败必须重试，直到成功**
 
 ---
 
-### 4.3 🔒 保存 result.md（强制，第二级保障）
+### 4.3 🔒 保存 result.md（双目录策略，第二级保障）
 
-**必须保存**到：`{run_dir}/tasks/{task_id}/result.md`
+> **🔧 源头改造：双目录写入策略**
+
+**必须同时保存到两个位置**：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/result.md` | 永久存储，版本控制 |
+| ⚠️ **临时目录（兼容）** | `{run_dir}/tasks/{task_id}/result.md` | 兼容保留，可清理 |
 
 文件内容必须包含：
 1. 任务基本信息（ID、名称、模块）
@@ -305,16 +319,23 @@ triggers:
    - ESLint 检查结果
 4. 完成时间
 
-**✅ 保存后必须验证**：
+**✅ 保存后必须验证两个目录的文件**：
 - 重新读取文件，确认大小 > 100 字节
 - 确认包含文件清单和质量检查结果
 - **验证失败必须重试，直到成功**
 
 ---
 
-### 4.4 🔒 更新 task-status.json（强制，最高优先级！第三级保障）
+### 4.4 🔒 更新 task-status.json（双目录策略，最高优先级！第三级保障）
 
-**必须更新** `{run_dir}/task-status.json`：
+> **🔧 源头改造：双目录写入策略**
+
+**必须同时更新两个位置**：
+
+| 目录类型 | 路径 | 说明 |
+|---------|------|------|
+| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-status.json` | 永久存储 |
+| ⚠️ **临时目录（兼容）** | `{run_dir}/task-status.json` | 兼容保留 |
 
 ```json
 {
@@ -345,19 +366,24 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
 
 ```
 ========================================
-📦 文件生成审计报告（先审后写 v3.0）
+📦 文件生成审计报告（双目录策略 v3.2）
 ========================================
 
 ✅ 业务代码文件:
    - src/components/Button/types.ts
 
-✅ 可追溯文件（确认后一次性写入）:
-   - .claude/runs/run-xxx/tasks/T001/scheme.md (已验证: 大小 2.1KB ✓)
-   - .claude/runs/run-xxx/tasks/T001/result.md (已验证: 大小 1.2KB ✓)
-   - .claude/runs/run-xxx/task-status.json (已验证: T001.status = completed ✓)
+✅ 正式目录文件（永久存储 / 版本控制）:
+   - tasks/{project_name}/{task_name}/scheme.md (已验证 ✓)
+   - tasks/{project_name}/{task_name}/result.md (已验证 ✓)
+   - tasks/{project_name}/{task_name}/task-status.json (已验证 ✓)
+
+⚠️  临时目录文件（兼容保留 / 可清理）:
+   - .claude/runs/run-xxx/tasks/T001/scheme.md (已验证 ✓)
+   - .claude/runs/run-xxx/tasks/T001/result.md (已验证 ✓)
+   - .claude/runs/run-xxx/task-status.json (已验证 ✓)
 
 ========================================
-所有文件已验证写入磁盘 ✓
+💡 所有文件已自动保存到正式目录 tasks/，无需手动整理！
 ========================================
 ```
 
@@ -403,9 +429,11 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
 2. ✅ **检查所有任务的状态**：
    - 读取 task-status.json
    - 如果所有任务状态都是 `completed` 或 `skipped`（没有 `pending` 任务）
-   - **自动生成 final-report.md**，保存到运行目录
+   - **自动生成 final-report.md**（**双目录写入**）：
+     - ✅ 正式目录：`tasks/{project_name}/final-report.md`（永久存储）
+     - ⚠️  临时目录：`{run_dir}/final-report.md`（兼容保留）
    - **v3.1 新增：自动生成 output-manifest.json**（多阶段项目产物清单）
-   - 在状态看板底部显示提示：`🎉 所有任务已完成，最终报告 + 产物清单已生成`
+   - 在状态看板底部显示提示：`🎉 所有任务已完成，最终报告已保存到 tasks/ 目录！`
 
 ---
 
