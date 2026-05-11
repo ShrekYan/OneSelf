@@ -1,5 +1,5 @@
-name: XMind 工作流 - 五要素智能执行模式 v3.3（先审后写）
-description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件；4) 支持 --run 参数直接指定 run 目录。
+name: XMind 工作流 - 五要素智能执行模式 v3.4（单目录集中存储）
+description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】【v3.4 优化：所有文件集中在 Run 目录内，不再生成外部 tasks/ 目录】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件；4) 支持 --run 参数直接指定 run 目录；5) 所有文件集中在 Run 目录内，易于管理和归档。
 
 inputs:
   - name: file_path
@@ -256,11 +256,11 @@ EOF
         TASK_NAME="$FILE_NAME"
       fi
 
-      # 🔧 源头改造：正式存储目录（永久保留）
-      TASKS_DIR="tasks/${PROJECT_NAME}/${TASK_NAME}"
-      # 临时运行目录（兼容保留，可清理）
+      # 🔧 v3.4 优化：所有文件集中在 Run 目录内
       RUN_ID=$(date +%Y%m%d-%H%M%S)
       RUN_DIR=".claude/runs/${FILE_NAME}-run-${RUN_ID}"
+      # 任务执行结果目录（Run 目录内的 Tasks 子目录）
+      TASKS_DIR="${RUN_DIR}/Tasks"
 
       # 保存路径信息供后续步骤使用
       echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
@@ -270,45 +270,30 @@ EOF
       echo "TASK_NAME=$TASK_NAME" >> .claude/runs/.last-run
 
       # 创建目录结构
-      mkdir -p "$TASKS_DIR"  # ✅ 正式目录，永久存储
-      mkdir -p "$RUN_DIR"    # ⚠️ 临时目录，兼容保留
-      mkdir -p "$RUN_DIR/tasks"
+      mkdir -p "$RUN_DIR"
+      mkdir -p "$TASKS_DIR"
 
-      echo "📂 新建运行目录"
-      echo "   📍 正式存储：$TASKS_DIR"
-      echo "   ⚠️  临时运行：$RUN_DIR"
-      echo "   💡 执行完成后，文件将自动保存到正式目录，无需手动整理"
+      echo "📂 新建运行目录（v3.4 单目录集中存储）"
+      echo "   📍 Run 目录：$RUN_DIR"
+      echo "   📂 任务结果：$TASKS_DIR"
+      echo "   💡 所有文件集中保存，无需跨目录管理"
       echo ""
 
       # 获取文件绝对路径
       TARGET_FILE="{{ file_path }}"
       TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
 
-      # 保存运行基本信息（与 Agent 格式完全一致）
+      # 保存运行基本信息（v3.4 单目录存储）
       cat > "$RUN_DIR/run-info.json" << EOF
       {
         "run_id": "$RUN_ID",
         "source_file": "{{ file_path }}",
         "source_file_abs": "$TARGET_ABS_PATH",
         "start_time": "$(date -Iseconds)",
-        "mode": "smart-execution-v3.3",
+        "mode": "smart-execution-v3.4",
         "continue_execution": false,
         "last_resume_time": null,
-        "parser_version": "3.3"
-      }
-      EOF
-
-      # 正式目录也写入 run-info.json
-      cat > "$TASKS_DIR/run-info.json" << EOF
-      {
-        "run_id": "$RUN_ID",
-        "source_file": "{{ file_path }}",
-        "source_file_abs": "$TARGET_ABS_PATH",
-        "start_time": "$(date -Iseconds)",
-        "mode": "smart-execution-v3.3",
-        "continue_execution": false,
-        "last_resume_time": null,
-        "parser_version": "3.3"
+        "parser_version": "3.4"
       }
       EOF
 
@@ -321,7 +306,7 @@ EOF
       }
       EOF
 
-      echo "✅ 新运行环境初始化完成"
+      echo "✅ 新运行环境初始化完成（v3.4 单目录集中存储）"
       echo ""
 
   # ============================================================================
@@ -334,23 +319,23 @@ EOF
       source .claude/runs/.last-run
       rm -f .claude/runs/.parse-needed
 
-      echo "🧠 解析 XMind（v3.0 五要素深度解析）"
+      echo "🧠 解析 XMind（v3.4 五要素深度解析）"
       echo ""
       echo "请调用 xmind-task-parser Agent 解析以下文件内容："
       echo ""
       echo "文件路径：{{ file_path }}"
       echo ""
-      echo "输出要求（v3.1 - 双目录存储）："
+      echo "输出要求（v3.4 - 单目录集中存储）："
       echo "- 支持任意深度嵌套检测五要素"
       echo "- 提取五要素：goal / context / quality_standards / constraints / execution_mode"
-      echo "- ✅ 正式目录：保存任务清单 JSON 到：$TASKS_DIR/task-manifest.json"
-      echo "- ✅ 正式目录：复制任务定义到：$TASKS_DIR/task-definition.md"
-      echo "- ⚠️  临时目录：保存任务清单 JSON 到：$RUN_DIR/task-manifest.json（兼容保留）"
+      echo "- ✅ 统一目录：所有文件保存在 Run 目录内"
+      echo "- 保存任务清单 JSON 到：$RUN_DIR/task-manifest.json"
+      echo "- 复制任务定义到：$RUN_DIR/task-definition.md"
       echo "- 生成执行计划文档到：$RUN_DIR/execution-plan.md"
       echo "- 在 task-status.json 中记录每个任务的 execution_mode"
       echo "- 同时在对话中展示任务清单概览（包含执行模式）"
       echo ""
-      echo "💡 改造说明：双目录写入策略，文件自动保存到 tasks/ 正式目录，无需手动整理"
+      echo "💡 改造说明：v3.4 单目录集中存储，所有文件自动保存到 Run 目录，无需跨目录管理"
       echo ""
 
   # ============================================================================
@@ -482,11 +467,15 @@ EOF
       # 重要说明
       # --------------------------------------------------------------------------
       echo "========================================"
-      echo "📦 强制保存的可追溯文件："
-      echo "  • scheme.md      → 完整代码方案（审核用）"
-      echo "  • result.md      → 执行结果 + 质量检查记录"
-      echo "  • task-status.json → 任务状态跟踪（包含 execution_mode）"
-      echo "  • task-manifest.json → 结构化任务清单（五要素完整信息）"
+      echo "📦 强制保存的可追溯文件（v3.4 单目录集中存储）："
+      echo "  • Tasks/{TASK_ID}/scheme.md → 每个任务的完整代码方案"
+      echo "  • Tasks/{TASK_ID}/result.md → 每个任务的执行结果 + 质量检查"
+      echo "  • task-status.json          → 任务状态跟踪（包含 execution_mode）"
+      echo "  • task-manifest.json        → 结构化任务清单（五要素完整信息）"
+      echo "  • run-info.json             → 运行元信息"
+      echo "  • task-definition.md        → 原始任务定义"
+      echo "  • execution-plan.md         → 人类可读执行计划"
+      echo "  • final-report.md           → 最终执行报告（所有任务完成后）"
       echo "========================================"
       echo ""
 

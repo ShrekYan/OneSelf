@@ -209,27 +209,23 @@ xmind-task-parser docs/小贝3-阶段二.md --depends-on=run-20260510-100000
 }
 ```
 
-## 11. 文件保存规则（强制执行）
+## 11. 文件保存规则（强制执行 v3.4）
 
-### 11.1 run-id 生成规则（v3.1 多阶段增强）
+### 11.1 run-id 生成规则（v3.4 单目录集中存储）
 
 - 基础格式：`run-{YYYYMMDD}-{HHMMSS}`
-- **v3.1 新增**：从 H1 标题中自动提取阶段名称，追加到 run-id 后：
+- **v3.4 保留**：从 H1 标题中自动提取阶段名称，追加到 run-id 后：
   - 示例：`run-20260510-100000-阶段一-后端API层`
   - 提取规则：标题中包含「阶段」「Phase」关键字时，提取该段文字
 
 ---
 
-### 11.2 必须保存 task-manifest.json（双目录策略 v3.2）
+### 11.2 必须保存 task-manifest.json（单目录策略 v3.4）
 
-**🔧 源头改造：双目录写入策略**
+**🔧 v3.4 优化：所有文件集中保存在 Run 目录，不再分散到外部 tasks/ 目录**
 
-**必须首先**将完整的结构化任务清单保存为 JSON 文件，写入两个位置：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-manifest.json` | 永久存储，版本控制 |
-| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/task-manifest.json` | 兼容保留，可清理 |
+**必须首先**将完整的结构化任务清单保存为 JSON 文件：
+`{RUN_DIR}/task-manifest.json`
 
 文件内容就是【输出格式】中定义的完整 JSON 结构，包含：
 - project_name
@@ -240,19 +236,15 @@ xmind-task-parser docs/小贝3-阶段二.md --depends-on=run-20260510-100000
 - tasks 数组（所有任务的完整信息）
 - execution_plan（包含拓扑排序和并行分组）
 
-### 11.3 必须保存 task-definition.md（新增）
+### 11.3 必须保存 task-definition.md（v3.4 优化）
 
-**必须复制**任务定义文件到正式目录：
-`tasks/{project_name}/{task_name}/task-definition.md`
+**必须复制**任务定义文件到 Run 目录：
+`{RUN_DIR}/task-definition.md`
 
-### 11.4 必须初始化 task-status.json（双目录策略）
+### 11.4 必须初始化 task-status.json（单目录策略 v3.4）
 
-**必须初始化**任务状态文件，写入两个位置：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-status.json` | 永久存储 |
-| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/task-status.json` | 兼容保留 |
+**必须初始化**任务状态文件：
+`{RUN_DIR}/task-status.json`
 
 文件格式：
 ```json
@@ -271,7 +263,7 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
 ### 11.5 必须保存 execution-plan.md
 
 然后将人类可读的执行计划保存为 Markdown 文件，路径：
-`.claude/runs/{run-id}/execution-plan.md`
+`{RUN_DIR}/execution-plan.md`
 
 文件内容包含：
 - 项目基本信息
@@ -283,14 +275,10 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
 - 质量门禁
 - 验收标准
 
-### 11.6 必须生成 run-info.json（双目录策略 v3.3 新增）
+### 11.6 必须生成 run-info.json（单目录策略 v3.4）
 
-**必须生成**运行元信息文件，写入两个位置：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/run-info.json` | 永久存储 |
-| ⚠️ **临时目录（兼容）** | `.claude/runs/{run-id}/run-info.json` | 兼容保留 |
+**必须生成**运行元信息文件：
+`{RUN_DIR}/run-info.json`
 
 文件格式（标准统一）：
 ```json
@@ -299,29 +287,36 @@ status 枚举值：`pending` (待执行) / `reviewing` (审核中) / `completed`
   "source_file": "原始文件相对路径",
   "source_file_abs": "原始文件绝对路径",
   "start_time": "ISO 8601 格式时间",
-  "mode": "smart-execution-v3.3",
+  "mode": "smart-execution-v3.4",
   "continue_execution": false,
   "last_resume_time": null,
-  "parser_version": "3.3"
+  "parser_version": "3.4"
 }
 ```
 
-### 11.7 保存顺序要求（双目录策略）
+### 11.7 任务执行结果保存（v3.4 新增）
 
-1. ✅ **先保存 run-info.json** → 同时写入正式目录 + 临时目录（NEW！）
-2. ✅ **再保存 task-manifest.json** → 同时写入正式目录 + 临时目录
-3. ✅ **再保存 task-definition.md** → 写入正式目录
-4. ✅ **再初始化 task-status.json** → 同时写入正式目录 + 临时目录
-5. ✅ **再保存 execution-plan.md** → 写入临时目录
-6. ✅ **最后在对话中展示结果**
+任务执行完成后，将以下文件保存到按任务 ID 分目录：
+- `{RUN_DIR}/Tasks/{TASK_ID}/scheme.md` - 代码方案
+- `{RUN_DIR}/Tasks/{TASK_ID}/result.md` - 执行结果 + 质量检查记录
+
+### 11.8 保存顺序要求（单目录策略 v3.4）
+
+1. ✅ **先保存 run-info.json** → Run 目录
+2. ✅ **再保存 task-manifest.json** → Run 目录
+3. ✅ **再保存 task-definition.md** → Run 目录
+4. ✅ **再初始化 task-status.json** → Run 目录
+5. ✅ **再保存 execution-plan.md** → Run 目录
+6. ✅ **任务执行后** → 保存到 `{RUN_DIR}/Tasks/{TASK_ID}/`
+7. ✅ **最后在对话中展示结果**
 
 **所有文件必须都保存，缺一不可。**
 
-> 💡 **改造说明**：执行完成后，所有核心文件已自动保存到 `tasks/` 正式目录，无需手动整理！
+> 💡 **v3.4 优化说明**：执行完成后，所有核心文件已自动保存在 Run 目录内，集中管理，无需跨目录操作！
 
 ---
 
-# 📤 输出格式（严格遵守 v3.1，字段名必须完全一致）
+# 📤 输出格式（严格遵守 v3.4，字段名必须完全一致）
 
 ⚠️ **极其重要：所有字段名必须与下面示例完全一致，不能有任何拼写错误！**
 ⚠️ **极其重要：必须使用标准 JSON 格式，所有字符串使用双引号 `"`，禁止使用单引号 `'`！**
