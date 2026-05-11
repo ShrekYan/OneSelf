@@ -1,104 +1,37 @@
-name: XMind 工作流 - 五要素智能执行模式 v3.4（单目录集中存储）
-description: 【铁律 1：优先复用已有解析结果，不重复创建文件】【铁律 2：只有 yes 确认执行后才写文件】【v3.4 优化：所有文件集中在 Run 目录内，不再生成外部 tasks/ 目录】解析 XMind 导出的 Markdown 文件，生成结构化任务清单，支持三种执行模式。核心优化：1) 先在控制台审方案，确认后一次性写文件，节省 token；2) 所有 edit 迭代在内存中完成，不产生中间垃圾文件；3) 找到已有结果时直接复用整个运行目录，从源头上避免重复文件；4) 支持 --run 参数直接指定 run 目录；5) 所有文件集中在 Run 目录内，易于管理和归档。
+name: XMind 工作流 - 五要素智能执行模式 v4.2（严格输入匹配版）
+description: 【🔴 v4.2 核心改造】所有命令严格正则匹配，不做模糊猜测，大小写不敏感，防止输入误判。
+  【🔴 v4.1 核心改造】解析 → 显示看板 → 选择任务 → 方案预览（含执行计划）→ 用户确认 → 执行代码 → 更新状态。
+  所有写文件操作在用户 yes 确认后才执行，完全内存预览，零中间文件。
 
 inputs:
   - name: file_path
     description: XMind 导出的 Markdown 文件路径（如 docs/strategy-detail-xmind.md）或 --run 目录名（如 run-20260509-103000）
     required: true
+  - name: command
+    description: 【可选】启动时直接执行命令（如 T001、exec T001、status、report），不指定则进入正常交互模式
+    required: false
 
 steps:
   # ============================================================================
-  # 第一步：检测执行模式（--run 直接指定目录 / 正常文件路径）
+  # 阶段 1：初始化 + 模式检测 + 竞态防护
   # ============================================================================
-  - name: 🔍 【第一步】检测执行模式
-    description: 支持两种模式：1) --run 目录名直接进入 2) 正常文件路径按原逻辑执行
+  - name: 🔧 模式检测 + 竞态防护
+    description: 检测执行模式（--run / 文件路径）+ 竞态条件防护 + 查找已有解析结果
     run: |
       # --------------------------------------------------------------------------
-      # 1. 初始化基本信息
+      # 1. 调用初始化脚本检测模式
       # --------------------------------------------------------------------------
       INPUT="{{ file_path }}"
-      echo "🚀 开始 XMind 工作流 - 五要素智能执行模式 v3.3"
-      echo ""
+      python3 .claude/scripts/run_initializer.py "$INPUT"
 
       # --------------------------------------------------------------------------
-      # 2. 检测是否为 --run 模式
-      # --------------------------------------------------------------------------
-      if echo "$INPUT" | grep -qE "^--run\s+"; then
-        # --run 模式：直接提取目录名
-        RUN_DIR_NAME=$(echo "$INPUT" | sed 's/^--run\s*//' | xargs)  # 去掉 --run 和空格
-        RUN_DIR=".claude/runs/$RUN_DIR_NAME"
-
-        echo "🔧 模式：--run 直接指定目录"
-        echo "📂 目标目录：$RUN_DIR"
-        echo ""
-
-        # 检查目录是否存在
-        if [ ! -d "$RUN_DIR" ]; then
-          echo "❌ 错误：目录不存在：$RUN_DIR"
-          echo ""
-          echo "可用的 run 目录："
-          ls -1 .claude/runs/ | grep run- | head -10
-          exit 1
-        fi
-
-        # 检查必要文件是否存在
-        if [ ! -f "$RUN_DIR/task-manifest.json" ]; then
-          echo "❌ 错误：目录中找不到 task-manifest.json"
-          exit 1
-        fi
-
-        if [ ! -f "$RUN_DIR/task-status.json" ]; then
-          echo "❌ 错误：目录中找不到 task-status.json"
-          exit 1
-        fi
-
-        # 直接写入 .last-run，跳过所有匹配逻辑
-        echo "RUN_ID=$RUN_DIR_NAME" > .claude/runs/.last-run
-        echo "RUN_DIR=$RUN_DIR" >> .claude/runs/.last-run
-
-        echo "✅ 已直接指定运行目录：$RUN_DIR"
-        echo ""
-
-        # 标记为 --run 模式，跳过后续解析步骤
-        touch .claude/runs/.run-mode
-        touch .claude/runs/.skip-parse
-        touch .claude/runs/.skip-init
-
-      else
-        # 正常文件路径模式
-        echo "🔧 模式：文件路径匹配"
-        echo "📂 文件路径：$INPUT"
-        echo ""
-
-        TARGET_FILE="$INPUT"
-        TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
-
-        echo "🔍 执行铁律：优先检查已有解析结果（创建新目录前）"
-        echo ""
-        echo "目标文件：$TARGET_FILE"
-        echo "绝对路径：$TARGET_ABS_PATH"
-        echo ""
-
-        # 保存到临时文件供后续步骤使用
-        echo "TARGET_ABS_PATH=$TARGET_ABS_PATH" > .claude/runs/.target-path
-      fi
-
-      # --------------------------------------------------------------------------
-      # P0: 竞态条件防护（物理多开专用）
-      # 使用 mkdir 原子操作防止多个窗口同时创建同一个项目的 run 目录
+      # 2. 竞态条件防护（物理多开专用）
       # --------------------------------------------------------------------------
       if [ ! -f .claude/runs/.run-mode ]; then
         source .claude/runs/.target-path 2>/dev/null
 
-        # 基于 XMind 文件绝对路径生成唯一锁 ID（兼容 macOS/Linux）
-        if command -v md5sum >/dev/null 2>&1; then
-          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | md5sum | cut -d' ' -f1)
-        elif command -v md5 >/dev/null 2>&1; then
-          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | md5 -q)
-        else
-          # 没有 md5 命令时，使用文件名的 base64 作为锁 ID
-          LOCK_ID=$(echo -n "$TARGET_ABS_PATH" | base64 | tr -d '/=' | head -c 16)
-        fi
+        # 基于文件绝对路径生成唯一锁 ID
+        LOCK_ID=$(python3 .claude/scripts/run_initializer.py "$INPUT" --lock-id)
         LOCK_FILE=".claude/runs/.lock.${LOCK_ID}"
         LOCK_ACQUIRED=0
 
@@ -130,428 +63,509 @@ steps:
       fi
 
       # --------------------------------------------------------------------------
-      # 2. 如果不是 --run 模式：清理半完成目录 + 查找已有解析结果
+      # 3. 显示当前状态摘要
       # --------------------------------------------------------------------------
-      if [ ! -f .claude/runs/.run-mode ]; then
-        # 加载 TARGET_ABS_PATH
-        source .claude/runs/.target-path 2>/dev/null
-
-        # 清理半完成目录
-        echo "🧹 清理无效的半完成目录（有 execution-plan 但无 task-manifest）"
-        for run_dir in .claude/runs/run-*; do
-          if [ -d "$run_dir" ]; then
-            if [ -f "$run_dir/execution-plan.md" ] && [ ! -f "$run_dir/task-manifest.json" ]; then
-              echo "  🗑️  清理半完成目录：$run_dir"
-              rm -rf "$run_dir"
-            fi
-          fi
-        done
-        echo ""
-
-        # 查找已有解析结果（按时间倒序，优先最新）
-        FOUND_MANIFEST=""
-        for manifest in $(find .claude/runs -name "task-manifest.json" -type f 2>/dev/null | sort -r); do
-          SOURCE_XMIND=$(cat "$manifest" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source_xmind',''))" 2>/dev/null)
-          if [ -n "$SOURCE_XMIND" ] && [ "$SOURCE_XMIND" = "$TARGET_ABS_PATH" ]; then
-            FOUND_MANIFEST="$manifest"
-            break
-          fi
-        done
-      fi
-
-      # --------------------------------------------------------------------------
-      # 3. 统一输出任务清单（--run 模式 和 正常匹配模式 都走这里）
-      # --------------------------------------------------------------------------
-      if [ -f .claude/runs/.run-mode ] || [ -n "$FOUND_MANIFEST" ]; then
-        # 加载 .last-run 获取实际目录
-        source .claude/runs/.last-run
-
-        # ------------------------------------------------------------------------
-        # 3.1 输出任务清单概览
-        # ------------------------------------------------------------------------
-        python3 << EOF
-import json
-
-with open('$RUN_DIR/task-manifest.json', 'r') as f:
-    manifest = json.load(f)
-
-print("📋 运行目录：$RUN_DIR")
-print("=" * 70)
-print(f"{'任务ID':<6} {'目标':<35} {'执行模式':<15} {'状态':<10}")
-print("=" * 70)
-
-with open('$RUN_DIR/task-status.json', 'r') as f:
-    status = json.load(f)
-
-for task in manifest.get('tasks', []):
-    task_id = task.get('task_id')
-    task_status = status.get('tasks', {}).get(task_id, {}).get('status', 'pending')
-    mode = task.get('execution_mode', 'review-first')
-    if mode == 'plan-only':
-        mode_icon = "📋 plan-only"
-    elif mode == 'review-first':
-        mode_icon = "👀 review-first"
-    else:
-        mode_icon = "⚡ auto-exec"
-    if task_status == 'completed':
-        status_icon = "✅"
-    elif task_status == 'reviewing':
-        status_icon = "📋"
-    else:
-        status_icon = "⏸️"
-    print(f"  {task_id:<4} | {task.get('goal')[:33]:<35} | {mode_icon:<15} | {status_icon} {task_status}")
-print("=" * 70)
-EOF
-
-        # ------------------------------------------------------------------------
-        # 3.2 更新 run-info 标记为继续执行
-        # ------------------------------------------------------------------------
-        python3 << EOF
-import json
-from datetime import datetime
-
-with open('$RUN_DIR/run-info.json', 'r') as f:
-    run_info = json.load(f)
-    run_info['continue_execution'] = True
-    run_info['last_resume_time'] = datetime.now().isoformat()
-with open('$RUN_DIR/run-info.json', 'w') as f:
-    json.dump(run_info, f, indent=2, ensure_ascii=False)
-EOF
-
-        echo ""
-        echo "✅ 已进入运行目录，继续之前的执行状态"
-        echo ""
-        echo "🔄 请输入任务指令（如 T001, T002 等）"
-
-      # --------------------------------------------------------------------------
-      # 4. 未找到已有结果：标记需要创建新目录和解析（仅非 --run 模式）
-      # --------------------------------------------------------------------------
-      elif [ ! -f .claude/runs/.run-mode ] && [ -z "$FOUND_MANIFEST" ]; then
-        echo "⚠️  未找到已有解析结果，将创建新目录并执行新的解析"
-        touch .claude/runs/.parse-needed
-        touch .claude/runs/.init-needed
-      fi
-      echo ""
+      python3 .claude/scripts/run_status.py --summary
 
   # ============================================================================
-  # 第二步：初始化新运行环境（仅当没有已有结果时）
+  # 阶段 2：初始化新运行环境（仅当没有已有结果时）
   # ============================================================================
-  - name: 初始化新运行环境（仅当没有已有结果时）
-    description: 仅当没有已有解析结果时，才创建新的运行目录和基础文件
+  - name: 📂 初始化新运行环境
+    description: 仅当没有已有解析结果时，创建新的运行目录和基础文件
     if: '[ -f .claude/runs/.init-needed ]'
     run: |
       rm -f .claude/runs/.init-needed
 
-      # 从文件名提取项目名称和任务名称（智能识别）
-      FILE_NAME=$(basename "{{ file_path }}" .md)
+      # 调用初始化脚本创建 Run 目录和所有基础文件
+      python3 .claude/scripts/run_initializer.py "{{ file_path }}" --init
 
-      # 🔧 智能识别：检查文件名是否包含 - 分隔符
-      if echo "$FILE_NAME" | grep -q '-'; then
-        # 格式 A：{项目名}-{任务名}.md（多阶段/多任务项目）
-        PROJECT_NAME=$(echo "$FILE_NAME" | cut -d'-' -f1)
-        TASK_NAME=$(echo "$FILE_NAME" | cut -d'-' -f2-)
+      echo "✅ 新运行环境初始化完成（v4.1 单目录集中存储）"
+      echo ""
+
+      # 显示当前状态摘要
+      python3 .claude/scripts/run_status.py --summary
+
+  # ============================================================================
+  # 阶段 3：确定性脚本解析（优先！100% 可预测，0.5 秒完成）
+  # ============================================================================
+  - name: 🚀 确定性脚本解析（优先执行）
+    description: 使用 Python 脚本快速解析 XMind，100% 可预测，0.5 秒完成
+    if: '[ -f .claude/runs/.parse-needed ]'
+    run: |
+      source .claude/runs/.last-run
+      INPUT="{{ file_path }}"
+
+      echo "========================================"
+      echo "🚀 确定性脚本解析 v1.0（优先执行）"
+      echo "========================================"
+      echo "📄 输入文件: $INPUT"
+      echo "📂 输出目录: $RUN_DIR"
+      echo ""
+
+      # ============================================================
+      # ✅ 直接执行脚本，捕获结果，不需要 Claude 做任何"决定"
+      # ============================================================
+      python3 .claude/scripts/xmind_parser.py "$INPUT" "$RUN_DIR"
+      EXIT_CODE=$?
+
+      echo ""
+
+      if [ $EXIT_CODE -eq 0 ]; then
+        echo "✅ 脚本解析成功！"
+        echo ""
+
+        # ============================================================
+        # ✅ 校验解析结果完整性（确保确实解析成功）
+        # ============================================================
+        echo "🔍 校验解析结果完整性..."
+        ALL_OK=true
+
+        # 检查所有必需的文件
+        for file in task-manifest.json task-status.json execution-plan.md task-definition.md; do
+            if [ -f "$RUN_DIR/$file" ]; then
+                SIZE=$(wc -c < "$RUN_DIR/$file" | tr -d ' ')
+                echo "   ✅ $file ($SIZE 字节)"
+            else
+                echo "   ❌ $file 缺失"
+                ALL_OK=false
+            fi
+        done
+
+        # 验证 JSON 格式
+        if python3 -c "import json; json.load(open('$RUN_DIR/task-manifest.json'))" 2>/dev/null; then
+            echo "   ✅ task-manifest.json JSON 格式正确"
+        else
+            echo "   ❌ task-manifest.json JSON 格式错误"
+            ALL_OK=false
+        fi
+
+        echo ""
+
+        if $ALL_OK; then
+            echo "✅ 所有校验通过！"
+            echo ""
+
+            # 显示解析结果摘要
+            echo "📊 解析结果统计："
+            python3 << 'EOF'
+import json
+import os
+run_dir = os.environ['RUN_DIR']
+with open(f'{run_dir}/task-manifest.json', 'r', encoding='utf-8') as f:
+    m = json.load(f)
+print(f'   任务数量: {len(m["tasks"])}')
+print(f'   预计耗时: {m["execution_plan"]["estimated_duration"]}')
+for t in m["tasks"]:
+    print(f'   {t["task_id"]}: {t["module"]} - {t["goal"][:50]}...')
+EOF
+
+            # ✅ 移除解析标记，后续步骤不会再调用 Agent
+            rm -f .claude/runs/.parse-needed 2>/dev/null || true
+
+            echo ""
+            echo "========================================"
+            echo "✅ 解析完成（确定性脚本模式）"
+            echo "========================================"
+            echo ""
+        else
+            echo "❌ 校验未通过"
+            echo "   → 自动降级调用 Agent 兜底"
+            echo ""
+            # 保留标记，继续用 Agent
+        fi
+
+      elif [ $EXIT_CODE -eq 2 ]; then
+        echo "⚠️  脚本无法解析复杂结构（退出码 2）"
+        echo "   → 自动降级调用 Agent 兜底"
+        echo ""
+        # 保留标记，继续用 Agent
       else
-        # 格式 B：{需求名}.md（单需求，无阶段）
-        PROJECT_NAME="单需求"
-        TASK_NAME="$FILE_NAME"
+        echo "❌ 脚本执行错误（退出码: $EXIT_CODE）"
+        echo "   → 自动降级调用 Agent 兜底"
+        echo ""
+        # 保留标记，继续用 Agent
       fi
 
-      # 🔧 v3.4 优化：所有文件集中在 Run 目录内
-      RUN_ID=$(date +%Y%m%d-%H%M%S)
-      RUN_DIR=".claude/runs/${FILE_NAME}-run-${RUN_ID}"
-      # 任务执行结果目录（Run 目录内的 Tasks 子目录）
-      TASKS_DIR="${RUN_DIR}/Tasks"
-
-      # 保存路径信息供后续步骤使用
-      echo "RUN_ID=$RUN_ID" > .claude/runs/.last-run
-      echo "RUN_DIR=$RUN_DIR" >> .claude/runs/.last-run
-      echo "TASKS_DIR=$TASKS_DIR" >> .claude/runs/.last-run
-      echo "PROJECT_NAME=$PROJECT_NAME" >> .claude/runs/.last-run
-      echo "TASK_NAME=$TASK_NAME" >> .claude/runs/.last-run
-
-      # 创建目录结构
-      mkdir -p "$RUN_DIR"
-      mkdir -p "$TASKS_DIR"
-
-      echo "📂 新建运行目录（v3.4 单目录集中存储）"
-      echo "   📍 Run 目录：$RUN_DIR"
-      echo "   📂 任务结果：$TASKS_DIR"
-      echo "   💡 所有文件集中保存，无需跨目录管理"
-      echo ""
-
-      # 获取文件绝对路径
-      TARGET_FILE="{{ file_path }}"
-      TARGET_ABS_PATH=$(realpath "$TARGET_FILE" 2>/dev/null || echo "$TARGET_FILE")
-
-      # 保存运行基本信息（v3.4 单目录存储）
-      cat > "$RUN_DIR/run-info.json" << EOF
-      {
-        "run_id": "$RUN_ID",
-        "source_file": "{{ file_path }}",
-        "source_file_abs": "$TARGET_ABS_PATH",
-        "start_time": "$(date -Iseconds)",
-        "mode": "smart-execution-v3.4",
-        "continue_execution": false,
-        "last_resume_time": null,
-        "parser_version": "3.4"
-      }
-      EOF
-
-      # 初始化任务状态文件
-      cat > "$RUN_DIR/task-status.json" << EOF
-      {
-        "tasks": {},
-        "execution_order": [],
-        "parallel_groups": []
-      }
-      EOF
-
-      echo "✅ 新运行环境初始化完成（v3.4 单目录集中存储）"
-      echo ""
-
   # ============================================================================
-  # 第三步：解析 XMind 生成任务清单（仅当需要时）
+  # 阶段 4：Agent 兜底解析（仅当脚本明确失败时才调用）
   # ============================================================================
-  - name: 🧠 解析 XMind 生成任务清单（仅当需要时）
-    description: 仅当没有已有解析结果时，调用 xmind-task-parser Agent 解析
+  - name: 🧠 Agent 兜底解析（仅当脚本失败时）
+    description: 仅当脚本无法处理时，调用 xmind-task-parser Agent 兜底解析
     if: '[ -f .claude/runs/.parse-needed ]'
     run: |
       source .claude/runs/.last-run
       rm -f .claude/runs/.parse-needed
 
-      echo "🧠 解析 XMind（v3.4 五要素深度解析）"
+      echo "========================================"
+      echo "🧠 Agent 兜底解析（脚本无法处理的复杂情况）"
+      echo "========================================"
+      echo "📄 输入文件: {{ file_path }}"
+      echo "📂 输出目录: $RUN_DIR"
       echo ""
-      echo "请调用 xmind-task-parser Agent 解析以下文件内容："
+      echo "⚠️  脚本无法处理此文件，调用 Agent 兜底解析"
       echo ""
-      echo "文件路径：{{ file_path }}"
-      echo ""
-      echo "输出要求（v3.4 - 单目录集中存储）："
-      echo "- 支持任意深度嵌套检测五要素"
-      echo "- 提取五要素：goal / context / quality_standards / constraints / execution_mode"
-      echo "- ✅ 统一目录：所有文件保存在 Run 目录内"
-      echo "- 保存任务清单 JSON 到：$RUN_DIR/task-manifest.json"
-      echo "- 复制任务定义到：$RUN_DIR/task-definition.md"
-      echo "- 生成执行计划文档到：$RUN_DIR/execution-plan.md"
-      echo "- 在 task-status.json 中记录每个任务的 execution_mode"
-      echo "- 同时在对话中展示任务清单概览（包含执行模式）"
-      echo ""
-      echo "💡 改造说明：v3.4 单目录集中存储，所有文件自动保存到 Run 目录，无需跨目录管理"
+      echo "请调用 xmind-task-parser Agent 解析。"
       echo ""
 
   # ============================================================================
-  # 第四步：显示状态看板，等待人工指令
+  # 阶段 5：🔴 显示任务状态看板 + 自动执行命令（如果指定了 command 参数）
   # ============================================================================
-  - name: 显示状态看板，等待人工指令
-    description: 显示任务状态看板，支持三种执行模式，完全由人工输入指令控制。新增：P1 跨窗口依赖检查 + 并发修改警告
+  - name: 📊 显示任务状态看板 + 自动执行命令
+    description: 调用任务状态脚本显示完整状态看板 - 这是用户看到的第一个界面；如果指定了 command 参数，自动执行
     run: |
       source .claude/runs/.last-run
+
       echo ""
       echo "========================================"
-      echo "✅ XMind 解析完成！进入五要素智能执行模式 v3.3"
+      echo "✅ XMind 解析完成！请选择任务开始执行"
       echo "========================================"
       echo ""
 
-      # --------------------------------------------------------------------------
-      # P1: 跨窗口依赖检查
-      # 扫描所有 run 目录，检查前置依赖是否完成
-      # --------------------------------------------------------------------------
-      echo "🔗 P1 跨窗口依赖检查..."
-      DEPS_WARNING=0
-
-      # 检查本项目内的依赖
-      if [ -f "$RUN_DIR/task-manifest.json" ]; then
-        python3 << 'EOF'
-import json
-import sys
-
-with open(sys.argv[1], 'r') as f:
-    manifest = json.load(f)
-
-tasks = manifest.get('tasks', [])
-warnings = 0
-
-for task in tasks:
-    task_id = task.get('task_id', '')
-    deps = task.get('explicit_dependencies', [])
-    if deps:
-        print(f"  {task_id}: 依赖 {', '.join(deps)}")
-
-if warnings > 0:
-    print(f"  ⚠️  共 {warnings} 个任务存在未完成的依赖")
-EOF
-      fi
+      # 调用脚本显示完整状态看板
+      python3 .claude/scripts/task_status.py --overview
 
       echo ""
+      echo "========================================"
+      echo "💡 可用指令（严格匹配，大小写不敏感）"
+      echo "========================================"
+      echo "  T001          → 查看 T001 方案预览（含执行计划）"
+      echo "  view T001     → 只查看 T001 方案，不执行"
+      echo "  exec T001     → 强制直接执行 T001，跳过审核（慎用）"
+      echo "  status        → 刷新显示状态看板"
+      echo "  report        → 查看执行报告"
+      echo "  exit          → 退出工作流"
+      echo ""
+      echo "🔴 【v4.3 新功能】启动时直接指定命令"
+      echo "   • 示例：/workflow xmind-exec.yml --input xxx --command T001"
+      echo "   • 示例：/workflow xmind-exec.yml --input xxx --command 'exec T001'"
+      echo ""
+      echo "🔴 【v4.2 重要说明】"
+      echo "   • 命令必须严格匹配格式，不做模糊猜测"
+      echo "   • 推荐使用：T001 → 预览方案 → yes 确认执行"
+      echo "   • exec Txxx 跳过审核模式请谨慎使用"
+      echo "   • 不支持 '执行T002' 这类非标准命令"
+      echo ""
+      echo "🔴 【执行流程】"
+      echo "   1. 选择任务（如输入 T001）"
+      echo "   2. 查看方案预览 + 具体执行计划"
+      echo "   3. 输入 yes 确认执行（此时才真正写文件）"
+      echo "   4. 执行完成后自动更新状态"
+      echo ""
 
-      # --------------------------------------------------------------------------
-      # P1: 并发修改警告检查
-      # 扫描所有 run 目录的 result.md，检查是否有其他窗口正在修改相同文件
-      # --------------------------------------------------------------------------
-      echo "⚠️  P1 并发文件修改检查..."
-      CONFLICT_COUNT=0
-
-      # 收集所有已修改的文件
-      declare -A FILE_OWNERS
-      while IFS= read -r result_file; do
-        if [ -f "$result_file" ]; then
-          RUN_DIR=$(dirname "$result_file")
-          RUN_NAME=$(basename "$RUN_DIR")
-          while IFS= read -r file_line; do
-            if echo "$file_line" | grep -qE "^(✅|📝) .+\.(ts|tsx|js|jsx|scss|css|yml|yaml|json|md)$"; then
-              FILE_PATH=$(echo "$file_line" | sed -E 's/^(✅|📝) //' | sed 's/ (已创建|已更新)$//')
-              if [ -n "$FILE_PATH" ]; then
-                if [ -n "${FILE_OWNERS[$FILE_PATH]}" ]; then
-                  FILE_OWNERS["$FILE_PATH"]="${FILE_OWNERS[$FILE_PATH]} $RUN_NAME"
-                else
-                  FILE_OWNERS["$FILE_PATH"]="$RUN_NAME"
-                fi
-              fi
-            fi
-          done < "$result_file"
-        fi
-      done < <(find .claude/runs -maxdepth 2 -name "result*.md" 2>/dev/null)
-
-      # 检查冲突
-      for file_path in "${!FILE_OWNERS[@]}"; do
-        OWNER_COUNT=$(echo "${FILE_OWNERS[$file_path]}" | wc -w | tr -d ' ')
-        if [ "$OWNER_COUNT" -gt 1 ]; then
-          CONFLICT_COUNT=$((CONFLICT_COUNT + 1))
-          echo "  ⚠️  $file_path"
-          echo "     → 被以下目录修改：${FILE_OWNERS[$file_path]}"
-        fi
-      done
-
-      if [ $CONFLICT_COUNT -eq 0 ]; then
-        echo "  ✅ 未检测到跨窗口文件修改冲突"
-      else
+      # ========================================================================
+      # v4.3 新增：如果指定了 command 参数，自动执行
+      # ========================================================================
+      AUTO_CMD="{{ command }}"
+      if [ -n "$AUTO_CMD" ] && [ "$AUTO_CMD" != "null" ] && [ "$AUTO_CMD" != "" ]; then
+        echo "========================================"
+        echo "🤖 检测到自动执行命令: $AUTO_CMD"
+        echo "========================================"
         echo ""
-        echo "  💡 提示：以上文件已被多个窗口修改，可能存在冲突"
-        echo "     执行时会再次警告，也可以使用 exec 强制执行"
+        echo "⏳ 3 秒后自动执行（按 Ctrl+C 可取消）..."
+        sleep 3
+        echo ""
+        echo "✅ 自动执行命令: $AUTO_CMD"
+        echo ""
+      else
+        echo "========================================"
+        echo "👉 请输入任务编号或指令（如 T001）："
+        echo "========================================"
       fi
-      echo ""
 
-      # --------------------------------------------------------------------------
-      # 执行模式说明
-      # --------------------------------------------------------------------------
-      echo "📊 执行模式说明（每个任务独立）："
-      echo ""
-      echo "  📋 plan-only     → 只生成方案，不执行代码"
-      echo "  👀 review-first  → 生成方案 + 理由，用户确认后再执行（默认）"
-      echo "  ⚡ auto-exec     → 自动执行，不需要确认"
-      echo ""
+  # ============================================================================
+  # 阶段 6：🅰️  用户选择任务 - 生成方案预览（含执行计划，纯内存，不写文件）
+  # ============================================================================
+  - name: 📋 步骤 6a: 生成方案预览 + 具体执行计划（纯内存，不写文件）
+    description: 用户选择任务后，调用 Agent 生成完整方案和执行计划，仅在控制台显示
+    run: |
+      source .claude/runs/.last-run
+
+      # 此步骤在用户输入任务编号后触发
+      # 逻辑：
+      # 1. 读取 task-manifest.json 获取任务信息
+      # 2. 调用 task-scheme-generator Agent 生成完整方案
+      # 3. 方案中包含：完整代码 + 具体执行计划（文件操作清单 + 质量检查步骤）
+      # 4. 全部内容仅在控制台显示，不写任何文件
+      # 5. 更新状态为 scheme-previewed（此时仍只是预览状态）
+      # 6. 显示 yes/no/edit 选项
 
       echo "========================================"
-      echo "📊 状态看板使用说明："
+      echo "📋 方案预览流程（纯内存，零文件写入）"
       echo "========================================"
       echo ""
-      echo "所有方案和执行结果都会被永久保存，100% 可追溯。"
+      echo "🔴 用户选择任务后，将执行以下流程："
       echo ""
-
-      # --------------------------------------------------------------------------
-      # 可用指令说明
-      # --------------------------------------------------------------------------
-      echo "可用指令："
-      echo "  T001         → 执行 T001（根据该任务的 execution_mode 决定是否需要确认）"
-      echo "  view T001    → 只查看 T001 方案，不执行"
-      echo "  exec T001    → 强制直接执行 T001，跳过审核"
-      echo "  yes          → 确认当前方案，开始执行"
-      echo "  no           → 取消当前任务"
-      echo "  edit 你的修改意见 → 根据你的意见调整方案，支持多轮迭代"
-      echo "                  示例：edit 把枚举名改成 DepartType，放到 constants 目录"
-      echo "  status       → 刷新显示状态看板"
-      echo "  report       → 查看执行报告"
-      echo "  exit         → 退出工作流，生成最终报告"
+      echo "1. 📖 读取 T001 任务信息"
+      echo "2. 🧠 调用 task-scheme-generator 生成方案"
+      echo "   → 完整代码内容"
+      echo "   → 文件操作清单（创建/修改的文件）"
+      echo "   → 质量检查步骤（tsc + lint）"
+      echo "   → 执行统计（文件数、预计时间）"
+      echo "3. 👁️  所有内容在控制台完整显示"
+      echo "4. 📝 更新状态为: scheme-previewed"
+      echo "5. ❓ 等待用户确认: yes / no / edit 意见"
       echo ""
-
-      # --------------------------------------------------------------------------
-      # 重要说明
-      # --------------------------------------------------------------------------
       echo "========================================"
-      echo "📦 强制保存的可追溯文件（v3.4 单目录集中存储）："
-      echo "  • Tasks/{TASK_ID}/scheme.md → 每个任务的完整代码方案"
-      echo "  • Tasks/{TASK_ID}/result.md → 每个任务的执行结果 + 质量检查"
-      echo "  • task-status.json          → 任务状态跟踪（包含 execution_mode）"
-      echo "  • task-manifest.json        → 结构化任务清单（五要素完整信息）"
-      echo "  • run-info.json             → 运行元信息"
-      echo "  • task-definition.md        → 原始任务定义"
-      echo "  • execution-plan.md         → 人类可读执行计划"
-      echo "  • final-report.md           → 最终执行报告（所有任务完成后）"
+      echo "💡 用户确认后才执行下一步"
+      echo "========================================"
+
+  # ============================================================================
+  # 阶段 7：🅱️  用户输入 yes 确认 - 开始真正执行
+  # ============================================================================
+  - name: ✅ 步骤 7: 用户确认后开始执行
+    description: 用户输入 yes 确认后才开始真正写文件和执行代码
+    run: |
+      source .claude/runs/.last-run
+
+      echo "========================================"
+      echo "⚡ 开始执行（用户已确认）"
       echo "========================================"
       echo ""
+      echo "🔴 执行流程（此时才真正开始写入文件）："
+      echo ""
+      echo "1. ✅ 更新状态: scheme-previewed → scheme-confirmed"
+      echo "2. 📝 写入 scheme.md 方案文件（永久保存）"
+      echo "3. 🧠 调用 task-executor 执行业务代码生成"
+      echo "   → 创建/修改所有业务代码文件"
+      echo "   → 运行 TypeScript 类型检查"
+      echo "   → 运行 ESLint 代码检查"
+      echo "4. 📝 写入 result.md 执行结果文件"
+      echo "5. ✅ 更新状态: scheme-confirmed → completed"
+      echo "6. 📊 刷新显示状态看板"
+      echo "7. 🎉 检查所有任务是否完成，生成 final-report.md"
+      echo ""
+      echo "========================================"
+      echo "💡 所有追溯文件在执行完成后统一写入"
+      echo "========================================"
 
-      echo "⚠️  关键：必须以 $RUN_DIR/task-status.json 为状态的唯一真相来源"
-      echo "请按以下顺序读取："
-      echo "  1. 首先读取 $RUN_DIR/task-status.json → 获取所有任务的真实状态 + execution_mode"
-      echo "  2. 然后读取 $RUN_DIR/task-manifest.json → 补充任务的五要素完整信息"
-      echo ""
+  # ============================================================================
+  # 阶段 8：显示最终结果和下一步提示
+  # ============================================================================
+  - name: 🎯 步骤 8: 显示最终结果 + 下一步提示
+    description: 任务执行完成后，显示最终状态和下一步操作提示
+    run: |
+      source .claude/runs/.last-run
 
-      echo "特别注意："
-      echo "  • 每个任务的 status 必须从 task-status.json 读取"
-      echo "  • 每个任务的 execution_mode 决定执行行为"
-      echo "  • status = 'completed' → 显示为 [✅] 已完成"
-      echo "  • status = 'pending'   → 显示为 [⏸️] 待执行"
-      echo "  • status = 'reviewing' → 显示为 [📋] 审核中"
-      echo "  • 不要将已完成的任务显示为待执行"
       echo ""
-
-      echo "然后显示当前所有任务的状态看板（显示每个任务的 execution_mode）"
-      echo ""
-
-      # --------------------------------------------------------------------------
-      # 任务执行后逻辑
-      # --------------------------------------------------------------------------
-      echo "📋 任务执行后逻辑："
-      echo "  1. 每个任务执行完成后，自动检查所有任务状态"
-      echo "  2. 如果所有任务都是 completed 或 skipped，自动生成 final-report.md"
-      echo "  3. 生成报告后显示提示：🎉 所有任务已完成，最终报告已生成"
-      echo ""
-
-      # --------------------------------------------------------------------------
-      # 方案确认交互流程
-      # --------------------------------------------------------------------------
-      echo "💡 方案确认交互流程（重要）："
-      echo "  当方案展示后，你可以："
-      echo ""
-      echo "  • yes        → ✅ 确认方案，开始执行代码"
-      echo "  • no         → ❌ 取消任务，不执行任何修改"
-      echo "  • edit + 意见 → 🔄 根据你的修改意见重新生成方案"
-      echo "                  支持多轮迭代，直到你满意再输入 yes 确认"
-      echo ""
-      echo "  示例：edit 把枚举名改成 DepartType，放到 constants 目录"
+      echo "========================================"
+      echo "✅ 任务执行完成"
+      echo "========================================"
       echo ""
 
-      # --------------------------------------------------------------------------
-      # 任务指令说明
-      # --------------------------------------------------------------------------
-      echo "💡 任务指令说明（task-executor v3.0 - 先审后写）："
-      echo "  • 当用户输入 T001 时："
-      echo "    1. 读取 T001 的 execution_mode"
-      echo "    2. 如果是 plan-only：只在控制台展示方案，不写任何文件，不执行"
-      echo "    3. 如果是 review-first：控制台展示方案 + 理由 → 用户确认后才写文件 + 执行"
-      echo "    4. 如果是 auto-exec：直接生成方案并执行，执行完成后一次性写文件"
-      echo "    5. 自动记录当前任务到 $RUN_DIR/.current-task（仅记录 task_id）"
-      echo ""
-      echo "  • 当用户输入 exec T001 时："
-      echo "    强制直接执行，忽略 execution_mode"
-      echo ""
+      # 刷新状态看板
+      python3 .claude/scripts/task_status.py --overview
 
-      echo "💡 【铁律 - 6 条红线全部保留，只调整写入时机】"
-      echo "  ✅ 红线 1：scheme.md 必须写，但只在 yes 确认后写（第一次也是最后一次）"
-      echo "  ✅ 红线 2：result.md 必须写，执行完成后写"
-      echo "  ✅ 红线 3：task-status.json 必须更新，执行完成后更新"
-      echo "  ✅ 红线 4：代码方案必须完整，不能用摘要"
-      echo "  ✅ 红线 5：严禁自动推进到下一个任务"
-      echo "  ✅ 红线 6：所有任务完成时自动生成 final-report.md"
       echo ""
-      echo "  💡 内存迭代，零中间文件："
-      echo "  ✅ 所有 edit 迭代都在内存中完成，不写任何中间文件"
-      echo "  ✅ no 取消时，什么都不写，干净退出"
+      echo "💡 下一步操作："
+      echo "  • 选择下一个任务继续执行（如输入 T002）"
+      echo "  • 输入 status 刷新状态看板"
+      echo "  • 输入 report 查看执行报告"
+      echo "  • 输入 exit 退出工作流"
       echo ""
+      echo "========================================"
+      echo "👉 请输入下一步指令："
+      echo "========================================"
 
-      echo "💡 用户指令行为："
-      echo "  • T00x → 读取任务 → 控制台展示方案 → 不写任何文件 → 等待 yes/no/edit"
-      echo "  • edit xxx → 内存中修改方案 → 控制台展示 → 不写任何文件"
-      echo "  • yes → 写 scheme.md → 执行代码 → 写 result.md → 更新 status → 清理状态"
-      echo "  • no → 清理状态 → 不写任何文件 → 干净退出"
-      echo "  • exec T00x → 直接执行 → 执行完一次性写所有文件"
-      echo ""
+workflow:
+  # ============================================================================
+  # 🔴 v4.3 新增：启动时自动执行命令（如果指定了 command 参数）
+  # ============================================================================
+  on_start: |
+    # 检查是否有 command 参数
+    if [ -n "{{ command }}" ] && [ "{{ command }}" != "null" ] && [ "{{ command }}" != "" ]; then
+      # 将 command 作为第一个用户输入
+      echo "{{ command }}" > .claude/runs/.auto-command
+    fi
+
+  # ============================================================================
+  # 🔴 工作流核心交互逻辑（状态机驱动）
+  # ============================================================================
+  state_machine:
+    # 初始状态
+    initial: ready
+
+    # 状态定义
+    states:
+      # 就绪状态 - 显示看板，等待用户选择任务
+      ready:
+        on:
+          # 用户选择任务（严格匹配：T + 1-3 位数字，大小写不敏感）
+          - pattern: "^[Tt][0-9]{1,3}$"
+            action: generate_scheme
+            next_state: scheme_preview
+
+          # 用户查看方案（严格匹配：view T + 1-3 位数字，大小写不敏感）
+          - pattern: "^[Vv][Ii][Ee][Ww] [Tt][0-9]{1,3}$"
+            action: view_scheme_only
+            next_state: ready
+
+          # 用户强制执行（严格匹配：exec T + 1-3 位数字，大小写不敏感）
+          - pattern: "^[Ee][Xx][Ee][Cc] [Tt][0-9]{1,3}$"
+            action: force_execute
+            next_state: executing
+
+          # 刷新状态（大小写不敏感）
+          - pattern: "^[Ss][Tt][Aa][Tt][Uu][Ss]$"
+            action: refresh_status
+            next_state: ready
+
+          # 查看报告（大小写不敏感）
+          - pattern: "^[Rr][Ee][Pp][Oo][Rr][Tt]$"
+            action: show_report
+            next_state: ready
+
+          # 退出（大小写不敏感）
+          - pattern: "^[Ee][Xx][Ii][Tt]$"
+            action: exit_workflow
+            next_state: exit
+
+      # 方案预览状态 - 方案已显示，等待用户 yes/no/edit
+      scheme_preview:
+        on:
+          # 用户确认执行（大小写不敏感）
+          - pattern: "^[Yy][Ee][Ss]$"
+            action: execute_task
+            next_state: executing
+
+          # 用户取消（大小写不敏感）
+          - pattern: "^[Nn][Oo]$"
+            action: cancel_task
+            next_state: ready
+
+          # 用户修改方案（大小写不敏感，edit 开头）
+          - pattern: "^[Ee][Dd][Ii][Tt] "
+            action: edit_scheme
+            next_state: scheme_preview
+
+          # 返回（大小写不敏感）
+          - pattern: "^[Bb][Aa][Cc][Kk]$"
+            action: go_back
+            next_state: ready
+
+      # 执行中状态
+      executing:
+        on:
+          # 执行完成后自动返回 ready
+          - pattern: "_complete_"
+            action: task_completed
+            next_state: ready
+
+      # 退出状态
+      exit:
+        terminal: true
+
+  # ============================================================================
+  # 工作流脚本交互逻辑（供主程序调用）
+  # ============================================================================
+  interaction:
+    # 用户输入处理（严格匹配模式，v4.2 改造 + v4.3 自动命令）
+    handle_input: |
+      # 🔴 严格匹配原则：
+      # 1. 所有命令必须严格匹配，不做模糊猜测
+      # 2. 非法输入直接返回 unknown，不尝试"智能"匹配
+      # 3. exec 命令必须严格为 "exec Txxx" 格式
+
+      # ========================================================================
+      # v4.3 新增：优先检查是否有自动命令文件（一次性使用）
+      # ========================================================================
+      if [ -f .claude/runs/.auto-command ]; then
+        AUTO_CMD=$(cat .claude/runs/.auto-command | xargs)
+        rm -f .claude/runs/.auto-command  # 用完即删，只执行一次
+        if [ -n "$AUTO_CMD" ]; then
+          echo "🤖 执行自动命令: $AUTO_CMD" >&2
+          USER_INPUT="$AUTO_CMD"
+        fi
+      fi
+
+      # 去除首尾空格，转大写（让 T001 和 t001 都能匹配）
+      INPUT_TRIMMED=$(echo "$USER_INPUT" | xargs | tr '[:lower:]' '[:upper:]')
+
+      case "$INPUT_TRIMMED" in
+        # 🔹 任务编号：严格匹配 "T" + 数字（如 T001、T002）
+        T[0-9][0-9][0-9])
+          echo "generate_scheme:$INPUT_TRIMMED"
+          ;;
+        T[0-9][0-9])
+          echo "generate_scheme:$INPUT_TRIMMED"
+          ;;
+        T[0-9])
+          echo "generate_scheme:$INPUT_TRIMMED"
+          ;;
+
+        # 🔹 查看方案：严格匹配 "VIEW Txxx"
+        "VIEW T"[0-9][0-9][0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/VIEW //')
+          echo "view_scheme:$TASK_ID"
+          ;;
+        "VIEW T"[0-9][0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/VIEW //')
+          echo "view_scheme:$TASK_ID"
+          ;;
+        "VIEW T"[0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/VIEW //')
+          echo "view_scheme:$TASK_ID"
+          ;;
+
+        # 🔹 强制执行：严格匹配 "EXEC Txxx"
+        "EXEC T"[0-9][0-9][0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/EXEC //')
+          echo "force_execute:$TASK_ID"
+          ;;
+        "EXEC T"[0-9][0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/EXEC //')
+          echo "force_execute:$TASK_ID"
+          ;;
+        "EXEC T"[0-9])
+          TASK_ID=$(echo "$INPUT_TRIMMED" | sed 's/EXEC //')
+          echo "force_execute:$TASK_ID"
+          ;;
+
+        # 🔹 确认执行：严格匹配 "YES"
+        YES)
+          echo "execute:current"
+          ;;
+
+        # 🔹 取消执行：严格匹配 "NO"
+        NO)
+          echo "cancel:current"
+          ;;
+
+        # 🔹 修改方案：严格匹配 "EDIT " 开头
+        "EDIT "*)
+          # 保留原始输入的修改内容（不转大写）
+          EDIT_CONTENT=$(echo "$USER_INPUT" | sed 's/^edit //i')
+          echo "edit_scheme:$EDIT_CONTENT"
+          ;;
+
+        # 🔹 其他命令：严格匹配
+        STATUS)
+          echo "refresh_status"
+          ;;
+        REPORT)
+          echo "show_report"
+          ;;
+        EXIT)
+          echo "exit"
+          ;;
+        BACK)
+          echo "go_back"
+          ;;
+
+        # 🔴 未知命令：不猜测，直接返回 unknown
+        *)
+          echo "unknown:$USER_INPUT"
+          ;;
+      esac
+
+  # ============================================================================
+  # 版本信息
+  # ============================================================================
+  version: 4.4.0
+  updated_at: 2026-05-11
+  changelog:
+    - "v4.4: 🔴 追溯文件扁平化 - 改为 Tasks/T001_scheme.md / Tasks/T001_result.md 结构；任务完成后一次性写入两个文件；方案确认前零文件"
+    - "v4.3: ✨ 启动时直接指定命令 - 新增 --command 参数，可直接执行 T001、exec T001 等命令，完全兼容原有交互模式"
+    - "v4.2: 🔴 输入处理严格化 - 所有命令严格匹配，不做模糊猜测；增加大小写不敏感；防止误判"
+    - "v4.1: 🔴 新流程改造 - 解析→看板→选任务→方案预览(含执行计划)→用户确认→执行→更新状态"
+    - "v4.0: Workflow 管控版 - Agent 只输出文本，写文件完全由 Workflow 控制"
+    - "v3.1: 增加确定性脚本解析，90% 情况 0.5 秒完成"

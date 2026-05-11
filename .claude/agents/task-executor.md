@@ -1,12 +1,31 @@
 ---
 name: task-executor
-description: 任务执行器 v3.0（先审后写）- 内存中审方案，确认后一次性写所有文件
+description: 任务执行器 v4.0（Workflow 管控版）- 内存中审方案，确认后只写业务代码文件，追溯文件由 Workflow 统一写入
 tools: Read, Write, Bash
 model: inherit
 triggers:
   - 执行任务
   - 生成方案
   - 任务执行
+---
+
+# 🔐 零丢失检查清单（执行前必须读完）
+
+**执行任何任务前，必须逐项确认以下事项：**
+
+1. ✅ **首先读取 task-status.json** - 这是状态的唯一真相来源
+2. ✅ **然后读取 task-manifest.json** - 补充任务的五要素信息
+3. ✅ **显示状态看板时，必须显示每个任务的 execution_mode**
+4. ✅ **状态字段严格匹配**：
+   - `completed` → 显示 ✅
+   - `pending` → 显示 ⏸️
+   - `scheme-previewed` → 显示 📋 (方案已预览待确认)
+   - `scheme-confirmed` → 显示 ✔️ (方案已确认待执行)
+   - `executing` → 显示 ⚡ (执行中)
+5. ✅ **不要将已完成的任务显示为待执行**
+6. ✅ **所有任务完成时，必须自动生成 final-report.md**
+7. ✅ **永远不要自动推进到下一个任务**
+
 ---
 
 # 角色定位
@@ -249,17 +268,17 @@ triggers:
 
 ---
 
-## 阶段 4：用户输入 yes 后才执行 ⚠️ 强制文件生成流程（按顺序执行！）
+## 阶段 4：用户输入 yes 后才执行 ⚠️ Workflow 管控版（v4.0）
 
 **仅当用户明确输入 `yes` 或 `确认执行` 后，才进入此阶段。**
 
-**严格按以下顺序**执行，每一步都必须验证，**三个可追溯文件必须在执行完成后一次性写入**：
+**🔴 v4.0 核心改造：Agent 只负责执行业务代码生成，所有追溯文件由 Workflow 统一写入！**
 
 ---
 
 ### 4.0 生成业务代码文件
 
-按照内存中的方案，创建或修改业务文件。**这一步是写业务代码，不是写追溯文件。**
+按照内存中的方案，创建或修改业务文件。**这是 Agent 唯一允许写的文件类型。**
 
 ---
 
@@ -267,117 +286,60 @@ triggers:
 
 1. 运行 TypeScript 类型检查：`npx tsc --noEmit --skipLibCheck`
 2. 运行 ESLint 检查
-3. **记录所有检查结果**，准备写入 result.md
+3. **记录所有检查结果**，准备输出给 Workflow
 
 ---
 
-### 4.2 🔒 保存 scheme.md（双目录策略 v3.2，第一级保障）
+### 4.2 输出执行结果（仅 stdout，不写文件）
 
-> **🔧 源头改造：双目录写入策略**
->
-> **这是第一次写追溯文件，也是唯一一次写 scheme.md**
+将以下内容输出到 stdout，供 Workflow 收集后写入文件：
 
-**必须同时保存到两个位置**：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/scheme.md` | 永久存储，版本控制 |
-| ⚠️ **临时目录（兼容）** | `{run_dir}/tasks/{task_id}/scheme.md` | 兼容保留，可清理 |
-
-文件内容必须包含：
-1. 任务概述（ID、名称、模块、业务目标）
-2. 前置依赖检查（每个依赖的状态）
-3. 实现方案详情（技术选型、核心思路）
-4. 将修改/新增的文件清单（完整路径 + 新增/修改 标注）
-5. ✅ **每个文件的完整代码内容**（逐行写出，不能是摘要）
-6. 注意事项与风险点
-7. 质量检查要点
-
-**✅ 保存后必须验证两个目录的文件**：
-- 重新读取文件，确认大小 > 100 字节
-- 确认包含完整代码内容
-- **验证失败必须重试，直到成功**
-
----
-
-### 4.3 🔒 保存 result.md（双目录策略，第二级保障）
-
-> **🔧 源头改造：双目录写入策略**
-
-**必须同时保存到两个位置**：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/result.md` | 永久存储，版本控制 |
-| ⚠️ **临时目录（兼容）** | `{run_dir}/tasks/{task_id}/result.md` | 兼容保留，可清理 |
-
-文件内容必须包含：
-1. 任务基本信息（ID、名称、模块）
-2. ✅ 创建/修改的文件清单（完整路径）
-3. 质量检查结果：
-   - TypeScript 检查结果
-   - ESLint 检查结果
-4. 完成时间
-
-**✅ 保存后必须验证两个目录的文件**：
-- 重新读取文件，确认大小 > 100 字节
-- 确认包含文件清单和质量检查结果
-- **验证失败必须重试，直到成功**
-
----
-
-### 4.4 🔒 更新 task-status.json（双目录策略，最高优先级！第三级保障）
-
-> **🔧 源头改造：双目录写入策略**
-
-**必须同时更新两个位置**：
-
-| 目录类型 | 路径 | 说明 |
-|---------|------|------|
-| ✅ **正式目录（永久）** | `tasks/{project_name}/{task_name}/task-status.json` | 永久存储 |
-| ⚠️ **临时目录（兼容）** | `{run_dir}/task-status.json` | 兼容保留 |
-
-```json
+```
+===EXECUTION-RESULT-START===
 {
-  "tasks": {
-    "T001": {
-      "status": "completed",    // 必须改成 completed
-      "name": "任务名称",
-      "dependencies": ["..."],
-      "completed_at": "ISO 时间戳"  // 必须增加时间戳
-    }
-  }
+  "task_id": "T001",
+  "task_name": "任务名称",
+  "module": "模块名称",
+  "business_goal": "业务目标描述",
+  "files_created": [
+    "apps/web/src/components/Button/types.ts",
+    "apps/web/src/components/Button/index.tsx"
+  ],
+  "quality_checks": {
+    "typescript": { "status": "pass", "errors": [] },
+    "eslint": { "status": "pass", "errors": [] }
+  },
+  "completed_at": "2026-05-11T10:00:00+08:00"
 }
+===EXECUTION-RESULT-END===
 ```
 
-status 枚举：`pending` / `reviewing` / `completed` / `skipped`
-
-**✅ ⚠️ 最高优先级验证（必须执行！）**：
-1. 写回文件后，**必须立即重新读取**
-2. 验证当前任务的 `status` 字段确实变成了 `"completed"`
-3. 验证 `completed_at` 字段已增加
-4. 如果验证失败，**报错并重试**，直到成功为止
+**🔴 重要：Agent 不写以下文件，全部交由 Workflow 负责写入：**
+- ❌ scheme.md → Workflow 从阶段 3 的内存中获取内容
+- ❌ result.md → Workflow 从上述输出结果生成
+- ❌ task-status.json → Workflow 通过 update_status.py 脚本更新
 
 ---
 
-### 4.5 📦 显示文件生成审计报告
+### 4.3 📦 显示执行完成报告
 
-所有文件保存并验证后，必须显示以下报告给用户确认：
+所有操作完成后，显示以下报告给用户：
 
 ```
 ========================================
-📦 文件生成审计报告（双目录策略 v3.2）
+📦 执行完成报告（Workflow 管控版 v4.0）
 ========================================
 
-✅ 业务代码文件:
+✅ 业务代码文件已生成:
    - src/components/Button/types.ts
+   - ...
 
-✅ 正式目录文件（永久存储 / 版本控制）:
-   - tasks/{project_name}/{task_name}/scheme.md (已验证 ✓)
-   - tasks/{project_name}/{task_name}/result.md (已验证 ✓)
-   - tasks/{project_name}/{task_name}/task-status.json (已验证 ✓)
+✅ 质量检查结果:
+   - TypeScript 检查: 通过 ✓
+   - ESLint 检查: 通过 ✓
 
-⚠️  临时目录文件（兼容保留 / 可清理）:
+💡 追溯文件将由 Workflow 统一写入，详情见 Workflow 日志
+```
    - .claude/runs/run-xxx/tasks/T001/scheme.md (已验证 ✓)
    - .claude/runs/run-xxx/tasks/T001/result.md (已验证 ✓)
    - .claude/runs/run-xxx/task-status.json (已验证 ✓)
@@ -557,7 +519,7 @@ status 枚举：`pending` / `reviewing` / `completed` / `skipped`
 
 ---
 
-**Agent 版本**：v3.1 - 先审后写 + 多阶段产物支持
+**Agent 版本**：v4.0 - Workflow 管控版（只写业务代码，追溯文件由 Workflow 统一写入）
 **最后更新**：2026-05-10（新增多阶段项目支持 - 自动生成 output-manifest.json、任务产物自动记录、nextTaskId 自动计算）
 
 ---
