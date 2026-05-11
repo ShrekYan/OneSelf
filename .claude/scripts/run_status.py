@@ -182,6 +182,14 @@ def display_run_status(run_dir: Path) -> None:
 
 def display_summary() -> None:
     """显示简化的状态摘要（用于 workflow 每个步骤结束时）"""
+    last_run_file = RUNS_DIR / ".last-run"
+    if not last_run_file.exists():
+        print("")
+        print("📊 当前状态：⏳ 环境待初始化")
+        print("   → 运行目录尚未创建，继续执行 workflow 即可")
+        print("")
+        return
+
     run_dir = load_last_run_dir()
 
     print("")
