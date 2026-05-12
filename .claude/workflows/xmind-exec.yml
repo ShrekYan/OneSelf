@@ -1,6 +1,6 @@
-name: XMind 工作流 - 五要素智能执行模式 v4.4 重构版
-description: 【🔴 v4.4 模块化重构】主入口仅 80 行，业务逻辑全部迁移到 Python 脚本
-  功能完全保持不变：解析→看板→选任务→方案预览→用户确认→执行→更新状态
+name: XMind 工作流 - 五要素智能执行模式 v4.5 简化版
+description: 【🔴 v4.5 方案 B 简化流程】合并生成方案和执行阶段
+  用户选择任务后直接看到完整方案并确认执行
   所有写文件操作在用户 yes 确认后才执行，完全内存预览，零中间文件。
 
 inputs:
@@ -28,7 +28,7 @@ steps:
     run: |
       rm -f .claude/runs/.init-needed
       python3 .claude/scripts/run_initializer.py "{{ file_path }}" --init
-      echo "✅ 新运行环境初始化完成（v4.4 单目录集中存储）"
+      echo "✅ 新运行环境初始化完成（v4.5 简化流程）"
       echo ""
       python3 .claude/scripts/run_status.py --summary
 
@@ -41,51 +41,23 @@ steps:
     run: python3 .claude/scripts/x03_parse_xmind.py "{{ file_path }}"
 
   # ============================================================================
-  # 阶段 4：🧠 Agent 兜底解析（仅当脚本明确失败时才调用）
+  # 阶段 4：显示状态看板（Python 实现）
   # ============================================================================
-  - name: 🧠 Agent 兜底解析（仅当脚本失败时）
-    description: 仅当脚本无法处理时，调用 xmind-task-parser Agent 兜底解析
-    if: '[ -f .claude/runs/.parse-needed ]'
-    run: |
-      source .claude/runs/.last-run
-      rm -f .claude/runs/.parse-needed
-
-      echo "========================================"
-      echo "🧠 Agent 兜底解析（脚本无法处理的复杂情况）"
-      echo "========================================"
-      echo "📄 输入文件：{{ file_path }}"
-      echo "📂 输出目录：$RUN_DIR"
-      echo ""
-      echo "⚠️  脚本无法处理此文件，调用 Agent 兜底解析"
-      echo ""
-      echo "请调用 xmind-task-parser Agent 解析。"
-      echo ""
-
-  # ============================================================================
-  # 阶段 5：显示任务状态看板 + 自动执行命令（Python 实现）
-  # ============================================================================
-  - name: 📊 显示任务状态看板 + 自动执行命令
-    description: 调用任务状态脚本显示完整状态看板 - 这是用户看到的第一个界面
+  - name: 📊 显示任务状态看板
+    description: 显示任务状态看板，等待用户选择任务
     run: python3 .claude/scripts/x04_show_dashboard.py "{{ command }}"
 
   # ============================================================================
-  # 阶段 6：用户选择任务 - 生成方案预览（Python 实现）
+  # 阶段 5：核心执行逻辑（生成方案 + 用户确认 + 执行写入）
   # ============================================================================
-  - name: 📋 步骤 6a：生成方案预览 + 具体执行计划（纯内存，不写文件）
-    description: 用户选择任务后，调用 Agent 生成完整方案和执行计划，仅在控制台显示
-    run: python3 .claude/scripts/x05_generate_scheme.py
-
-  # ============================================================================
-  # 阶段 7：用户输入 yes 确认 - 开始真正执行（Python 实现）
-  # ============================================================================
-  - name: ✅ 步骤 7：用户确认后开始执行
-    description: 用户输入 yes 确认后才开始真正写文件和执行代码
+  - name: ⚡ 核心执行逻辑
+    description: 选中任务后，生成方案 + 用户确认 + 执行写入
     run: python3 .claude/scripts/x06_execute_task.py
 
   # ============================================================================
-  # 阶段 8：显示最终结果和下一步提示（Python 实现）
+  # 阶段 6：显示最终结果和下一步提示（Python 实现）
   # ============================================================================
-  - name: 🎯 步骤 8：显示最终结果 + 下一步提示
+  - name: 🎯 显示最终结果 + 下一步提示
     description: 任务执行完成后，显示最终状态和下一步操作提示
     run: python3 .claude/scripts/x07_show_result.py
 
@@ -101,7 +73,8 @@ workflow:
     fi
 
   # ============================================================================
-  # 🔴 v4.4 模块化：状态机逻辑迁移到 x_state_machine.py
+  # ✅ v5.0 纯内存版：简化状态机（3 个状态，零临时文件）
+  # ready → generating → confirming → ready
   # ============================================================================
   state_machine:
     # 初始状态
@@ -111,8 +84,8 @@ workflow:
     states:
       ready:
         on:
-          - pattern: "^generate_scheme:"
-            next_state: scheme_preview
+          - pattern: "^generate_scheme:(T\\d+)"
+            next_state: scheme_previewing
           - pattern: "^view_scheme:"
             next_state: ready
           - pattern: "^force_execute:"
@@ -124,19 +97,47 @@ workflow:
           - pattern: "^exit"
             next_state: exit
 
-      scheme_preview:
+      # 兼容旧状态
+      scheme_previewing:
+        on:
+          - pattern: "^confirm_scheme"
+            next_state: generating    # ✅ 确认后进入生成状态
+          - pattern: "^cancel"
+            next_state: ready
+          - pattern: "^go_back"
+            next_state: ready
+          - pattern: "^exit"
+            next_state: exit
+
+      # ✅ 新增：方案生成中
+      generating:
+        on:
+          - pattern: "^scheme_generated"
+            next_state: confirming   # 生成完，进入确认执行状态
+          - pattern: "^cancel"
+            next_state: ready
+
+      # ✅ 新增：用户确认执行中（方案已显示在控制台）
+      confirming:
+        on:
+          - pattern: "^execute"
+            next_state: ready        # 用户确认执行
+          - pattern: "^cancel"
+            next_state: ready
+          - pattern: "^edit_scheme"
+            next_state: generating   # 用户要改，回到生成状态
+
+      # 兼容旧状态
+      executing:
         on:
           - pattern: "^execute:"
-            next_state: executing
+            next_state: ready
           - pattern: "^cancel:"
             next_state: ready
           - pattern: "^edit_scheme:"
-            next_state: scheme_preview
+            next_state: generating
           - pattern: "^go_back"
             next_state: ready
-
-      executing:
-        on:
           - pattern: "_complete_"
             next_state: ready
 
@@ -153,9 +154,12 @@ workflow:
 # ============================================================================
 # 版本信息
 # ============================================================================
-version: 4.4.0
-updated_at: 2026-05-11
+version: 4.5.1
+updated_at: 2026-05-12
 changelog:
+  - "v4.5.1: 🔴 铁律修复 - 新增 scheme_previewing 确认状态，严格遵循 看板→选任务→确认→生成方案→确认执行 的四步流程，防止自动生成方案；看板增加版本信息、运行目录、当前状态显示"
+  - "v4.5: 🔴 方案 B 简化流程 - 合并生成方案和执行阶段，用户选择任务后直接看到完整方案并确认执行"
+  - "v4.4.1: 📝 临时禁用 Agent 兜底解析 - xmind-task-parser Agent 调用已注释，脚本解析失败时提示用户手动准备任务文件"
   - "v4.4: 🔴 模块化重构 - xmind-exec.yml 从 570 行精简为 80 行，所有 Shell 胶水代码迁移到独立 Python 脚本，零功能丢失，完全向下兼容"
   - "v4.3: ✨ 启动时直接指定命令 - 新增 --command 参数，可直接执行 T001、exec T001 等命令"
   - "v4.2: 🔴 输入处理严格化 - 所有命令严格匹配，不做模糊猜测，增加大小写不敏感"

@@ -24,8 +24,10 @@ COMMAND_PATTERNS = [
     (r'^[Vv][Ii][Ee][Ww] [Tt](\d{1,3})$', 'view_scheme'),
     # 🔹 强制执行：严格匹配 "EXEC Txxx"
     (r'^[Ee][Xx][Ee][Cc] [Tt](\d{1,3})$', 'force_execute'),
-    # 🔹 确认执行：严格匹配 "YES"
-    (r'^[Yy][Ee][Ss]$', 'execute'),
+    # 🔹 确认生成方案：严格匹配 "YES" / "CONFIRM"（在 scheme_previewing 状态下）
+    (r'^[Yy][Ee][Ss]$|^[Cc][Oo][Nn][Ff][Ii][Rr][Mm]$', 'confirm_scheme'),
+    # 🔹 确认执行：严格匹配 "YES"（在 executing 状态下，通过状态上下文区分）
+    # (r'^[Yy][Ee][Ss]$', 'execute'),  # 与 confirm_scheme 合并，由状态上下文区分
     # 🔹 取消执行：严格匹配 "NO"
     (r'^[Nn][Oo]$', 'cancel'),
     # 🔹 修改方案：严格匹配 "EDIT " 开头
@@ -34,7 +36,7 @@ COMMAND_PATTERNS = [
     (r'^[Ss][Tt][Aa][Tt][Uu][Ss]$', 'refresh_status'),
     (r'^[Rr][Ee][Pp][Oo][Rr][Tt]$', 'show_report'),
     (r'^[Ee][Xx][Ii][Tt]$', 'exit'),
-    (r'^[Bb][Aa][Cc][Kk]$', 'go_back'),
+    (r'^[Bb][Aa][Cc][Kk]$|^[Rr][Ee][Tt][Uu][Rr][Nn]$', 'go_back'),
 ]
 
 

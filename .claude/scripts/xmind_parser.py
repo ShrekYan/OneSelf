@@ -20,10 +20,14 @@ from datetime import datetime
 def extract_field(content, keywords):
     """从内容中提取字段值
 
-    支持两种格式：
+    支持四种格式（无论多少缩进和空格）：
     1. - 关键词：值（同一行）
-    2. - 关键词
-         - 值（下一行缩进，支持多行）
+    2. - 关键词：
+         - 值（下一行缩进，带 - 前缀）
+    3. - 关键词
+         - 值（下一行缩进，带 - 前缀）
+    4. - 关键词
+         值（下一行缩进，不带 - 前缀，纯文本）
     """
     # 所有已知的字段关键词，用于判断何时停止收集
     all_field_keywords = [
@@ -35,7 +39,10 @@ def extract_field(content, keywords):
     ]
 
     for keyword in keywords:
-        # 格式 1: 同一行冒号分隔（匹配到下一个独立的字段关键词之前）
+        # ============================================================
+        # 格式 1: 同一行冒号分隔
+        # - 关键词：值（支持任意缩进）
+        # ============================================================
         pattern1 = r'-\s*' + re.escape(keyword) + r'\s*[：:]\s*(.+?)(?=\n\s*-\s*[\u4e00-\u9fa5]{2,}|\Z)'
         match1 = re.search(pattern1, content, re.DOTALL)
         if match1:
@@ -44,29 +51,68 @@ def extract_field(content, keywords):
             if value:
                 return value
 
-        # 格式 2: 关键词单独一行，后面可能有多行值
+        # ============================================================
+        # 格式 2: 关键词带冒号单独一行，后面是缩进的值
+        # - 关键词：
+        #   - 值1
+        #   - 值2
+        # ============================================================
+        pattern2 = r'-\s*' + re.escape(keyword) + r'\s*[：:]\s*\n((?:\s+[-*]\s+.+\n?)+)'
+        match2 = re.search(pattern2, content)
+        if match2:
+            values_block = match2.group(1)
+            # 提取每一行的值
+            values = []
+            for line in values_block.split('\n'):
+                line = line.strip()
+                if line:
+                    # 去掉前缀的 - 或 *
+                    if line.startswith('-') or line.startswith('*'):
+                        line = line[1:].strip()
+                    if line:
+                        values.append(line)
+            if values:
+                return '; '.join(values)
+
+        # ============================================================
+        # 格式 3 & 4: 关键词单独一行（无冒号），后面是缩进的值
+        # - 关键词
+        #   - 值（带 - 前缀）或  值（纯文本）
+        # ============================================================
         lines = content.split('\n')
         for i, line in enumerate(lines):
-            if re.match(r'^-\s*' + re.escape(keyword) + r'\s*$', line.strip()):
+            # 匹配：- 关键词 或 - 关键词：（忽略任意缩进）
+            stripped_line = line.strip()
+            if re.match(r'^-\s*' + re.escape(keyword) + r'\s*[：:]?\s*$', stripped_line):
                 values = []
-                # 找后面所有连续缩进的值，直到遇到新的字段（- 后跟中文）
-                for j in range(i+1, len(lines)):
-                    next_line = lines[j].strip()
-                    # 检查是否是已知的字段关键词
-                    is_new_field = False
-                    for fk in all_field_keywords:
-                        if re.match(r'^-\s*' + re.escape(fk) + r'\s*$', next_line):
-                            is_new_field = True
+                # 找后面所有连续缩进的值，直到遇到新的字段
+                base_indent = len(line) - len(line.lstrip())
+                for j in range(i + 1, len(lines)):
+                    next_line = lines[j]
+                    next_stripped = next_line.strip()
+                    next_indent = len(next_line) - len(next_line.lstrip())
+
+                    # 检查是否是新的字段（缩进层级相同或更小，且是 - 中文字段）
+                    if next_indent <= base_indent and next_stripped.startswith('-'):
+                        is_new_field = False
+                        for fk in all_field_keywords:
+                            if re.match(r'^-\s*' + re.escape(fk) + r'\s*[：:]?\s*$', next_stripped):
+                                is_new_field = True
+                                break
+                        if is_new_field:
                             break
-                    if is_new_field:
-                        break
-                    if next_line.startswith('-'):
-                        # 提取 - 后面的内容
-                        value = next_line[1:].strip()
+
+                    # 处理这一行内容（无论是否带 - 前缀）
+                    if next_stripped:
+                        # 去掉前缀的 - 或 *
+                        value = next_stripped
+                        if value.startswith('-') or value.startswith('*'):
+                            value = value[1:].strip()
+                        # 合并多余空格
                         value = re.sub(r'\s+', ' ', value)
                         if value:
                             values.append(value)
-                    # 空行继续跳过
+
                 if values:
                     return '; '.join(values)
 
@@ -206,6 +252,12 @@ def parse_single_task(module, content, task_num):
             if line and not line.startswith('-') and len(line) > 2:
                 goal = line
                 break
+
+    # 兜底：空字段填充默认值，避免生成的任务关键信息丢失
+    if not context:
+        context = '未指定上下文'
+    if not quality:
+        quality = '遵循项目通用质量标准'
 
     return {
         'task_id': f'T{task_num:03d}',
