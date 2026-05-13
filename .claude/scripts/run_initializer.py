@@ -50,7 +50,7 @@ def detect_mode(input_str: str) -> dict:
             print(f"❌ 错误：目录不存在：{run_dir}")
             print("")
             print("可用的 run 目录：")
-            available = sorted([d.name for d in RUNS_DIR.iterdir() if d.is_dir() and d.name.startswith("run-")])
+            available = sorted([d.name for d in RUNS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")])
             for d in available[:10]:
                 print(f"  {d}")
             sys.exit(1)
@@ -274,6 +274,7 @@ def main():
     parser.add_argument("--init", action="store_true", help="执行目录初始化")
     parser.add_argument("--cleanup", action="store_true", help="只清理半完成目录")
     parser.add_argument("--lock-id", action="store_true", help="只输出文件锁 ID")
+    parser.add_argument("--task", help="直接指定任务 ID 执行（如 T001）")
 
     args = parser.parse_args()
 
@@ -331,6 +332,14 @@ def main():
             f.write(f"RUN_DIR={run_dir}\n")
 
         print(f"✅ 已直接指定运行目录：{run_dir}")
+
+        # ✅ 新增：如果指定了 --task，写入自动命令文件
+        if args.task:
+            auto_cmd_file = RUNS_DIR / ".auto-command"
+            with open(auto_cmd_file, "w", encoding="utf-8") as f:
+                f.write(args.task)
+            print(f"✅ 已指定任务：{args.task}")
+
         print("")
 
         # 标记跳过后续步骤

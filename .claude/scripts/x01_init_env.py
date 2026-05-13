@@ -76,7 +76,12 @@ def main():
     # --------------------------------------------------------------------------
     # 1. 调用初始化脚本检测模式
     # --------------------------------------------------------------------------
-    run_shell_command(f'python3 .claude/scripts/run_initializer.py "{input_path}"')
+    # 支持传递 --task 参数
+    task_arg = ""
+    if len(sys.argv) > 2:
+        task_arg = f' --task {sys.argv[2]}'
+
+    run_shell_command(f'python3 .claude/scripts/run_initializer.py "{input_path}"{task_arg}')
 
     # --------------------------------------------------------------------------
     # 2. 竞态条件防护（物理多开专用）

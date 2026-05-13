@@ -5,8 +5,15 @@ description: 【🔴 v4.5 方案 B 简化流程】合并生成方案和执行阶
 
 inputs:
   - name: file_path
-    description: XMind 导出的 Markdown 文件路径（如 docs/strategy-detail-xmind.md）或 --run 目录名（如 run-20260509-103000）
+    description: |
+      XMind 导出的 Markdown 文件路径，或：
+      - --run <目录名>：直接打开已有的 run 目录
+      - --run <目录名> --task T001：打开并执行指定任务
+      示例：--run 小贝3项目-run-20260512-134612 --task T001
     required: true
+  - name: task
+    description: 【可选】配合 --run 使用，直接指定要执行的任务 ID（如 T001）
+    required: false
   - name: command
     description: 【可选】启动时直接执行命令（如 T001、exec T001、status、report），不指定则进入正常交互模式
     required: false
