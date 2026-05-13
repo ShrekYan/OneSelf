@@ -2,15 +2,20 @@
 # -*- coding: utf-8 -*-
 """
 XMind 工作流 - 任务状态显示工具
-v4.0
+v5.0 并发安全版
 功能：
   1. 显示任务清单概览表格
   2. 跨窗口依赖检查
   3. 并发文件修改警告
+
+v5.0 更新：
+  - 新增 --dir 参数支持直接传入 run 目录（不再依赖 .last-run 全局文件）
+  - 向后兼容：没有 --dir 时自动 fallback 到 .last-run
 """
 import os
 import sys
 import json
+import argparse
 from pathlib import Path
 from collections import defaultdict
 
@@ -18,11 +23,25 @@ from collections import defaultdict
 RUNS_DIR = Path(".claude/runs").resolve()
 
 
-def load_last_run_dir() -> Path:
-    """加载当前运行目录"""
+def get_run_dir(dir_path: str = None) -> Path:
+    """获取运行目录（v5.0 并发安全版）
+
+    优先级：
+    1. 优先使用 --dir 传入的目录（推荐，无竞态）
+    2. fallback 到 .last-run 全局文件（向后兼容）
+    """
+    if dir_path:
+        path = Path(dir_path).resolve()
+        if path.exists():
+            return path
+        print(f"❌ 错误：指定的目录不存在: {dir_path}")
+        sys.exit(1)
+
+    # fallback 到旧方式（向后兼容）
     last_run_file = RUNS_DIR / ".last-run"
     if not last_run_file.exists():
-        print("❌ 错误：找不到 .last-run 文件")
+        print("❌ 错误：找不到 .last-run 文件，也没有指定 --dir 参数")
+        print("💡  请使用 --dir 参数指定 run 目录（v5.0 推荐方式，无竞态）")
         sys.exit(1)
 
     with open(last_run_file, "r", encoding="utf-8") as f:
@@ -313,9 +332,8 @@ def display_command_behavior(run_dir: Path) -> None:
 
 
 def main():
-    import argparse
-
     parser = argparse.ArgumentParser(description="XMind 工作流任务状态工具")
+    parser.add_argument("--dir", help="指定 run 目录路径（v5.0 推荐，无竞态）")
     parser.add_argument("--overview", action="store_true", help="只显示任务清单概览")
     parser.add_argument("--deps", action="store_true", help="只显示依赖检查")
     parser.add_argument("--conflicts", action="store_true", help="只显示并发修改检查")
@@ -325,7 +343,7 @@ def main():
     args = parser.parse_args()
 
     # 加载当前运行目录
-    run_dir = load_last_run_dir()
+    run_dir = get_run_dir(args.dir)
 
     if args.overview:
         display_task_overview(run_dir)
