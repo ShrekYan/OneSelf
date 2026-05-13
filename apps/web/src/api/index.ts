@@ -8,6 +8,7 @@ import { userApi } from './user';
 import { articleApi } from './article';
 import { categoryApi } from './category';
 import * as authApi from './auth';
+import * as normalApi from './normal';
 import type { AxiosInstance } from 'axios';
 
 // 导出核心类型定义
@@ -24,7 +25,7 @@ export { apiUtils } from './core/api-utils';
 import api from './core/axios-instance';
 
 // 导出各业务模块 API
-export { productApi, userApi, articleApi, categoryApi, authApi };
+export { productApi, userApi, articleApi, categoryApi, authApi, normalApi };
 
 /**
  * 默认导出对象聚合 axios 实例 和 所有业务模块 API
@@ -38,6 +39,7 @@ interface DefaultApi extends AxiosInstance {
   article: typeof articleApi;
   category: typeof categoryApi;
   auth: typeof authApi;
+  normal: typeof normalApi;
 }
 
 const defaultApi = api as DefaultApi;
@@ -46,5 +48,6 @@ defaultApi.user = userApi;
 defaultApi.article = articleApi;
 defaultApi.category = categoryApi;
 defaultApi.auth = authApi;
+defaultApi.normal = normalApi;
 
 export default defaultApi;
