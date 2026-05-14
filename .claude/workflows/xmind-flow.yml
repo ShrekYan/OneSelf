@@ -1,0 +1,33 @@
+name: XMind 极简执行流 v1.0
+description: |
+  线性 5 步：解析 → 看板 → 选任务 → 出方案 → 执行
+  - 零状态机，零中间方案文件
+  - 仅保留 task-manifest.json（可复用）+ execution-log.jsonl（追溯）
+  - 全程持有锁，并发安全
+
+inputs:
+  - name: file
+    description: XMind 导出的 Markdown 文件路径（如 docs/xxx.md），用于解析或复用已有 manifest
+    required: true
+  - name: task_id
+    description: 直接指定要执行的任务 ID（如 T001），跳过看板直接进入出方案和执行
+    required: false
+
+steps:
+  - name: 🚀 一站式执行（解析 → 看板 → 选任务 → 出方案 → 执行）
+    description: |
+      单 Python 进程从头跑到尾，全程持锁。
+      不传入 task_id 时为完整交互模式；传入 task_id 时为快速执行模式，跳过解析和看板。
+    run: |
+      python3 .claude/scripts/xmind_flow.py "{{ file }}" --task "{{ task_id }}" --yes
+
+# ============================================
+# 设计说明
+# ============================================
+# 1. 解析 / 看板 / 选任务 / 日志回写 → Python 脚本（确定性、可控）
+# 2. 输出方案 / 执行代码         → Agent（大模型主创作）
+# 3. Agent 调用通过 <<<INVOKE_AGENT:xxx>>> 信令交给外层 Claude
+# 4. 方案文本仅在终端展示，不落盘
+# 5. 每个任务执行完成后，脚本兜底追加一行到 execution-log.jsonl
+# ============================================
+version: 1.0.0

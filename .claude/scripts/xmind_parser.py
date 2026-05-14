@@ -327,24 +327,6 @@ def generate_task_manifest(parsed_result, source_file):
     return manifest
 
 
-def generate_task_status(manifest):
-    """生成 task-status.json，格式与原 Agent 完全兼容"""
-    tasks = {}
-    for task in manifest['tasks']:
-        tasks[task['task_id']] = {
-            'status': 'pending',
-            'name': task['goal'][:50] + ('...' if len(task['goal']) > 50 else ''),
-            'dependencies': task['explicit_dependencies'],
-            'execution_mode': task['execution_mode']
-        }
-
-    return {
-        'tasks': tasks,
-        'execution_order': manifest['execution_plan']['execution_order'],
-        'parallel_groups': manifest['execution_plan']['parallel_groups']
-    }
-
-
 def generate_execution_plan(manifest):
     """生成人类可读的 execution-plan.md，格式与原 Agent 完全兼容"""
     lines = []
@@ -458,7 +440,6 @@ def main():
 
     # 生成各输出文件（格式与原 Agent 完全兼容）
     manifest = generate_task_manifest(parsed, input_file)
-    task_status = generate_task_status(manifest)
     execution_plan = generate_execution_plan(manifest)
 
     # 写入文件
@@ -467,10 +448,6 @@ def main():
     with open(output_dir / 'task-manifest.json', 'w', encoding='utf-8') as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
     print("✅ task-manifest.json 已写入")
-
-    with open(output_dir / 'task-status.json', 'w', encoding='utf-8') as f:
-        json.dump(task_status, f, indent=2, ensure_ascii=False)
-    print("✅ task-status.json 已写入")
 
     with open(output_dir / 'execution-plan.md', 'w', encoding='utf-8') as f:
         f.write(execution_plan)

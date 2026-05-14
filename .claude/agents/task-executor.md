@@ -13,15 +13,10 @@ triggers:
 
 **执行任何任务前，必须逐项确认以下事项：**
 
-1. ✅ **首先读取 task-status.json** - 这是状态的唯一真相来源
-2. ✅ **然后读取 task-manifest.json** - 补充任务的五要素信息
+1. ✅ **读取 task-manifest.json** - 获取任务清单和五要素信息
+2. ✅ **读取 execution-log.jsonl** - 获取已完成的任务列表
 3. ✅ **显示状态看板时，必须显示每个任务的 execution_mode**
-4. ✅ **状态字段严格匹配**：
-   - `completed` → 显示 ✅
-   - `pending` → 显示 ⏸️
-   - `scheme-previewed` → 显示 📋 (方案已预览待确认)
-   - `scheme-confirmed` → 显示 ✔️ (方案已确认待执行)
-   - `executing` → 显示 ⚡ (执行中)
+4. ✅ **状态判断**：任务 task_id 出现在 execution-log.jsonl 中 → 显示 ✅，否则显示 ⏸️
 5. ✅ **不要将已完成的任务显示为待执行**
 6. ✅ **所有任务完成时，必须自动生成 final-report.md**
 7. ✅ **永远不要自动推进到下一个任务**
@@ -35,11 +30,10 @@ triggers:
 **【铁律】所有红线禁止事项都强制执行，只调整方案写入时机：**
 1. ✅ **scheme.md 必须写**（只在用户 yes 确认执行后写）
 2. ✅ **result.md 必须写**（执行完成后写）
-3. ✅ **task-status.json 必须更新**（执行完成后更新）
-4. ✅ **必须显示审计报告**
-5. ✅ **严禁自动推进任务**
-6. ✅ **所有任务完成时自动生成 final-report.md**
-7. ✅ **代码方案必须完整，不能用摘要**
+3. ✅ **必须显示审计报告**
+4. ✅ **严禁自动推进任务**
+5. ✅ **所有任务完成时自动生成 final-report.md**
+6. ✅ **代码方案必须完整，不能用摘要**
 
 ---
 
@@ -141,7 +135,7 @@ triggers:
 
 必须先读取以下文件：
 1. `{run_dir}/task-manifest.json` - 获取任务完整信息
-2. `{run_dir}/task-status.json` - 获取任务当前状态
+2. `{run_dir}/execution-log.jsonl` - 获取已完成的任务列表（逐行读取，提取 task_id）
 
 ---
 
@@ -317,7 +311,7 @@ triggers:
 **🔴 重要：Agent 不写以下文件，全部交由 Workflow 负责写入：**
 - ❌ scheme.md → Workflow 从阶段 3 的内存中获取内容
 - ❌ result.md → Workflow 从上述输出结果生成
-- ❌ task-status.json → Workflow 通过 update_status.py 脚本更新
+- ❌ execution-log.jsonl → Workflow 追加写入执行记录
 
 ---
 
@@ -342,7 +336,7 @@ triggers:
 ```
    - .claude/runs/run-xxx/tasks/T001/scheme.md (已验证 ✓)
    - .claude/runs/run-xxx/tasks/T001/result.md (已验证 ✓)
-   - .claude/runs/run-xxx/task-status.json (已验证 ✓)
+   - .claude/runs/run-xxx/execution-log.jsonl (已验证 ✓)
 
 ========================================
 💡 所有文件已自动保存到正式目录 tasks/，无需手动整理！
@@ -353,9 +347,9 @@ triggers:
 
 ### 4.6 检查是否所有任务都已完成
 
-读取 task-status.json 检查所有任务状态：
-- 如果所有任务都是 `completed` 或 `skipped` → 自动生成 `final-report.md`
-- 如果还有 `pending` 任务 → 不生成报告，等待用户下一步指令
+读取 task-manifest.json 的任务列表，对比 execution-log.jsonl 中的已完成任务：
+- 如果所有任务都已在 execution-log.jsonl 中 → 自动生成 `final-report.md`
+- 如果还有未完成的任务 → 不生成报告，等待用户下一步指令
 
 ---
 
@@ -364,8 +358,8 @@ triggers:
 任务执行完成后，执行以下操作：
 
 1. ✅ **刷新显示状态看板**（与 workflow-manager、xmind-exec 格式 100% 一致）：
-   - 首先读取 task-status.json 获取最新状态
-   - 然后读取 task-manifest.json 补充任务业务信息
+   - 首先读取 task-manifest.json 获取任务清单
+   - 然后读取 execution-log.jsonl 获取已完成的任务列表
    - 严格按照以下格式显示：
 
 ```
@@ -389,8 +383,8 @@ triggers:
 ```
 
 2. ✅ **检查所有任务的状态**：
-   - 读取 task-status.json
-   - 如果所有任务状态都是 `completed` 或 `skipped`（没有 `pending` 任务）
+   - 读取 execution-log.jsonl，提取所有已完成的 task_id
+   - 对比 task-manifest.json 的任务列表，如果全部已完成
    - **自动生成 final-report.md**（**双目录写入**）：
      - ✅ 正式目录：`tasks/{project_name}/final-report.md`（永久存储）
      - ⚠️  临时目录：`{run_dir}/final-report.md`（兼容保留）
@@ -483,7 +477,7 @@ triggers:
 |---------|------------|------------|------|
 | 1. 只展示方案不保存 scheme.md | ❌ 严禁 | ❌ **仍然严禁，但时机改为 yes 后必须保存** | ⚠️ 调整时机，红线保留 |
 | 2. 只执行任务不保存 result.md | ❌ 严禁 | ❌ **仍然严禁** | ✅ 完全不变 |
-| 3. 执行后不更新 task-status.json | ❌ 严禁 | ❌ **仍然严禁** | ✅ 完全不变 |
+| 3. 执行后不回写 execution-log.jsonl | ❌ 严禁 | ❌ **仍然严禁** | ✅ 完全不变 |
 | 4. 代码方案使用摘要 | ❌ 严禁 | ❌ **仍然严禁** | ✅ 完全不变 |
 | 5. 自动推进到下一个任务 | ❌ 严禁 | ❌ **仍然严禁** | ✅ 完全不变 |
 | 6. 所有任务完成时自动生成 final-report | ✅ 允许 | ✅ **仍然允许** | ✅ 完全不变 |
@@ -504,7 +498,7 @@ triggers:
 ### 🔒 文件保障（三级验证机制）
 - [ ] ✅ **scheme.md**：已保存，重新读取验证，大小 > 100 字节，包含完整代码
 - [ ] ✅ **result.md**：已保存，重新读取验证，大小 > 100 字节，包含文件清单
-- [ ] ✅ **task-status.json**：**最高优先级**，已更新，重新读取验证，当前任务 status = "completed"，completed_at 时间戳已增加
+- [ ] ✅ **execution-log.jsonl**：已追加执行记录，重新读取验证，当前任务已出现在日志中
 
 ### 质量检查
 - [ ] TypeScript 检查已运行并记录结果
