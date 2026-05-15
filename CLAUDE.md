@@ -254,3 +254,8 @@ refactor(auth+backend+log): 抽离通用响应格式
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
 | 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
 | Git 提交信息生成、分支管理、PR 描述 | `git-helper` |
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->

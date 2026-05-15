@@ -288,30 +288,12 @@ def step5_execute(run_dir: Path, task: dict, timer: StepTimer) -> None:
     print(json.dumps(task, ensure_ascii=False, indent=2))
     print("<<<END_INVOKE>>>")
     print("=" * 60)
-    print("📊 Token 统计：请在工作流执行完成后将 token 用量写入 run_dir/.token-usage.json")
-    print("   格式：{\"input\": 1234, \"output\": 567}")
-    print("=" * 60)
 
     timer.start("execute")
     # 这里实际上是由外层 Claude Agent 执行，Python 脚本在此等待
     # Agent 执行完成后会返回到 Python 脚本继续执行
     execute_ms = timer.stop()
     print(f"⏱️  执行阶段耗时：{execute_ms}ms")
-
-    # 读取 token 用量（如果 Agent 已写入）
-    token_usage = {"input": None, "output": None, "total": None}
-    token_file = run_dir / ".token-usage.json"
-    if token_file.exists():
-        try:
-            usage = json.loads(token_file.read_text(encoding="utf-8"))
-            token_usage = {
-                "input": usage.get("input"),
-                "output": usage.get("output"),
-                "total": usage.get("input", 0) + usage.get("output", 0) if usage.get("input") and usage.get("output") else None,
-            }
-            print(f"📊 Token 用量：input={token_usage['input']}, output={token_usage['output']}")
-        except Exception:
-            pass
 
     # 脚本兜底回写日志（可审计）
     log_file = run_dir / "execution-log.jsonl"
@@ -328,7 +310,7 @@ def step5_execute(run_dir: Path, task: dict, timer: StepTimer) -> None:
             "execute_ms": timings["steps"].get("execute", 0),
             "total_ms": timings["total_ms"],
         },
-        "tokens": token_usage,
+        "tokens": null,
     }
     with log_file.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
