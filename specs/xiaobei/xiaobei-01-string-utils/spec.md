@@ -8,6 +8,12 @@
 
 **Input**: User description: "小贝项目 - 任务1：字符串工具函数。实现基础字符串工具函数与备份字符串工具函数，包含去除首尾空格、转为大写、转为小写；质量标准为类型声明完整；执行模式为 plan-only。"
 
+## Clarifications
+
+### Session 2026-05-23
+
+- Q: 是否要求新增或运行单元测试？ → A: 不要求单元测试；本阶段验证以契约核对、TypeScript 类型检查和 lint 为准。
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 使用基础字符串处理能力 (Priority: P1)
@@ -74,7 +80,7 @@
 ### Measurable Outcomes
 
 - **SC-001**: All 6 requested string processing capabilities are specified with clear input and output expectations.
-- **SC-002**: 100% of defined capabilities have independently verifiable acceptance scenarios or edge-case coverage.
+- **SC-002**: 100% of defined capabilities have independently verifiable acceptance scenarios or edge-case coverage; no new unit tests are required for this stage.
 - **SC-003**: Developers can identify the expected result for trimming, uppercase conversion, and lowercase conversion without needing additional clarification.
 - **SC-004**: Primary and backup capabilities have matching behavior definitions for all three transformation types.
 
