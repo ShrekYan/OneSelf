@@ -256,6 +256,5 @@ refactor(auth+backend+log): 抽离通用响应格式
 | Git 提交信息生成、分支管理、PR 描述 | `git-helper` |
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+Current plan: specs/002-xiaobei-utils/plan.md
 <!-- SPECKIT END -->

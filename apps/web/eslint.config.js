@@ -9,7 +9,16 @@ import claudeArchitecture from '../../.claude/contracts/index.js';
 export default tseslint.config(
   // 1. Global ignores
   {
-    ignores: ['**/dist', 'eslint.config.js', '.history/**', '.claude/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      '**/*.min.js',
+      'eslint.config.js',
+      '.history/**',
+      '.claude/**',
+    ],
   },
 
   // 2. Node globals for config files
