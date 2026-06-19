@@ -184,7 +184,7 @@ node .claude/contracts/cli/auto-check.js
 
 ### 自动记录机制
 
-ESLint Formatter 已集成自动记录功能。每次运行 lint 时，架构规则违规会自动记录到 `review-log.json`。
+ESLint Formatter 已集成自动记录功能。每次运行 lint 时，架构规则违规会自动记录到运行时文件 `review-log.json`。该文件不存在时会自动初始化，且不纳入版本控制。
 
 ### CLI 工具使用
 

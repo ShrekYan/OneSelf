@@ -7,7 +7,7 @@
 > **相关文档**:
 > - 后端架构决策: `.claude/DECISIONS.md`
 > - 前端架构决策: `.claude/FRONTEND-DECISIONS.md`
-> - 整体架构概览: `.claude/ARCHITECTURE-OVERVIEW.md`
+> - 项目架构入口: `CLAUDE.md`
 > - 编码与安全规则: `.claude/rules/`
 >
 > **最后更新**: 2026-05-28

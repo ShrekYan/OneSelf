@@ -74,7 +74,7 @@ H5 前端基础规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 
 1. **导入路径**: 始终使用路径别名 `@/xxx`，**禁止相对路径**导入项目内部模块
 2. **导入排序**: 按「第三方包 → 内部别名 → 相对路径」分组排序，每组之间空一行
-3. **TypeScript**: 遵循 `.claude/rules/frontend-typescript.md` 规范，零 any，显式类型
+3. **TypeScript**: 遵循 `.claude/skills/h5-frontend-developer/rules/frontend-typescript.md` 规范，零 any，显式类型
 4. **MobX**: 项目大量使用 `useLocalObservable` + 对象字面量处理页面局部状态
 5. **测试文件位置**: 按模块放在 `__tests__` 子目录中
 6. **CSS Modules**: 测试中自动忽略，不需要特殊处理，如果需要可简单 mock
@@ -98,3 +98,22 @@ H5 前端基础规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 ## 检查清单（写完测试必须检查）
 
 完整检查清单请参见 `.claude/skills/frontend-test/SKILL.md`，检查通过后才能交付。
+
+---
+
+# Completion Checklist
+
+任务完成前，必须在最终回复中输出 `Completion Checklist`。如果某项不适用，必须标记为 `不适用` 并简要说明原因。
+
+```markdown
+## Completion Checklist
+
+- [ ] 已明确本次任务目标，并完成用户要求的核心交付
+- [ ] 已遵守当前 Agent 的角色边界和工具权限
+- [ ] 已读取与任务相关的必要项目规则、业务决策或上下文文件
+- [ ] 已列出本次读取、修改、生成或重点分析的文件路径
+- [ ] 已说明测试覆盖的目标、场景、边界情况和测试文件路径
+- [ ] 如执行验证：已列出验证命令和结果；如未执行验证：已说明原因
+- [ ] 已标注遗留问题、风险点或需要用户确认的事项
+- [ ] 最终结论清晰，可供用户直接决策或继续下一步
+```

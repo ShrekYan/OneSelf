@@ -93,7 +93,7 @@ flowchart TD
 | 新建 | `apps/web/src/pages/Discover/index.tsx` |
 | 新建 | `apps/web/src/pages/Discover/index.module.scss` |
 | 读取 | `CLAUDE.md` |
-| 读取 | `.../h5-frontend-developer.md` |
+| 读取 | `.claude/skills/h5-frontend-developer/SKILL.md` |
 
 
 ## 规则

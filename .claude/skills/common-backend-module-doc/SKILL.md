@@ -7,7 +7,7 @@ description: 后端模块功能介绍文档生成规范
 
 ## 触发条件
 
-当用户使用 `/backend-module-doc [模块路径]` 命令时触发，为指定的 NestJS 后端模块生成完整的设计文档，输出到 `backend/docs` 目录，用于日后回顾学习设计决策。
+当用户使用 `/backend-module-doc [模块路径]` 命令时触发，为指定的 NestJS 后端模块生成完整的设计文档，输出到 `docs/services/backend` 目录，用于日后回顾学习设计决策。
 
 ## 核心原则
 
@@ -299,7 +299,7 @@ erDiagram
 
 输出文件必须写入：
 ```
-backend/docs/{module-name}-{YYYYMMDD}.md
+docs/services/backend/{module-name}-{YYYYMMDD}.md
 ```
 - `module-name`: 从模块路径提取最后一级目录名作为模块名
 - `YYYYMMDD`: 当前日期，便于版本追溯
@@ -322,7 +322,7 @@ backend/docs/{module-name}-{YYYYMMDD}.md
    - 提取 API 接口定义
 5. **填充模板**：按照上述章节顺序填充内容
 6. **生成 mermaid 图**：按照本规范生成架构图和流程图，检查语法
-7. **写入文件**：输出到 `backend/docs/{module-name}-YYYYMMDD.md`
+7. **写入文件**：输出到 `docs/services/backend/{module-name}-YYYYMMDD.md`
 8. **反馈结果**：输出生成的文件路径，告知用户完成
 
 ---
@@ -338,7 +338,7 @@ backend/docs/{module-name}-{YYYYMMDD}.md
 - [ ] 是否完成了技术选型对比表格？
 - [ ] 数据库章节是否完整（表、索引、性能、N+1）？
 - [ ] 涉及分布式是否提供了服务器配置表格？
-- [ ] 输出路径是否正确写入 `backend/docs/`？
+- [ ] 输出路径是否正确写入 `docs/services/backend/`？
 - [ ] 文件名是否符合 `{module-name}-{YYYYMMDD}.md` 格式？
 - [ ] 是否说明了每个设计决策的理由？
 

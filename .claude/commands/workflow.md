@@ -14,10 +14,7 @@ description: 执行预定义的自动化工作流
 ```
 
 **示例：**
-- `/workflow dev-startup` - 启动开发环境工作流
-- `/workflow pre-commit-check` - 预提交检查工作流
-- `/workflow frontend-code-review` - 前端代码审查工作流
-- `/workflow backend-code-review` - 后端代码审查工作流
+- `/workflow xmind-exec` - 执行 XMind 自动化工作流
 
 ## 工作流定义格式
 

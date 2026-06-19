@@ -48,15 +48,15 @@ docs/xmind/
 
 弃用后的影响：
 
-| 原 XMind 职责 | 新替代方案 |
-| --- | --- |
-| 大任务拆分 | SpecKit `spec.md` / `tasks.md` |
-| 执行计划 | SpecKit `plan.md` |
-| 任务执行记录 | `progress.md` |
-| 质量检查结果 | `verification.md` |
-| 审查报告 | `review.md` |
-| 复盘沉淀 | `retro.md` |
-| 经验沉淀 | `.claude/project-memory.md` / `.claude/rules` / `.claude/DECISIONS.md` |
+| 原 XMind 职责 | 新替代方案                                                             |
+| ------------- | ---------------------------------------------------------------------- |
+| 大任务拆分    | SpecKit `spec.md` / `tasks.md`                                         |
+| 执行计划      | SpecKit `plan.md`                                                      |
+| 任务执行记录  | `progress.md`                                                          |
+| 质量检查结果  | `verification.md`                                                      |
+| 审查报告      | `review.md`                                                            |
+| 复盘沉淀      | `retro.md`                                                             |
+| 经验沉淀      | `.claude/project-memory.md` / `.claude/rules` / `.claude/DECISIONS.md` |
 
 ---
 
@@ -117,22 +117,22 @@ specs/<domain>/<feature>/
 
 其中已有的 SpecKit 文件继续保留：
 
-| 文件 | 职责 |
-| --- | --- |
-| `spec.md` | 描述需求、用户故事、验收标准 |
-| `plan.md` | 描述技术方案、架构影响、约束检查 |
-| `tasks.md` | 拆分具体执行任务 |
-| `contracts/` | 定义功能契约或接口契约 |
-| `quickstart.md` | 定义如何验证功能 |
+| 文件            | 职责                             |
+| --------------- | -------------------------------- |
+| `spec.md`       | 描述需求、用户故事、验收标准     |
+| `plan.md`       | 描述技术方案、架构影响、约束检查 |
+| `tasks.md`      | 拆分具体执行任务                 |
+| `contracts/`    | 定义功能契约或接口契约           |
+| `quickstart.md` | 定义如何验证功能                 |
 
 新增建议文件：
 
-| 文件 | 职责 |
-| --- | --- |
-| `progress.md` | 记录当前执行进度、已完成任务、阻塞事项 |
-| `verification.md` | 记录 lint、typecheck、test、build 等确定性检查结果 |
-| `review.md` | 记录代码审查、安全审查、性能审查结果 |
-| `retro.md` | 记录本次任务复盘，以及是否需要更新 memory / rules / decisions / contracts |
+| 文件              | 职责                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| `progress.md`     | 记录当前执行进度、已完成任务、阻塞事项                                    |
+| `verification.md` | 记录 lint、typecheck、test、build 等确定性检查结果                        |
+| `review.md`       | 记录代码审查、安全审查、性能审查结果                                      |
+| `retro.md`        | 记录本次任务复盘，以及是否需要更新 memory / rules / decisions / contracts |
 
 ---
 
@@ -180,20 +180,20 @@ Loop Engineering 最关键的是：任务结束后的反馈要进入正确位置
 
 ### 6.1 分流表
 
-| 反馈类型 | 存放位置 |
-| --- | --- |
-| 当前 feature 的临时进展 | `specs/<feature>/progress.md` |
-| 当前 feature 的验证结果 | `specs/<feature>/verification.md` |
-| 当前 feature 的审查结果 | `specs/<feature>/review.md` |
-| 当前 feature 的复盘结论 | `specs/<feature>/retro.md` |
-| 可复用踩坑 | `.claude/project-memory.md` |
-| 用户个人长期偏好 | auto memory |
-| 长期架构约束 | `.claude/DECISIONS.md` |
-| 前端长期架构规则 | `.claude/FRONTEND-DECISIONS.md` |
-| 后端长期业务规则 | `.claude/BACKEND-BUSINESS-DECISIONS.md` |
-| 所有 Agent 都要遵守的通用规则 | `.claude/rules/*.md` |
-| 可以机器检查的高频红线 | `.claude/contracts/` |
-| 方法论、流程、认知总结 | `docs/ai/loop-engineering/` |
+| 反馈类型                      | 存放位置                                |
+| ----------------------------- | --------------------------------------- |
+| 当前 feature 的临时进展       | `specs/<feature>/progress.md`           |
+| 当前 feature 的验证结果       | `specs/<feature>/verification.md`       |
+| 当前 feature 的审查结果       | `specs/<feature>/review.md`             |
+| 当前 feature 的复盘结论       | `specs/<feature>/retro.md`              |
+| 可复用踩坑                    | `.claude/project-memory.md`             |
+| 用户个人长期偏好              | auto memory                             |
+| 长期架构约束                  | `.claude/DECISIONS.md`                  |
+| 前端长期架构规则              | `.claude/FRONTEND-DECISIONS.md`         |
+| 后端长期业务规则              | `.claude/BACKEND-BUSINESS-DECISIONS.md` |
+| 所有 Agent 都要遵守的通用规则 | `.claude/rules/*.md`                    |
+| 可以机器检查的高频红线        | `.claude/contracts/`                    |
+| 方法论、流程、认知总结        | `docs/ai/loop-engineering/`             |
 
 ### 6.2 判断规则
 
@@ -343,15 +343,15 @@ lint:check = 只检查，不修改
 
 建议后续把高频问题继续升级为 contracts：
 
-| 高频问题 | 是否适合升级 |
-| --- | --- |
-| 前端禁止 `../../` 相对导入 | 适合 |
-| 前端禁止手动设置 Authorization Token | 适合 |
-| 后端 DTO 缺少校验装饰器 | 适合 |
-| 禁止日志输出完整 Token | 适合 |
-| 禁止新增 bcrypt 密码哈希 | 已有 |
-| 禁止 Prisma `as any` | 已有 |
-| 禁止前端 `observer()` HOC | 已有 |
+| 高频问题                             | 是否适合升级 |
+| ------------------------------------ | ------------ |
+| 前端禁止 `../../` 相对导入           | 适合         |
+| 前端禁止手动设置 Authorization Token | 适合         |
+| 后端 DTO 缺少校验装饰器              | 适合         |
+| 禁止日志输出完整 Token               | 适合         |
+| 禁止新增 bcrypt 密码哈希             | 已有         |
+| 禁止 Prisma `as any`                 | 已有         |
+| 禁止前端 `observer()` HOC            | 已有         |
 
 演进路线：
 
@@ -404,16 +404,16 @@ Loop Engineering 需要指标，否则无法判断系统是否真的变好。
 
 建议先记录以下指标：
 
-| 指标 | 含义 |
-| --- | --- |
-| 一次通过率 | AI 修改后第一次 lint / test / build 通过比例 |
-| 返工次数 | 同一任务被修复几轮 |
-| P0 / P1 问题数 | 审查发现的严重问题数量 |
-| 架构契约违规数 | contracts 命中次数 |
-| 同类问题复发率 | 之前记录过的问题是否再次出现 |
-| memory 更新次数 | 多少反馈沉淀为项目记忆 |
-| rules 更新次数 | 多少反馈升级为规则 |
-| contracts 更新次数 | 多少规则升级为硬约束 |
+| 指标               | 含义                                         |
+| ------------------ | -------------------------------------------- |
+| 一次通过率         | AI 修改后第一次 lint / test / build 通过比例 |
+| 返工次数           | 同一任务被修复几轮                           |
+| P0 / P1 问题数     | 审查发现的严重问题数量                       |
+| 架构契约违规数     | contracts 命中次数                           |
+| 同类问题复发率     | 之前记录过的问题是否再次出现                 |
+| memory 更新次数    | 多少反馈沉淀为项目记忆                       |
+| rules 更新次数     | 多少反馈升级为规则                           |
+| contracts 更新次数 | 多少规则升级为硬约束                         |
 
 后续可新增文档：
 
@@ -470,7 +470,7 @@ apps/web/package.json
 services/backend/package.json
 services/auth-service/package.json
 services/log-service/package.json
-.claude/workflows/pre-commit-check.yml
+.claude/skills/pre-commit-check/SKILL.md
 .husky/pre-push
 ```
 

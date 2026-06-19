@@ -135,7 +135,7 @@ H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预�
    ↓
 5. 编写符合规范的代码（路径/样式/MobX/类型）
    ↓
-6. 自我验证：对照 `.claude/commands/review.md` 检查清单
+6. 自我验证：对照 `.claude/skills/frontend-code-review/SKILL.md` 检查清单
    ↓
 7. 自动调用 `frontend-code-reviewer` agent 做最终审查
 ```
@@ -164,7 +164,7 @@ H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 - `.claude/rules/code-format-common.md` - 代码格式通用规范
 - `.claude/rules/project-behavior.md` - 项目整体行为规范
 - `.claude/rules/frontend-components.md` - 公共组件规范（涉及公共组件时读取）
-- `.claude/commands/review.md` - 代码审查清单
+- `.claude/skills/frontend-code-review/SKILL.md` - 前端代码审查清单
 - `commitlint.config.js` - Git 提交信息规范
 
 ---
@@ -178,3 +178,22 @@ H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 - 修复前端 Bug 和性能问题
 - 重构现有代码符合项目规范
 - 实现移动端交互动画效果
+
+---
+
+# Completion Checklist
+
+任务完成前，必须在最终回复中输出 `Completion Checklist`。如果某项不适用，必须标记为 `不适用` 并简要说明原因。
+
+```markdown
+## Completion Checklist
+
+- [ ] 已明确本次任务目标，并完成用户要求的核心交付
+- [ ] 已遵守当前 Agent 的角色边界和工具权限
+- [ ] 已读取与任务相关的必要项目规则、业务决策或上下文文件
+- [ ] 已列出本次读取、修改、生成或重点分析的文件路径
+- [ ] 如修改前端代码：已说明变更内容、影响范围，并遵守 H5 前端规范、MobX、CSS Modules、API 类型规范
+- [ ] 如执行验证：已列出验证命令和结果；如未执行验证：已说明原因
+- [ ] 已标注遗留问题、风险点或需要用户确认的事项
+- [ ] 最终结论清晰，可供用户直接决策或继续下一步
+```

@@ -84,7 +84,7 @@ model: inherit
 - [ ] 缓存配置是否合理（不常变数据开启 `cache: true`）？
 - [ ] 是否使用路径别名 `@/api` 而非相对路径？
 
-### 🔵 TypeScript 类型安全（遵循 `.claude/rules/frontend-typescript.md`）
+### 🔵 TypeScript 类型安全（遵循 `.claude/skills/h5-frontend-developer/rules/frontend-typescript.md`）
 - [ ] 是否存在隐式 `any` 或滥用 `any` 绕过类型检查？（优先 `unknown`）
 - [ ] 组件 Props、API 请求/响应是否有完整类型定义？
 - [ ] 可空值是否用 `Type | null` 明确标注？（区分 `undefined` 和 `null` 语义）
@@ -107,7 +107,7 @@ model: inherit
 - [ ] 是否使用 `useObserver` Hook？（禁止 observer HOC）
 - [ ] 是否避免在 actions 之外修改状态？
 
-### 🔵 样式规范（SCSS + CSS Modules，遵循 `.claude/rules/frontend-css-scss.md`）
+### 🔵 样式规范（SCSS + CSS Modules，遵循 `.claude/skills/h5-frontend-developer/rules/frontend-css-scss.md`）
 - [ ] 是否使用 `*.module.scss`？（禁止全局样式污染）
 - [ ] class 命名是否为 **camelCase**（SCSS 源码与 TS 引用保持一致）？
 - [ ] **根容器命名** 是否遵循 `{componentName}Container` 规则？

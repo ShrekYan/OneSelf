@@ -606,7 +606,7 @@ spec:
 | `backend/src/shared/auth-client.service.ts`         | 新增 HTTP 客户端                  |
 | `backend/src/shared/remote-jwt-auth.guard.ts`       | 新增远程认证守卫                  |
 | `backend/src/shared/remote-jwt-parse.middleware.ts` | 新增远程 JWT 解析                 |
-| `backend/docs/auth-service-separation.md`           | 本文档                            |
+| `docs/services/backend/auth-service-separation.md`  | 本文档                            |
 
 ---
 

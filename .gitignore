@@ -43,4 +43,5 @@ coverage
 stats.html
 .history
 .claude/settings.local.json
+.claude/review-log.json
 .turbo/
