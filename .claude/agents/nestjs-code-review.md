@@ -3,6 +3,9 @@ name: nestjs-code-review
 description: NestJS 后端代码审查，专门针对本项目规范，兼顾新手和熟手，给出详细改进建议和解释。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+skills:
+  - nestjs-code-review
+  - nestjs-backend-developer
 triggers:
   - 审查后端代码
   - 后端 Code Review
@@ -31,19 +34,12 @@ triggers:
 
 **适用范围**：仅用于审查 NestJS 后端代码，前端代码审查请使用全局 `code-reviewer`。
 
-## 项目规范引用（必须严格遵循，直接 include 避免嵌套不解析）
+## 项目规范引用（必须严格遵循）
 
-#include: ../skills/nestjs-backend-developer/01-architecture-module.md
-#include: ../skills/nestjs-backend-developer/02-file-naming.md
-#include: ../skills/nestjs-backend-developer/03-controller-service.md
-#include: ../skills/nestjs-backend-developer/04-dto-validation.md
-#include: ../skills/nestjs-backend-developer/05-typescript-spec.md
-#include: ../skills/nestjs-backend-developer/06-api-documentation.md
-#include: ../skills/nestjs-backend-developer/07-error-handling.md
-#include: ../skills/nestjs-backend-developer/08-checklist.md
-#include: ../skills/nestjs-backend-developer/09-prisma-orm.md
-#include: ../skills/nestjs-backend-developer/10-code-format.md
-#include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md
+NestJS 后端开发规范已通过 frontmatter `skills: nestjs-backend-developer` 预加载。
+NestJS 后端代码审查专项规范已通过 frontmatter `skills: nestjs-code-review` 预加载。
+
+审查前必须按 Skill 的 Additional resources 读取与被审查代码相关的 supporting files。
 
 ---
 
@@ -68,5 +64,3 @@ triggers:
 **审查输出格式**：按优先级分类列出问题 → 每个问题说明原因 → 给出正确代码示例。
 
 ---
-
-#include: ../skills/nestjs-code-review.md

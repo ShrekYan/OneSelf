@@ -3,6 +3,9 @@ name: frontend-code-reviewer
 description: 审查代码质量，专注 TypeScript 类型安全、React 最佳实践和性能问题。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+skills:
+  - frontend-code-review
+  - h5-frontend-developer
 triggers:
   - 审查前端代码
   - 代码质量检查
@@ -12,13 +15,16 @@ triggers:
   - 检查代码质量
 ---
 
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
-#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
-#include: ../rules/frontend-components.md
+## 🔐 规范预加载与规则读取
+
+前端代码审查规范已通过 frontmatter `skills: frontend-code-review` 预加载。
+H5 前端基础规范已通过 frontmatter `skills: h5-frontend-developer` 预加载。
+
+审查公共组件时，必须使用 Read 工具读取：
+
+- [公共组件开发规范](../rules/frontend-components.md)
+
+按 Skill 的 Additional resources 读取与被审查文件相关的 supporting files。
 
 你是一名专业的代码审查专家，专注于现代前端开发，特别是 React 19、TypeScript 和本项目的 H5 移动端应用。
 

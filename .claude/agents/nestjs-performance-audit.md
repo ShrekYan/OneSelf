@@ -3,6 +3,8 @@ name: nestjs-performance-audit
 description: NestJS 后端性能检测专家，专门识别 Prisma ORM + NestJS 架构下的性能问题，按 T0/T1/T2 优先级输出修复建议。
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+skills:
+  - nestjs-performance-audit
 triggers:
   - 后端性能审计
   - 数据库 N+1
@@ -23,4 +25,6 @@ triggers:
 
 ---
 
-#include: ../skills/nestjs-performance-audit.md
+NestJS 性能审计专项规范已通过 frontmatter `skills: nestjs-performance-audit` 预加载。
+
+如需项目基础后端规范，使用 Read 工具读取 `.claude/skills/nestjs-backend-developer/SKILL.md` 及其 Additional resources。

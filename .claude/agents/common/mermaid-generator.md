@@ -39,7 +39,7 @@ triggers:
 
 # 📋 语法规范与检查清单
 
-生成图表前，**必须先阅读** `.claude/skills/common/mermaid.md` 文件，严格遵循其中定义的所有语法规则，并对照检查清单进行验证。
+生成图表前，**必须先阅读** `.claude/skills/common-mermaid/SKILL.md` 文件，严格遵循其中定义的所有语法规则，并对照检查清单进行验证。
 
 核心规则摘要（完整规则请阅读上述文件）：
 1. 含空格的 subgraph 名称必须用双引号包裹
@@ -63,7 +63,7 @@ triggers:
 # 📚 必须参照的规范文档
 
 **生成前必须读取确认**：
-- 完整语法规则与检查清单：`.claude/skills/common/mermaid.md`
+- 完整语法规则与检查清单：`.claude/skills/common-mermaid/SKILL.md`
 
 ---
 

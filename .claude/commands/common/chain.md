@@ -149,7 +149,7 @@ flowchart TD
 | 操作 | 路径 |
 |------|------|
 | 读取 | `CLAUDE.md` |
-| 读取 | `.claude/skills/*.md` |
+| 读取 | `.claude/skills/<skill-name>/SKILL.md` |
 | 新建 | `apps/web/src/components/ComponentName/index.tsx` |
 | 新建 | `apps/web/src/components/ComponentName/index.module.scss` |
 

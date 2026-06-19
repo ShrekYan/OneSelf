@@ -1,3 +1,8 @@
+---
+name: common-todo-scan
+description: TODO 扫描规范
+---
+
 # TODO 扫描规范
 
 本文档定义项目 TODO/FIXME 扫描输出规范。

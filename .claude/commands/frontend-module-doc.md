@@ -21,4 +21,4 @@
 
 ---
 
-include: ../skills/common/frontend-module-doc.md
+请调用 Skill 工具执行 `common-frontend-module-doc`，并将用户参数原样传入。规范入口：[common-frontend-module-doc Skill](../skills/common-frontend-module-doc/SKILL.md)。

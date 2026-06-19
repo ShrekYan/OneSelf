@@ -1,12 +1,17 @@
+---
+name: common-pr
+description: PR 描述生成规范
+---
+
 # PR 描述生成规范
 
-本文档定义 Pull Request 描述生成规范。**类型、格式、命名都遵循项目已有的 [Git Commit 规范](./commit.md)，保持一致。
+本文档定义 Pull Request 描述生成规范。**类型、格式、命名都遵循项目已有的 [Git Commit 规范](../common-commit/SKILL.md)，保持一致。
 
 ---
 
 ## 核心原则
 
-1. **复用规范**: PR 标题和类型完全遵循 [Conventional Commits 规范](./commit.md)，保持一致
+1. **复用规范**: PR 标题和类型完全遵循 [Conventional Commits 规范](../common-commit/SKILL.md)，保持一致
 2. **简洁清晰**: 标题一句话说清楚，改动分类列出，避免冗长
 3. **结构化**: 使用固定模板，便于审阅者快速扫描
 4. **诚实完整**: 不要隐瞒破坏性变更，所有改动都要列出来
@@ -18,7 +23,7 @@
 
 ### PR 标题格式
 
-**完全复用 [./commit.md](./commit.md) 的规范**：
+**完全复用 [common-commit](../common-commit/SKILL.md) 的规范**：
 ```
 <type>(<scope>): <简短描述>
 ```
@@ -82,7 +87,7 @@ Closes: #{issue_number}
 
 ## 破坏性变更处理
 
-复用 [commit.md](./commit.md) 的规范：
+复用 [common-commit](../common-commit/SKILL.md) 的规范：
 
 如果本次 PR 包含不兼容的破坏性变更：
 1. **必须**在标题或摘要中明确提示

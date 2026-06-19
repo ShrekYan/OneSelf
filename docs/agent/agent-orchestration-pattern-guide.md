@@ -20,7 +20,7 @@
 
 | 概念                   | 文件位置示例                                          | 角色定位       | 通俗比喻                         |
 | ---------------------- | ----------------------------------------------------- | -------------- | -------------------------------- |
-| **Skill**              | `.claude/skills/full-frontend-review.md`              | **用户入口层** | 🔑 遥控器按钮 - 用户点一下就触发 |
+| **Skill**              | `.claude/skills/full-frontend-review/SKILL.md`              | **用户入口层** | 🔑 遥控器按钮 - 用户点一下就触发 |
 | **Orchestrator Agent** | `.claude/agents/full-frontend-review-orchestrator.md` | **执行指挥层** | 🎬 导演 - 拿着剧本指挥演员干活   |
 
 ### 2.2 编排器 vs 普通 Agent
@@ -266,7 +266,7 @@ triggers:
 
 | 文件                                                  | 用途                     |
 | ----------------------------------------------------- | ------------------------ |
-| `.claude/skills/full-frontend-review.md`              | Skill 入口，用户命令定义 |
+| `.claude/skills/full-frontend-review/SKILL.md`              | Skill 入口，用户命令定义 |
 | `.claude/agents/full-frontend-review-orchestrator.md` | 编排器核心实现           |
 | `.claude/agents/frontend-code-reviewer.md`            | 子 Agent：代码质量       |
 | `.claude/agents/frontend-security-auditor.md`         | 子 Agent：安全扫描       |

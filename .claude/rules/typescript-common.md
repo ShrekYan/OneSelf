@@ -148,7 +148,7 @@ export type Feature = ...; // 应该写为 export type Feature = ...
 
 ## 延伸阅读
 
-- **前端特有 TypeScript 规范**：见 `.claude/skills/h5-frontend-developer/rules/frontend-typescript.md`
-- **后端特有 TypeScript 规范**：见 `.claude/skills/nestjs-backend-developer/rules/nestjs-typescript.md`
-- **代码格式规范**：见 `.claude/rules/code-format-common.md`
-- **安全规范**：见 `.claude/rules/security-common.md`
+- **前端特有 TypeScript 规范**：见 [前端 TypeScript 规范](../skills/h5-frontend-developer/rules/frontend-typescript.md)
+- **后端特有 TypeScript 规范**：见 [NestJS TypeScript 规范](../skills/nestjs-backend-developer/rules/nestjs-typescript.md)
+- **代码格式规范**：见 [代码格式通用规范](./code-format-common.md)
+- **安全规范**：见 [安全通用规范](./security-common.md)

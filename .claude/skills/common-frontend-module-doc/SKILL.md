@@ -1,3 +1,8 @@
+---
+name: common-frontend-module-doc
+description: 前端模块功能介绍文档生成规范
+---
+
 # 前端模块功能介绍文档生成规范
 
 ## 触发条件
@@ -437,7 +442,7 @@ sequenceDiagram
 
 ## Mermaid 语法检查清单
 
-生成 mermaid 图后，必须按照 `.claude/skills/common/mermaid.md` 检查：
+生成 mermaid 图后，必须按照 `.claude/skills/common-mermaid/SKILL.md` 检查：
 
 - [ ] subgraph 标题包含空格时，必须用双引号包裹 `subgraph "标题文字"`
 - [ ] 节点名称不能包含特殊字符 `&()[]|\/{}` 等

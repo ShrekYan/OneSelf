@@ -19,4 +19,4 @@
 
 ---
 
-include: ../skills/common/pr.md
+请调用 Skill 工具执行 `common-pr`，并将用户参数原样传入。规范入口：[common-pr Skill](../skills/common-pr/SKILL.md)。

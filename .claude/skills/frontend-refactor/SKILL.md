@@ -49,12 +49,12 @@ description: 前端代码重构分析规范，提供结构化重构建议和实�
 ### 第三步：匹配项目规范
 根据本项目既定规范，确认重构方向是否正确：
 
-- 📐 [API 设计规范](../rules/frontend-api-design.md)
-- 📐 [TypeScript 规范](../rules/frontend-typescript.md)
-- 📐 [CSS/SCSS 规范](../rules/frontend-css-scss.md)
-- 📐 [Hooks 开发规范](../rules/frontend-hooks-ts.md)
-- 📐 [Hooks 与错误处理规范](../rules/frontend-hooks-error-handling.md)
-- 📐 [第三方库规范](../rules/frontend-third-party-libraries.md)
+- 📐 [API 设计规范](../h5-frontend-developer/rules/frontend-api-design.md)
+- 📐 [TypeScript 规范](../h5-frontend-developer/rules/frontend-typescript.md)
+- 📐 [CSS/SCSS 规范](../h5-frontend-developer/rules/frontend-css-scss.md)
+- 📐 [Hooks 开发规范](../h5-frontend-developer/rules/frontend-hooks-ts.md)
+- 📐 [Hooks 与错误处理规范](../h5-frontend-developer/rules/frontend-hooks-error-handling.md)
+- 📐 [第三方库规范](../h5-frontend-developer/rules/frontend-third-party-libraries.md)
 
 ### 第四步：提出重构方案
 

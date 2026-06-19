@@ -88,7 +88,7 @@
 
 ### Phase 2：方案 A - Skill 预理解指令
 
-**文件**：`/.claude/skills/h5-frontend-developer/h5-frontend-developer.md`
+**文件**：`/.claude/skills/h5-frontend-developer/SKILL.md`
 
 在 skill 最开头新增「预理解阶段」三步骤：
 

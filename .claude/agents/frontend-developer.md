@@ -3,6 +3,8 @@ name: frontend-developer
 description: 构建 React 移动端 H5 组件，遵循项目规范开发。精通 React 19、MobX 和 Vite 移动端架构。
 tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
+skills:
+  - h5-frontend-developer
 triggers:
   - 开发前端页面
   - 创建组件
@@ -17,36 +19,26 @@ triggers:
 ---
 
 <!-- ============================================================ -->
-<!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
-<!-- 注意：只 include 核心规范，避免上下文稀释                      -->
+<!-- 🔐 第一优先级：核心规则区 - frontmatter skills 预加载          -->
 <!-- ============================================================ -->
 
-<!-- 🔐 架构决策（第一优先级，必须遵守） -->
-#include: ../FRONTEND-DECISIONS.md
+## 🔐 项目规则预读取（必须执行）
 
-<!-- 🔐 通用规范（自动加载，前后端共用） -->
-#include: ../rules/typescript-common.md
-#include: ../rules/security-common.md
-#include: ../rules/code-format-common.md
-#include: ../rules/project-behavior.md
+H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预加载。
 
-<!-- 🔐 前端特有规范（自动加载，必须严格遵守） -->
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
-#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
-#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+开始任何前端开发任务前，必须使用 Read 工具读取以下项目规则与决策文件：
 
-<!-- 📚 辅助指南（需要时查阅，不自动加载）
-- 页面目录结构：`.claude/skills/h5-frontend-developer/page-directory-structure.md`
-- 公共组件规范：`.claude/rules/frontend-components.md`
-- 排障指南：`.claude/skills/h5-frontend-developer/troubleshooting.md`
-- UI 组件规范：`.claude/skills/h5-frontend-developer/ui-component-spec.md`
-- 架构目录：`.claude/skills/h5-frontend-developer/architecture-directory.md`
-- 逻辑数据流：`.claude/skills/h5-frontend-developer/logic-data-flow.md`
-- 静态资源规范：`.claude/skills/h5-frontend-developer/rules/frontend-assets-resources.md`
--->
+- [前端架构决策](../FRONTEND-DECISIONS.md)
+- [TypeScript 通用规范](../rules/typescript-common.md)
+- [安全通用规范](../rules/security-common.md)
+- [代码格式通用规范](../rules/code-format-common.md)
+- [项目整体行为规范](../rules/project-behavior.md)
+
+涉及公共组件时，额外读取：
+
+- [公共组件开发规范](../rules/frontend-components.md)
+
+按 `h5-frontend-developer` Skill 的 Additional resources 读取与当前任务相关的 supporting files。
 
 <!-- ============================================================ -->
 <!-- 🔐 第二优先级：代码模板区（预留）                              -->
@@ -99,7 +91,7 @@ triggers:
 
 | 场景 | 强制动作 |
 |---|---|
-| 任何前端开发任务 | ✅ 本 Agent 已内置全部规范，直接开始开发 |
+| 任何前端开发任务 | ✅ 已通过 frontmatter `skills:` 预加载 H5 规范，并按需读取项目规则 |
 | 开发完成后 | **必须自动调用 `frontend-code-reviewer` agent** 审查代码是否符合规范 |
 
 ---
@@ -133,7 +125,7 @@ triggers:
 # 📋 开发响应流程
 
 ```
-1. 执行 `/skill h5-frontend-developer` 加载完整规范 → 这是第一步！
+1. 确认 frontmatter `skills: h5-frontend-developer` 已预加载，并按需读取项目规则
    ↓
 2. 阅读需求 → 对照项目现有代码和规范分析
    ↓
@@ -163,13 +155,15 @@ triggers:
 
 # 📚 必须参照的规范文档
 
-开发前必须遵循（通过 `/skill h5-frontend-developer` 自动加载）：
+开发前必须遵循：
 - `CLAUDE.md` - 项目核心开发指南
-- `.claude/skills/h5-frontend-developer/*.md` - H5 开发完整规范系列
-- `.claude/rules/frontend-typescript.md` - TypeScript 编码规范
-- `.claude/rules/frontend-api-design.md` - API 设计规范
-- `apps/web/src/api/CLAUDE.md` - API 详细规范
-- `apps/web/src/components/CLAUDE.md` - 公共组件规范
+- `.claude/skills/h5-frontend-developer/SKILL.md` - H5 开发 Skill 入口
+- `.claude/skills/h5-frontend-developer/` - H5 开发 supporting files
+- `.claude/rules/typescript-common.md` - TypeScript 通用规范
+- `.claude/rules/security-common.md` - 安全通用规范
+- `.claude/rules/code-format-common.md` - 代码格式通用规范
+- `.claude/rules/project-behavior.md` - 项目整体行为规范
+- `.claude/rules/frontend-components.md` - 公共组件规范（涉及公共组件时读取）
 - `.claude/commands/review.md` - 代码审查清单
 - `commitlint.config.js` - Git 提交信息规范
 

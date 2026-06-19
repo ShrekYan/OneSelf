@@ -18,4 +18,4 @@
 
 ---
 
-include: ../skills/common/backend-module-doc.md
+请调用 Skill 工具执行 `common-backend-module-doc`，并将用户参数原样传入。规范入口：[common-backend-module-doc Skill](../skills/common-backend-module-doc/SKILL.md)。

@@ -1,5 +1,5 @@
 ---
-name: pixso
+name: frontend-pixso
 description: Pixso 设计稿获取与代码生成，内置完善错误处理和大结果支持
 trigger: /pixso <fileKey> [nodeId]
 model: inherit
@@ -228,9 +228,11 @@ round to integer pixels
 
 ## 📜 遵循项目开发规范
 
-以下项目规范必须严格遵守：
+以下项目规范必须严格遵守。生成代码前，必须先读取：
 
-include: ./h5-frontend-developer/h5-frontend-developer.md
+- [H5 frontend developer skill](../h5-frontend-developer/SKILL.md)
+
+并根据该 skill 的 Additional resources 继续读取与当前任务相关的 supporting files。
 
 ---
 
@@ -246,7 +248,11 @@ include: ./h5-frontend-developer/h5-frontend-developer.md
 - [ ] **设计缩放**：所有尺寸已正确缩放到 750px 设计稿基准吗？
 
 ### 通用规范检查
-已通过上方 `include` 引入的 `h5-frontend-developer` 规范自动覆盖
+- [ ] 是否已读取并遵循 [H5 frontend developer skill](../h5-frontend-developer/SKILL.md)？
+- [ ] 是否按该 skill 的 Additional resources 读取了相关 supporting files？
+- [ ] 是否遵循 React + TypeScript + MobX + SCSS Modules 规范？
+- [ ] 是否遵循 750px 设计稿、px 自动转 vw、禁止手写 vw？
+- [ ] 是否遵循页面拆分、组件拆分、API 调用与样式命名规范？
 
 ---
 

@@ -47,7 +47,7 @@ include: h5-frontend-developer/architecture-directory.md # ❌ 路径错误
 **正确写法**：
 
 ```markdown
-// 文件位于 .claude/skills/h5-frontend-developer/h5-frontend-developer.md
+// 文件位于 .claude/skills/h5-frontend-developer/SKILL.md
 #include: architecture-directory.md // ✅ 同级文件直接写
 #include: rules/frontend-api-design.md // ✅ 子目录文件写相对路径
 ```
@@ -125,7 +125,7 @@ nestjs-backend-developer.md
 
 **问题的完整回答**：
 
-> **问**：`#include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md` 这样就能把规则全部加载进去吗？
+> **问**：`#include: ../skills/nestjs-backend-developer/SKILL.md` 这样就能把规则全部加载进去吗？
 >
 > **答**：原来不能（因为 Skill 内部是 `include:` 无 `#`），修复后 **100% 能**。
 

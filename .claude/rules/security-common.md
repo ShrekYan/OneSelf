@@ -161,7 +161,7 @@ argon2.hash(password, {
 
 ## 延伸阅读
 
-- **前端安全规范**：见 `.claude/skills/h5-frontend-developer/rules/frontend-api-design.md`
-- **后端安全规范**：见 `.claude/skills/nestjs-backend-developer/11-security-authentication.md`
-- **TypeScript 规范**：见 `.claude/rules/typescript-common.md`
-- **代码格式规范**：见 `.claude/rules/code-format-common.md`
+- **前端安全规范**：见 [前端 API 设计规范](../skills/h5-frontend-developer/rules/frontend-api-design.md)
+- **后端安全规范**：见 [后端安全认证规范](../skills/nestjs-backend-developer/11-security-authentication.md)
+- **TypeScript 规范**：见 [TypeScript 通用规范](./typescript-common.md)
+- **代码格式规范**：见 [代码格式通用规范](./code-format-common.md)

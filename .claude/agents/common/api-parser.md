@@ -176,9 +176,9 @@ triggers:
 ### 前端规范
 
 **所有规范严格遵循项目现有文档，直接引用：**
-- API 设计规范 → [.claude/skills/h5-frontend-developer/rules/frontend-api-design.md](.claude/skills/h5-frontend-developer/rules/frontend-api-design.md)
-- TypeScript 规范 → [.claude/skills/h5-frontend-developer/rules/frontend-typescript.md](.claude/skills/h5-frontend-developer/rules/frontend-typescript.md)
-- 项目整体规范 → [CLAUDE.md](CLAUDE.md)
+- API 设计规范 → [前端 API 设计规范](../../skills/h5-frontend-developer/rules/frontend-api-design.md)
+- TypeScript 规范 → [前端 TypeScript 规范](../../skills/h5-frontend-developer/rules/frontend-typescript.md)
+- 项目整体规范 → [CLAUDE.md](../../../CLAUDE.md)
 
 #### 目录与命名规范（前端）
 
@@ -229,7 +229,7 @@ export default {
 ### 后端规范 (NestJS)
 
 **所有规范严格遵循后端现有文档，直接引用：**
-- 后端开发规范 → [.claude/projects/backend-project-info.md](.claude/projects/backend-project-info.md)
+- 后端开发规范 → [Backend 项目开发指南](../../projects/backend-project-info.md)
 - NestJS 官方约定 → 遵循标准 NestJS 模块化架构
 
 #### 后端模块文件结构

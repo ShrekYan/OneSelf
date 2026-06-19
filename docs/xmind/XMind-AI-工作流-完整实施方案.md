@@ -309,7 +309,7 @@ feat(strategy): 实现策略详情页普通发车功能
 | `.claude/agents/xmind-task-parser.md`  | 修改      | 升级现有 Agent，增强解析能力 |
 | `.claude/agents/task-orchestrator.md`  | 新增      | 任务编排与并行执行 Agent     |
 | `.claude/workflows/xmind-exec.yml`     | 新增      | 端到端工作流定义             |
-| `.claude/skills/xmind-exec.md`         | 新增      | 技能入口                     |
+| `.claude/skills/xmind-exec/SKILL.md`         | 新增      | 技能入口                     |
 | `docs/AI-能力边界客观评价.md`          | ✅ 已完成 | AI 能力边界文档              |
 | `docs/XMind-AI-工作流-完整实施方案.md` | ✅ 已完成 | 本方案文档                   |
 | `docs/XMind-使用示例模板.md`           | 新增      | XMind 编写模板与最佳实践     |

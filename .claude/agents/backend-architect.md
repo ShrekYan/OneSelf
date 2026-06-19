@@ -3,6 +3,8 @@ name: backend-architect
 description: 专业后端架构师，擅长可扩展 API 设计、微服务架构和分布式系统。精通 REST/GraphQL/gRPC API、事件驱动架构、服务网格模式和现代后端框架。负责服务边界定义、服务间通信、弹性模式和可观测性。创建新后端服务或 API 时主动使用。
 tools: Read, Write, Edit, Glob, Grep, manage_core_memory, Skill
 model: inherit
+skills:
+  - nestjs-backend-developer
 triggers:
   - 开发后端
   - NestJS 开发
@@ -15,36 +17,22 @@ triggers:
 ---
 
 <!-- ============================================================ -->
-<!-- 🔐 第一优先级：核心规则区 - 编译期 100% 物理嵌入              -->
-<!-- 注意：全部扁平化列出，不嵌套，确保 Claude Code 解析器能加载    -->
+<!-- 🔐 第一优先级：核心规则区 - frontmatter skills 预加载          -->
 <!-- ============================================================ -->
 
-<!-- 🔐 架构决策（第一优先级，必须遵守） -->
-#include: ../DECISIONS.md
+## 🔐 项目规则预读取（必须执行）
 
-<!-- 🔐 通用规范（自动加载，前后端共用） -->
-#include: ../rules/typescript-common.md
-#include: ../rules/security-common.md
-#include: ../rules/code-format-common.md
-#include: ../rules/project-behavior.md
+NestJS 后端开发规范已通过 frontmatter `skills: nestjs-backend-developer` 预加载。
 
-<!-- NestJS 核心规范（按编号顺序，直接 include 避免嵌套不解析） -->
-#include: ../skills/nestjs-backend-developer/01-architecture-module.md
-#include: ../skills/nestjs-backend-developer/02-file-naming.md
-#include: ../skills/nestjs-backend-developer/03-controller-service.md
-#include: ../skills/nestjs-backend-developer/04-dto-validation.md
-#include: ../skills/nestjs-backend-developer/05-typescript-spec.md
-#include: ../skills/nestjs-backend-developer/06-api-documentation.md
-#include: ../skills/nestjs-backend-developer/07-error-handling.md
-#include: ../skills/nestjs-backend-developer/08-checklist.md
-#include: ../skills/nestjs-backend-developer/09-prisma-orm.md
-#include: ../skills/nestjs-backend-developer/10-code-format.md
-#include: ../skills/nestjs-backend-developer/11-security-authentication.md
-#include: ../skills/nestjs-backend-developer/12-middleware.md
-#include: ../skills/nestjs-backend-developer/13-scheduled-tasks.md
+开始任何后端设计或开发任务前，必须使用 Read 工具读取以下项目规则与决策文件：
 
-<!-- 基础规则扩展 -->
-#include: ../skills/nestjs-backend-developer/rules/nestjs-typescript.md
+- [后端架构决策](../DECISIONS.md)
+- [TypeScript 通用规范](../rules/typescript-common.md)
+- [安全通用规范](../rules/security-common.md)
+- [代码格式通用规范](../rules/code-format-common.md)
+- [项目整体行为规范](../rules/project-behavior.md)
+
+按 `nestjs-backend-developer` Skill 的 Additional resources 读取与当前任务相关的 supporting files。
 
 <!-- ============================================================ -->
 <!-- 🔐 第二优先级：代码模板区（预留）                              -->
@@ -95,7 +83,7 @@ triggers:
 
 本项目使用 **NestJS + TypeScript + Prisma** 技术栈，所有代码输出必须严格遵循项目规范。
 
-规范通过 `/skill nestjs-backend-developer` 自动加载，包含：
+规范通过 frontmatter `skills: nestjs-backend-developer` 预加载，包含：
 - 模块架构设计规范
 - 文件命名约定
 - Controller / Service 分层规范

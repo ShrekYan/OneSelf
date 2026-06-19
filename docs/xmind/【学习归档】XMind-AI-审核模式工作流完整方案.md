@@ -330,7 +330,7 @@ apps/web/src/components/index.tsx # T003 - 统一导出
 | `.claude/agents/xmind-task-parser.md`     | XMind 解析器 Agent   |
 | `.claude/agents/task-scheme-generator.md` | 任务方案生成器 Agent |
 | `.claude/workflows/xmind-exec.yml`        | 端到端工作流定义     |
-| `.claude/skills/xmind-exec.md`            | 技能入口定义         |
+| `.claude/skills/xmind-exec/SKILL.md`            | 技能入口定义         |
 | `docs/XMind-使用示例模板.md`              | XMind 编写模板       |
 | `docs/test-orchestration-*.md`            | 编排测试示例         |
 | `.claude/runs/*`                          | 历史运行记录         |

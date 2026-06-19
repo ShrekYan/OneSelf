@@ -1,5 +1,5 @@
 ---
-name: commit
+name: common-commit
 description: Git Commit 信息生成规范，遵循 Conventional Commits 约定式提交。用于生成符合项目规范的 Git 提交信息。
 ---
 

@@ -3,6 +3,9 @@ name: frontend-test-writer
 description: 为前端组件和函数编写单元测试和集成测试。使用 Vitest + React Testing Library。专注于 React + MobX 前端项目。
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: inherit
+skills:
+  - frontend-test
+  - h5-frontend-developer
 triggers:
   - 前端单元测试
   - Vitest 测试
@@ -11,9 +14,12 @@ triggers:
   - 测试用例编写
 ---
 
-#include: ../skills/frontend-test.md
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
+## 🔐 规范预加载与规则读取
+
+前端测试规范已通过 frontmatter `skills: frontend-test` 预加载。
+H5 前端基础规范已通过 frontmatter `skills: h5-frontend-developer` 预加载。
+
+编写测试前如需确认类型、第三方库或目录规则，按 `h5-frontend-developer` 的 Additional resources 读取相关 supporting files。
 
 # Test Writer Agent 测试编写规范
 
@@ -91,4 +97,4 @@ triggers:
 
 ## 检查清单（写完测试必须检查）
 
-完整检查清单请参见 `.claude/skills/frontend-test.md`，检查通过后才能交付。
+完整检查清单请参见 `.claude/skills/frontend-test/SKILL.md`，检查通过后才能交付。

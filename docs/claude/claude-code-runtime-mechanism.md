@@ -172,7 +172,7 @@ Claude Code 查找是否有对应的 Command
 Command 指向对应的 Skill:
   #use: frontend-code-reviewer
     ↓
-加载 .claude/skills/frontend-code-review.md
+加载 .claude/skills/frontend-code-review/SKILL.md
     ↓
 执行技能定义的操作
 ```
@@ -191,7 +191,7 @@ skills/ (实际技能实现)
 
 - 用户输入 `/git commit`
 - → 加载 `.claude/commands/git.md`
-- → 调用 `.claude/skills/common/commit.md`
+- → 调用 `.claude/skills/common-commit/SKILL.md`
 - → 生成符合规范的 Git Commit
 
 ---

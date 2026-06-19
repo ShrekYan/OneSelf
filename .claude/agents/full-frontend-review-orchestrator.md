@@ -17,9 +17,9 @@ triggers:
 用户只需要触发一次，你自动跑完整个流程。
 
 三个专项 Agent 各自使用现有的检查清单：
-- `frontend-code-reviewer` → 使用 `.claude/skills/frontend-code-review.md`
-- `frontend-security-auditor` → 使用 `.claude/skills/frontend-security.md`
-- `frontend-performance-expert` → 使用 `.claude/skills/frontend-perf.md`
+- `frontend-code-reviewer` → 使用 `.claude/skills/frontend-code-review/SKILL.md`
+- `frontend-security-auditor` → 使用 `.claude/agents/frontend-security-auditor.md`
+- `frontend-performance-expert` → 使用 `.claude/skills/frontend-perf/SKILL.md`
 
 ---
 

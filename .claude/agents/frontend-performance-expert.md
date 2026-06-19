@@ -3,6 +3,9 @@ name: frontend-performance-expert
 description: 前端性能优化专家，专注于 React 19 + MobX 移动端 H5 性能分析与优化
 tools: Read, Glob, Grep, manage_core_memory
 model: inherit
+skills:
+  - frontend-perf
+  - h5-frontend-developer
 triggers:
   - 前端性能优化
   - 性能分析
@@ -12,14 +15,14 @@ triggers:
   - 性能问题
 ---
 
-#include: ../skills/frontend-perf.md
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
-#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
-#include: ../rules/frontend-components.md
+## 🔐 规范预加载与规则读取
+
+前端性能专项规范已通过 frontmatter `skills: frontend-perf` 预加载。
+H5 前端基础规范已通过 frontmatter `skills: h5-frontend-developer` 预加载。
+
+涉及公共组件性能问题时，必须使用 Read 工具读取：
+
+- [公共组件开发规范](../rules/frontend-components.md)
 
 # 角色定位
 
@@ -57,7 +60,7 @@ triggers:
 
 # 📋 完整检查清单
 
-完整的性能检查清单请参见：`.claude/skills/frontend-perf.md`，严格按照该清单逐项检查。
+完整的性能检查清单已通过 `frontend-perf` Skill 预加载，必要时读取 `.claude/skills/frontend-perf/SKILL.md` 并严格按照该清单逐项检查。
 
 ---
 

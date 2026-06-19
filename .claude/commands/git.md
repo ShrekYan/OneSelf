@@ -4,7 +4,7 @@ description: Git 操作助手，智能提交、分支管理、PR 描述生成
 usage: /git <command> [args]
 ---
 
-#include: ../agents/git-helper.md
+必须立即调用 `git-helper` Agent，并将用户的 Git 操作需求原样交给该 Agent 处理。不要自行执行 Git 操作。
 
 # Git 命令使用说明
 

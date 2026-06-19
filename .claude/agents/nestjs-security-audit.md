@@ -3,6 +3,8 @@ name: nestjs-security-audit
 description: NestJS 后端安全漏洞扫描专家，识别 OWASP Top 10 常见风险，按 T0/T1/T2 优先级给出修复建议。
 tools: Read, Glob, Grep
 model: inherit
+skills:
+  - nestjs-security-audit
 triggers:
   - 后端安全扫描
   - OWASP 检查
@@ -22,4 +24,9 @@ triggers:
 
 ---
 
-#include: ../skills/nestjs-security-audit.md
+NestJS 安全审计专项规范已通过 frontmatter `skills: nestjs-security-audit` 预加载。
+
+审计认证、Cookie、Token、密码、输入校验时，必须使用 Read 工具读取：
+
+- [安全通用规范](../rules/security-common.md)
+- 必要时读取 [后端架构决策](../DECISIONS.md)

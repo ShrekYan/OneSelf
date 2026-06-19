@@ -4,6 +4,34 @@ description: 前端 H5 代码质量审查指南（备用参考文档，不被 Ag
 model: inherit
 ---
 
+# 🚨 /frontend-code-review 强制执行协议（优先级 999）
+
+> **重要：这是你必须执行的唯一动作，没有其他选择**
+
+## ✅ 立即执行：调用前端代码审查 Agent
+
+**使用 `Agent` 工具**，参数如下：
+
+| 参数 | 值 |
+|------|----|
+| `subagent_type` | `frontend-code-reviewer` |
+| `description` | 用户的代码审查需求 |
+| `prompt` | "用户审查需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的审查工作流程执行。" |
+
+## 🔍 自我验证（执行后确认）
+- [ ] 我使用了 `Agent` 工具进行调用
+- [ ] 我没有自行扫描或分析任何代码
+- [ ] 调用 Agent 是我做的第一件事
+- [ ] 我在调用前没有输出其他文字
+
+## ❌ 绝对禁止行为（违反即失败）
+- 主 Claude 自行扫描代码
+- 跳过 Agent 直接输出审查报告
+- 先解释再调用 Agent
+- 输出任何与调用 Agent 无关的内容
+
+---
+
 <!--
   ⚠️  重要说明：
   此文件的引用已扁平化到以下 Agent 配置中，不直接被加载：
@@ -14,13 +42,17 @@ model: inherit
 -->
 
 
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
-#include: ../skills/h5-frontend-developer/rules/frontend-api-design.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-ts.md
-#include: ../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md
-#include: ../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md
-#include: ../rules/frontend-components.md
+## Additional resources
+
+审查前如需查看详细规范，请读取以下参考文件：
+
+- [Frontend TypeScript](../h5-frontend-developer/rules/frontend-typescript.md)
+- [Frontend CSS/SCSS](../h5-frontend-developer/rules/frontend-css-scss.md)
+- [Frontend API design](../h5-frontend-developer/rules/frontend-api-design.md)
+- [Frontend hooks TS](../h5-frontend-developer/rules/frontend-hooks-ts.md)
+- [Frontend hooks error handling](../h5-frontend-developer/rules/frontend-hooks-error-handling.md)
+- [Frontend third-party libraries](../h5-frontend-developer/rules/frontend-third-party-libraries.md)
+- [Frontend components](../../rules/frontend-components.md)
 
 # 代码审查指南
 

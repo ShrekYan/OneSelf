@@ -10,9 +10,11 @@ triggers:
   - Git 操作
 ---
 
-#include: ../skills/common/commit.md
-
 # Git 操作助手
+
+Git Commit 规范参考文件：`.claude/skills/common-commit/SKILL.md`。
+
+当任务涉及 commit message 生成或提交操作时，必须使用 Read 工具读取该文件。
 
 ## 核心能力
 

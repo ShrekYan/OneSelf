@@ -17,4 +17,4 @@
 
 ---
 
-include: ../skills/common/todo-scan.md
+请调用 Skill 工具执行 `common-todo-scan`，并将用户参数原样传入。规范入口：[common-todo-scan Skill](../skills/common-todo-scan/SKILL.md)。
