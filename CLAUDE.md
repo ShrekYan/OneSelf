@@ -108,54 +108,7 @@ auth-service (认证) ←→ backend (主业务) ←→ log-service (日志)
 - **并行开发所有服务**: `npm run dev`
 - **全项目代码检查**: `npm run lint`
 
-### 🔄 多系统开发流程
-
-#### 单系统开发（推荐，隔离性好）
-```bash
-# 前端开发
-cd apps/web && npm run dev
-
-# 单个后端服务开发
-cd services/auth-service && npm run start:dev
-cd services/backend && npm run start:dev
-cd services/log-service && npm run start:dev
-
-# 共享包开发
-cd packages/shared-logging && npm run build
-```
-
-
-#### 前端（apps/web/ 目录下）
-- **开发**: `npm run dev` (默认外测环境)
-- **构建**: `npm run build` (全流程)
-- **检查**: `npm run lint` / `npx tsc --noEmit`
-- **各环境开发**: `npm run test-dev` (测试) | `npm run sit-dev` (SIT) | `npm run prd-dev` (生产)
-
-#### 后端（进入对应服务目录执行）
-```bash
-# 各服务独立开发
-cd services/auth-service && npm run start:dev
-cd services/backend && npm run start:dev
-cd services/log-service && npm run start:dev
-```
-- **构建**: `npm run build`
-- **检查**: `npm run lint`
-
-### 📦 共享包开发规范
-
-#### packages/ 目录规则
-1. **纯技术库**：不包含业务逻辑，仅提供通用能力
-2. **单向依赖**：只能被其他包引用，不能引用业务服务
-3. **同步更新**：修改共享包必须同步更新所有使用方
-4. **破坏性变更**：必须在 commit body 中详细说明影响范围
-
-#### 跨系统修改提交规范
-```bash
-# 同时修改多个系统
-feat(auth+web): 统一登录状态管理
-fix(backend+shared): 修复日志格式兼容性问题
-refactor(auth+backend+log): 抽离通用响应格式
-```
+ 
 
 ## 📚 项目规范入口
 
@@ -185,10 +138,11 @@ refactor(auth+backend+log): 抽离通用响应格式
 
 ## ✅ 验证流程
 
-完成开发后，请务必依次执行：
+完成任务后，只需执行 ESLint 和 TypeScript 类型检查：
 1. `npm run lint` (在修改的子项目目录执行，不要在根目录执行全项目检查)
 2. 前端目录：`npx tsc --noEmit` (TypeScript 类型检查)
-3. 参照 @.claude/commands/frontend-code-review.md 进行自我审计。
+
+除非用户明确要求，不需要执行构建、测试或额外自我审计。
 
 ## 🧠 项目记忆规则
 
