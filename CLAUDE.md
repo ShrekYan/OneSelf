@@ -226,7 +226,3 @@ auth-service (认证) ←→ backend (主业务) ←→ log-service (日志)
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
 | 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
 | Git 提交信息生成、分支管理、PR 描述 | `git-helper` |
-
-<!-- SPECKIT START -->
-Current plan: specs/xiaobei/xiaobei-03-array-utils/plan.md
-<!-- SPECKIT END -->
