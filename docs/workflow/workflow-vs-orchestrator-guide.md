@@ -21,7 +21,7 @@
 ### 2.1 Workflow 写法（YAML 配置）
 
 ```yaml
-# .claude/workflows/frontend-code-review.yml
+# 历史示例：.claude/workflows/frontend-code-review.yml（当前已迁移到 .claude/skills/full-frontend-review/SKILL.md）
 steps:
   - name: 代码质量审查
     agent: frontend-code-reviewer-agent # 固定写死调用哪个
@@ -183,7 +183,7 @@ steps:
 ### 例子 1：`pre-commit-check.yml` → 用 Workflow 是正确的
 
 ```yaml
-# .claude/workflows/pre-commit-check.yml
+# 历史示例：.claude/workflows/pre-commit-check.yml（当前已迁移到 .claude/skills/pre-commit-check/SKILL.md）
 steps:
   - run: npm run lint # 固定命令
   - run: npx tsc --noEmit # 固定命令
@@ -324,8 +324,8 @@ A：当你发现自己在想：
 
 | 文件路径                                              | 类型         | 说明                     |
 | ----------------------------------------------------- | ------------ | ------------------------ |
-| `.claude/workflows/pre-commit-check.yml`              | Workflow     | 预提交检查示例           |
-| `.claude/workflows/frontend-code-review.yml`          | Workflow     | 前端审查 Workflow 版     |
+| `.claude/skills/pre-commit-check/SKILL.md`            | Skill        | 预提交检查入口           |
+| `.claude/skills/full-frontend-review/SKILL.md`        | Skill        | 前端完整审查入口         |
 | `.claude/agents/full-frontend-review-orchestrator.md` | Orchestrator | 前端审查 Orchestrator 版 |
 
 ---

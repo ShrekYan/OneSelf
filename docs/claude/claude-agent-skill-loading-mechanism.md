@@ -69,7 +69,7 @@ model: inherit
 
 <!-- 🔐 项目规范自动加载 - 100% 生效，无需手动调用 -->
 
-#include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md
+#include: ../skills/nestjs-backend-developer/SKILL.md
 
 ---
 

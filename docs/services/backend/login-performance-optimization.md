@@ -491,17 +491,17 @@ $ npx tsc --noEmit
 
 ### 相关文件链接
 
-| 文件             | 类型         | 路径                                               |
-| ---------------- | ------------ | -------------------------------------------------- |
-| 认证服务         | 修改         | `src/auth/auth.service.ts`                         |
-| 认证模块         | 原有         | `src/auth/auth.module.ts`                          |
-| 密码缓存服务     | 原有         | `src/auth/password-cache.service.ts`               |
-| 清理模块         | 新增         | `src/cleanup/cleanup.module.ts`                    |
-| 清理服务         | 新增         | `src/cleanup/cleanup.service.ts`                   |
-| 应用根模块       | 修改         | `src/app.module.ts`                                |
-| 环境配置         | 需要手动添加 | `.env`                                             |
-| 本文档           | 新增         | `backend/docs/login-performance-optimization.md`   |
-| 最初安全性能分析 | 原有         | `backend/docs/login-performance-security-audit.md` |
+| 文件             | 类型         | 路径                                                        |
+| ---------------- | ------------ | ----------------------------------------------------------- |
+| 认证服务         | 修改         | `src/auth/auth.service.ts`                                  |
+| 认证模块         | 原有         | `src/auth/auth.module.ts`                                   |
+| 密码缓存服务     | 原有         | `src/auth/password-cache.service.ts`                        |
+| 清理模块         | 新增         | `src/cleanup/cleanup.module.ts`                             |
+| 清理服务         | 新增         | `src/cleanup/cleanup.service.ts`                            |
+| 应用根模块       | 修改         | `src/app.module.ts`                                         |
+| 环境配置         | 需要手动添加 | `.env`                                                      |
+| 本文档           | 新增         | `docs/services/backend/login-performance-optimization.md`   |
+| 最初安全性能分析 | 原有         | `docs/services/backend/login-performance-security-audit.md` |
 
 ---
 

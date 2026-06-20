@@ -269,13 +269,11 @@ class WebhookNotifier implements Notifier {}
 
 ## 🔗 相关文件索引
 
-| 文件路径                                  | 说明           | 阶段 |
-| ----------------------------------------- | -------------- | ---- |
-| `.claude/workflows/xmind-exec.yml`        | 任务执行器     | 1    |
-| `.claude/workflows/xmind-multi-stage.yml` | 多任务看板     | 1    |
-| `.claude/workflows/xmind-status.yml`      | 状态看板       | 1    |
-| `.claude/locks/`                          | 全局文件锁目录 | 2    |
-| `.claude/docs/`                           | 文档目录       | -    |
+| 文件路径                           | 说明               | 阶段 |
+| ---------------------------------- | ------------------ | ---- |
+| `.claude/workflows/xmind-exec.yml` | 任务执行与状态入口 | 1    |
+| `.claude/locks/`                   | 全局文件锁目录     | 2    |
+| `docs/`                            | 文档目录           | -    |
 
 ---
 

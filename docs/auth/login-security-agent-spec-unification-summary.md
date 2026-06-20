@@ -204,7 +204,7 @@ if (import.meta.env.DEV) {
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
 #include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
 #include: ../skills/h5-frontend-developer/page-directory-structure.md
-#include: ../skills/frontend-code-review.md
+#include: ../skills/frontend-code-review/SKILL.md
 #include: ../rules/frontend-components.md
 ```
 
@@ -214,7 +214,7 @@ if (import.meta.env.DEV) {
 <!-- 🔐 项目规范引用（必须严格遵循） -->
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/frontend-perf.md
+#include: ../skills/frontend-perf/SKILL.md
 #include: ../skills/h5-frontend-developer/rules/frontend-handle-ts.md
 ```
 
@@ -224,7 +224,7 @@ if (import.meta.env.DEV) {
 <!-- 🔐 项目规范引用（必须严格遵循） -->
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/frontend-security.md
+#include: ../rules/security-common.md
 #include: ../rules/project-behavior.md
 ```
 
@@ -234,7 +234,7 @@ if (import.meta.env.DEV) {
 <!-- 🔐 项目规范引用（必须严格遵循） -->
 
 #include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/frontend-test.md
+#include: ../skills/frontend-test/SKILL.md
 ```
 
 ### 2.4 改造进度

@@ -136,5 +136,4 @@ nest --help
 
 ---
 
-<!-- 引入完整 NestJS 开发技能规范 -->
-include: ../skills/nestjs-backend-developer/nestjs-backend-developer.md
+完整 NestJS 开发规范入口见 [NestJS 后端开发 Skill](../skills/nestjs-backend-developer/SKILL.md)。Markdown 链接仅作为 supporting files 索引，不会自动展开；需要时请按链接读取。

@@ -64,18 +64,17 @@ apps/web/src/
 
 ## 📚 规范索引 (模块化拆分)
 
-- **专家级开发规范**: [.claude/skills/h5-frontend-developer/h5-frontend-developer.md](.claude/skills/h5-frontend-developer/h5-frontend-developer.md)
-- **API 设计规范**: [.claude/rules/frontend-api-design.md](.claude/rules/frontend-api-design.md)
-- **TypeScript 规范**: [.claude/rules/frontend-typescript.md](.claude/rules/frontend-typescript.md)
-- **CSS/SCSS 规范**: [.claude/rules/frontend-css-scss.md](.claude/rules/frontend-css-scss.md)
-- **Hooks 与错误处理**: [.claude/rules/frontend-hooks-error-handling.md](.claude/rules/frontend-hooks-error-handling.md)
-- **静态资源规范**: [.claude/rules/frontend-assets-resources.md](.claude/rules/frontend-assets-resources.md)
-- **第三方库规范**: [.claude/rules/frontend-third-party-libraries.md](.claude/rules/frontend-third-party-libraries.md)
-- **公共组件规范**: [apps/web/src/components/CLAUDE.md](apps/web/src/components/CLAUDE.md)
-- **代码审查清单**: [.claude/commands/review.md](.claude/commands/review.md)
-- **提交规范**: [commitlint.config.js](commitlint.config.js)
+- **专家级开发规范**: [H5 前端开发 Skill](../skills/h5-frontend-developer/SKILL.md)
+- **API 设计规范**: [前端 API 设计规范](../skills/h5-frontend-developer/rules/frontend-api-design.md)
+- **TypeScript 规范**: [前端 TypeScript 规范](../skills/h5-frontend-developer/rules/frontend-typescript.md)
+- **CSS/SCSS 规范**: [前端 CSS/SCSS 规范](../skills/h5-frontend-developer/rules/frontend-css-scss.md)
+- **Hooks 与错误处理**: [Hooks 与错误处理规范](../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md)
+- **静态资源规范**: [静态资源规范](../skills/h5-frontend-developer/rules/frontend-assets-resources.md)
+- **第三方库规范**: [第三方库规范](../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md)
+- **公共组件规范**: [公共组件开发规范](../rules/frontend-components.md)
+- **代码审查清单**: [前端代码审查命令](../commands/frontend-code-review.md)
+- **提交规范**: [commitlint.config.js](../../commitlint.config.js)
 
 ---
 
-<!-- 引入完整 H5 前端开发技能规范 -->
-include: ../skills/h5-frontend-developer/h5-frontend-developer.md
+完整 H5 前端开发规范入口见 [H5 前端开发 Skill](../skills/h5-frontend-developer/SKILL.md)。Markdown 链接仅作为 supporting files 索引，不会自动展开；需要时请按链接读取。

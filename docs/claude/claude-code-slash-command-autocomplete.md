@@ -23,7 +23,7 @@
 .claude/
 ├── commands/          # 👈 必须放这里！Claude 扫描 → 出现在补全列表
 │   ├── full-test3.md -> ../skills/full-test3.md  (软链接)
-│   └── full-frontend-review.md -> ../skills/full-frontend-review.md
+│   └── full-frontend-review.md -> ../skills/full-frontend-review/SKILL.md
 └── skills/            # 存放技能源码文档，便于分类管理
     ├── full-test3.md
     └── full-frontend-review.md

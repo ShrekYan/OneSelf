@@ -76,7 +76,7 @@
 │       ├── auto-check.js            # Git 批量检查脚本
 │       ├── eslint-formatter.js      # 自动记录违规的 formatter
 │       └── record-violation.js      # CLI 手动记录工具
-└── review-log.json                  # 违规数据库 + 统计
+└── review-log.json                  # 运行时生成的违规数据库 + 统计（不纳入版本控制）
 
 docs/
 └── architecture-governance-3.5.md   # 本文档

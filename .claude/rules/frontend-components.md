@@ -3,8 +3,12 @@ name: frontend-components-spec
 description: 公共组件开发规范
 ---
 
-#include: ../skills/h5-frontend-developer/rules/frontend-typescript.md
-#include: ../skills/h5-frontend-developer/rules/frontend-css-scss.md
+相关 supporting files：
+
+- [前端 TypeScript 规范](../skills/h5-frontend-developer/rules/frontend-typescript.md)
+- [前端 CSS/SCSS 规范](../skills/h5-frontend-developer/rules/frontend-css-scss.md)
+
+Markdown 链接仅作为参考索引，不会自动展开；需要时请按链接读取。
 
 # 公共组件开发规范
 
@@ -52,10 +56,10 @@ apps/web/src/components/
 
 | 项 | 规则 |
 |----|------|
-| **样式方案** | SCSS + CSS Modules，必须遵循 [frontend-css-scss.md](.claude/rules/frontend-css-scss.md) |
-| **类型系统** | TypeScript 显式类型，必须遵循 [frontend-typescript.md](.claude/rules/frontend-typescript.md) |
+| **样式方案** | SCSS + CSS Modules，必须遵循 [前端 CSS/SCSS 规范](../skills/h5-frontend-developer/rules/frontend-css-scss.md) |
+| **类型系统** | TypeScript 显式类型，必须遵循 [前端 TypeScript 规范](../skills/h5-frontend-developer/rules/frontend-typescript.md) |
 | **状态管理** | 纯组件，仅依赖 Props，不使用 MobX |
-| **第三方依赖** | 必须遵循 [frontend-third-party-libraries.md](.claude/rules/frontend-third-party-libraries.md) |
+| **第三方依赖** | 必须遵循 [第三方库规范](../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md) |
 
 ---
 
@@ -104,7 +108,7 @@ export default LazyImage;
 
 ## 样式规范
 
-公共组件样式必须遵循 [CSS/SCSS 规范](.claude/rules/frontend-css-scss.md)，额外要求：
+公共组件样式必须遵循 [前端 CSS/SCSS 规范](../skills/h5-frontend-developer/rules/frontend-css-scss.md)，额外要求：
 
 ### 根容器命名强制要求
 ```scss
