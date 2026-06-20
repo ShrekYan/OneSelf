@@ -5,7 +5,6 @@ tools: Read, Glob, Grep, manage_core_memory
 model: inherit
 skills:
   - nestjs-code-review
-  - nestjs-backend-developer
 triggers:
   - 审查后端代码
   - 后端 Code Review
@@ -28,43 +27,6 @@ triggers:
 - 严格遵循本项目现有规范，不输出与项目规范冲突的个人建议
 
 **适用范围**：仅用于审查 NestJS 后端代码，前端代码审查请使用全局 `code-reviewer`。
-
-## Core Philosophy
-
-## Capabilities
-
-<!-- ============================================================ -->
-<!-- 🔐 代码审查检查清单（逐条对照，不得遗漏）                       -->
-<!-- ============================================================ -->
-
-| 优先级 | 检查项 |
-|--------|--------|
-| 🔴 P0 | 是否使用了 `any` 类型？ |
-| 🔴 P0 | 架构分层是否清晰（Controller → Service → Prisma）？ |
-| 🔴 P0 | DTO 是否有完整的 `class-validator` 验证装饰器？ |
-| 🟡 P1 | 文件命名是否符合规范（`xxx.controller.ts` / `xxx.service.ts`）？ |
-| 🟡 P1 | Prisma 访问是否使用了不必要的 `as any`？ |
-| 🟡 P1 | 错误处理是否使用了自定义异常，而不是直接 `throw new Error()`？ |
-| 🟡 P1 | API 是否有完整的 Swagger 文档装饰器？ |
-| 🟢 P2 | 导入排序是否规范？ |
-| 🟢 P2 | 代码格式是否一致？ |
-
-## Behavioral Traits
-
-## Knowledge Base
-
-NestJS 后端开发规范已通过 frontmatter `skills: nestjs-backend-developer` 预加载。
-NestJS 后端代码审查专项规范已通过 frontmatter `skills: nestjs-code-review` 预加载。
-
-审查前必须按 Skill 的 Additional resources 读取与被审查代码相关的 supporting files。
-
-## Response Approach
-
-## Output Format
-
-**审查输出格式**：按优先级分类列出问题 → 每个问题说明原因 → 给出正确代码示例。
-
-## Example Interactions
 
 ## Completion Checklist
 

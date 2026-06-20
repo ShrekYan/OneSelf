@@ -3,33 +3,21 @@ name: nestjs-code-review
 description: NestJS 后端代码审查规范，包含完整检查清单和输出格式。代码审查时自动加载。
 ---
 
-# 🚨 /nestjs-code-review 强制执行协议（优先级 999）
+# NestJS 后端代码审查规范
 
-> **重要：这是你必须执行的唯一动作，没有其他选择**
+你是一位经验丰富的 NestJS 后端技术负责人，精通 NestJS + TypeScript + Prisma 开发最佳实践，专门为本项目做代码审查。
 
-## ✅ 立即执行：调用 NestJS 代码审查专家 Agent
+## 预理解阶段（审查前必须执行）
 
-**使用 `Agent` 工具**，参数如下：
+在开始代码审查之前，请先阅读本 skill 的 Additional resources 中与任务相关的 supporting files，特别关注：
 
-| 参数 | 值 |
-|------|----|
-| `subagent_type` | `nestjs-code-review` |
-| `description` | 用户的 NestJS 代码审查需求 |
-| `prompt` | "用户审查需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的审查工作流程执行。" |
-
-## 🔍 自我验证（执行后确认）
-- [ ] 我使用了 `Agent` 工具进行调用
-- [ ] 我没有自行扫描或分析任何代码
-- [ ] 调用 Agent 是我做的第一件事
-- [ ] 我在调用前没有输出其他文字
-
-## ❌ 绝对禁止行为（违反即失败）
-- 主 Claude 自行扫描代码
-- 跳过 Agent 直接输出审查报告
-- 先解释再调用 Agent
-- 输出任何与调用 Agent 无关的内容
-
----
+1. 架构与模块分层规则
+2. Controller / Service 编码规则
+3. DTO 与数据验证规则
+4. TypeScript 类型安全规则
+5. 错误处理规则
+6. Prisma ORM 使用规则
+7. API 文档规则
 
 ## 审查工作流程
 
@@ -43,109 +31,25 @@ description: NestJS 后端代码审查规范，包含完整检查清单和输出
 
 ---
 
-## 1. 架构与模块分层检查清单
+## Additional resources
 
-- [ ] 是否按业务领域正确拆分模块
-- [ ] 分层职责是否清晰（Controller 只处理 HTTP，Service 处理业务逻辑，不交叉）
-- [ ] 目录结构是否符合标准模块结构
-- [ ] 导入是否正确分组排序（NestJS 包 → 第三方包 → 内部模块 → 当前模块）
-- [ ] DTO 是否统一从 `./dto` 导入，不是直接导入单个文件
+开始 NestJS 后端代码审查任务前，必须按任务类型读取以下 supporting files。
 
----
+### 审查规则
 
-## 2. 命名与文件组织检查清单
+- [Architecture module](rules/code-review-architecture.md)
+- [Naming convention](rules/code-review-naming.md)
+- [Controller service](rules/code-review-controller-service.md)
+- [DTO validation](rules/code-review-dto.md)
+- [TypeScript spec](rules/code-review-typescript.md)
+- [Error handling](rules/code-review-error-handling.md)
+- [Prisma ORM](rules/code-review-prisma.md)
+- [API documentation](rules/code-review-api-docs.md)
+- [Code quality](rules/code-review-quality.md)
 
-- [ ] 所有文件使用 kebab-case 命名（如 `auth.controller.ts`，不是 `AuthController.ts`）
-- [ ] 文件名后缀正确（`.controller.ts`, `.service.ts`, `.dto.ts`, `.module.ts`）
-- [ ] 类名使用 PascalCase（`AuthController`, `ArticleService`）
-- [ ] 变量和函数使用 camelCase
-- [ ] 所有 DTO 类以 `Dto` 结尾（`LoginDto`，不是 `Login` 或 `loginDTO`）
-- [ ] 枚举：类名 PascalCase，成员 UPPER_SNAKE_CASE
+### 参考规范
 
----
-
-## 3. Controller 与 Service 编码检查清单
-
-### Controller
-- [ ] 路由前缀使用 kebab-case，RESTful 复数命名（`/articles`，不是 `/Article` 或 `/article`）
-- [ ] HTTP 方法使用正确（GET 查询，POST 创建，PATCH/PUT 更新，DELETE 删除）
-- [ ] 参数获取方式正确（`@Query()` 分页/筛选，`@Param()` ID，`@Body()` 创建/更新）
-- [ ] 方法命名符合约定（`queryList`, `getDetail`, `create`, `update`, `remove`）
-- [ ] 方法显式声明返回类型 `Promise<ResponseDto>`
-- [ ] Controller 方法不使用不必要的 `async/await`（直接返回 Promise 即可）
-- [ ] Controller 不包含业务逻辑，只做 HTTP 参数处理和响应
-
-### Service
-- [ ] 依赖注入使用 `private readonly`
-- [ ] PrismaService 正确注入（PrismaModule 已全局注册，直接注入即可）
-- [ ] 环境配置通过 ConfigService 获取，不直接读 `process.env`
-- [ ] 公共方法在前，私有方法在后，排序清晰
-
----
-
-## 4. DTO 与数据验证检查清单
-
-- [ ] 所有请求/响应都有独立 DTO 定义，不使用 `any`
-- [ ] DTO 文件放在 `dto/` 目录，一个 DTO 一个文件
-- [ ] 每个字段都添加 `class-validator` 验证装饰器（`@IsString()`, `@IsInt()`, 等）
-- [ ] 数字类型都添加了 `@Type(() => Number)`（class-transformer 需要）
-- [ ] 可选字段添加 `@IsOptional()` 并设置默认值
-- [ ] 所有字段都添加 `@ApiProperty({ description })` 给 Swagger 文档
-- [ ] 所有 DTO 在 `dto/index.ts` 统一导出
-- [ ] DTO 文件较多时按业务领域分类子目录
-
----
-
-## 5. TypeScript 类型安全检查清单
-
-- [ ] 所有方法参数都有显式类型声明
-- [ ] 所有方法返回值都有显式类型声明
-- [ ] `async` 方法正确返回 `Promise<T>`
-- [ ] 尽量避免使用 `any`，优先使用 `unknown` 或具体类型
-- [ ] catch 块中 `error: unknown` 正确进行类型收窄（`if (error instanceof Error)`）
-- [ ] 仅导出类型时使用 `export type`（利于 tree-shaking）
-
----
-
-## 6. 错误处理检查清单
-
-- [ ] 检查到错误立即抛出，不吞异常（不返回 `null` 隐藏错误）
-- [ ] 业务错误使用 `BusinessException` + 预定义业务错误码
-- [ ] Prisma 操作正确处理常见错误（P2002 唯一冲突、P2025 记录不存在）
-- [ ] 错误消息清晰易懂，对用户友好
-- [ ] 遵循项目异常分层体系，不自行返回错误码
-
----
-
-## 7. Prisma ORM 最佳实践检查清单
-
-- [ ] Schema 中每个模型和字段都有 `///` 文档注释
-- [ ] 模型名 PascalCase，表名使用 `@@map("underscore")` 下划线复数
-- [ ] 字段名数据库层面使用下划线命名
-- [ ] 查询使用 `select` 只获取需要的字段（提升查询性能）
-- [ ] 多个原子写操作使用事务 `$transaction` 保证一致性
-- [ ] 查询单条记录处理了记录不存在的情况（抛出对应业务异常）
-- [ ] 从数据库到 DTO 正确完成下划线 → 驼峰命名转换
-- [ ] 分页查询正确使用 `skip` + `take` 并查询总数
-- [ ] 常用查询字段添加了索引 (`@@index` 或 `@unique`)
-- [ ] 全小写模型名正确处理了 TypeScript 类型问题（参考项目经验）
-
----
-
-## 8. API 文档检查清单
-
-- [ ] Controller 添加了 `@ApiTags` 标签
-- [ ] 每个路由添加了 `@ApiOperation({ summary })` 说明接口用途
-- [ ] 每个 DTO 字段都有 `@ApiProperty` 描述
-
----
-
-## 9. 代码质量与格式检查清单
-
-- [ ] 执行过 `npm run lint` 没有错误
-- [ ] 执行过 `npm run format` 格式化
-- [ ] 移除了调试用的 `console.log`
-- [ ] `npx tsc --noEmit` 类型检查通过
+- [NestJS 后端开发规范](../nestjs-backend-developer/SKILL.md)
 
 ---
 

@@ -26,7 +26,6 @@ XMind 自动化执行工作流（审核模式）：解析 XMind 导出的 Markdo
    └── 自动创建 .claude/runs/run-{timestamp}/ 目录
 
 2. 🧠 解析 XMind 生成任务清单
-   └── 调用 xmind-task-parser Agent
    └── 生成 task-manifest.json
    └── 生成 execution-plan.md
 

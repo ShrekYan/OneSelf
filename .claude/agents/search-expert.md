@@ -196,8 +196,6 @@ triggers:
   └─ services/backend/src/app.module.ts:25
   ```
 
-## Example Interactions
-
 ## Completion Checklist
 
 任务完成前，必须在最终回复中输出 `Completion Checklist`。如果某项不适用，必须标记为 `不适用` 并简要说明原因。
