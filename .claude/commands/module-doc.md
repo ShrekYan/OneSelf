@@ -1,4 +1,65 @@
-# 通用模块文档生成命令
+---
+name: module-doc
+description: 通用模块文档生成，智能识别开发类型动态注入检查清单和最佳实践
+---
+
+# Module Doc Command
+
+## 分类定位
+
+面向文档与知识管理的 command，聚焦于智能分析对话内容，自动识别开发类型，生成结构化的模块说明文档。
+
+## 适用场景
+
+| 场景 | 描述 | 典型输出 |
+| --- | --- | --- |
+| 前端 React 组件文档 | 识别 React 组件开发，注入前端检查清单 | 组件功能说明、设计检查清单 |
+| 后端 NestJS 模块文档 | 识别 NestJS 模块，注入后端架构检查清单 | API 说明、架构检查清单 |
+| 数据库设计文档 | 识别 Prisma 数据库开发 | 数据库设计检查清单 |
+| 工具函数文档 | 识别通用工具函数 | 函数设计检查清单 |
+
+## Context
+
+用户需要生成模块功能说明文档，智能分析对话内容识别开发类型，动态注入对应检查清单和最佳实践。
+
+## Requirements
+
+$ARGUMENTS
+
+## Instructions
+
+### 1. Type Identification
+- 分析对话内容，识别开发类型
+- 匹配关键词，命中 2 个以上即匹配对应类型
+- 支持多类型组合
+
+### 2. Content Injection
+- 根据识别到的类型，从配置中注入对应内容
+- 包括检查清单、代码示例、最佳实践、注意事项
+- 自动去重和合并多类型内容
+
+### 3. Document Generation
+- 生成结构化文档
+- 包含功能概述、技术实现、文件清单、动态章节
+- 添加通用质量检查清单
+
+### 4. Output and Verification
+- 输出文档内容
+- 提供文档路径和识别类型信息
+- 确认文档完整性
+
+## Output Format
+
+Return:
+- Document Summary（文档摘要）
+- Recognized Types（识别的类型）
+- Injected Sections（注入的章节）
+- Document Path（文档路径）
+- Verification Status（验证状态）
+
+---
+
+## 通用模块文档生成命令
 
 **触发**: `/module-doc [可选：模块路径]`
 - `模块路径`（可选）：手动指定模块路径，覆盖自动检测

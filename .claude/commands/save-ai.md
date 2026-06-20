@@ -1,4 +1,59 @@
-# AI 协同结果智能保存命令
+---
+name: save-ai
+description: AI 协同结果智能保存，保存对话过程中的所有开发产出
+---
+
+# Save AI Command
+
+## 分类定位
+
+面向文档与知识管理的 command，聚焦于保存人机协同对话过程中的所有开发产出，包括代码变更、架构决策、问题解决方案等。
+
+## 适用场景
+
+| 场景 | 描述 | 典型输出 |
+| --- | --- | --- |
+| 开发成果保存 | 保存对话过程中的代码变更 | 模块功能文档、协同成果文档、教学总结 |
+| 知识沉淀 | 将开发经验转化为教学素材 | 教学指南、最佳实践文档 |
+| 决策记录 | 记录架构决策和问题解决方案 | 决策文档、问题复盘 |
+
+## Context
+
+用户需要保存人机协同对话过程中的所有开发成果，不依赖 Git 变更检测，基于当前对话上下文进行智能提取和归档。
+
+## Requirements
+
+$ARGUMENTS
+
+## Instructions
+
+### 1. Context Analysis
+- 扫描对话历史，识别核心内容
+- 提取关键信息：模块名称、文件路径、技术问题、架构决策
+- 完整保留用户原始提示词
+
+### 2. Module Path Identification
+- 优先使用用户指定的模块路径
+- 自动识别：从对话中提取文件路径推断模块路径
+- 无法识别时提示用户手动指定
+
+### 3. Document Generation
+- 生成模块功能文档（调用 /module-doc）
+- 生成协同成果文档（记录完整过程）
+- 生成教学总结文档（调用 /teaching-summary）
+
+### 4. Verification and Output
+- 执行强制校验：原始提示词完整性、7维度评判、不足点改进建议、质量评分、成品模板
+- 输出汇总结果，展示所有生成的文档路径
+
+## Output Format
+
+Return:
+- Collaboration Summary（协同摘要）
+- Generated Documents（生成的文档列表）
+- Document Paths（文档路径）
+- Verification Status（验证状态）
+- Next Steps（下一步行动）
 
 ---
 

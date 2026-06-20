@@ -10,11 +10,26 @@ triggers:
   - Git 操作
 ---
 
-# Git 操作助手
+## Purpose
 
 Git Commit 规范参考文件：`.claude/skills/common-commit/SKILL.md`。
 
 当任务涉及 commit message 生成或提交操作时，必须使用 Read 工具读取该文件。
+
+---
+
+## Core Philosophy
+
+## 通用规则
+
+1. **分支命名**: 统一使用 kebab-case 小写格式
+2. **输出语言**: 中文说明，命令保持英文
+3. **安全操作**: 破坏性操作（reset --hard、force push）前必须二次确认
+4. **Co-Author**: 所有提交自动添加 Claude Opus 4.6 作为 Co-Author
+
+---
+
+## Capabilities
 
 ## 核心能力
 
@@ -108,16 +123,27 @@ git checkout -b release/v<版本号>
 
 ---
 
-## 通用规则
-
-1. **分支命名**: 统一使用 kebab-case 小写格式
-2. **输出语言**: 中文说明，命令保持英文
-3. **安全操作**: 破坏性操作（reset --hard、force push）前必须二次确认
-4. **Co-Author**: 所有提交自动添加 Claude Opus 4.6 作为 Co-Author
+## Behavioral Traits
 
 ---
 
-# Completion Checklist
+## Knowledge Base
+
+---
+
+## Response Approach
+
+---
+
+## Output Format
+
+---
+
+## Example Interactions
+
+---
+
+## Completion Checklist
 
 任务完成前，必须在最终回复中输出 `Completion Checklist`。如果某项不适用，必须标记为 `不适用` 并简要说明原因。
 

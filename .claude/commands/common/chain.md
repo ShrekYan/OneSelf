@@ -1,7 +1,60 @@
-# 调用链预演规范
+---
+name: chain
+description: 调用链预演 - 输出执行规划流程图，确认后再执行
+---
 
-**触发**: `/chain <任务描述>`
-**行为**: 不执行任何操作，只输出调用链规划，用流程图展示层级关系，确认后再执行。
+# Chain Command
+
+## 分类定位
+
+面向 API/AI 服务开发的 command，聚焦于调用链规划、执行流程可视化和操作确认机制。
+
+## 适用场景
+
+| 场景 | 描述 | 典型输出 |
+| --- | --- | --- |
+| 任务规划 | 复杂任务的执行流程规划 | 流程图、步骤清单 |
+| MCP 调用预演 | 外部服务调用规划 | MCP 调用链、权限检查 |
+| 多步骤操作 | 多阶段任务的执行顺序 | 步骤序列、文件操作清单 |
+
+## Context
+
+用户需要预演复杂任务的执行流程，输出调用链规划，确认后再执行实际操作。
+
+## Requirements
+
+$ARGUMENTS
+
+## Instructions
+
+### 1. Task Analysis
+- 解析任务描述
+- 识别所需工具和 Agent
+- 确定执行顺序
+
+### 2. Call Chain Planning
+- 构建调用链流程图
+- 定义步骤依赖关系
+- 识别文件操作
+
+### 3. Visualization
+- 生成 Mermaid 流程图
+- 创建步骤表格
+- 列出文件操作清单
+
+### 4. Confirmation
+- 输出规划结果
+- 等待用户确认
+- 提供执行/取消选项
+
+## Output Format
+
+Return:
+- Task Summary（任务摘要）
+- Flowchart（流程图）
+- Steps Table（步骤表格）
+- File Operations（文件操作清单）
+- Confirmation Prompt（确认提示）
 
 ---
 
