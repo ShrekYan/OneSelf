@@ -5,43 +5,10 @@
 
 ### 🔴 核心架构决策（自动加载）
 
-#### 后端架构决策
-本项目所有后端架构决策已固化在 @.claude/DECISIONS.md，包括：
-- 认证安全：HttpOnly Cookie、Argon2id 密码加密
-- 数据库规范：Prisma PascalCase 命名、BigInt 时间戳
-- 微服务边界：auth-service / backend / log-service 职责划分
-- 性能优化：Redis 缓存、响应压缩、连接重试策略
-- 异常处理：三层过滤器、统一响应格式
+@.claude/TECH-DECISIONS.md
+@.claude/BUSINESS-DECISIONS.md
 
-#### 前端架构决策
-本项目所有前端架构决策已固化在 @.claude/FRONTEND-DECISIONS.md，包括：
-- 技术栈：React 19 + Vite + TypeScript + MobX + Ant Design Mobile
-- 状态管理：MobX 双轨架构 + useObserver Hook
-- 页面架构：5 文件标准拆分模式（index/useStore/handle/constant/types）
-- 样式方案：SCSS + CSS Modules + 设计令牌体系
-- 路由架构：React Router v6 模块化 + KeepAlive + 路由守卫
-- API 架构：Axios 分层封装 + RequestCache + HttpOnly Cookie
-- 导入规范：@/ 别名 + 统一导入排序
-
-#### 前端业务决策
-本项目前端业务决策已固化在 @.claude/FRONTEND-BUSINESS-DECISIONS.md，包括：
-- 前端定位：移动端内容消费与互动入口，不作为业务事实源
-- 页面职责：首页、发现、搜索、文章列表、文章详情、个人中心的业务边界
-- 认证体验：HttpOnly Cookie 登录态、redirect 回跳、用户信息展示缓存
-- 互动规则：点赞以后端返回校准，收藏/评论当前为预留或未闭环能力
-- 缓存边界：分类、热门词可短期缓存，权限和写操作结果不得仅依赖缓存
-- 遗留识别：product、transactionRecord 等非博客核心业务暂不作为新增模板
-
-#### 后端业务决策
-本项目后端业务决策已固化在 @.claude/BACKEND-BUSINESS-DECISIONS.md，包括：
-- 服务业务边界：auth-service 负责认证，backend 负责内容主业务，log-service 负责日志审计
-- 认证规则：手机号账号、注册即登录、Refresh Token 会话事实源、introspect 统一校验
-- 用户资料：认证字段与展示字段隔离，对外 DTO 禁止泄露密码、Token 等敏感字段
-- 内容规则：公开列表只返回已发布文章，特色文章必须置顶且已发布
-- 互动一致性：点赞使用用户-文章唯一关系，关系记录和计数必须事务一致
-- 待治理项：Users 模型重复、backend auth 遗留、详情空对象语义、logout Token 日志风险
-
-**Claude 每次启动会通过 `@path` 官方引用方式加载以上文件，请严格遵守所有已确认的架构决策与业务决策。**
+**以上决策文件通过 `@path` 引用方式在 Claude Code 启动时自动加载，请严格遵守所有已确认的架构决策与业务决策。**
 
 ---
 
