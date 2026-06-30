@@ -85,10 +85,10 @@ Interceptor = 高阶组件（HOC）
 
 ```
 ✅ 异常冒泡机制：
-Controller 抛出异常
+NestJS 全局过滤器捕获
+ → Controller 抛出异常
   → Service 抛出异常
-    → 向上冒泡
-      → NestJS 全局过滤器捕获
+      
 
 ✅ 洋葱圈模型：
 请求 → Middleware → Guard → Interceptor → Pipe → Controller

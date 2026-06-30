@@ -66,8 +66,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/contracts/cli/post-edit-check.js",
-            "onFailure": "notify"
+            "command": "node .claude/contracts/cli/post-edit-check.js"
           }
         ]
       }
@@ -75,7 +74,9 @@
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": false,
-    "security-guidance@claude-plugins-official": true
+    "security-guidance@claude-plugins-official": false,
+    "document-skills@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true
   },
   "language": "chinese",
   "alwaysThinkingEnabled": true,
