@@ -8,38 +8,38 @@
 flowchart TB
     REQ[HTTP 请求到达]
 
-    subgraph 中间件层 Middleware
-        CORS[CORS 中间件<br/>跨域处理]
-        REQLOG[RequestLogMiddleware<br/>请求日志记录]
-        JWT[JwtParseMiddleware<br/>Cookie Token 解析]
+    subgraph "中间件层"
+        CORS["CORS 中间件<br/>跨域处理"]
+        REQLOG["RequestLogMiddleware<br/>请求日志记录"]
+        JWT["JwtParseMiddleware<br/>Cookie Token 解析"]
     end
 
-    subgraph 守卫层 Guard
-        AUTH[AuthGuard<br/>认证检查]
-        ROLE[RolesGuard<br/>权限检查]
+    subgraph "守卫层"
+        AUTH["AuthGuard<br/>认证检查"]
+        ROLE["RolesGuard<br/>权限检查"]
     end
 
-    subgraph 拦截器层 Interceptor
-        TRANS[TransformInterceptor<br/>响应统一包装]
-        RESLOG[ResponseLogInterceptor<br/>响应日志记录]
-        COMP[CompressionInterceptor<br/>响应压缩]
+    subgraph "拦截器层"
+        TRANS["TransformInterceptor<br/>响应统一包装"]
+        RESLOG["ResponseLogInterceptor<br/>响应日志记录"]
+        COMP["CompressionInterceptor<br/>响应压缩"]
     end
 
-    subgraph 管道层 Pipe
-        VALID[ValidationPipe<br/>DTO 自动验证]
-        PARSE[ParseIntPipe 等<br/>类型转换]
+    subgraph "管道层"
+        VALID["ValidationPipe<br/>DTO 自动验证"]
+        PARSE["ParseIntPipe 等<br/>类型转换"]
     end
 
-    subgraph 业务层
-        CTRL[Controller]
-        SVC[Service]
-        REPO[Repository / Prisma]
+    subgraph "业务层"
+        CTRL["Controller"]
+        SVC["Service"]
+        REPO["Repository / Prisma"]
     end
 
-    subgraph 过滤器层 Filter（异常路径）
-        BIZ[BusinessExceptionFilter]
-        PRISMA[PrismaExceptionFilter]
-        ALL[AllExceptionsFilter]
+    subgraph "过滤器层-异常路径"
+        BIZ["BusinessExceptionFilter"]
+        PRISMA["PrismaExceptionFilter"]
+        ALL["AllExceptionsFilter"]
     end
 
     REQ --> CORS --> REQLOG --> JWT
@@ -48,15 +48,14 @@ flowchart TB
     COMP --> VALID --> PARSE
     PARSE --> CTRL --> SVC --> REPO
 
-    REPO --> DB[(数据库)]
+    REPO --> DB[("数据库")]
 
     CTRL -->|异常| BIZ -->|非业务| PRISMA -->|其他| ALL
-    ALL --> RESP[返回响应]
+    ALL --> RESP["返回响应"]
 
-    note over 中间件层,过滤器层 "NestJS 洋葱圈模型
-请求按顺序经过各层
-响应按反序返回
-异常逆序冒泡到 Filter"
+    Note["📌 NestJS 洋葱圈模型\n• 请求按顺序经过各层\n• 响应按反序返回\n• 异常逆序冒泡到 Filter"]
+
+    style Note fill:#f9f9f9,stroke:#ccc,stroke-width:1px,color:#666
 ```
 
 ---

@@ -38,10 +38,7 @@ sequenceDiagram
         S->>S: 验证密码...后续流程相同
     end
 
-    note over R,DB "设计目标：
-99% 的请求走 Redis 命中
-只有新用户/冷启动才查 DB
-单实例支撑 600-1000 QPS"
+    note over R,DB: 设计目标：99% 的请求走 Redis 命中，只有新用户/冷启动才查 DB，单实例支撑 600-1000 QPS
 ```
 
 ---
