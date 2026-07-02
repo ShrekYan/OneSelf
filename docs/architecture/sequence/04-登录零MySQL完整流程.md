@@ -10,35 +10,57 @@ sequenceDiagram
     participant C as 客户端
     participant Ctrl as AuthController
     participant S as AuthService
+    participant UL as UserLoaderService
     participant Sync as UserSyncService
+    participant PV as PasswordValidationService
     participant Pwd as PasswordCacheService
+    participant TG as TokenGeneratorService
     participant RT as RefreshTokenRedisService
     participant R as Redis
     participant DB as MySQL
 
     C->>Ctrl: POST /auth/login {username, password}
-    Ctrl->>S: login(username, password)
+    Ctrl->>S: login(username, password, clientIp)
 
-    S->>Sync: getUserKey(username) 获取带版本的 Key
+    S->>UL: loadUser(username) 加载用户
+    UL->>Sync: getUserKey(username) 获取带版本的 Key
     Sync->>R: GET user:full:v{ver}:{username}
 
-    alt Redis 缓存命中 ✅
-        R-->>S: 返回完整用户 JSON
-        S->>S: argon2.verify(password, 密码哈希)
-        S->>S: 生成 accessToken (2h) + refreshToken (7d)
-        S->>RT: saveRefreshToken(token, userId, ip)
-        RT->>R: SET refresh:token:{token}
-        S-->>Ctrl: 返回成功 + Set-Cookie
-        Ctrl-->>C: 200 OK（整个过程零 MySQL 查询）
-    else 缓存未命中
-        R-->>S: null
-        S->>DB: SELECT * FROM users WHERE username = ?
-        DB-->>S: 返回用户数据
-        S->>Sync: syncSingleUserToRedis(user) 补缓存
-        S->>S: 验证密码...后续流程相同
+    alt Redis 预加载缓存命中 ✅
+        R-->>UL: 返回完整用户 JSON
+        UL-->>S: 返回用户数据 + userFromDb=false
+    else 缓存未命中（新用户/冷启动）
+        R-->>UL: null
+        UL->>DB: SELECT * FROM users WHERE username = ?
+        DB-->>UL: 返回用户数据
+        UL->>Sync: syncSingleUserToRedis(username, user) 补缓存
+        UL-->>S: 返回用户数据 + userFromDb=true
     end
 
-    note over R,DB: 设计目标：99% 的请求走 Redis 命中，只有新用户/冷启动才查 DB，单实例支撑 600-1000 QPS
+    S->>S: 检查用户状态 is_active
+    S->>PV: validatePassword(password, user)
+    PV->>PV: argon2.verify 或 bcrypt.compare
+    PV-->>S: 密码验证结果
+
+    alt 密码验证失败 ❌
+        PV->>PV: handleLoginFailure(user)
+        S-->>Ctrl: 抛出 AUTH_INVALID_CREDENTIALS 异常
+        Ctrl-->>C: 401 用户名或密码错误
+    else 密码验证成功 ✅
+        S->>PV: processValidPassword(user, userFromDb, clientIp)
+        PV->>Pwd: setPasswordCache(username, hash) 缓存密码
+        PV->>PV: startSilentMigration(user, password) 静默迁移
+        S->>TG: generateAndSaveTokens(userId, clientIp)
+        TG->>TG: 生成 accessToken (2h) + refreshToken (7d)
+        TG->>RT: saveRefreshToken(token, userId, expiresAt, clientIp)
+        RT->>R: SET refresh:token:{token} + SADD refresh:user:{userId}
+        TG-->>S: 返回 tokens + expiresIn
+        S->>S: buildUserDto(user) 构建用户 DTO
+        S-->>Ctrl: 返回 LoginResponseDto + Set-Cookie
+        Ctrl-->>C: 200 OK（99% 请求零 MySQL 查询）
+    end
+
+    note over R,DB: 设计目标：预加载缓存命中率 > 95%，单实例支撑 600-1000 QPS，密码验证 ~8-10ms
 ```
 
 ---
@@ -142,6 +164,13 @@ USER_PRELOAD_ENABLED = false
 2. 立刻删 Redis 里的用户缓存
 → 下次登录就会重新加载，看到最新状态
 
+✅ 静默密码迁移（bcrypt → argon2id）：
+1. 用户登录时验证成功
+2. 检查 password_algorithm 是否为 bcrypt
+3. 如果是，异步执行迁移（不阻塞响应）
+4. 更新 MySQL + 更新 Redis 缓存
+5. 下次登录使用新算法验证
+
 ✅ 最终一致性兜底：
 就算写 Redis 失败了也没关系
 Redis Key 有 7 天 TTL
@@ -165,8 +194,9 @@ Redis Key 有 7 天 TTL
    - 性能可提升 2-3 倍
 
 2. 密码哈希缓存
-   - 相同密码 + 相同盐 → 结果相同
-   - 可以缓存最近 1 小时的验证结果
+   - 验证成功后缓存密码哈希到 Redis（TTL: 1h）
+   - 下次登录优先使用缓存验证
+   - 降低 CPU 消耗，性能提升 5-10 倍
    - 暴力破解的场景会撞库攻击 → 1 分钟内 1 2 次相同密码
    - 性能再提升 2-10 倍（取决于重复率
 
@@ -182,16 +212,73 @@ Redis Key 有 7 天 TTL
 过早优化是万恶之源
 ```
 
+### 6. 为什么需要 UserLoaderService？它和 UserSyncService 的职责区别？
+
+```
+✅ 职责分离设计：
+
+UserSyncService（数据同步层）
+- 负责用户数据在 Redis 中的存储和版本管理
+- 全量同步：syncAllUsersToRedis()
+- 单个同步：syncSingleUserToRedis()
+- 删除用户：deleteUserFromRedis()
+- 获取 Key：getUserKey()
+- 不关心业务逻辑，只管数据同步
+
+UserLoaderService（业务加载层）
+- 负责根据业务需求加载用户数据
+- 优先从缓存加载（调用 UserSyncService）
+- 缓存未命中时回源 DB（降级）
+- 自动回填缓存（调用 UserSyncService）
+- 返回统一接口 LoadedUser
+- 包含业务逻辑：缓存未命中处理、用户不存在异常
+
+💡 设计好处：
+- 职责清晰：同步归同步，加载归加载
+- 易于测试：可以 mock UserSyncService
+- 易于扩展：未来可以加其他加载策略
+```
+
+### 7. Token 生成为什么需要单独的 TokenGeneratorService？
+
+```
+✅ TokenGeneratorService 的职责：
+
+1. 封装 JWT 生成逻辑
+   - generateAccessToken(userId, deviceId)
+   - generateRefreshToken(userId, deviceId)
+   - 统一管理 JWT 密钥和过期时间
+
+2. 封装 Token 保存逻辑
+   - generateAndSaveTokens(userId, clientIp)
+   - 调用 RefreshTokenRedisService 保存刷新令牌
+
+3. 构建用户 DTO
+   - buildUserDto(user)
+   - 统一用户响应格式
+
+💡 设计好处：
+- 单一职责：AuthService 只管认证流程，不管 Token 怎么生成
+- 易于修改：要换 JWT 库或改 Token 结构，只改一个地方
+- 易于复用：其他服务需要生成 Token 时可以直接复用
+```
+
 ---
 
 ## 🔗 对应代码位置
 
-| 组件                     | 路径                                                       |
-| ------------------------ | ---------------------------------------------------------- |
-| UserSyncService          | `services/backend/src/users/user-sync.service.ts`          |
-| PasswordCacheService     | `services/backend/src/users/password-cache.service.ts`     |
-| RefreshTokenRedisService | `services/backend/src/auth/refresh-token-redis.service.ts` |
-| AuthService              | `services/backend/src/auth/auth.service.ts`                |
+| 组件                     | 路径                                                           |
+| ------------------------ | -------------------------------------------------------------- |
+| AuthController           | `services/auth-service/src/auth/auth.controller.ts`               |
+| AuthService              | `services/auth-service/src/auth/auth.service.ts`                |
+| UserLoaderService        | `services/auth-service/src/auth/user-loader.service.ts`          |
+| UserSyncService          | `services/auth-service/src/users/user-sync.service.ts`          |
+| PasswordValidationService | `services/auth-service/src/auth/password-validation.service.ts` |
+| PasswordCacheService     | `services/auth-service/src/auth/password-cache.service.ts`       |
+| TokenGeneratorService    | `services/auth-service/src/auth/token-generator.service.ts`     |
+| RefreshTokenRedisService | `services/auth-service/src/auth/refresh-token-redis.service.ts` |
+| PrismaService (Users)   | `services/auth-service/src/prisma/prisma.service.ts`           |
+| RedisService             | `services/auth-service/src/redis/redis.service.ts`             |
 
 ---
 
@@ -202,3 +289,8 @@ Redis Key 有 7 天 TTL
 - [ ] 能说出三级降级方案分别是什么
 - [ ] 能解释用户改密码时的缓存一致性保证
 - [ ] 能说出当前方案的性能瓶颈和 3 个进一步优化方向
+- [ ] 能解释 UserLoaderService 和 UserSyncService 的职责区别
+- [ ] 能说出密码验证的完整流程（PasswordValidationService 的作用）
+- [ ] 能解释静默密码迁移的原理（bcrypt → argon2id）
+- [ ] 能说出 Token 生成的完整流程（TokenGeneratorService 的作用）
+- [ ] 能解释 RefreshToken 在 Redis 中的存储结构（token key + user tokens set）
