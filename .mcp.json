@@ -6,18 +6,11 @@
     },
     "playwright": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest",
-        "--headless"
-      ]
+      "args": ["-y", "@playwright/mcp@latest", "--headless"]
     },
     "context7": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp@latest"
-      ]
+      "args": ["-y", "@upstash/context7-mcp@latest"]
     },
     "pixso": {
       "type": "http",
@@ -26,14 +19,14 @@
     },
     "apifox": {
       "command": "npx",
-      "args": [
-        "-y",
-        "apifox-mcp-server@latest",
-        "--project-id=8010949"
-      ],
+      "args": ["-y", "apifox-mcp-server@latest", "--project-id=8010949"],
       "env": {
         "APIFOX_ACCESS_TOKEN": "MXwyODEyOTQ2MXwzMmZlZjhmMA"
       }
+    },
+    "codegraph": {
+      "command": "codegraph",
+      "args": ["mcp"]
     }
   }
 }
