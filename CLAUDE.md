@@ -173,8 +173,9 @@ auth-service (认证) ←→ backend (主业务) ←→ log-service (日志)
 - `subagent_type`：下方表格中列的 Agent 名称
 
 ### 前端相关
-| 用户输入特征 | 自动使用 Agent |
+| 用户输入特征 | 自动使用 方式 |
 |-------------|---------------|
+| Figma 设计稿转代码、Figma 转 H5 页面/组件、Figma URL 转 React 代码 | `Skill` 工具调用 `figma-to-code` skill（skill 位于 `.claude/skills/figma-to-code/SKILL.md`，user-invocable，可通过 `/figma-to-code` 直接触发） |
 | 开发前端页面、组件、API、Hook | `frontend-developer` |
 | 审查前端代码质量 | `frontend-code-reviewer` |
 | 前端性能问题分析、优化 | `frontend-performance-expert` |
