@@ -30,6 +30,13 @@
         "serve",
         "--mcp"
       ]
+    },
+    "my-mcp": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/Users/yanjinqiang/WebstormProjects/claude/services/mcp-server/src/stdio.ts"
+      ]
     }
   }
 }
