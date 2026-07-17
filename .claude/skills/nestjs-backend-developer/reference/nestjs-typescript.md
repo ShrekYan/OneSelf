@@ -14,6 +14,27 @@
 
 ---
 
+## 0. 后端文件命名规范
+
+> **通用命名规范**：见 `.claude/rules/200-naming.md`，本文件仅定义后端特有规范。
+
+- DTO 文件：`{name}.dto.ts`（如 `CreateUserDto`、`UpdateUserDto`）
+- Controller 文件：`{name}.controller.ts`（类名以 `Controller` 结尾）
+- Service 文件：`{name}.service.ts`（类名以 `Service` 结尾）
+- Module 文件：`{name}.module.ts`（类名以 `Module` 结尾）
+- Entity 文件：`{name}.entity.ts`（TypeORM 使用）
+- Guard 文件：`{name}.guard.ts`
+- Pipe 文件：`{name}.pipe.ts`
+- Exception 文件：`{name}.exception.ts`
+
+**类命名规范**：
+- Controller：`{Resource}Controller`（如 `UsersController`）
+- Service：`{Resource}Service`（如 `UsersService`）
+- Module：`{Resource}Module`（如 `UsersModule`）
+- DTO：`{Action}{Resource}Dto`（如 `CreateUserDto`、`UpdateUserDto`）
+
+---
+
 ## 1. 基础类型声明规范
 
 ### type vs interface vs class 选择
