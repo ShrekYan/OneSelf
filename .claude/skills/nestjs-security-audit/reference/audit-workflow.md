@@ -31,5 +31,5 @@
 
 ### 安全规范
 
-- [安全通用规范](../../rules/security-common.md)
+- [安全规范](../../rules/400-security.md)
 - [后端安全认证规范](../nestjs-backend-developer/11-security-authentication.md)

@@ -322,10 +322,10 @@ NestJS 后端开发规范已通过 frontmatter `skills: nestjs-backend-developer
 开始任何后端设计或开发任务前，必须使用 Read 工具读取以下项目规则与决策文件：
 
 - [后端架构决策](../DECISIONS.md)
-- [TypeScript 通用规范](../rules/typescript-common.md)
-- [安全通用规范](../rules/security-common.md)
-- [代码格式通用规范](../rules/code-format-common.md)
-- [项目整体行为规范](../rules/project-behavior.md)
+- [技术栈规范](../rules/100-tech-stack.md)
+- [安全规范](../rules/400-security.md)
+- [代码格式规范](../rules/300-code-format.md)
+- [禁止事项](../rules/000-forbidden.md)
 
 按 `nestjs-backend-developer` Skill 的 Additional resources 读取与当前任务相关的 supporting files。
 

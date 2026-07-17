@@ -1,6 +1,6 @@
 # NestJS TypeScript 开发规范（后端特有）
 
-> **通用 TypeScript 规范**：已抽离至 `.claude/rules/typescript-common.md`，本文件仅定义后端特有规范。
+> **通用 TypeScript 规范**：已抽离至 `.claude/rules/100-tech-stack.md`，本文件仅定义后端特有规范。
 
 ---
 
@@ -188,7 +188,7 @@ model User {
 
 ### 密码加密规范
 
-**通用安全规范**：见 `.claude/rules/security-common.md`
+**通用安全规范**：见 `.claude/rules/400-security.md`
 
 - **必须使用 Argon2id 算法**（通过 `argon2` 包）
 - ❌ **不再使用 bcrypt**：抗 GPU/ASIC 攻击能力弱

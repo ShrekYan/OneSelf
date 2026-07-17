@@ -1,6 +1,6 @@
 # 10 - 代码格式与工具链规范（NestJS 后端特有）
 
-> **通用代码格式规范**：已抽离至 `.claude/rules/code-format-common.md`，本文件仅定义后端特有规范。
+> **通用代码格式规范**：已抽离至 `.claude/rules/300-code-format.md`，本文件仅定义后端特有规范。
 
 ---
 
@@ -32,7 +32,7 @@
 
 ## 3. Prettier 配置
 
-**通用配置**：见 `.claude/rules/code-format-common.md`
+**通用配置**：见 `.claude/rules/300-code-format.md`
 
 项目配置：
 ```json
@@ -50,7 +50,7 @@
 
 ## 4. 导入排序（后端特有）
 
-**通用原则**：见 `.claude/rules/code-format-common.md`
+**通用原则**：见 `.claude/rules/300-code-format.md`
 
 导入按以下顺序分组，每组之间空一行。同一组内按字母顺序排列。
 

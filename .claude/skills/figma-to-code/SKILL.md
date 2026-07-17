@@ -70,7 +70,7 @@ user-invocable: true
 2. **拉取上下文**：按 [reference/figma-context-fetch.md](reference/figma-context-fetch.md) 使用 Figma MCP 获取节点数据
 3. **判断路由**：
    - 产出物是页面 → 加载 [../h5-frontend-developer/reference/page-directory-structure.md](../h5-frontend-developer/reference/page-directory-structure.md)
-   - 产出物是组件 → 加载 [../../rules/frontend-components.md](../../rules/frontend-components.md)
+   - 产出物是组件 → 加载 [../../rules/200-naming.md](../../rules/200-naming.md)
 4. **资产处理（若 Figma 节点含图片/图标）**：按 [reference/asset-handling.md](reference/asset-handling.md) 处理资产下载和落地
 5. **Token 提取（按需）**：若涉及颜色/字号/间距 token，按 [reference/design-token-mapping.md](reference/design-token-mapping.md) 处理
 6. **布局转换**：按 [reference/layout-to-react.md](reference/layout-to-react.md) 把 Figma 层级转成 React JSX 结构
@@ -84,11 +84,11 @@ user-invocable: true
 
 在执行任何任务前，先阅读以下通用规则：
 
-- [TypeScript 通用规范](../../rules/typescript-common.md)
-- [代码格式通用规范](../../rules/code-format-common.md)
-- [项目行为规范](../../rules/project-behavior.md)
+- [技术栈规范](../../rules/100-tech-stack.md)
+- [代码格式规范](../../rules/300-code-format.md)
+- [禁止事项](../../rules/000-forbidden.md)
 - [前端项目信息](../../projects/frontend-project-info.md)
-- [公共组件开发规范](../../rules/frontend-components.md)
+- [命名规范](../../rules/200-naming.md)
 
 ### Figma 专项参考
 
@@ -105,7 +105,7 @@ user-invocable: true
 | 产出物类型 | 委托文档 |
 |-----------|---------|
 | 页面 | [../h5-frontend-developer/reference/page-directory-structure.md](../h5-frontend-developer/reference/page-directory-structure.md) |
-| 组件 | [../../rules/frontend-components.md](../../rules/frontend-components.md) |
+| 组件 | [../../rules/200-naming.md](../../rules/200-naming.md) |
 | 接口对接 | [../h5-frontend-developer/reference/rules/frontend-api-design.md](../h5-frontend-developer/reference/rules/frontend-api-design.md) |
 
 ### 示例

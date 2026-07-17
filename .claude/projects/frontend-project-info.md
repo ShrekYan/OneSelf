@@ -71,7 +71,7 @@ apps/web/src/
 - **Hooks 与错误处理**: [Hooks 与错误处理规范](../skills/h5-frontend-developer/rules/frontend-hooks-error-handling.md)
 - **静态资源规范**: [静态资源规范](../skills/h5-frontend-developer/rules/frontend-assets-resources.md)
 - **第三方库规范**: [第三方库规范](../skills/h5-frontend-developer/rules/frontend-third-party-libraries.md)
-- **公共组件规范**: [公共组件开发规范](../rules/frontend-components.md)
+- **命名规范**: [命名规范](../rules/200-naming.md)
 - **代码审查清单**: [前端代码审查命令](../commands/frontend-code-review.md)
 - **提交规范**: [commitlint.config.js](../../commitlint.config.js)
 

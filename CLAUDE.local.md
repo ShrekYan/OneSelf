@@ -1,17 +1,17 @@
-# 核心架构决策（自动加载）
+# 核心架构决策（按需读取）
 
 ## 决策文件清单
 
 | 决策类型 | 文件路径 | 说明 |
 |---------|---------|------|
-| 技术决策 | @.claude/TECH-DECISIONS.md | 后端架构决策（ADR-001 ~ ADR-020）+ 前端架构决策（FADR-001 ~ FADR-018） |
-| 业务决策 | @.claude/BUSINESS-DECISIONS.md | 前端业务决策（FBDR-001 ~ FBDR-015）+ 后端业务决策（BBDR-001 ~ BBDR-031） |
-| 后端业务决策 | @.claude/BACKEND-BUSINESS-DECISIONS.md | backend / auth-service / log-service 业务规则 |
-| 前端业务决策 | @.claude/FRONTEND-BUSINESS-DECISIONS.md | apps/web H5 业务规则 |
-| 后端技术决策 | @.claude/BACKEND-DECISIONS.md | 后端架构决策原始文件 |
-| 前端技术决策 | @.claude/FRONTEND-DECISIONS.md | 前端架构决策原始文件 |
+| 技术决策 | .claude/TECH-DECISIONS.md | 后端架构决策（ADR-001 ~ ADR-020）+ 前端架构决策（FADR-001 ~ FADR-018） |
+| 业务决策 | .claude/BUSINESS-DECISIONS.md | 前端业务决策（FBDR-001 ~ FBDR-015）+ 后端业务决策（BBDR-001 ~ BBDR-031） |
+| 后端业务决策 | .claude/BACKEND-BUSINESS-DECISIONS.md | backend / auth-service / log-service 业务规则 |
+| 前端业务决策 | .claude/FRONTEND-BUSINESS-DECISIONS.md | apps/web H5 业务规则 |
+| 后端技术决策 | .claude/BACKEND-DECISIONS.md | 后端架构决策原始文件 |
+| 前端技术决策 | .claude/FRONTEND-DECISIONS.md | 前端架构决策原始文件 |
 
-**以上决策文件通过 `@path` 引用方式在 Claude Code 启动时自动加载，请严格遵守所有已确认的架构决策与业务决策。**
+**以上决策文件不再通过 `@path` 自动加载，必须在涉及架构或业务判断时按需读取，请严格遵守所有已确认的架构决策与业务决策。**
 
 ## 按需读取规则
 

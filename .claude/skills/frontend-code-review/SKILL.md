@@ -52,7 +52,7 @@ license: Complete terms in LICENSE.txt
 - [Frontend hooks TS](../h5-frontend-developer/rules/frontend-hooks-ts.md)
 - [Frontend hooks error handling](../h5-frontend-developer/rules/frontend-hooks-error-handling.md)
 - [Frontend third-party libraries](../h5-frontend-developer/rules/frontend-third-party-libraries.md)
-- [Frontend components](../../rules/frontend-components.md)
+- [Naming conventions](../../rules/200-naming.md)
 
 ## Output Format
 

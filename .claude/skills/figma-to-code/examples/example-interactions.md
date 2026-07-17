@@ -29,7 +29,7 @@
 
 1. 前置确认：提取 Figma URL、产出物类型（组件）、产出物地址
 2. 拉取上下文：读取 [reference/figma-context-fetch.md](../reference/figma-context-fetch.md)，调用 Figma MCP
-3. 路由到组件规范：读取 [../../rules/frontend-components.md](../../../rules/frontend-components.md)
+3. 路由到组件规范：读取 [../../rules/200-naming.md](../../../rules/200-naming.md)
 4. 按组件目录结构落地代码
 
 ---

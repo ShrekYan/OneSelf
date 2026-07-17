@@ -34,10 +34,10 @@ triggers:
 前端代码审查规范已通过 frontmatter `skills: frontend-code-review` 预加载。
 
 审查前必须读取的核心规范文件：
-- [公共组件开发规范](../rules/frontend-components.md)
-- [TypeScript 通用规范](../rules/typescript-common.md)
-- [代码格式通用规范](../rules/code-format-common.md)
-- [安全通用规范](../rules/security-common.md)
+- [命名规范](../rules/200-naming.md)
+- [技术栈规范](../rules/100-tech-stack.md)
+- [代码格式规范](../rules/300-code-format.md)
+- [安全规范](../rules/400-security.md)
 
 ## Completion Checklist
 

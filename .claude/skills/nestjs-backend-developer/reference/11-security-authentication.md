@@ -1,6 +1,6 @@
 # 11 - 安全认证规范（NestJS 后端特有）
 
-> **通用安全规范**：已抽离至 `.claude/rules/security-common.md`，本文件仅定义后端特有规范。
+> **通用安全规范**：已抽离至 `.claude/rules/400-security.md`，本文件仅定义后端特有规范。
 
 ---
 
@@ -14,7 +14,7 @@
 
 ## 1. HttpOnly Cookie 安全策略（后端特有）
 
-**通用安全规范**：见 `.claude/rules/security-common.md`
+**通用安全规范**：见 `.claude/rules/400-security.md`
 
 ### 1.1 启用 Cookie Parser
 
@@ -196,7 +196,7 @@ export class RemoteJwtAuthGuard implements CanActivate {
 
 ## 4. 密码加密规范
 
-**通用安全规范**：见 `.claude/rules/security-common.md`
+**通用安全规范**：见 `.claude/rules/400-security.md`
 
 ### 4.1 算法选择
 

@@ -79,14 +79,14 @@ H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 开始任何前端开发任务前，必须使用 Read 工具读取以下项目规则与决策文件：
 
 - [前端架构决策](../FRONTEND-DECISIONS.md)
-- [TypeScript 通用规范](../rules/typescript-common.md)
-- [安全通用规范](../rules/security-common.md)
-- [代码格式通用规范](../rules/code-format-common.md)
-- [项目整体行为规范](../rules/project-behavior.md)
+- [技术栈规范](../rules/100-tech-stack.md)
+- [安全规范](../rules/400-security.md)
+- [代码格式规范](../rules/300-code-format.md)
+- [禁止事项](../rules/000-forbidden.md)
 
 涉及公共组件时，额外读取：
 
-- [公共组件开发规范](../rules/frontend-components.md)
+- [命名规范](../rules/200-naming.md)
 
 按 `h5-frontend-developer` Skill 的 Additional resources 读取与当前任务相关的 supporting files。
 
@@ -97,11 +97,11 @@ H5 前端开发规范已通过 frontmatter `skills: h5-frontend-developer` 预�
 - `CLAUDE.md` - 项目核心开发指南
 - `.claude/skills/h5-frontend-developer/SKILL.md` - H5 开发 Skill 入口
 - `.claude/skills/h5-frontend-developer/` - H5 开发 supporting files
-- `.claude/rules/typescript-common.md` - TypeScript 通用规范
-- `.claude/rules/security-common.md` - 安全通用规范
-- `.claude/rules/code-format-common.md` - 代码格式通用规范
-- `.claude/rules/project-behavior.md` - 项目整体行为规范
-- `.claude/rules/frontend-components.md` - 公共组件规范（涉及公共组件时读取）
+- `.claude/rules/100-tech-stack.md` - 技术栈规范
+- `.claude/rules/400-security.md` - 安全规范
+- `.claude/rules/300-code-format.md` - 代码格式规范
+- `.claude/rules/000-forbidden.md` - 禁止事项
+- `.claude/rules/200-naming.md` - 命名规范（涉及公共组件时读取）
 - `.claude/skills/frontend-code-review/SKILL.md` - 前端代码审查清单
 - `commitlint.config.js` - Git 提交信息规范
 

@@ -5,7 +5,7 @@ pattern: ./apps/web/src/**/*.{ts,tsx}
 
 # 前端 TypeScript 规范（React 特有）
 
-> **通用 TypeScript 规范**：已抽离至 `.claude/rules/typescript-common.md`，本文件仅定义前端特有规范。
+> **通用 TypeScript 规范**：已抽离至 `.claude/rules/100-tech-stack.md`，本文件仅定义前端特有规范。
 
 ---
 

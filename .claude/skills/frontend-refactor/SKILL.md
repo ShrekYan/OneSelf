@@ -63,9 +63,9 @@ license: Complete terms in LICENSE.txt
 
 在执行任何任务前，先阅读以下通用规则：
 
-- [TypeScript 通用规范](../../rules/typescript-common.md)
-- [代码格式通用规范](../../rules/code-format-common.md)
-- [项目行为规范](../../rules/project-behavior.md)
+- [技术栈规范](../../rules/100-tech-stack.md)
+- [代码格式规范](../../rules/300-code-format.md)
+- [禁止事项](../../rules/000-forbidden.md)
 
 ### 前端专项规范
 

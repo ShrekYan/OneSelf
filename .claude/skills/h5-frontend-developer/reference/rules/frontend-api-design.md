@@ -5,7 +5,7 @@ pattern: ./apps/web/src/api/**/*
 
 # 前端 API 设计规范
 
-> **通用安全规范**：已抽离至 `.claude/rules/security-common.md`，本文件仅定义前端 API 特有规范。
+> **通用安全规范**：已抽离至 `.claude/rules/400-security.md`，本文件仅定义前端 API 特有规范。
 
 ---
 
@@ -196,7 +196,7 @@ defaultApi.yourModule = yourModuleApi;
 
 ## 🔒 HttpOnly Cookie 前端约束（强制）
 
-**通用安全规范**：见 `.claude/rules/security-common.md`
+**通用安全规范**：见 `.claude/rules/400-security.md`
 
 ### 前端特有约束
 

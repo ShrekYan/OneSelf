@@ -32,7 +32,7 @@ triggers:
 安全审计技能已通过 frontmatter `skills: frontend-security-audit` 预加载。
 
 审计前必须读取的核心规范文件：
-- [安全通用规范](../rules/security-common.md)
+- [安全规范](../rules/400-security.md)
 
 ## Completion Checklist
 
