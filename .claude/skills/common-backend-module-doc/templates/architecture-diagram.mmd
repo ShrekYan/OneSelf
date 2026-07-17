@@ -1,0 +1,25 @@
+flowchart TD
+    subgraph "Controller 层"
+        C[ModuleController<br/>HTTP 接口层]:::controller
+    end
+
+    subgraph "Service 层"
+        S[ModuleService<br/>业务逻辑层]:::service
+    end
+
+    subgraph "Repository 层"
+        R[(ModuleRepository<br/>数据访问层)]:::repository
+    end
+
+    subgraph "持久化层"
+        DB[(Prisma<br/>数据库)]:::database
+    end
+
+    C --> S
+    S --> R
+    R --> DB
+
+    classDef controller fill:#fcc,stroke:#333,stroke-width:2px
+    classDef service fill:#cfc,stroke:#333,stroke-width:2px
+    classDef repository fill:#ccf,stroke:#333,stroke-width:2px
+    classDef database fill:#f9f,stroke:#333,stroke-width:2px

@@ -1,102 +1,32 @@
 ---
 name: common-pr
-description: PR 描述生成规范
+description: Use this skill when the user wants to generate Pull Request descriptions. Triggers include "PR 描述", "生成 PR", "PR 模板", "创建 PR". Also use when summarizing code changes for review. Do NOT use for commit message generation (use common-commit skill instead).
+license: Complete terms in LICENSE.txt
 ---
 
 # PR 描述生成规范
 
-本文档定义 Pull Request 描述生成规范。**类型、格式、命名都遵循项目已有的 [Git Commit 规范](../common-commit/SKILL.md)，保持一致。
+## Overview
 
----
+本 skill 用于生成符合项目规范的 Pull Request 描述。核心目标是帮助开发者快速创建结构化、清晰的 PR 内容，便于代码审阅者理解改动意图和范围。所有类型、格式和命名都遵循项目已有的 [Git Commit 规范](../common-commit/SKILL.md)，保持一致性。
 
-## 核心原则
+## When to use this skill
 
-1. **复用规范**: PR 标题和类型完全遵循 [Conventional Commits 规范](../common-commit/SKILL.md)，保持一致
-2. **简洁清晰**: 标题一句话说清楚，改动分类列出，避免冗长
-3. **结构化**: 使用固定模板，便于审阅者快速扫描
-4. **诚实完整**: 不要隐瞒破坏性变更，所有改动都要列出来
-5. **检查清单**: 必须包含检查清单，提醒作者和审阅者确认关键点
+- 用户需要生成或完善 PR 描述时
+- 用户询问 PR 格式规范时
+- 用户需要总结代码改动并创建结构化 PR 时
+- 用户需要拆分多个 commit 并按类型分组时
 
----
+**不适用场景**：
+- 需要生成单个 commit 信息时（应使用 `common-commit` skill）
 
-## PR 格式规范
+## Inputs
 
-### PR 标题格式
+- 当前分支名（自动获取）
+- 未合并到主分支的 commit 列表（自动获取）
+- 用户可能提供的额外上下文或说明
 
-**完全复用 [common-commit](../common-commit/SKILL.md) 的规范**：
-```
-<type>(<scope>): <简短描述>
-```
-
-- **type**: 必须小写，和 commit 类型完全一致，见 commit.md
-- **scope**: 影响范围，和 commit 规范一致
-- **description**: 中文，一句话说明，结尾不加句号
-
-### 多个 commit 类型选择
-
-当有多个不同类型 commit 时：
-- 选择**数量最多**的类型作为 PR 主类型
-- 如果数量相当，优先级：`feat` > `fix` > `refactor` > 其他
-
-### PR 正文模板
-
-```markdown
-## 摘要
-
-{一句话概括本次 PR 的目的和主要改动}
-
-## 改动清单
-
-{按类型分组列出所有 commit}
-
-### 🎯 新增功能 (feat)
-- commit 信息...
-
-### 🐛 Bug 修复 (fix)
-- commit 信息...
-
-### 🔨 代码重构 (refactor)
-- commit 信息...
-
-### 📚 文档更新 (docs)
-- commit 信息...
-
-### ⚡ 性能优化 (perf)
-- commit 信息...
-
-### 🧪 测试相关 (test)
-- commit 信息...
-
-### 🔧 工具/构建 (chore/ci)
-- commit 信息...
-
-## 检查清单
-
-- [ ] 代码已通过 `npm run lint` 检查
-- [ ] 代码已通过 `npx tsc --noEmit` 类型检查
-- [ ] 本地功能测试验证通过
-- [ ] 新增代码符合项目开发规范
-- [ ] 相关文档已更新（如需要）
-
-## 关联 Issue
-
-Closes: #{issue_number}
-```
-
----
-
-## 破坏性变更处理
-
-复用 [common-commit](../common-commit/SKILL.md) 的规范：
-
-如果本次 PR 包含不兼容的破坏性变更：
-1. **必须**在标题或摘要中明确提示
-2. **必须**在正文中添加 `BREAKING CHANGE` 段落说明
-3. **必须**说明变更原因和迁移指南
-
----
-
-## 执行流程
+## Workflow
 
 ### 第一步：获取信息
 
@@ -121,18 +51,29 @@ Closes: #{issue_number}
 4. **检查清单**: 填入标准检查项
 5. **关联 Issue**: 留占位符让用户填写
 
----
-
-## 输出要求
+### 第五步：交付结果
 
 1. 先展示**完整可复制的 PR 内容**，用代码块包裹
 2. 告诉用户可以直接复制粘贴到 GitHub/GitLab
 3. 如果有多个主类型选择困难，询问用户确认
 4. 如果检测到破坏性变更，提示用户补充说明
 
----
+## Resources
 
-## 本项目特定要求
+| 资源 | 何时使用 |
+|------|----------|
+| `templates/pr-template.md` | 生成 PR 正文时，作为可复制模板 |
+| `reference/specification.md` | 需要了解格式规范、类型优先级、破坏性变更处理时 |
+
+## Validation
+
+- [ ] PR 标题符合 `<type>(<scope>): <简短描述>` 格式
+- [ ] 摘要清晰描述本次 PR 的目的和主要改动
+- [ ] 改动清单按类型分组列出所有 commit
+- [ ] 检查清单包含所有标准检查项
+- [ ] 如包含破坏性变更，已添加 `BREAKING CHANGE` 段落
+
+## Constraints
 
 - 严格遵循 commit.md 的 type/scope 规范，保持一致
 - 描述和正文都使用中文

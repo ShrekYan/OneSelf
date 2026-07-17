@@ -1,239 +1,73 @@
 ---
 name: common-mermaid
-description: Mermaid 流程图生成 Skill
+description: Use this skill whenever the user wants to generate Mermaid diagrams, including flowcharts, architecture diagrams, and sequence diagrams. Triggers include "generate mermaid", "draw flowchart", "sequence diagram", "architecture diagram". Also use when the user asks for visualizing a process, system flow, or component interaction. Do NOT use for non-Mermaid visual formats such as PNG, SVG drawings, or PlantUML.
+license: Complete terms in LICENSE.txt
 ---
 
-# Mermaid 流程图生成 Skill
+# Mermaid 流程图生成技能
 
-## 触发条件
-当用户要求生成 mermaid 流程图、架构图、序列图时触发。
+## Overview
 
-## 语法规范（必须严格遵守）
+本技能用于根据用户描述生成符合项目规范的 Mermaid 图表。核心产物是可直接渲染的 Mermaid 代码块，支持流程图、架构图和序列图。
 
-### 1. Subgraph 规则
-- **subgraph 名称包含空格必须用双引号包裹**
-- 错误：`subgraph 应用层 - 单进程`
-- 正确：`subgraph "应用层 - 单进程"`
+## When to use this skill
 
-### 2. 节点文字规则
-- 节点文字**不能包含** `{ } ( ) < >` 这些特殊字符
-- 遇到需要分隔的地方用 `-` 代替
-- 错误：`user:full:{username}`
-- 正确：`user-full-username`
+- 用户要求生成 Mermaid 流程图、架构图或序列图
+- 用户希望可视化某个业务流程、系统交互或组件关系
+- 用户需要把技术方案以图表形式呈现
 
-### 3. 箭头标签规则
-- **箭头标签不能包含中文**，有些解析器会报错
-- 使用英文简写：`hit` 表示命中，`miss` 表示未命中，`query` 表示查询
-- **箭头必须每个连接单独一行**
-- 错误：
-  ```
-  L1--hit-->回填L1 密码验证CPU
-  ```
-- 正确：
-  ```
-  L1--hit-->回填L1
-  回填L1-->密码验证CPU
-  ```
+不适用场景：
 
-### 4. 换行规则
-- 每个箭头连接单独一行
-- 不要在一行放多个连接
-- 使用 `<br/>` 或 `\n` 在节点内换行，语法：`节点名[文字<br/>换行]`
+- 生成非 Mermaid 格式的图片或矢量图
+- 使用 PlantUML 等其他图表语法
 
-### 5. 反引号
-- mermaid 代码块整体用三个反引号包裹，**节点内部不要使用反引号**
+## Inputs
 
-## 正确示例 - 方案一 缓存优化架构
+- 用户想要表达的业务场景、流程步骤或系统组件关系
+- 图表类型偏好（流程图、架构图、序列图）
+- 是否需要分组、样式或特定节点命名
 
-```mermaid
-flowchart TD
-    subgraph "应用层 - 单进程"
-        L1[L1 进程内 LRU 缓存<br/>容量 10000 条<br/>TTL 5 分钟<br/>热点最近用户]
-    end
+## Workflow
 
-    subgraph "Redis 层"
-        L2[L2 Redis 密码缓存<br/>login-password-username<br/>TTL 1 小时]
-        L3[L3 Redis 用户缓存<br/>user-info-username<br/>TTL 1 天]
-    end
+1. 识别任务类型：确认用户需要流程图、架构图还是序列图。
+2. 收集必要输入：梳理关键节点、步骤、参与方和连接关系。
+3. 加载必要资源：
+   - 生成前阅读 [reference/mermaid-syntax-rules.md](reference/mermaid-syntax-rules.md) 了解语法约束。
+   - 如需模仿输出格式，参考 [examples/](examples/) 中的示例。
+4. 执行核心流程：按照语法规范编写 Mermaid 代码块。
+5. 验证输出结果：对照 Validation 清单检查语法正确性。
+6. 向用户交付结果：返回可直接使用的 Mermaid 代码块。
 
-    subgraph "持久化层"
-        L4[(MySQL<br/>用户表)]
-    end
+## Resources
 
-    L1--hit-->密码验证CPU
-    L1--miss-->L2
-    L2--hit-->回填L1
-    回填L1-->密码验证CPU
-    L2--miss-->L3
-    L3--hit-->回填L1
-    回填L1-->回填L2
-    回填L2-->密码验证CPU
-    L3--miss-->L4
-    L4--query-->回填L1
-    回填L1-->回填L2
-    回填L2-->回填L3
-    回填L3-->密码验证CPU
+| 资源 | 何时使用 |
+|------|----------|
+| [reference/mermaid-syntax-rules.md](reference/mermaid-syntax-rules.md) | 生成图表前必须加载，确认 subgraph、节点文字、箭头标签、换行和反引号规则 |
+| [examples/example-flowchart-cache-optimization.md](examples/example-flowchart-cache-optimization.md) | 需要参考多级缓存流程图示例时 |
+| [examples/example-flowchart-redis-cache.md](examples/example-flowchart-redis-cache.md) | 需要参考纯 Redis 缓存架构示例时 |
+| [examples/example-flowchart-tiered-cache.md](examples/example-flowchart-tiered-cache.md) | 需要参考分级缓存热点预计算示例时 |
+| [examples/example-flowchart-architecture.md](examples/example-flowchart-architecture.md) | 需要参考整体架构层次示例时 |
+| [examples/example-sequence-login.md](examples/example-sequence-login.md) | 需要参考登录流程序列图示例时 |
 
-    style L1 fill:#ffcccc,stroke:#333,stroke-width:2px
-    style L2 fill:#ccf,stroke:#333,stroke-width:2px
-    style L3 fill:#ccf,stroke:#333,stroke-width:2px
-    style L4 fill:#cfc,stroke:#333,stroke-width:2px
-```
+## Output format
 
-## 正确示例 - 方案二 纯 Redis 全缓存架构
+最终输出为一个或多个被 ```mermaid 包裹的代码块。每个代码块第一行必须声明图表类型，例如 `flowchart TD` 或 `sequenceDiagram`。
 
-```mermaid
-flowchart TD
-    subgraph "预加载任务"
-        P[启动/定时预加载<br/>全量扫描MySQL<br/>写入Redis]
-    end
+## Validation
 
-    subgraph "Redis 层"
-        L1[全量用户缓存<br/>user-full-username<br/>TTL 7 天<br/>百万用户 200MB]
-    end
+生成后必须逐项检查：
 
-    subgraph "持久化层"
-        L2[(MySQL<br/>用户表)]
-    end
+- [ ] 图表第一行声明了图表类型，例如 `flowchart TD` 或 `sequenceDiagram`
+- [ ] 所有含空格的 subgraph 都用双引号包裹
+- [ ] 节点文字中没有 `{ } ( ) < >` 这些特殊字符
+- [ ] 需要分隔的地方用 `-` 代替了特殊字符
+- [ ] 箭头标签只使用英文简写（如 hit、miss、query），没有中文
+- [ ] 每个箭头连接单独一行，没有一行放多个连接
+- [ ] 没有在节点文字内部使用反引号
 
-    P --> L1
-    登录请求 --> L1
-    L1--hit-->密码验证CPU
-    L1--miss-->L2
-    L2--query-->L1
-    L1-->密码验证CPU
+## Constraints
 
-    style P fill:#ffcccc,stroke:#333,stroke-width:2px
-    style L1 fill:#ccf,stroke:#333,stroke-width:2px
-    style L2 fill:#cfc,stroke:#333,stroke-width:2px
-```
-
-## 正确示例 - 方案三 分级缓存 热点预计算
-
-```mermaid
-flowchart TD
-    subgraph "应用层 - 单进程"
-        L0[L0 热点 Top N 缓存<br/>预加载常驻内存<br/>永不手动过期<br/>后台定时刷新]
-        L1[L1 进程内 LRU 缓存<br/>最近登录用户<br/>TTL 5 分钟]
-    end
-
-    subgraph "Redis 层"
-        L2[L2 全量用户缓存<br/>所有用户<br/>TTL 1 天]
-    end
-
-    subgraph "持久化层"
-        L3[(MySQL<br/>用户表-登录统计表)]
-    end
-
-    subgraph "后台定时任务"
-        T[每小时统计<br/>登录频次排行<br/>更新热点 Top N]
-    end
-
-    T --> L0
-    L3 --> T
-
-    登录请求 --> L0
-    L0--hit-->密码验证CPU
-    L0--miss-->L1
-    L1--hit-->回填L0
-    回填L0-->密码验证CPU
-    L1--miss-->L2
-    L2--hit-->回填L0
-    回填L0-->回填L1
-    回填L1-->密码验证CPU
-    L2--miss-->L3
-    L3--query-->回填L0
-    回填L0-->回填L1
-    回填L1-->回填L2
-    回填L2-->密码验证CPU
-
-    style L0 fill:#f96,stroke:#333,stroke-width:2px
-    style L1 fill:#ffcccc,stroke:#333,stroke-width:2px
-    style L2 fill:#ccf,stroke:#333,stroke-width:2px
-    style L3 fill:#cfc,stroke:#333,stroke-width:2px
-    style T fill:#fcc,stroke:#333,stroke-width:2px
-```
-
-## 正确示例 - 整体架构层次
-
-```mermaid
-flowchart TD
-    A[客户端请求<br/>登录接口] --> B[负载均衡<br/>Nginx-云LB]
-    B --> C[应用层集群<br/>Node.js-PM2多进程]
-    C --> D[缓存层]
-    D --> E[持久化层<br/>MySQL]
-
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style E fill:#9f9,stroke:#333,stroke-width:2px
-```
-
-## 正确示例 - 序列图
-
-序列图语法相对宽松，主要遵循：
-
-```mermaid
-sequenceDiagram
-    participant C as 客户端
-    participant A as AuthService
-    participant L1 as L1 LRU缓存
-    participant L2 as L2 Redis密码缓存
-    participant L3 as L3 Redis用户缓存
-    participant DB as MySQL数据库
-    participant CPU as CPU密码验证
-
-    C->>A: 发起登录请求 username password
-    A->>L1: 查询 getCachedPasswordHash username
-
-    alt L1 hit
-        L1-->>A: 返回 password_hash
-        A->>CPU: verifyPassword password hash
-        CPU-->>A: 验证结果
-    else L1 miss
-        A->>L2: 查询 Redis password_hash
-
-        alt L2 hit
-            L2-->>A: 返回 password_hash
-            A->>L1: 回填 L1 缓存
-            A->>CPU: verifyPassword password hash
-            CPU-->>A: 验证结果
-        else L2 miss
-            A->>L3: 查询 Redis userinfo
-
-            alt L3 hit
-                L3-->>A: 返回 userinfo password_hash
-                A->>L1: 回填 L1
-                A->>L2: 回填 L2
-                A->>CPU: verifyPassword
-                CPU-->>A: 验证结果
-            else L3 miss
-                A->>DB: 查询 users by username
-                DB-->>A: 返回 userinfo
-                A->>L1: 回填 L1
-                A->>L2: 回填 L2
-                A->>L3: 回填 L3
-                A->>CPU: verifyPassword
-                CPU-->>A: 验证结果
-            end
-        end
-    end
-
-    alt 验证成功
-        CPU-->>A: true
-        A->>A: 生成 AccessToken RefreshToken
-        A->>C: 返回登录成功
-    else 验证失败
-        CPU-->>A: false
-        A->>C: 返回认证错误
-    end
-```
-
-## 检查清单（生成后必须检查）
-
-- [ ] **图表第一行必须声明图表类型**，例如 `flowchart TD` 或 `sequenceDiagram`，不能省略
-- [ ] 所有含空格的 subgraph 都用双引号包裹了吗？
-- [ ] 节点文字中没有 `{ } ( )` 这些特殊字符吗？
-- [ ] 需要分隔的地方用 `-` 代替了特殊字符吗？
-- [ ] 箭头标签只用了英文 hit/miss/query 没有中文吗？
-- [ ] 每个箭头连接单独一行，没有一行放多个连接吗？
-- [ ] 没有在节点文字内部使用反引号吗？
-
+- 必须遵守 [reference/mermaid-syntax-rules.md](reference/mermaid-syntax-rules.md) 中的全部规则
+- 箭头标签只能使用英文，避免中文导致解析失败
+- 节点文字避免特殊字符，使用 `-` 作为分隔符
+- 复杂图表优先拆分为多个子图，并通过样式区分层次

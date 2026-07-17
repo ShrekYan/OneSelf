@@ -1,111 +1,90 @@
 ---
 name: xmind-exec
-description: XMind 自动化执行命令 - 审核模式。解析 XMind 导出的 Markdown，逐条生成任务方案 → 人工审核 → 执行代码。
-parameters:
-  - name: file_path
-    description: XMind 导出的 Markdown 文件路径（如 docs/my-feature-xmind.md）
-    type: string
-    required: true
+description: 使用此 skill 当用户希望将 XMind 思维导图导出为 Markdown 后自动解析为结构化任务，并按审核模式逐条生成方案、人工确认、执行代码。触发场景包括 "/xmind-exec"、"XMind 执行"、"思维导图转任务"、"XMind 生成代码"。也适用于需要从 XMind 导出物中提取任务清单并按依赖顺序执行的场景。不适用于非 XMind 来源的任务管理或直接代码生成（无 XMind 输入）。
+license: Complete terms in LICENSE.txt
 ---
 
-# xmind-exec 技能 - 审核模式
+# XMind 自动化执行 - 审核模式
 
-XMind 自动化执行工作流（审核模式）：解析 XMind 导出的 Markdown 文件 → 生成结构化任务清单 → 逐条生成执行方案 → 人工审核 → 执行代码。
+## Overview
 
-## 使用方式
+本 skill 解析 XMind 导出的 Markdown 文件，将其转换为结构化任务清单，并采用"方案生成 → 人工审核 → 代码执行"的模式逐个完成任务。所有中间产物保存到 `.claude/runs/run-{timestamp}/` 目录，确保过程可追溯、可干预、可复现。
 
-```bash
-# 基本用法
-/xmind-exec docs/your-xmind-file.md
-```
+核心工作方式：
 
-## 执行流程
+- 使用确定性脚本优先解析 XMind Markdown，快速生成任务清单。
+- 每个任务生成独立执行方案，用户确认后再写入代码。
+- 支持任务依赖推断、风险等级评估、质量门禁检查。
 
-```
-1. 📂 初始化运行环境
-   └── 自动创建 .claude/runs/run-{timestamp}/ 目录
+## When to use this skill
 
-2. 🧠 解析 XMind 生成任务清单
-   └── 生成 task-manifest.json
-   └── 生成 execution-plan.md
+- 用户输入 `/xmind-exec <file_path>` 命令。
+- 用户提供 XMind 导出的 Markdown 文件，希望自动转任务并执行。
+- 用户希望按模块/依赖顺序逐步完成思维导图中的开发任务。
+- 用户需要任务执行过程持久化、可审核、可中断恢复。
 
-3. ✅ 确认执行计划
-   └── 用户确认整体任务清单
+不适用场景：
 
-4. ⚡ 逐条审核执行（核心）
-   ┌── 对每个任务：
-   │     a. 生成详细执行方案 scheme.md
-   │     b. 展示方案供用户审核
-   │     c. 用户选择：确认执行 / 修改方案 / 跳过 / 终止
-   │     d. 执行任务（生成代码 + 质量检查）
-   │     e. 保存执行结果
-   └── 循环直到所有任务完成
+- 没有 XMind Markdown 文件，直接要求生成代码。
+- 任务来源是其他工具（如 Notion、飞书文档）。
+- 仅需生成文档或计划而不执行代码。
 
-5. 📦 生成最终交付报告
-   └── final-report.md
-```
+## Inputs
 
-## 审核模式特点
+- `file_path`：XMind 导出的 Markdown 文件路径（必填）。
+- 用户确认：每个任务的方案需经用户确认后才执行。
+- 可选指令：在工作流看板中可输入 `T001`、`status`、`report`、`exit` 等指令。
 
-| 特点 | 说明 |
-|------|------|
-| ✅ **风险可控** | 每个任务都可以审核后再执行 |
-| ✅ **方案透明** | 每个任务做什么、改哪些文件一目了然 |
-| ✅ **可干预** | 随时可以修改方案或跳过任务 |
-| ✅ **结果可追溯** | 所有中间文件都持久化保存 |
+## Workflow
 
-## 运行时文件结构
+1. **参数校验**：检查 `file_path` 是否存在，是否为 Markdown 文件。
+2. **初始化运行目录**：在 `.claude/runs/run-{timestamp}/` 创建独立目录。
+3. **解析 XMind Markdown**：调用确定性脚本生成 `task-manifest.json`、`execution-plan.md`、`task-definition.md` 等产物。
+4. **展示任务看板**：列出任务状态、依赖、风险等级和可用指令。
+5. **选择任务**：用户输入任务编号（如 `T001`）进入方案生成阶段。
+6. **生成方案**：读取 `reference/xmind-format-guide.md` 和 `reference/best-practices.md`，为当前任务生成详细 `scheme.md`。
+7. **人工审核**：用户选择确认执行、修改方案、跳过或终止。
+8. **执行代码**：按方案生成或修改代码，执行质量检查。
+9. **保存结果**：更新任务状态，记录变更文件和执行结果。
+10. **循环或交付**：重复步骤 5-9 直到所有任务完成，生成 `final-report.md`。
 
-```
-.claude/runs/run-{timestamp}/
-├── run-info.json                # 运行基本信息
-├── task-manifest.json          # 任务清单
-├── execution-plan.md            # 完整执行计划
-├── tasks/                       # 每个任务独立目录
-│   ├── T001/
-│   │   ├── scheme.md            # 任务执行方案
-│   │   ├── review-comments.md   # 审核意见（如有）
-│   │   ├── execution-result.md  # 执行结果
-│   │   ├── changed-files.json   # 修改文件清单
-│   │   └── status.json          # 任务状态
-│   ├── T002/
-│   └── T003/
-└── final-report.md              # 最终交付报告
-```
+## Resources
 
-## XMind 编写规范（极简即可）
+| 资源 | 何时使用 |
+|------|----------|
+| `reference/xmind-format-guide.md` | 解析 XMind Markdown 前加载，了解编写规范和任务要素格式 |
+| `reference/workflow-detail.md` | 需要了解完整执行流程、运行时文件结构和看板指令时加载 |
+| `reference/best-practices.md` | 生成任务方案或执行代码前加载，了解任务粒度和依赖标注规范 |
+| `templates/scheme-template.md` | 为每个任务生成方案时作为结构模板 |
+| `examples/xmind-sample.md` | 需要参考标准 XMind Markdown 格式时加载 |
+| `examples/runtime-structure.md` | 需要了解运行目录产物结构时加载 |
 
-你只需要写业务需求，技术规范由项目自动注入：
+## Output format
 
-```markdown
-# 我的项目
+最终产物包括：
 
-## 公共组件
-### 按钮组件
-- 支持 primary / default / danger 三种样式
-- 支持点击事件
-- 支持禁用状态
+1. `.claude/runs/run-{timestamp}/run-info.json`：运行基本信息。
+2. `.claude/runs/run-{timestamp}/task-manifest.json`：结构化任务清单。
+3. `.claude/runs/run-{timestamp}/execution-plan.md`：人类可读执行计划。
+4. `.claude/runs/run-{timestamp}/tasks/T{nnn}/scheme.md`：任务执行方案。
+5. `.claude/runs/run-{timestamp}/tasks/T{nnn}/execution-result.md`：任务执行结果。
+6. `.claude/runs/run-{timestamp}/tasks/T{nnn}/changed-files.json`：变更文件清单。
+7. `.claude/runs/run-{timestamp}/final-report.md`：最终交付报告。
+8. 实际代码变更：按任务方案写入的项目文件。
 
-### 徽章组件
-- 右上角红点显示
-- 支持数字显示
-- 显式依赖：T001
+## Validation
 
-## 页面层
-### 用户中心页面
-- 展示用户基本信息
-- 集成按钮组件
-- 显式依赖：T001, T002
-```
+- [ ] `task-manifest.json` 是否包含至少一个有效任务。
+- [ ] 每个任务是否提取到目标描述、上下文、质量标准等关键要素。
+- [ ] 任务依赖关系是否合理，不存在循环依赖。
+- [ ] 每个任务方案是否经过用户确认后再执行。
+- [ ] 代码生成后是否通过 lint 和 TypeScript 类型检查（或对应质量门禁）。
+- [ ] 所有中间产物是否保存到运行目录。
 
-## 最佳实践
+## Constraints
 
-1. **任务粒度适中**：每个任务对应一个原子功能（一个组件 / 一个接口 / 一个页面）
-2. **依赖关系明确**：有依赖的任务用"显式依赖：T001"标注
-3. **业务描述清晰**：任务描述越清晰，生成的方案越准确
-4. **审核时充分沟通**：如果方案不符合预期，直接提出修改意见
-
----
-
-**版本**：v2.0 - 审核模式
-**最后更新**：2026-05-09
+- 必须基于 XMind 导出的 Markdown 文件启动，不能凭空构造任务。
+- 每个任务执行前必须获得用户明确确认，禁止自动跳过审核。
+- 解析失败时必须向用户说明原因，不得隐藏错误继续执行。
+- 任务方案应优先使用对应技术栈的 Agent 或 skill 执行（如前端任务使用 `frontend-developer`）。
+- 运行目录中的中间文件不得删除用户已有代码或覆盖未确认变更。

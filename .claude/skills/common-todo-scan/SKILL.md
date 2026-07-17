@@ -1,109 +1,75 @@
 ---
 name: common-todo-scan
-description: TODO 扫描规范
+description: 当用户需要扫描代码库中的 TODO/FIXME 注释时使用此技能。触发场景包括"扫描 TODO"、"查找 FIXME"、"检查待办"、"代码待办清单"、"TODO 清理"。也适用于审查代码技术债务时。不适用于通用代码搜索或文档生成。
+license: Complete terms in LICENSE.txt
 ---
 
-# TODO 扫描规范
+# TODO 扫描
 
-本文档定义项目 TODO/FIXME 扫描输出规范。
+## Overview
 
----
+本 skill 用于扫描项目中的 TODO/FIXME/HACK/XXX/BUG 等注释标记，生成结构化的扫描报告。帮助开发者识别代码中的待办事项、技术债务和潜在问题，支持代码质量改进和技术债务管理。
 
-## 搜索目标
+## When to use this skill
 
-扫描以下关键词：
+典型触发场景：
+- 用户要求扫描代码中的 TODO/FIXME 标记
+- 用户要求查找项目中的待办事项
+- 用户要求检查代码技术债务
+- 用户要求生成 TODO 清理报告
 
-| 关键词 | 含义 |
-|--------|------|
-| `TODO` | 需要后续完成的功能/优化 |
-| `FIXME` | 需要修复的问题 |
-| `XXX` | 需要注意的潜在问题/代码异味 |
-| `HACK` | 临时 hack 需要后续重构 |
-| `BUG` | 已知但暂时未修复的 bug |
+不适用场景：
+- 通用代码搜索
+- 文档生成
+- 代码修改或重构
 
----
+## Inputs
 
-## 需要排除的目录
+- 项目根目录（可选，默认为当前工作目录）
+- 扫描范围（可选，默认扫描整个项目）
+- 排除规则（可选，默认使用内置排除目录）
 
-扫描时必须排除以下目录，避免输出大量噪声：
+## Workflow
 
-- `node_modules/` - 依赖库
-- `.git/` - Git 元数据
-- `.claude/` - Claude 配置（这个文件里的 TODO 不需要扫描）
-- `dist/` / `build/` - 构建输出
-- `coverage/` - 测试覆盖率输出
-- `.nyc_output/` - NYC 覆盖率
-- `.next/` - Next.js 构建缓存
-- `*.log` - 日志文件
+1. **确认扫描范围**: 获取项目根目录和扫描路径
+2. **加载参考规范**: 读取 [reference/scan-specification.md](reference/scan-specification.md) 了解搜索目标和排除规则
+3. **执行搜索**: 使用 `rg` 工具搜索关键词
+4. **解析结果**: 提取文件路径、行号、类型和内容
+5. **按文件分组**: 相同文件的结果归为一组并排序
+6. **生成报告**: 使用 [templates/todo-report-template.md](templates/todo-report-template.md) 生成结构化报告
+7. **验证输出**: 检查报告完整性和格式正确性
 
----
+## Resources
 
-## 输出模板
+| 资源 | 何时使用 |
+|------|----------|
+| `templates/todo-report-template.md` | 生成扫描报告时使用 |
+| `reference/scan-specification.md` | 需要了解搜索目标、排除目录、分类说明、执行步骤和输出要求时 |
+| `examples/sample-report.md` | 需要参考示例输出格式时 |
 
-```markdown
-# TODO / FIXME 扫描报告
+## Output format
 
-## 统计
+输出结构化的 TODO/FIXME 扫描报告，包含：
+- 统计信息（扫描范围、发现条目总数）
+- 待办清单（按文件路径排序，每个文件包含行号、类型、内容表格）
+- 清理建议
 
-- **扫描范围**: `项目根目录`
-- **发现条目**: {total} 个
+参考 [examples/sample-report.md](examples/sample-report.md) 了解输出格式。
 
----
+## Validation
 
-## 待办清单
+- [ ] 是否正确识别所有关键词（TODO、FIXME、XXX、HACK、BUG）
+- [ ] 是否正确排除了指定目录
+- [ ] 文件路径是否为相对路径
+- [ ] 是否显示行号
+- [ ] 是否按文件分组并排序
+- [ ] 是否统计了条目总数
+- [ ] 是否处理了无结果和结果过多的情况
 
-按文件路径排序：
+## Constraints
 
-{foreach file in sorted_files}
-
-### `{file_path}`
-
-| 行号 | 类型 | 内容 |
-|------|------|------|
-{foreach match in file.matches}
-| {line} | {type} | {content} |
-{end}
-{end}
-
----
-
-## 清理建议
-
-1. 已完成的 TODO 及时删除
-2. 长期未处理的 TODO 考虑安排进迭代
-3. 紧急的 FIXME 优先处理
-```
-
----
-
-## 分类说明
-
-| 类型 | 处理建议优先级 |
-|------|----------------|
-| `FIXME` | 🔴 高 - 有问题需要修复 |
-| `BUG` | 🔴 高 - 已知缺陷需要修复 |
-| `TODO` | 🟡 中 - 计划中功能优化 |
-| `HACK` | 🟡 中 - 需要重构 |
-| `XXX` | 🟢 低 - 需要注意潜在问题 |
-
----
-
-## 执行步骤
-
-1. **运行搜索**: 使用 `rg -n "(TODO|FIXME|XXX|HACK|BUG):" --glob "!{exclude_patterns}" .`
-2. **解析结果**: 逐行解析，提取文件路径、行号、内容
-3. **分类提取**: 识别是 TODO 还是 FIXME 等类型
-4. **按文件分组**: 相同文件的结果归为一组
-5. **按路径排序**: 便于阅读
-6. **统计总数**: 输出统计信息
-7. **按照模板输出**: 生成结构化报告
-
----
-
-## 输出要求
-
-- 文件路径使用相对路径，方便 IDE 点击跳转
-- 必须显示行号，便于快速定位
-- 内容提取从关键词之后开始，截断过长行
-- 如果没有找到任何 TODO，输出空报告说明 "未发现待办"
-- 如果结果太多，限制输出前 100 条，提示结果过多
+- 不扫描 `node_modules/`、`.git/`、`.claude/` 等目录
+- 文件路径使用相对路径
+- 内容过长时进行截断
+- 结果超过 100 条时限制输出并提示
+- 无结果时输出"未发现待办"说明

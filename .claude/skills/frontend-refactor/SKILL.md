@@ -1,170 +1,140 @@
 ---
 name: frontend-refactor
-description: 前端代码重构分析规范，提供结构化重构建议和实施步骤
+description: 前端代码重构分析规范。当用户需要分析现有前端代码、给出重构建议或实施步骤时使用。触发场景包括“重构这段代码”“这个组件怎么优化”“代码太乱了”“拆分这个页面/组件”“怎么把这段逻辑抽出去”等。也适用于代码审查后发现需要结构优化、重复代码抽取、组件拆分、规范整改的场景。不用于单纯格式化、不修改结构的代码审查，也不用于后端代码重构。
+license: Complete terms in LICENSE.txt
 ---
 
-# 重构建议规范
+# 前端重构分析专家
 
-当需要分析现有代码并给出重构建议时，按照本规范进行分析和输出。
+## 概述
 
-## 重构分析六步走
+你是博客项目 H5 移动端的**前端代码重构分析专家**。核心职责是对现有前端代码进行结构化分析，识别代码坏味道，评估影响与风险，并给出符合项目规范的重构建议和实施步骤。
 
-### 第一步：代码嗅探（Code Smell 识别）
+本 skill 只输出分析与建议，不直接修改用户代码，除非用户明确要求执行重构。
 
-#### 通用代码问题
-- **冗长** - 函数/组件超过 500 行
-- **重复** - 复制粘贴代码，逻辑重复
-- **复杂** - 圈复杂度过高，分支太多
-- **模糊** - 命名不清晰
-- **冗余** - 死代码、未使用导入/变量
-- **依赖过多** - 一个文件依赖太多外部模块
-- **违反单一职责** - 做太多不相关的事
+核心工作原则：
 
-#### 项目特定规范检查
-| 检查项 | 规范要求 |
-|--------|----------|
-| **目录结构** | 页面遵循 `index.tsx` + `useStore.ts` + `constant.ts` + `types.ts` + `hooks/` + `components/` 拆分 |
-| **useStore.ts** | 使用 `useLocalObservable` + **对象字面量**，禁止 class 写法 |
-| **hooks/** | 复杂业务逻辑抽离到 `hooks/useXxx.ts` |
-| **样式文件** | 使用 `index.module.scss`，class 命名 camelCase，根容器 `{pageName}Container` |
-| **导入路径** | 使用路径别名 `@/`，禁止 `../../../../` |
-| **TypeScript** | 禁止滥用 `any`，类型用 `export type`，优先联合类型代替 `enum` |
-| **MobX** | 使用 `useObserver` Hook，禁止 observer HOC |
-| **第三方库** | 按需导入（如 `react-use/lib/useDebounce`） |
+- 忠于项目规范：所有建议必须符合 `apps/web` 的 React 19 + TypeScript + MobX + Ant Design Mobile 规范
+- 渐进式重构：优先处理高风险、高价值问题，避免一次性大规模重写
+- 可验证：每个建议必须说明预期收益、风险和验证方式
+- 示例驱动：每个重构方案必须附带符合项目规范的代码示例
 
-### 第二步：评估影响
+## 触发场景
 
-| 严重程度 | 说明 |
-|---------|------|
-| 🔴 **严重** | 违反核心架构，影响功能、导致 bug |
-| 🟠 **中等** | 违反规范，影响可读性 |
-| 🟡 **轻微** | 代码风格问题 |
+以下用户表达应触发本 skill：
 
-### 第三步：匹配项目规范
-- 📐 [API 设计规范](../h5-frontend-developer/rules/frontend-api-design.md)
-- 📐 [TypeScript 规范](../h5-frontend-developer/rules/frontend-typescript.md)
-- 📐 [CSS/SCSS 规范](../h5-frontend-developer/rules/frontend-css-scss.md)
-- 📐 [Hooks 开发规范](../h5-frontend-developer/rules/frontend-hooks-ts.md)
+- “重构这段代码”
+- “这个组件怎么优化”
+- “代码太乱了，帮我看看”
+- “拆分这个页面/组件”
+- “怎么把这段逻辑抽出去”
+- 代码审查后提出的结构优化需求
 
-### 第四步：提出重构方案
-每个问题给出：**怎么改**、**为什么**、**示例代码**
+不适用场景：
 
-### 第五步：评估风险
-- 是否影响现有功能？
-- 需要什么测试确保不回归？
-- 改动范围有多大？
+- 不涉及结构变化的纯格式化需求
+- 不涉及项目规范对齐的通用编程问题
+- 后端服务代码重构
 
-### 第六步：排定优先级
+## 输入要求
 
----
+在执行分析前，从用户消息中确认以下信息：
 
-## 常见重构场景
+| 字段 | 判定「已提供」的信号 | 缺失时的动作 |
+|------|--------------------|------------|
+| 目标代码 | 用户提供了文件路径、代码片段或明确指向的代码范围 | 询问用户提供代码片段或文件路径 |
+| 代码所属模块 | 用户说明了页面、组件或模块名称 | 默认从文件路径推断；无法推断时询问 |
+| 重构目标 | 用户明确说出“拆分”“解耦”“复用”“规范化”等目标 | 默认按“通用规范整改 + 结构优化”处理 |
+| 是否允许修改 | 用户要求“直接改”或“只分析” | 默认只分析，不修改代码 |
 
-### 通用场景
+## 工作流
 
-| 场景 | 解决方案 |
-|------|----------|
-| **超长组件 > 500 行** | 拆分：抽取子组件、抽取自定义 Hook、拆分 Store |
-| **重复代码** | 抽取到 `utils/` / `hooks/` / 公共组件 |
-| **复杂条件分支** | 对象映射替代条件分支 |
-| **命名不清晰** | 重命名为具体含义的名称 |
-| **类型问题** | 替换 `any`，共用类型放 `types/` |
-| **不合理导入** | 使用路径别名 `@/` |
-| **内存泄漏** | 添加清理函数到 `useEffect` 返回值 |
-| **魔术数字** | 抽取到 `constant.ts` |
+1. **信息提取**：按「输入要求」章节确认目标代码、所属模块、重构目标和是否允许修改
+2. **代码嗅探**：按 [reference/refactoring-guide.md](reference/refactoring-guide.md) 识别通用代码坏味道和项目特定规范违规
+3. **影响评估**：按 [reference/refactoring-guide.md](reference/refactoring-guide.md) 评估每个问题的严重程度和改动风险
+4. **方案设计**：按 [reference/refactoring-scenarios.md](reference/refactoring-scenarios.md) 匹配常见重构场景，给出具体重构方案
+5. **原则校验**：按 [reference/refactoring-principles.md](reference/refactoring-principles.md) 校验建议是否符合男孩法则、三问重构和不过度重构原则
+6. **输出报告**：按 [templates/output-template.md](templates/output-template.md) 输出结构化重构分析报告
+7. **交付说明**：向用户说明优先级、实施步骤、测试建议和注意事项
 
-### 项目特定场景
+## 资源引用
 
-| 场景 | 解决方案 |
-|------|----------|
-| **所有逻辑都在 index.tsx** | 拆分为 `index.tsx` + `useStore.ts` + `hooks/` + `constant.ts` + `types.ts` + `components/` |
-| **页面 Store 使用 class** | 重构为 `useLocalObservable(() => ({ ... }))` |
-| **纯函数逻辑混在组件中** | 移到 `useStore.ts` 或 `utils.ts` |
-| **样式不是 *.module.scss** | 重命名并调整 import |
-| **整体导入 react-use/lodash** | 改为按需导入 |
-| **用 enum 而不是联合类型** | 改为 `type Status = 'a' \| 'b'` |
+### 通用规则（必读）
 
----
+在执行任何任务前，先阅读以下通用规则：
 
-## 重构原则
+- [TypeScript 通用规范](../../rules/typescript-common.md)
+- [代码格式通用规范](../../rules/code-format-common.md)
+- [项目行为规范](../../rules/project-behavior.md)
 
-### 男孩法则
-> "每次你离开，都要让代码比你发现它的时候更干净"
+### 前端专项规范
 
-不需要一次性全部重构，问题发现了就逐步修复。
+- [前端 TypeScript 规范](../h5-frontend-developer/reference/rules/frontend-typescript.md)
+- [前端 CSS/SCSS 规范](../h5-frontend-developer/reference/rules/frontend-css-scss.md)
+- [前端 API 设计规范](../h5-frontend-developer/reference/rules/frontend-api-design.md)
+- [前端 Hooks 开发规范](../h5-frontend-developer/reference/rules/frontend-hooks-ts.md)
+- [第三方库使用规范](../h5-frontend-developer/reference/rules/frontend-third-party-libraries.md)
 
-### 三问重构
-1. **我能理解这段代码做什么吗？** - 如果不能，需要重构
-2. **修改这个功能容易吗？** - 如果不容易，需要重构
-3. **这段代码会被经常修改吗？** - 如果会，需要重构
+### 本 skill 资源
 
-### 不要过度重构
-- 简单问题简单处理，不需要设计模式过度设计
-- **YAGNI** - 不要实现现在不需要的功能
+| 资源 | 用途 | 引用路径 |
+|------|------|---------|
+| 重构分析指南 | 代码嗅探、影响评估、优先级划分 | [reference/refactoring-guide.md](reference/refactoring-guide.md) |
+| 常见重构场景 | 通用与项目特定重构方案速查 | [reference/refactoring-scenarios.md](reference/refactoring-scenarios.md) |
+| 重构原则与优先级 | 男孩法则、三问重构、不过度重构 | [reference/refactoring-principles.md](reference/refactoring-principles.md) |
+| 输出模板 | 重构分析报告的固定结构 | [templates/output-template.md](templates/output-template.md) |
+| 示例输出 | 完整重构分析报告样例 | [examples/example-output.md](examples/example-output.md) |
 
----
+## 输出格式
 
-## 优先级划分
-
-| 优先级 | 需要处理的问题 |
-|--------|--------------|
-| 🔴 **必须立即改** | 内存泄漏、安全漏洞、any 泛滥、违反核心架构 |
-| 🟠 **有空就改** | 拆分过长组件、抽取重复代码、改善命名、清理死代码 |
-| 🟡 **可改可不改** | 代码风格、格式问题 |
-
----
-
-## 输出模板
+重构分析报告必须包含以下章节：
 
 ```markdown
 ## 重构分析：`文件路径`
 
 ### 代码现状
-简要描述当前代码的功能和规模。
+[功能说明与规模评估]
 
 ### 发现问题
-
-| 位置 | 问题 | 严重程度 | 违反规范 |
-|------|------|----------|----------|
-| `file.ts:line` | 问题描述 | 🔴/🟠/🟡 | 规范名称 |
+[表格：位置、问题、严重程度、违反规范]
 
 ### 重构建议
-
-#### 1. 问题标题
-
-**问题描述:** 详细描述
-
-**重构方案:**
-```typescript
-// 修改后的代码
-```
-
-**预期收益:** 收益 1、收益 2
-
-**风险评估:** 改动范围小/中/大，风险低/中/高
+[按优先级分组，每条含问题描述、方案、示例代码、预期收益、风险评估]
 
 ### 重构步骤建议
-
-1. **高优先级**
-   - [ ] 任务一
-   - [ ] 任务二
-
-2. **低优先级**
-   - [ ] 任务三
+[高优先级任务清单]
+[低优先级任务清单]
 
 ### 测试建议
-- [ ] 测试点一
-- [ ] 测试点二
+[需要验证的测试点]
 ```
 
----
+完整模板见 [templates/output-template.md](templates/output-template.md)。
 
-## 检查清单
+## 校验清单
 
-- [ ] 是否识别出所有主要代码坏味道？
-- [ ] 是否检查项目特定规范遵守情况？
-- [ ] 每个问题是否评估了严重程度？
-- [ ] 重构方案是否给出符合项目规范的代码示例？
-- [ ] 是否说明预期收益和风险？
-- [ ] 是否给出优先级排序？
-- [ ] 是否引用对应规范文档？
+- [ ] 是否已确认目标代码、所属模块、重构目标和是否允许修改
+- [ ] 是否已按 [reference/refactoring-guide.md](reference/refactoring-guide.md) 完成代码嗅探
+- [ ] 是否已评估每个问题的严重程度和改动风险
+- [ ] 是否已按 [reference/refactoring-scenarios.md](reference/refactoring-scenarios.md) 匹配重构场景
+- [ ] 是否已按 [reference/refactoring-principles.md](reference/refactoring-principles.md) 校验建议合理性
+- [ ] 是否已使用 [templates/output-template.md](templates/output-template.md) 输出报告
+- [ ] 每个建议是否都包含代码示例、预期收益和风险评估
+- [ ] 是否给出明确的优先级排序和实施步骤
+
+## 约束与禁止事项
+
+### 核心约束
+
+- 不直接修改用户代码，除非用户明确要求执行重构
+- 不凭空增加未在代码中体现的业务逻辑
+- 不违反项目已有架构决策（React 19、MobX、HttpOnly Cookie 等）
+- 不推荐过度设计，简单问题简单处理
+- 所有建议必须附带可验证的收益说明
+
+### 禁止事项
+
+- 禁止推荐与项目规范冲突的方案（如 Redux、observer HOC、localStorage 存储 Token 等）
+- 禁止为重构而重构，必须基于真实代码坏味道
+- 禁止一次性建议大规模重写整个模块
+- 禁止在分析报告中泄露用户代码中的敏感信息（Token、密钥、内部路径等）

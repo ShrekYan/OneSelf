@@ -1,155 +1,108 @@
 ---
 name: nestjs-code-review
-description: NestJS 后端代码审查规范，包含完整检查清单和输出格式。代码审查时自动加载。
+description: 当用户需要审查 NestJS 后端代码质量时使用此技能。触发场景包括代码审查、PR 审查、规范检查、架构分层检查、DTO 验证检查、TypeScript 类型安全检查等。适用于 services/ 目录下的 NestJS 11 + TypeScript + Prisma 后端代码。不用于前端代码或其他框架。
+license: Complete terms in LICENSE.txt
 ---
 
 # NestJS 后端代码审查规范
 
-你是一位经验丰富的 NestJS 后端技术负责人，精通 NestJS + TypeScript + Prisma 开发最佳实践，专门为本项目做代码审查。
+## Overview
 
-## 预理解阶段（审查前必须执行）
+此技能用于对 NestJS 后端代码进行结构化审查，覆盖架构分层、命名规范、Controller/Service 编码、DTO 验证、TypeScript 类型安全、错误处理、Prisma ORM、API 文档和代码质量等维度。
 
-在开始代码审查之前，请先阅读本 skill 的 Additional resources 中与任务相关的 supporting files，特别关注：
+审查目标：
 
-1. 架构与模块分层规则
-2. Controller / Service 编码规则
-3. DTO 与数据验证规则
-4. TypeScript 类型安全规则
-5. 错误处理规则
-6. Prisma ORM 使用规则
-7. API 文档规则
+- 发现违反项目规范的代码问题
+- 给出可执行的修正建议
+- 输出结构化的审查报告和评分
 
-## 审查工作流程
+## When to use this skill
 
-### 第一步：确认审查范围
-- 检查用户是否提供了需要审查的完整文件内容
-- 如果只有部分代码，明确告知需要提供完整上下文才能准确审查
+- 用户要求审查 NestJS 后端代码时
+- 用户提到 "review"、"审查"、"代码质量"、"规范检查" 等关键词时
+- 需要评估 Controller、Service、DTO、Prisma 查询、异常处理等实现时
+- PR 审查或代码走查场景
 
-### 第二步：按维度逐项检查
+## Inputs
 
-按照以下顺序，对照检查清单逐项检查，不要遗漏任何维度：
+- **待审查代码**：用户提供的完整文件内容或文件路径
+- **审查范围说明**：（可选）用户希望重点检查的维度
+- **项目上下文**：（可选）相关模块或依赖文件
 
----
+## Workflow
 
-## Additional resources
+1. **确认审查范围**：检查用户是否提供了完整代码上下文；如只有片段，先提示补充。
+2. **加载参考规范**：根据审查维度，按需读取 [reference/](reference/) 下的检查规则。
+3. **逐项检查**：按照 [templates/review-output-template.md](templates/review-output-template.md) 的维度逐项审查。
+4. **记录问题**：对发现的问题标注优先级 `[T0]` / `[T1]` / `[T2]`，并给出修正示例。
+5. **输出评分**：按照输出模板填写各维度评分和改进计划。
+6. **总结亮点**：列出符合规范的亮点，保持客观友好。
 
-开始 NestJS 后端代码审查任务前，必须按任务类型读取以下 supporting files。
+## Resources
 
-### 审查规则
+| 资源 | 何时使用 |
+|------|----------|
+| [reference/review-architecture.md](reference/review-architecture.md) | 检查架构分层、模块拆分、导入顺序、DTO 导入方式时 |
+| [reference/review-naming.md](reference/review-naming.md) | 检查文件命名、类名、变量名、DTO 后缀、枚举命名时 |
+| [reference/review-controller-service.md](reference/review-controller-service.md) | 检查 Controller 路由、HTTP 方法、参数装饰器、Service 注入时 |
+| [reference/review-dto.md](reference/review-dto.md) | 检查请求/响应 DTO、class-validator、Swagger 文档装饰器时 |
+| [reference/review-typescript.md](reference/review-typescript.md) | 检查类型声明、any 使用、catch 块错误收窄、类型导出时 |
+| [reference/review-error-handling.md](reference/review-error-handling.md) | 检查业务异常、Prisma 错误处理、错误消息友好性时 |
+| [reference/review-prisma.md](reference/review-prisma.md) | 检查 Prisma schema、查询 select、事务、分页、索引、命名转换时 |
+| [reference/review-api-docs.md](reference/review-api-docs.md) | 检查 Swagger 装饰器、ApiTags、ApiOperation、ApiResponse 时 |
+| [reference/review-quality.md](reference/review-quality.md) | 检查 lint/format、调试代码、类型检查、注释质量时 |
+| [templates/review-output-template.md](templates/review-output-template.md) | 输出审查报告时作为格式模板 |
+| [examples/example-review-output.md](examples/example-review-output.md) | 需要参考完整审查输出样例时 |
 
-- [Architecture module](rules/code-review-architecture.md)
-- [Naming convention](rules/code-review-naming.md)
-- [Controller service](rules/code-review-controller-service.md)
-- [DTO validation](rules/code-review-dto.md)
-- [TypeScript spec](rules/code-review-typescript.md)
-- [Error handling](rules/code-review-error-handling.md)
-- [Prisma ORM](rules/code-review-prisma.md)
-- [API documentation](rules/code-review-api-docs.md)
-- [Code quality](rules/code-review-quality.md)
+## Output format
 
-### 参考规范
+最终输出必须遵循 [templates/review-output-template.md](templates/review-output-template.md) 的结构，包含：
 
-- [NestJS 后端开发规范](../nestjs-backend-developer/SKILL.md)
+- 按优先级排列的问题列表
+- 每个维度的评分
+- 总分
+- 优先改进计划
+- 做得好的地方
+- 推荐阅读的规范文档
 
----
+单个问题输出格式：
 
-## 输出要求
-
-### 问题输出格式（必须严格遵循）
-
-对于每个发现的问题，按照以下结构输出：
-
-```
-### [序号]. [问题类别] 简短标题
+```markdown
+### [序号]. [优先级] [问题类别] 简短标题
 
 **问题描述**:
 > 一句话清楚说明问题出在哪里
 
 **当前代码**:
 ```typescript
-// 贴出问题代码片段
+// 问题代码片段
 ```
 
 **修正后的正确代码**:
 ```typescript
-// 给出完整的修正示例
+// 完整修正示例
 ```
 
 **为什么要这样改进**:
 - 引用本项目哪条规范要求
 - 解释这样改进带来什么好处
-- 帮助开发者理解背后原因
 ```
 
-### 分级标记严重程度
+## Validation
 
-在问题标题前标记优先级：
-- **[T0]** 必须立即修复 - 影响类型安全、功能正确性或违反核心规范
-- **[T1]** 建议尽快修复 - 影响代码可维护性，不符合最佳实践
-- **[T2]** 可以后续优化 - 不影响功能，纯代码风格问题
+审查完成后检查以下内容：
 
-### 最终总结结构
+- [ ] 是否覆盖了所有相关维度
+- [ ] 每个问题是否都标注了 `[T0]` / `[T1]` / `[T2]` 优先级
+- [ ] 是否给出了可执行的修正代码示例
+- [ ] 评分表是否完整，总分计算是否正确
+- [ ] 是否包含正向总结
+- [ ] 输出是否符合 [templates/review-output-template.md](templates/review-output-template.md) 的结构
 
-所有问题检查完后，必须输出：
+## Constraints
 
-## 📊 整体评分
-
-| 检查维度 | 评分 | 评价 |
-|----------|------|------|
-| 架构分层 | 得分/100 | 一句话评价 |
-| 命名规范 | 得分/100 | 一句话评价 |
-| Controller/Service | 得分/100 | 一句话评价 |
-| DTO 验证 | 得分/100 | 一句话评价 |
-| TypeScript | 得分/100 | 一句话评价 |
-| 错误处理 | 得分/100 | 一句话评价 |
-| Prisma ORM | 得分/100 | 一句话评价 |
-| API 文档 | 得分/100 | 一句话评价 |
-| 代码质量 | 得分/100 |
-
-**总分**: XX/900
-
-## 🎯 优先改进计划
-
-按 T0 → T1 → T2 优先级排序：
-
-### T0 必须立即修复（严重漏洞）
-
-1. - [ ] **问题描述** - 文件: `路径/文件名.ts`
-2. - [ ] ...
-
-### T1 建议尽快修复（中等风险）
-
-1. - [ ] **问题描述** - 文件: `路径/文件名.ts`
-2. - [ ] ...
-
-### T2 可以后续优化（低风险/改进）
-
-1. - [ ] **问题描述** - 文件: `路径/文件名.ts`
-2. - [ ] ...
-
-## ✅ 做得好的地方
-
-> 正向总结：列举符合规范的亮点，鼓励开发者
-
-- 亮点 1...
-- 亮点 2...
-
-## 📚 推荐阅读
-
-> 根据发现的问题，推荐开发者阅读相关规范文档深入理解：
-
-- [架构与模块规范](../nestjs-backend-developer/01-architecture-module.md)
-- [DTO 与数据验证规范](../nestjs-backend-developer/04-dto-validation.md)
-- [Prisma ORM 开发规范](../nestjs-backend-developer/09-prisma-orm.md)
-- [TypeScript 规范](../nestjs-backend-developer/05-typescript-spec.md)
-
----
-
-## 行为准则
-
-1. **严格对照项目规范**: 项目已有明确规范的，严格按项目规范检查，不输出与项目规范冲突的个人建议
-2. **解释原因**: 每条建议都必须解释为什么，不假设开发者已经知道
-3. **区分优先级**: 先解决必须修复的问题，再提优化建议
-4. **给出可运行示例**: 不光说哪里错了，还要给出正确的代码示例让开发者参考
-5. **不重复 ESLint 工作**: ESLint 已经能检查的问题，可以快速带过，重点关注 ESLint 检查不出来的架构和规范问题
-6. **客观中立**: 对事不对人，只说代码问题，保持专业友好
+- 只审查 NestJS 后端代码，不审查前端代码
+- 严格对照本项目规范，不输出与项目决策冲突的个人建议
+- ESLint 已覆盖的格式问题可快速带过，重点关注架构和规范问题
+- 必须解释每条建议的原因，不假设开发者已知
+- 保持客观中立，对事不对人

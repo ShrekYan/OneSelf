@@ -1,89 +1,71 @@
 ---
 name: pre-commit-check
-description: 提交代码前一键运行完整检查，自动顺序执行：前端 ESLint → 前端 TypeScript → （有后端服务变更则执行）后端 ESLint → 后端构建
+description: Use this skill when the user wants to run a complete pre-commit check before submitting code. Triggers include "pre-commit", "提交前检查", "代码检查", "lint检查", "构建检查". Also use when the user needs to verify front-end and back-end code quality before git commit. Do NOT use for individual lint commands or isolated build tasks.
+license: Complete terms in LICENSE.txt
 ---
 
 # pre-commit-check
 
-提交代码前一键运行完整检查，自动顺序执行所有本地检查命令，替代手动逐条输入。
+## Overview
 
-## 检查流程
+提交代码前一键运行完整检查，自动顺序执行所有本地检查命令，替代手动逐条输入。适用于在 git commit 前进行全面的代码质量验证，确保前端和后端代码符合项目规范。
 
-一次触发，自动跑完：
+## When to use this skill
 
-1. **前端 ESLint 检查** → `npm run lint` - 检查代码风格
-2. **前端 TypeScript 类型检查** → `npx tsc --noEmit` - 验证类型正确性
-3. **条件执行：后端检查** → 如果检测到 `services/backend/`、`services/auth-service/` 或 `services/log-service/` 目录有变更，对发生变更的服务分别进入对应目录执行：
+使用场景：
+- 用户请求运行预提交代码检查
+- 用户需要验证前端和后端代码质量
+- 改了后端服务或大功能后需要完整检查
+
+不适用场景：
+- 仅需要运行单独的 lint 命令
+- 仅需要运行单独的构建任务
+- 不需要检查后端变更的场景
+
+## Inputs
+
+- 无需额外输入，自动检测项目结构和变更
+
+## Workflow
+
+1. **开始检查**：输出检查开始提示
+2. **前端 ESLint 检查**：执行 `npm run lint` 检查代码风格
+3. **前端 TypeScript 类型检查**：执行 `npx tsc --noEmit` 验证类型正确性
+4. **后端变更检测**：检查是否有 `services/backend/`、`services/auth-service/` 或 `services/log-service/` 目录变更
+5. **后端检查（条件执行）**：如果检测到后端变更，对发生变更的服务分别执行：
    - 后端 ESLint 检查 → `npm run lint`
    - 后端构建检查 → `npm run build`
-4. **输出总结** → 告诉你哪些检查通过，哪个步骤失败了
+6. **输出总结**：显示检查结果汇总，列出通过和失败的检查项
 
-任何一步失败都会立即停止，提示你修复问题后重试。
+任何一步失败都会立即停止，提示用户修复问题后重试。
 
-## 使用方法
+## Resources
 
-```
-/pre-commit-check
-```
+| 资源 | 何时使用 |
+|------|----------|
+| `reference/husky-comparison.md` | 用户询问与 Husky 的区别时加载 |
+| `examples/output-samples.md` | 需要参考输出格式时加载 |
 
-## 示例
+## Output format
 
-```bash
-# 默认使用：运行所有检查，后端变更自动检测
-/pre-commit-check
-```
+检查报告结构：
+1. 检查开始提示
+2. 各检查步骤执行状态（通过/失败）
+3. 如果有后端变更，显示后端检查详情
+4. 总结：所有检查通过提示或失败步骤提示
+5. 检查项汇总列表
 
-## 输出示例
+## Validation
 
-所有检查通过：
-```
-🚀 开始预提交代码检查...
+- [ ] 是否按顺序执行前端 ESLint、TypeScript 检查
+- [ ] 是否正确检测后端服务目录变更
+- [ ] 是否仅在后端变更时执行后端检查
+- [ ] 是否在失败时立即停止并提示
+- [ ] 是否输出清晰的检查结果汇总
 
-📐 运行前端 ESLint 检查...
-✅ 前端 ESLint 检查通过
+## Constraints
 
-🔍 运行前端 TypeScript 类型检查...
-✅ 前端 TypeScript 类型检查通过
-
-🎉 所有检查通过！可以提交代码了
-
-检查项：
-  ✅ 前端 ESLint 代码风格检查
-  ✅ 前端 TypeScript 类型检查
-```
-
-有后端变更：
-```
-...（前端检查通过）
-
-🔙 检测到后端服务变更，按变更服务分别运行后端检查...
-
-📐 运行后端 ESLint 检查...
-✅ 后端 ESLint 检查通过
-
-🏗️  运行后端构建检查...
-✅ 后端构建检查通过
-
-🎉 所有检查通过！可以提交代码了
-
-检查项：
-  ✅ 前端 ESLint 代码风格检查
-  ✅ 前端 TypeScript 类型检查
-  ✅ 后端 ESLint 代码风格检查
-  ✅ 后端 TypeScript 构建检查
-```
-
-## 和 Husky pre-commit 的关系
-
-| 场景 | 使用什么 | 说明 |
-|------|----------|------|
-| 日常快速提交 | Husky pre-commit（已配置） | git commit 自动执行，只检查暂存文件，速度快 |
-| 完整检查（改了后端服务 / 大功能）| `/pre-commit-check` | 手动触发，检查前端 + 后端服务，更全面 |
-
-两者共存互补，不修改现有 Husky 配置。
-
-## 说明
-
-- **执行方式**：自动顺序执行 shell 命令，一次触发等全部完成
-- **失败策略**：任何一步失败立即退出，不浪费时间，早发现早修复
-- **智能检测**：只在有后端服务文件变更时运行后端检查，节省时间
+- 自动顺序执行检查，用户无需手动干预
+- 任何一步失败立即退出，不继续后续检查
+- 智能检测后端变更，无变更时跳过后端检查节省时间
+- 不修改现有 Husky 配置，与 Husky pre-commit 互补使用

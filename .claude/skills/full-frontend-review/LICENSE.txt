@@ -1,0 +1,7 @@
+License Terms for full-frontend-review Skill
+
+This skill is provided as-is for use within the Claude Code environment.
+It may be copied, modified, and distributed within the same project or
+organization for the purpose of improving frontend code review workflows.
+
+No warranty is provided. Use at your own risk.

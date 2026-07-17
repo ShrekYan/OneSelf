@@ -1,59 +1,101 @@
 ---
 name: h5-frontend-developer
-description: H5 移动端前端开发工程师的代码规范和最佳实践。在编写 React 组件、样式、状态管理和数据获取时自动加载。
+description: Use this skill when the user wants to develop H5 mobile frontend applications using React + TypeScript + MobX. Triggers include creating React components, implementing styles with CSS Modules, managing state with MobX, handling API calls, and following frontend coding standards. Also use when refactoring existing frontend code or debugging frontend issues. Do NOT use for non-frontend tasks or backend development.
+license: Complete terms in LICENSE.txt
 ---
 
 # H5 前端开发工程师
 
-你是一位专业的 H5 移动端前端开发工程师，精通 React + TypeScript + MobX 技术栈，请严格遵循以下项目开发规范。
+## Overview
 
-## 预理解阶段（代码生成前必须执行）
+本 skill 提供 H5 移动端前端开发的完整规范和最佳实践，技术栈为 React 19 + TypeScript + MobX + Vite + Ant Design Mobile + SCSS Modules。适用于页面开发、组件设计、状态管理、API 调用、样式开发等场景。
 
-在开始任何代码生成任务之前，请你按以下步骤系统性理解本项目规范。
+## When to use this skill
 
-### 第一步：阅读并提取核心规则
+- 用户需要创建或修改 React 组件
+- 用户需要实现 CSS/SCSS 样式
+- 用户需要使用 MobX 管理状态
+- 用户需要调用 API 接口
+- 用户需要遵循前端代码规范
+- 用户需要重构现有前端代码
+- 用户需要排查前端常见问题
 
-请先阅读本 skill 的 Additional resources 中与任务相关的 supporting files，特别关注：
+## Inputs
 
-1. 强制规范（标有禁止的内容）
-2. 目录结构（文件组织方式）
-3. 命名约定（文件、变量、class 命名规则）
-4. MobX 写法（useLocalObservable 和 useObserver 规范）
-5. 样式规范（CSS Modules + 750px 设计稿）
-6. API 调用方式（apps/web/src/api/ 模块使用）
+- 用户需求描述（页面功能、组件需求等）
+- 技术栈约束（如必须使用特定框架）
+- 设计稿或样式要求
+- 接口文档或 API 信息
+- 项目现有代码结构
 
-### 第二步：确认关键约束
+## Workflow
 
-在输出代码前，请确认以下检查点：
+1. 识别任务类型（页面开发、组件开发、状态管理、API 调用等）
+2. 读取相关参考文档和模板
+3. 收集必要输入信息
+4. 按照规范生成代码
+5. 验证代码符合规范要求
+6. 交付结果并说明
 
-- [ ] 是否会使用 `@/` 别名而不是相对路径？
-- [ ] 是否会使用 `*.module.scss` 而不是普通 CSS？
-- [ ] MobX 是否会用 `useObserver` Hook 而非 observer HOC？
-- [ ] `useLocalObservable` 中的方法是否用方法语法而非箭头函数？
+## Resources
+
+| 资源 | 何时使用 |
+|------|----------|
+| `templates/` | 创建新页面、组件或文件时，使用模板作为起点 |
+| `reference/` | 需要查阅详细规范、最佳实践或分语言指南时 |
+
+## Output format
+
+根据任务类型输出：
+- 完整的页面代码（包含所有必要文件）
+- 组件代码（包含 TSX 和样式文件）
+- API 调用代码
+- 状态管理代码
+- 代码修改建议
+- 问题排查报告
+
+## Validation
+
+- [ ] 是否使用了 `@/` 别名而非相对路径？
+- [ ] 是否使用了 `*.module.scss` 而非普通 CSS？
+- [ ] MobX 是否使用了 `useObserver` Hook 而非 observer HOC？
 - [ ] 是否所有类型都显式定义，没有 `any`？
-- [ ] 页面是否按规范拆分为多个文件？
+- [ ] 是否遵循了目录结构规范？
+- [ ] 是否通过了 TypeScript 类型检查？
 
-### 第三步：开始代码生成
+## Constraints
 
-确认理解所有规范后，再开始执行用户的具体开发任务。
+- 禁止在组件内直接使用 axios，必须通过 `@/api/` 模块调用
+- 禁止滥用 `any` 类型，优先使用 `unknown` + 类型守卫
+- 禁止使用 ID 选择器和标签选择器直接定义全局样式
+- 禁止在 useEffect 依赖数组中监听 MobX store 对象
+- 禁止使用常规 enum，使用联合类型替代
 
 ## Additional resources
 
-开始前端开发任务前，必须按任务类型读取以下 supporting files。
-
 ### 核心架构与页面规范
 
-- [Architecture directory](architecture-directory.md)
-- [Page directory structure](page-directory-structure.md)
-- [UI component spec](ui-component-spec.md)
-- [Logic data flow](logic-data-flow.md)
-- [Troubleshooting](troubleshooting.md)
+- [架构与目录规范](reference/architecture-directory.md)
+- [页面目录结构规范](reference/page-directory-structure.md)
+- [组件与 UI 开发规范](reference/ui-component-spec.md)
+- [状态、逻辑与数据流规范](reference/logic-data-flow.md)
+- [常见问题与排错](reference/troubleshooting.md)
 
 ### 前端规则
 
-- [Frontend API design](rules/frontend-api-design.md)
-- [Frontend TypeScript](rules/frontend-typescript.md)
-- [Frontend CSS/SCSS](rules/frontend-css-scss.md)
-- [Frontend hooks error handling](rules/frontend-hooks-error-handling.md)
-- [Frontend assets resources](rules/frontend-assets-resources.md)
-- [Frontend third-party libraries](rules/frontend-third-party-libraries.md)
+- [API 设计规范](reference/rules/frontend-api-design.md)
+- [TypeScript 规范](reference/rules/frontend-typescript.md)
+- [CSS/SCSS 样式规范](reference/rules/frontend-css-scss.md)
+- [自定义 Hooks 与错误处理规范](reference/rules/frontend-hooks-error-handling.md)
+- [Hooks 目录规范](reference/rules/frontend-hooks-ts.md)
+- [静态资源规范](reference/rules/frontend-assets-resources.md)
+- [第三方工具库使用规范](reference/rules/frontend-third-party-libraries.md)
+
+### 模板文件
+
+- [页面模板](templates/page-template/)
+- [组件模板](templates/component-template/)
+- [Store 模板](templates/store-template/)
+- [Hook 模板](templates/hook-template/)
+- [API 模块模板](templates/api-module-template/)
+

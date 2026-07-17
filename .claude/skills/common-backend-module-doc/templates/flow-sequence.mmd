@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client as 客户端
+    participant Gateway as API网关
+    participant C as Controller
+    participant S as Service
+    participant R as Repository
+    participant DB as 数据库
+
+    Client->>Gateway: 请求
+    Gateway->>C: 路由转发
+    C->>S: 调用业务方法
+    S->>R: 查询数据
+    alt 缓存命中
+        R-->>S: 返回缓存
+    else 缓存未命中
+        R->>DB: 查询数据库
+        DB-->>R: 返回数据
+    end
+    R-->>S: 返回数据
+    S-->>C: 处理结果
+    C-->>Client: 返回响应
