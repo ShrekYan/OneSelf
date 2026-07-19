@@ -9,14 +9,6 @@ description: 调用链预演 - 输出执行规划流程图，确认后再执行
 
 面向 API/AI 服务开发的 command，聚焦于调用链规划、执行流程可视化和操作确认机制。
 
-## 适用场景
-
-| 场景 | 描述 | 典型输出 |
-| --- | --- | --- |
-| 任务规划 | 复杂任务的执行流程规划 | 流程图、步骤清单 |
-| MCP 调用预演 | 外部服务调用规划 | MCP 调用链、权限检查 |
-| 多步骤操作 | 多阶段任务的执行顺序 | 步骤序列、文件操作清单 |
-
 ## Context
 
 用户需要预演复杂任务的执行流程，输出调用链规划，确认后再执行实际操作。
@@ -27,22 +19,27 @@ $ARGUMENTS
 
 ## Instructions
 
-### 1. Task Analysis
-- 解析任务描述
-- 识别所需工具和 Agent
-- 确定执行顺序
+### 1. Requirement and Contract Analysis
+- 识别任务描述和执行步骤需求
+- 定义输入/输出模式和工具调用契约
+- 验证所需工具和 Agent 的可用性
 
-### 2. Call Chain Planning
+### 2. Architecture Design
+- 分析调用链步骤序列
+- 验证步骤依赖关系
+- 检查工具调用顺序合理性
+
+### 3. Implementation Scaffold
 - 构建调用链流程图
 - 定义步骤依赖关系
 - 识别文件操作
 
-### 3. Visualization
+### 4. Testing and Verification
 - 生成 Mermaid 流程图
 - 创建步骤表格
 - 列出文件操作清单
 
-### 4. Confirmation
+### 5. Deployment and Operations
 - 输出规划结果
 - 等待用户确认
 - 提供执行/取消选项
@@ -50,11 +47,13 @@ $ARGUMENTS
 ## Output Format
 
 Return:
-- Task Summary（任务摘要）
-- Flowchart（流程图）
-- Steps Table（步骤表格）
-- File Operations（文件操作清单）
-- Confirmation Prompt（确认提示）
+- Service Summary
+- Architecture
+- Interface / Contract Definitions
+- Implementation Scaffold
+- Test Plan
+- Deployment Notes
+- Operational Checks
 
 ---
 

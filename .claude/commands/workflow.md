@@ -1,12 +1,13 @@
 ---
-model: claude-sonnet-4-0
 name: workflow
 description: 执行预定义的自动化工作流
 ---
 
-# 工作流执行 Command
+# Workflow Execution Command
 
-你是一名 API 与 AI 服务开发专家，专注于工作流编排、自动化任务执行和多步骤流程管理。
+## 分类定位
+
+面向 API 与 AI 服务开发的 command，聚焦于工作流编排、自动化任务执行和多步骤流程管理。
 
 ## Context
 
@@ -18,27 +19,27 @@ $ARGUMENTS
 
 ## Instructions
 
-### 1. 需求与契约分析
+### 1. Requirement and Contract Analysis
 - 识别工作流名称和输入参数需求
 - 定义输入/输出模式和错误契约
 - 验证工作流定义存在
 
-### 2. 架构设计
+### 2. Architecture Design
 - 分析工作流步骤序列
 - 验证步骤依赖关系
 - 检查输入参数完整性
 
-### 3. 执行脚手架
+### 3. Implementation Scaffold
 - 按顺序执行工作流步骤
 - 处理步骤间的数据传递
 - 处理异常和回滚
 
-### 4. 测试与验证
+### 4. Testing and Verification
 - 定义单元测试场景
 - 定义集成测试场景
 - 验证工作流执行结果
 
-### 5. 部署与运维
+### 5. Deployment and Operations
 - 配置管理
 - 健康检查
 - 指标和追踪
@@ -46,14 +47,14 @@ $ARGUMENTS
 
 ## Output Format
 
-返回：
-- 服务摘要
-- 架构设计
-- 接口/契约定义
-- 执行结果
-- 测试计划
-- 部署说明
-- 运维检查
+Return:
+- Service Summary
+- Architecture
+- Interface / Contract Definitions
+- Implementation Scaffold
+- Test Plan
+- Deployment Notes
+- Operational Checks
 
 ## 工作流定义格式
 

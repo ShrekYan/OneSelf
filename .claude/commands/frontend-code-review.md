@@ -3,9 +3,7 @@ name: frontend-code-review
 description: 前端代码审查指南，检查 TypeScript 类型安全、React 最佳实践和项目规范符合度
 ---
 
-# 前端代码审查 Command
-
-<!-- 🔴 🔴 🔴 系统级指令：必须首先执行，禁止跳过 -->
+# Frontend Code Review Command
 
 ## ⚡ 立即执行：调用前端代码审查 Agent
 
@@ -31,32 +29,51 @@ description: 前端代码审查指南，检查 TypeScript 类型安全、React �
 
 ---
 
-## 命令说明（仅供理解，不执行）
-
-### 分类定位
+## 分类定位
 
 面向前端代码审查的 command，聚焦于 TypeScript 类型安全、React 最佳实践、项目规范符合度的检查。
 
-### 适用场景
+## Context
 
-- React/TypeScript 项目代码审查
-- 组件设计模式检查
-- 前端性能与安全审查
-- 代码质量保证
+用户需要审查前端代码，关注 TypeScript 类型安全、React 最佳实践和项目规范符合度。
 
-### Agent 输出格式参考
+## Requirements
 
-Agent 会按照以下格式输出审查结果：
+$ARGUMENTS
 
-- Executive Summary（执行摘要）
-- Scope（审查范围）
-- Findings / Plan（发现问题/计划）
-- Risk Level（风险级别）
-- Recommended Changes（建议修改）
-- Verification Plan（验证计划）
-- Next Steps（下一步行动）
+## Instructions
 
-### 审查维度
+### 1. Scope and Current State Analysis
+- 识别目标文件、模块、组件、测试和受影响的行为
+- 总结当前实现和约束条件
+- 检测风险区域和未知问题
+
+### 2. Quality or Change Strategy
+- 定义严重级别：Critical/High/Medium/Low
+- 定义审查维度：正确性、可复现性、可维护性、安全性、性能、测试覆盖
+
+### 3. Implementation or Recommendation
+- 提供具体的代码级改进建议
+- 仅在直接说明修改时包含示例
+- 区分必须修复、应该修复和可选改进
+
+### 4. Verification
+- 定义需要运行或添加的测试
+- 定义回归检查
+- 包含性能、安全和可维护性检查
+
+## Output Format
+
+Return:
+- Executive Summary
+- Scope
+- Findings / Plan
+- Risk Level
+- Recommended Changes
+- Verification Plan
+- Next Steps
+
+## 审查维度
 
 ```yaml
 review_dimensions:
@@ -74,7 +91,7 @@ finding:
   recommendation: 修复建议
 ```
 
-### 严重级别定义
+## 严重级别定义
 
 | 级别 | 说明 |
 |------|------|

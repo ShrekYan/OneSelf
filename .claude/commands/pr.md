@@ -3,18 +3,11 @@ name: pr
 description: PR 描述生成，自动分析分支 commit 生成符合规范的 Pull Request 描述
 ---
 
-# PR 描述生成 Command
+# PR Description Command
 
 ## 分类定位
 
 面向 Pull Request 增强的 command，聚焦于自动生成符合项目规范的 PR 描述，包括标题、改动清单、检查清单。
-
-## 适用场景
-
-- PR 描述自动生成
-- 代码审查辅助
-- 团队协作规范落地
-- CI/CD 流程集成
 
 ## Context
 
@@ -26,34 +19,35 @@ $ARGUMENTS
 
 ## Instructions
 
-### 1. Branch Analysis
-- 获取当前分支名称
-- 获取未合并的 commit 历史
-- 验证分支状态（非 main 分支）
+### 1. Scope and Current State Analysis
+- 识别当前分支、commit 历史和改动范围
+- 总结当前实现和约束条件
+- 检测风险区域和未知问题
 
-### 2. Commit Classification
-- 分析所有 commit，按 type 分类整理
-- 提取主类型用于生成 PR 标题
-- 识别破坏性变更
+### 2. Quality or Change Strategy
+- 定义 PR 类型和严重级别
+- 定义审查维度：正确性、完整性、可维护性、测试覆盖
 
-### 3. Description Generation
+### 3. Implementation or Recommendation
 - 生成符合 Conventional Commits 规范的标题
-- 生成结构化的改动清单
-- 添加检查清单和风险评估
+- 提供具体的改动清单和风险评估
+- 区分必须修复、应该修复和可选改进
 
-### 4. Output and Verification
-- 展示生成结果供预览
-- 提供复制功能
-- 验证描述完整性
+### 4. Verification
+- 定义验证步骤
+- 定义回归检查
+- 包含质量和安全检查
 
 ## Output Format
 
 Return:
-- PR Title（PR 标题）
-- PR Description（PR 描述）
-- Changes Summary（改动摘要）
-- Checklist（检查清单）
-- Risk Assessment（风险评估）
+- Executive Summary
+- Scope
+- Findings / Plan
+- Risk Level
+- Recommended Changes
+- Verification Plan
+- Next Steps
 
 ## 执行流程
 
@@ -70,4 +64,4 @@ Return:
 
 ## 强制执行协议
 
-请调用 Skill 工具执行 `common-pr`，并将用户参数原样传入。规范入口：[common-pr Skill](../skills/common-pr/SKILL.md)。
+请调用 Skill 工具执行 `common-pr`，并将用户参数原样传入。规范入口：[common-pr Skill](../skills/common-pr/SKILL.md)

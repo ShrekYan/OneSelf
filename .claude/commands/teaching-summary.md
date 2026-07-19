@@ -9,14 +9,6 @@ description: 教学教材生成，将开发案例总结成结构化的教学素�
 
 面向文档与知识管理的 command，聚焦于将开发案例总结成结构化的教学教材，包含提示词分析、方案对比、复盘清单等内容。
 
-## 适用场景
-
-| 场景 | 描述 | 典型输出 |
-| --- | --- | --- |
-| Bug 修复教学 | 分析 Bug 修复案例 | 问题复盘、修复方案对比、预防措施 |
-| 新功能开发教学 | 分析新功能开发案例 | 架构决策、技术选型、最佳实践 |
-| 代码审查教学 | 分析代码审查案例 | 审查要点、改进建议、代码优化 |
-
 ## Context
 
 用户需要将当前对话中的开发案例总结成结构化的教学教材，输出到文档目录。
@@ -27,39 +19,36 @@ $ARGUMENTS
 
 ## Instructions
 
-### 1. Case Analysis
-- 分析对话中的开发案例：需求描述、问题、修复过程、决策点
+### 1. Source Discovery
+- 识别对话中的开发案例：需求描述、问题、修复过程、决策点
 - 提取用户原始提示词，保留完整原文
-- 识别关键决策点和技术方案
+- 确定每个来源的新鲜度和可靠性
+- 标记缺失或冲突的信息
 
-### 2. Prompt Evaluation
-- 执行 7 维度标准化评判
-- 分析提示词不足点，给出优化建议
-- 生成质量评分和优缺点分析
+### 2. Knowledge Extraction
+- 提取目标、架构、工作流、API、决策、约束和当前状态
+- 保留理由，而不仅仅是结论
+- 将任务特定细节与稳定的项目知识分开
 
-### 3. Content Generation
-- 生成提示词对照学习区（原始 vs 优化后）
-- 生成问题分析和方案对比章节
-- 生成复盘清单和教学总结
+### 3. Structuring
+- 根据受众和目的选择输出模板
+- 使用清晰的章节、表格、检查清单和示例进行组织
+- 添加有用的链接或文件引用
 
-### 4. Template Generation
-- 生成高质量提示词完整模板
-- 包含用途说明、模板内容、质量对比表、使用说明
-- 确保模板可以直接复制套用
-
-### 5. Verification and Output
-- 执行强制校验：原始提示词完整性、7维度评判、不足点改进建议、质量评分、成品模板
-- 输出教学文档到指定路径
+### 4. Validation
+- 检查与源材料的一致性
+- 识别过时或不确定的条目
+- 定义下次更新或负责人
 
 ## Output Format
 
 Return:
-- Case Summary（案例摘要）
-- Prompt Analysis（提示词分析）
-- Problem Analysis（问题分析）
-- Teaching Content（教学内容）
-- Document Path（文档路径）
-- Verification Status（验证状态）
+- Purpose and Audience
+- Source Summary
+- Structured Documentation / Notes / Context
+- Open Questions
+- Action Items
+- Maintenance Guidance
 
 ---
 

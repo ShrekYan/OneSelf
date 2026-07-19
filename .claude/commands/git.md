@@ -4,7 +4,7 @@ description: Git 操作助手，智能提交、分支管理、PR 描述生成
 usage: /git <command> [args]
 ---
 
-# Git 操作助手 Command
+# Git Command
 
 ## 分类定位
 
@@ -12,61 +12,58 @@ usage: /git <command> [args]
 
 ## 适用场景
 
-- 智能提交信息生成（Conventional Commits 规范）
-- 分支创建与管理
-- PR 描述自动生成
-- Git 工作流辅助
-
-## 结构化模板
-
-```markdown
-# Git 操作助手
-
-You are a Git workflow expert specializing in commit conventions, branching strategies, and PR descriptions.
+| 场景 | 描述 | 典型输出 |
+| --- | --- | --- |
+| 智能提交信息生成 | Conventional Commits 规范提交信息 | 提交信息方案列表 |
+| 分支创建与管理 | 功能分支、修复分支、发布分支 | 分支名称、操作步骤 |
+| PR 描述自动生成 | 分析分支 diff 生成描述 | PR 标题、改动清单 |
+| Git 工作流辅助 | 日常 Git 操作支持 | 操作指南、示例命令 |
 
 ## Context
-The user needs Git assistance for {specific_task}. Focus on best practices, automation, and consistency.
+
+用户需要 Git 操作辅助，包括提交信息生成、分支管理、PR 描述生成等。
 
 ## Requirements
+
 $ARGUMENTS
 
 ## Instructions
 
-### 1. Task Analysis
+### 1. System and Environment Analysis
 - 识别 Git 操作类型：commit、branch、pr 或其他
 - 理解上下文和需求
-- 验证前提条件
+- 验证前提条件（当前分支状态、工作区状态）
 
-### 2. Strategy Definition
+### 2. Infrastructure Design or Optimization
 - 对于提交：生成符合 Conventional Commits 规范的提交信息
-- 对于分支：遵循命名约定
+- 对于分支：遵循命名约定创建分支
 - 对于 PR：分析 diff 并生成结构化描述
 
-### 3. Execution
+### 3. Safety and Rollback
 - 执行或推荐 Git 操作
 - 提供清晰的步骤和示例
-- 包含破坏性操作的安全检查
+- 包含破坏性操作的安全检查和确认机制
 
-### 4. Verification
+### 4. Observability and Operations
 - 确认执行成功
 - 提供下一步建议
+- 记录操作历史
+
+### 5. Cost and Efficiency
+- 优化操作流程
+- 减少重复操作
+- 提供快捷命令建议
 
 ## Output Format
+
 Return:
-- Task Summary（任务摘要）
-- Generated Output（生成的输出：提交信息、分支名称、PR 描述）
-- Verification Status（验证状态）
-- Next Steps（下一步行动）
-```
-
-## 字段规范
-
-| 字段 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| `operation_type` | string | 是 | commit / branch / pr / other |
-| `context` | string | 是 | 操作上下文 |
-| `requirements` | string[] | 是 | 用户需求列表 |
-| `output_format` | string | 是 | 输出格式要求 |
+- Deployment / Infrastructure Summary（任务摘要）
+- Generated Resources or Plan（生成的输出）
+- Security and Compliance Notes（安全和合规说明）
+- Rollout Strategy（执行策略）
+- Rollback Plan（回滚计划）
+- Validation Checklist（验证检查清单）
+- Monitoring and Cost Controls（监控和控制）
 
 ## 可用命令
 

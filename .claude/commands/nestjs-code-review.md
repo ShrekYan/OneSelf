@@ -3,30 +3,42 @@ name: nestjs-code-review
 description: NestJS 后端代码审查，对照项目规范检查架构分层、命名规范、DTO 验证、TypeScript 类型安全等
 ---
 
-# NestJS 代码审查 Command
+# NestJS Code Review Command
+
+## ✅ 立即执行：调用 NestJS 代码审查专家 Agent
+
+**使用 `Agent` 工具**，参数如下：
+
+| 参数 | 值 |
+|------|----|
+| `subagent_type` | `nestjs-code-review` |
+| `description` | 用户的 NestJS 代码审查需求 |
+| `prompt` | "用户审查需求：$ARGUMENTS\n\n请严格按照你的系统提示词中的审查工作流程执行。" |
+
+### 🔍 自我验证（执行后确认）
+- [ ] 我使用了 `Agent` 工具进行调用
+- [ ] 我没有自行扫描或分析任何代码
+- [ ] 调用 Agent 是我做的第一件事
+- [ ] 我在调用前没有输出其他文字
+
+### ❌ 绝对禁止行为（违反即失败）
+- 主 Claude 自行扫描代码
+- 跳过 Agent 直接输出审查报告
+- 先解释再调用 Agent
+- 输出任何与调用 Agent 无关的内容
+
+---
 
 ## 分类定位
 
 面向 NestJS 后端代码审查的 command，聚焦于架构分层、命名规范、DTO 验证、TypeScript 类型安全的检查。
 
-## 适用场景
-
-- NestJS 后端模块审查
-- Controller/Service/Repository 分层检查
-- DTO 验证与类型安全审查
-- 中间件、拦截器、守卫配置审查
-
-## 结构化模板
-
-```markdown
-# NestJS 代码审查
-
-You are a NestJS backend code review expert specializing in architecture, security, and best practices.
-
 ## Context
-The user needs to review NestJS backend code for {specific_concerns}. Focus on architectural patterns, type safety, and security.
+
+用户需要审查 NestJS 后端代码，关注架构模式、类型安全和安全性。
 
 ## Requirements
+
 $ARGUMENTS
 
 ## Instructions
@@ -36,11 +48,11 @@ $ARGUMENTS
 - 总结当前实现和约束条件
 - 检测风险区域和未知问题
 
-### 2. Review Strategy
+### 2. Quality or Change Strategy
 - 定义严重级别：Critical/High/Medium/Low
 - 定义审查维度：架构、正确性、可维护性、安全性、测试覆盖
 
-### 3. Implementation Recommendations
+### 3. Implementation or Recommendation
 - 提供具体的代码级改进建议
 - 仅在直接说明修改时包含示例
 - 区分必须修复、应该修复和可选改进
@@ -51,27 +63,15 @@ $ARGUMENTS
 - 包含安全和可维护性检查
 
 ## Output Format
+
 Return:
-- Executive Summary（执行摘要）
-- Scope（审查范围）
-- Findings / Plan（发现问题/计划）
-- Risk Level（风险级别）
-- Recommended Changes（建议修改）
-- Verification Plan（验证计划）
-- Next Steps（下一步行动）
-```
-
-## 字段规范
-
-| 字段 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| `domain` | string | 是 | 例如 `nestjs`, `backend`, `api` |
-| `capabilities` | string[] | 是 | 专家能力描述 |
-| `goal` | string | 是 | 用户审查目标 |
-| `focus_points` | string[] | 是 | 审查关注点 |
-| `severity_levels` | enum[] | 是 | `Critical/High/Medium/Low` |
-| `risk_areas` | string[] | 是 | 潜在破坏面 |
-| `verification_plan` | string[] | 是 | 验证方式 |
+- Executive Summary
+- Scope
+- Findings / Plan
+- Risk Level
+- Recommended Changes
+- Verification Plan
+- Next Steps
 
 ## 审查维度
 
@@ -90,31 +90,14 @@ finding:
   recommendation: 修复建议
 ```
 
----
+## 字段规范
 
-## 强制执行协议
-
-<!-- 🔴 🔴 🔴 最高优先级：必须首先执行工具调用 -->
-<!-- 使用 Claude Code 原生 Agent 工具，100% 触发 NestJS 代码审查专家 -->
-
-### ✅ 立即执行：调用 NestJS 代码审查专家 Agent
-
-**使用 `Agent` 工具**，参数如下：
-
-| 参数 | 值 |
-|------|----|
-| `subagent_type` | `nestjs-code-review` |
-| `description` | 用户的 NestJS 代码审查需求 |
-| `prompt` | "用户审查需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的审查工作流程执行。" |
-
-### 🔍 自我验证（执行后确认）
-- [ ] 我使用了 `Agent` 工具进行调用
-- [ ] 我没有自行扫描或分析任何代码
-- [ ] 调用 Agent 是我做的第一件事
-- [ ] 我在调用前没有输出其他文字
-
-### ❌ 绝对禁止行为（违反即失败）
-- 主 Claude 自行扫描代码
-- 跳过 Agent 直接输出审查报告
-- 先解释再调用 Agent
-- 输出任何与调用 Agent 无关的内容
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `domain` | string | 是 | 例如 `nestjs`, `backend`, `api` |
+| `capabilities` | string[] | 是 | 专家能力描述 |
+| `goal` | string | 是 | 用户审查目标 |
+| `focus_points` | string[] | 是 | 审查关注点 |
+| `severity_levels` | enum[] | 是 | `Critical/High/Medium/Low` |
+| `risk_areas` | string[] | 是 | 潜在破坏面 |
+| `verification_plan` | string[] | 是 | 验证方式 |
