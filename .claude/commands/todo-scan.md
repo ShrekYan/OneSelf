@@ -1,25 +1,15 @@
 ---
 name: todo-scan
-description: TODO 扫描命令，扫描项目中所有 TODO/FIXME/XXX 标记，整理输出待办清单
+description: 扫描项目中的 TODO/FIXME/XXX 标记，生成结构化待办清单
 ---
 
-# TODO Scan Command
+# TODO Scan
 
-## 分类定位
-
-面向数据与配置治理的 command，聚焦于项目待办事项扫描、技术债务追踪和代码配置一致性检查。强调扫描结果的正确性、一致性和可量化追踪。
-
-## 适用场景
-
-| 场景 | 描述 | 典型输出 |
-| --- | --- | --- |
-| 技术债务清理 | 扫描项目中的 TODO/FIXME/XXX 标记 | 待办清单、统计报告、清理建议 |
-| 代码审查前置 | 审查前扫描待办事项 | 按优先级排序的待办列表 |
-| 项目健康检查 | 定期扫描追踪技术债务 | 趋势报告、治理节奏建议 |
+你是一名代码质量与技术债务分析专家，专注于基于注释标记发现债务、确定优先级并制定修复计划。
 
 ## Context
 
-用户需要扫描项目中所有的 TODO/FIXME/XXX 标记，整理输出结构化的待办清单，方便清理和追踪。重点关注正确性、一致性、可靠性和可量化追踪。
+用户需要识别并梳理散落在代码库中的 TODO/FIXME/XXX 标记。重点在于呈现可执行的待办项、按位置分组，并提供团队可以逐步执行的清理路线图。
 
 ## Requirements
 
@@ -27,92 +17,56 @@ $ARGUMENTS
 
 ## Instructions
 
-### 1. Target and Constraint Analysis
-- 识别扫描范围：项目根目录
-- 排除不需要搜索的目录（node_modules, .git, .claude, dist, build 等）
-- 确定搜索模式：TODO, FIXME, XXX
-- 识别环境和所有权
+### 1. Scope and Current State Analysis
+- 使用 **common-todo-scan** skill 扫描项目中的 TODO/FIXME/XXX 标记。
+- 未提供参数时，从项目根目录开始扫描；否则使用用户提供的路径或选项作为扫描根目录。
+- 识别受影响的文件、行号、标记类型及上下文。
+- 按标记类型（TODO / FIXME / XXX）和文件汇总总数。
 
-### 2. Schema / Rules / Indicators Definition
-- 定义搜索模式规则：TODO（普通待办）、FIXME（需要修复）、XXX（占位符）
-- 定义优先级规则：默认优先级、紧急标记
-- 定义严重程度：Critical | High | Medium | Low
+### 2. Quality or Change Strategy
+- 按严重程度对每个标记分类：
+  - **Critical**：阻塞正确性、安全性或生产稳定性的 FIXME。
+  - **High**：与活跃功能、缺失校验或错误处理相关的 TODO。
+  - **Medium**：与重构、优化或文档补充相关的 TODO。
+  - **Low**：XXX 备注、提示或可选改进项。
+- 标记重复出现的模式和聚集区域，这些往往意味着系统性技术债务。
 
-### 3. Pipeline or Validation Design
-- 定义扫描阶段：搜索、收集、整理、统计
-- 定义执行方式：使用 ripgrep 搜索
-- 定义输出格式：详细报告或摘要报告
+### 3. Implementation or Recommendation
+- 针对每个标记或每个聚集区域提供具体的清理建议。
+- 区分必须修复、建议修复和可选改进。
+- 当标记意图不明确时，建议负责人或后续跟进动作。
 
-### 4. Monitoring and Governance
-- 定义分类统计和分组方式
-- 提供清理建议和优先级排序
-- 建立持续改进机制
+### 4. Verification
+- 建议在清理后重新运行扫描，确认标记已解决或是有意保留。
+- 指出哪些标记应转为正式跟踪的 issue，而不是继续以行内注释形式存在。
 
-## Output Format
+### 5. Output Format
 
-Return:
-- Scope and Assumptions（范围与假设）
-- Schema / Rules / SLO Definitions（规则定义）
-- Implementation Plan（实施计划）
-- Validation and Monitoring（验证与监控）
-- Failure Handling（故障处理）
-- Governance Cadence（治理节奏）
+返回：
+- **Executive Summary**：标记总数与整体债务评估。
+- **Scope**：扫描根目录与文件覆盖范围。
+- **Findings / Plan**：按文件分组，每条包含行号、标记类型、严重程度、内容与建议。
+- **Risk Level**：基于 FIXME 密度与关键发现评定的整体风险。
+- **Recommended Changes**：按优先级排列的清理动作。
+- **Verification Plan**：如何验证清理结果。
+- **Next Steps**：建议立即执行的后续动作。
 
----
+## 用法
 
-## 扫描配置
-
-```yaml
-governance_command:
-  target_type: configuration
-  inputs:
-    - TODO 标记
-    - FIXME 标记
-    - XXX 标记
-  outputs:
-    - 待办清单
-    - 统计报告
-    - 清理建议
-  rules:
-    - pattern: TODO
-      severity: Medium
-    - pattern: FIXME
-      severity: High
-    - pattern: XXX
-      severity: Critical
-  monitoring:
-    - 总数统计
-    - 按文件分组
-    - 优先级排序
-
-scan_config:
-  patterns:
-    - TODO
-    - FIXME
-    - XXX
-  exclude_dirs:
-    - node_modules
-    - .git
-    - .claude
-    - dist
-    - build
-  sort_by: path | priority | date
-  output_format: detailed | summary
+```
+/todo-scan
+/todo-scan services/backend
+/todo-scan --format=summary
 ```
 
----
+## 字段规范
 
-## 执行流程
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `marker_type` | enum | 是 | `TODO` / `FIXME` / `XXX` |
+| `severity` | enum | 是 | `Critical` / `High` / `Medium` / `Low` |
+| `location` | string | 是 | `file:line` 格式 |
+| `content` | string | 是 | 注释中的原始内容 |
+| `recommendation` | string | 是 | 修复或后续处理建议 |
 
-1. 使用 ripgrep 搜索整个项目中包含 TODO/FIXME/XXX 的所有行
-2. 排除不需要搜索的目录（node_modules, .git, .claude, dist, build 等）
-3. 按文件路径排序整理结果
-4. 统计总数，输出结构化清单
-5. 显示文件路径、行号、注释内容
-6. 给出清理建议
-
----
-
-## 强制执行协议
-
-请调用 Skill 工具执行 `common-todo-scan`，并将用户参数原样传入。规范入口：[common-todo-scan Skill](../skills/common-todo-scan/SKILL.md)。
+参考文档：[common-todo-scan Skill](../skills/common-todo-scan/SKILL.md)。

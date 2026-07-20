@@ -53,6 +53,17 @@
 
 ---
 
+## 📁 项目应用指南
+
+前后端详细开发规范与目录约定见 `.claude/projects`：
+
+| 系统 | 指南文件 |
+|------|---------|
+| 前端 H5 | [`.claude/projects/frontend-project-info.md`](.claude/projects/frontend-project-info.md) |
+| 后端 NestJS | [`.claude/projects/backend-project-info.md`](.claude/projects/backend-project-info.md) |
+
+---
+
 ## 🏗️ 系统架构与职责边界
 
 ```
@@ -108,16 +119,5 @@ auth-service (认证) ←→ backend (主业务) ←→ log-service (日志)
 
 ### 构建工具
 - Turborepo 2.4.2（Monorepo 构建优化）
-
----
-
-## 📁 项目应用指南
-
-前后端详细开发规范与目录约定见 `.claude/projects`：
-
-| 系统 | 指南文件 |
-|------|---------|
-| 前端 H5 | [`.claude/projects/frontend-project-info.md`](.claude/projects/frontend-project-info.md) |
-| 后端 NestJS | [`.claude/projects/backend-project-info.md`](.claude/projects/backend-project-info.md) |
 
 ---

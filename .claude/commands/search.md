@@ -13,7 +13,7 @@ description: 智能代码搜索 - 按功能、组件、调用链搜索全栈代�
 |------|----|
 | `subagent_type` | `search-expert` |
 | `description` | 用户的搜索需求 |
-| `prompt` | "搜索需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的搜索工作流程执行。支持前后端全栈代码搜索。" |
+| `prompt` | "搜索需求：$ARGUMENTS\n\n请严格按照你的系统提示词中的搜索工作流程执行。支持前后端全栈代码搜索。" |
 
 ### 🔍 自我验证（执行后确认）
 - [ ] 我使用了 `Agent` 工具进行调用
@@ -80,13 +80,3 @@ Return:
 - Recommended Fix
 - Verification Plan
 - Monitoring / Alerting Additions
-
-## 搜索配置
-
-```yaml
-search_config:
-  search_type: function | component | call_chain | symbol
-  scope: frontend | backend | fullstack
-  include_tests: true | false
-  result_count: 10
-```

@@ -15,8 +15,6 @@ description: 执行预定义的自动化工作流
 
 ## Requirements
 
-$ARGUMENTS
-
 ## Instructions
 
 ### 1. Requirement and Contract Analysis

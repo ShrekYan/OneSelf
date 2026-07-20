@@ -13,7 +13,7 @@ description: NestJS 后端单元测试生成，按照项目规范为 Controller/
 |------|----|
 | `subagent_type` | `nestjs-test-writer` |
 | `description` | 用户的 NestJS 测试生成需求 |
-| `prompt` | "用户需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的测试编写工作流程执行。" |
+| `prompt` | "用户需求：$ARGUMENTS\n\n请严格按照你的系统提示词中的测试编写工作流程执行。" |
 
 ### 🔍 自我验证（执行后确认）
 - [ ] 我使用了 `Agent` 工具进行调用
@@ -65,28 +65,3 @@ $ARGUMENTS
 - CI/CD 集成
 - 回归检查
 - 负责人和定期审查节奏
-
-## Output Format
-
-Return:
-- Executive Summary
-- Scope
-- Tooling / Standards
-- Findings by Severity
-- Remediation Plan
-- Verification Checklist
-- Continuous Governance Recommendations
-
-## 测试框架配置
-
-```yaml
-test_harness:
-  language: typescript
-  framework: jest
-  test_levels:
-    - unit
-    - integration
-    - e2e
-  fixtures: []
-  ci_steps: []
-```

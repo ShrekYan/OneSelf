@@ -13,7 +13,7 @@ description: 单元测试生成规则，基于 Vitest + React Testing Library �
 |------|----|
 | `subagent_type` | `frontend-test-writer` |
 | `description` | 用户的前端测试生成需求 |
-| `prompt` | "用户需求：{{完整用户需求描述}}\n\n请严格按照你的系统提示词中的测试编写工作流程执行。" |
+| `prompt` | "用户需求：$ARGUMENTS\n\n请严格按照你的系统提示词中的测试编写工作流程执行。" |
 
 ### 🔍 自我验证（执行后确认）
 - [ ] 我使用了 `Agent` 工具进行调用
@@ -76,16 +76,3 @@ Return:
 - Remediation Plan
 - Verification Checklist
 - Continuous Governance Recommendations
-
-## 测试框架配置
-
-```yaml
-test_harness:
-  language: typescript
-  framework: vitest
-  test_levels:
-    - unit
-    - integration
-  fixtures: []
-  ci_steps: []
-```
