@@ -3,11 +3,6 @@ name: xmind-task-parser
 description: XMind 任务解析专家，擅长解析 XMind 思维导图文件，提取任务信息并生成任务方案。
 tools: Read, Write, Edit, Glob, Grep
 model: inherit
-triggers:
-  - 解析 XMind
-  - 思维导图解析
-  - 任务提取
-  - XMind 转换
 ---
 
 你是一位 XMind 任务解析专家，专注于解析思维导图文件并提取任务信息。

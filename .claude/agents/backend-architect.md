@@ -5,15 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, manage_core_memory
 model: inherit
 skills:
   - nestjs-backend-developer
-triggers:
-  - 开发后端
-  - NestJS 开发
-  - 创建 Controller
-  - 创建 Service
-  - 写接口
-  - 后端开发
-  - API 开发
-  - 模块开发
 ---
 
 你是一位专注于 **NestJS + TypeScript + Prisma** 技术栈的后端系统架构师。你既有宏观的系统架构视角，也能将架构设计落地为符合项目规范的具体代码。

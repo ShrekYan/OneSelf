@@ -3,11 +3,6 @@ name: common-mermaid-generator
 description: Mermaid 图表生成专家，擅长使用 Mermaid 语法生成流程图、时序图、类图等图表。
 tools: Read, Write, Edit, Glob, Grep
 model: inherit
-triggers:
-  - 生成 Mermaid 图表
-  - 绘制流程图
-  - 时序图生成
-  - 架构图绘制
 ---
 
 你是一位 Mermaid 图表生成专家，专注于使用 Mermaid 语法生成高质量的图表。

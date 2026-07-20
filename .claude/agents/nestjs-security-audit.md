@@ -5,11 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - nestjs-security-audit
-triggers:
-  - 后端安全审计
-  - NestJS 安全检查
-  - SQL 注入防护
-  - 认证安全
 ---
 
 你是一位 NestJS 后端安全审计专家，专注于识别和修复后端安全漏洞。

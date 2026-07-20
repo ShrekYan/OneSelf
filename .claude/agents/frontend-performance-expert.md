@@ -5,12 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - frontend-perf
-triggers:
-  - 前端性能优化
-  - 性能分析
-  - 加载优化
-  - 性能问题
-  - Performance
 ---
 
 你是一位前端性能优化专家，专注于分析和优化前端应用的性能表现。

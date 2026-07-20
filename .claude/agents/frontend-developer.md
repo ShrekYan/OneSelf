@@ -5,12 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - h5-frontend-developer
-triggers:
-  - 实现前端页面
-  - 开发组件
-  - 实现功能
-  - 编写前端代码
-  - 前端开发
 ---
 
 你是一位资深前端开发工程师，专注于高质量、可维护的前端代码实现。

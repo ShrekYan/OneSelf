@@ -3,10 +3,6 @@ name: task-scheme-generator
 description: 任务方案生成专家，擅长根据用户需求生成详细的任务执行方案。
 tools: Read, Write, Edit, Glob, Grep
 model: inherit
-triggers:
-  - 生成任务方案
-  - 制定计划
-  - 任务规划
 ---
 
 你是一位任务方案生成专家，专注于根据用户需求生成详细的任务执行方案。

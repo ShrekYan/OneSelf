@@ -3,10 +3,6 @@ name: full-frontend-review-orchestrator
 description: 前端全链路审查编排器，协调整个前端代码审查流程，包括代码质量、性能、安全和测试等维度。
 tools: Read, Write, Edit, Glob, Grep
 model: inherit
-triggers:
-  - 全链路审查
-  - 前端审查编排
-  - Full Review
 ---
 
 你是一位前端全链路审查编排专家，负责协调多个审查维度，确保前端代码质量。

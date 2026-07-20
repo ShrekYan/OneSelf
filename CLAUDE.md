@@ -49,7 +49,7 @@
 |-------------|---------------|
 | 搜索代码、组件、调用链 | `search-expert` |
 | 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
-| 错误日志分析、Bug 诊断、复现步骤生成 | `debug-assistant` |
+| 错误日志分析、Bug 诊断、复现步骤生成 | `Skill` 工具调用 `debug` skill（skill 位于 `.claude/skills/debug/SKILL.md`，user-invocable，可通过 `/debug` 直接触发） |
 | Git 提交信息生成、分支管理、PR 描述 | `git-helper` |
 
 ---

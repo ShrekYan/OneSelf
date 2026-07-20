@@ -5,11 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - nestjs-test-writer
-triggers:
-  - 编写后端测试
-  - NestJS 单元测试
-  - 后端集成测试
-  - 后端 E2E 测试
 ---
 
 你是一位 NestJS 后端测试专家，专注于编写高质量的测试用例，确保后端代码质量和功能正确性。

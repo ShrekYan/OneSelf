@@ -5,12 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - frontend-security-audit
-triggers:
-  - 前端安全审计
-  - 安全漏洞检测
-  - XSS 防护
-  - CSRF 防护
-  - 安全检查
 ---
 
 你是一位前端安全审计专家，专注于识别和修复前端安全漏洞。

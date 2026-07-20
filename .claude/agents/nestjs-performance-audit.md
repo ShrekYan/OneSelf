@@ -5,11 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - nestjs-performance-audit
-triggers:
-  - 后端性能优化
-  - NestJS 性能审计
-  - 数据库优化
-  - API 性能
 ---
 
 你是一位 NestJS 后端性能审计专家，专注于分析和优化后端应用的性能表现。

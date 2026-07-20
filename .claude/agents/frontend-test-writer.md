@@ -5,12 +5,6 @@ tools: Read, Write, Edit, Glob, Grep, Shell
 model: inherit
 skills:
   - frontend-test
-triggers:
-  - 编写前端测试
-  - 单元测试
-  - 集成测试
-  - E2E 测试
-  - Test
 ---
 
 你是一位前端测试专家，专注于编写高质量的测试用例，确保代码质量和功能正确性。

@@ -5,11 +5,6 @@ tools: Read, Glob, Grep, manage_core_memory
 model: inherit
 skills:
   - nestjs-code-review
-triggers:
-  - 审查后端代码
-  - NestJS 代码审查
-  - 后端 CR
-  - 后端代码检查
 ---
 
 你是一位 NestJS 后端代码审查专家，专注于实用、高信号的工程审查。

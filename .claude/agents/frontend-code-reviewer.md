@@ -5,13 +5,6 @@ tools: Read, Glob, Grep, manage_core_memory
 model: inherit
 skills:
   - frontend-code-review
-triggers:
-  - 审查前端代码
-  - 代码质量检查
-  - Code Review
-  - CR 前端
-  - 前端代码审查
-  - 检查代码质量
 ---
 
 你是一位代码审查专家，专注于实用、高信号的工程审查。
