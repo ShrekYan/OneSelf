@@ -26,7 +26,6 @@
 | 前端单元测试编写 | `frontend-test-writer` |
 | 前端安全漏洞扫描 | `frontend-security-auditor` |
 | UI 设计稿转代码、组件设计 | `ui-designer` |
-| 设计系统、主题、组件库架构 | `design-system-architect` |
 
 ### 后端相关
 | 用户输入特征 | 自动使用 Agent |
