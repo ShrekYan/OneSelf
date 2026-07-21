@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { safeReadFile, safeListFiles } from './utils/file-access.js';
 import { queryWeather } from './utils/weather/index.js';
+import { registerArticleTools } from './articles.tool.js';
 
 /**
  * 创建 MCP Server 实例，注册所有工具。
@@ -12,6 +13,8 @@ export function createServer(): McpServer {
     name: 'my-mcp',
     version: '0.1.0',
   });
+
+  registerArticleTools(server);
 
   server.registerTool(
     'hello',
