@@ -8,7 +8,7 @@
     "stdio": "tsx src/stdio.ts",
     "build": "tsc",
     "start": "node dist/stdio.js",
-    "build-index": "tsx src/scripts/build-index.ts"
+    "build-index": "tsx scripts/build-index.ts"
   },
   "dependencies": {
     "@lancedb/lancedb": "^0.19.1",

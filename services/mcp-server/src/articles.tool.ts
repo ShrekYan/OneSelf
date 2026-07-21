@@ -1,3 +1,5 @@
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Document } from '@langchain/core/documents';
@@ -6,8 +8,11 @@ import { z } from 'zod';
 import { OllamaEmbeddings } from '@langchain/ollama';
 import * as lancedb from '@lancedb/lancedb';
 
+const execAsync = promisify(exec);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_DIR = path.resolve(__dirname, '../data/vector-db');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 const TABLE_NAME = 'articles';
 const TEXT_KEY = 'text';
@@ -30,12 +35,23 @@ function createEmbeddings(): OllamaEmbeddings {
 }
 
 /**
+ * 触发文章索引的增量重建
+ * @returns 命令输出
+ */
+async function rebuildArticleIndex(): Promise<string> {
+  const { stdout, stderr } = await execAsync('npm run build-index', {
+    cwd: PROJECT_ROOT,
+  });
+  return `${stdout}\n${stderr}`.trim();
+}
+
+/**
  * 搜索文章
  * @param query 搜索查询
  * @param topK 返回的文档数量
  * @returns 文档列表
  */
-async function searchArticles(
+export async function searchArticles(
   query: string,
   topK: number,
 ): Promise<Document[]> {
@@ -92,6 +108,38 @@ export function registerArticleTools(server: McpServer) {
           text: `【${r.metadata.title}】\n${r.pageContent}`,
         })),
       };
+    },
+  );
+
+  // 注册重建文章索引工具
+  server.registerTool(
+    'rebuild_article_index',
+    {
+      description: '触发文章向量索引的增量重建，只处理新增或修改过的文章',
+      inputSchema: {},
+    },
+    async () => {
+      try {
+        const output = await rebuildArticleIndex();
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: output || '文章索引重建完成',
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `文章索引重建失败：${message}`,
+            },
+          ],
+        };
+      }
     },
   );
 

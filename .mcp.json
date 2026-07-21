@@ -26,17 +26,11 @@
     },
     "codegraph": {
       "command": "codegraph",
-       "args": [
-        "serve",
-        "--mcp"
-      ]
+      "args": ["serve", "--mcp"]
     },
     "my-mcp": {
       "command": "npx",
-      "args": [
-        "tsx",
-        "/Users/yanjinqiang/WebstormProjects/claude/services/mcp-server/src/stdio.ts"
-      ]
+      "args": ["tsx", "/Users/yanjinqiang/WebstormProjects/claude/services/mcp-server/src/stdio.ts"]
     }
   }
 }
