@@ -5,54 +5,6 @@
 
 ---
 
-## 🤖 Agent 自动触发规则
-
-### 🔐 核心调用机制
-
-当用户输入符合以下特征时，**必须使用 `Agent` 工具调用对应的专属 Agent**，无需用户手动指定。
-
-**调用参数说明**：
-- `description`：简短描述任务内容（3-5 个词）
-- `prompt`：详细的任务描述和需求
-- `subagent_type`：下方表格中列的 Agent 名称
-
-### 前端相关
-| 用户输入特征 | 自动使用 方式 |
-|-------------|---------------|
-| Figma 设计稿转代码、Figma 转 H5 页面/组件、Figma URL 转 React 代码 | `Skill` 工具调用 `figma-to-code` skill（skill 位于 `.claude/skills/figma-to-code/SKILL.md`，user-invocable，可通过 `/figma-to-code` 直接触发） |
-| 开发前端页面、组件、API、Hook | `frontend-developer` |
-| 审查前端代码质量 | `frontend-code-reviewer` |
-| 前端性能问题分析、优化 | `frontend-performance-expert` |
-| 前端单元测试编写 | `frontend-test-writer` |
-| 前端安全漏洞扫描 | `frontend-security-auditor` |
-| UI 设计稿转代码、组件设计 | `ui-designer` |
-
-### 后端相关
-| 用户输入特征 | 自动使用 Agent |
-|-------------|---------------|
-| 开发 NestJS 后端、Controller、Service、Module | `backend-architect` |
-| 审查后端代码质量 | `nestjs-code-review` |
-| 后端性能问题分析、优化 | `nestjs-performance-audit` |
-| 后端单元测试编写 | `nestjs-test-writer` |
-| 后端安全漏洞扫描 | `nestjs-security-audit` |
-| 解析接口文档生成前后端 API 代码 | `api-parser` |
-
-### 架构与跨系统相关
-| 用户输入特征 | 自动使用 Agent |
-|-------------|---------------|
-| 生成架构图、流程图、序列图 | `mermaid-generator` |
-| XMind 思维导图转任务清单、结构化任务解析 | `xmind-task-parser` |
-
-### 通用工具
-| 用户输入特征 | 自动使用 Agent |
-|-------------|---------------|
-| 搜索代码、组件、调用链 | `search-expert` |
-| 全量前端代码审查（质量 + 安全 + 性能） | `full-frontend-review-orchestrator` |
-| 错误日志分析、Bug 诊断、复现步骤生成 | `Skill` 工具调用 `debug` skill（skill 位于 `.claude/skills/debug/SKILL.md`，user-invocable，可通过 `/debug` 直接触发） |
-| Git 提交信息生成、分支管理、PR 描述 | `git-helper` |
-
----
-
 ## 📁 项目应用指南
 
 前后端详细开发规范与目录约定见 `.claude/projects`：
