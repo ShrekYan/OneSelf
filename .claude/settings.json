@@ -20,26 +20,22 @@
       "Bash(npm --version)",
       "Bash(npx tsc --noEmit)"
     ],
-    "deny": [
-      "Bash(rm -rf *)",
-      "Bash(sudo *)",
-      "Bash(curl *)",
-      "Bash(wget *)",
-      "Read(./.env*)",
-      "Read(./secrets/**)",
-      "Read(./**/credentials*)",
-      "Edit(./.env*)",
-      "Edit(./secrets/**)",
-      "WebFetch"
-    ],
-    "ask": [
-      "Bash(git push *)",
-      "Bash(npm install *)"
-    ],
+    "deny": ["Bash(rm -rf *)", "Bash(sudo *)", "Bash(curl *)", "Bash(wget *)", "Read(./.env*)", "Read(./secrets/**)", "Read(./**/credentials*)", "Edit(./.env*)", "Edit(./secrets/**)", "WebFetch"],
+    "ask": ["Bash(git push *)", "Bash(npm install *)"],
     "defaultMode": "acceptEdits"
   },
   "model": "ark-code-latest",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codegraph prompt-hook"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
